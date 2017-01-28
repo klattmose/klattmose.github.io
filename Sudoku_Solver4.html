@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Sudoku Solver 4</title>
+	<link rel="shortcut icon" href="favicon.ico">
+    <style type="text/css">
+        .board input.c{
+            font-size: 15pt;
+            text-align: center;
+        }
+
+        .c{
+            border: 1px black solid;
+            width: 1.2em;
+            height: 1.2em;
+        }
+
+        .v{
+            border-right: 0;
+        }
+
+        .h{
+            border-bottom: 0;
+        }
+		
+		.d{
+			background-color : #E0E0E0;
+		}
+    </style>
+	<script src="jquery.js"></script>
+	<script src="dlxSolver.js"></script>
+    <script type="text/javascript">
+		function solve(){
+			document.getElementById("message").innerHTML = "";
+			var g = [];
+			for(var i = 0; i < 9; i++){
+				var r = [];
+				for(var j = 0; j < 9; j++){
+					var e = document.getElementById("c"+i+j);
+					r.push(e.value);
+				} // End for j
+				g.push(r);
+			} // End for i
+			
+			var r = solve_sudoku(g);
+			if(r > 0){
+				for(var i = 0; i < 9; i++){
+					for(var j = 0; j < 9; j++){
+						var e = document.getElementById("d"+i+j);
+						e.value = g[i][j];
+					} // End for j
+				} // End for i
+				
+				if(r > 1){
+					document.getElementById("message").innerHTML = "more than one solution";
+				} // End if r
+			}
+			else{
+				for(var i = 0; i < 9; i++){
+					for(var j = 0; j < 9; j++){
+						var e = document.getElementById("d"+i+j);
+						e.value = g[i][j];
+					} // End for j
+				} // End for i
+				
+				document.getElementById("message").innerHTML = "no solution";
+			} // End if r
+		}
+		
+		function make(diff){
+			document.getElementById("message").innerHTML = "";
+			var g = [];
+			
+			// first row
+			var p = [1,2,3,4,5,6,7,8,9];
+			var a = [];
+			for(var i = 0; i < 9; i++){
+				var rand = Math.floor(Math.random() * p.length);
+				a[i] = p[rand];
+				p.splice(rand,1);
+			} // End for i
+			g.push(a);
+			
+			// first box
+			var b = []
+			var c = []
+			p = [a[3],a[4],a[5],a[6],a[7],a[8]];
+			for(var i = 0; i < 3; i++){
+				var rand = Math.floor(Math.random() * p.length);
+				b[i] = p[rand];
+				p.splice(rand,1);
+				rand = Math.floor(Math.random() * p.length);
+				c[i] = p[rand];
+				p.splice(rand,1);
+			} // End for i
+			
+			for(var i = 3; i < 9; i++){
+				b[i] = 0;
+				c[i] = 0;
+			} // End for i
+			g.push(b);
+			g.push(c);
+			
+			for(var i = 3; i < 9; i++){
+				var r = [];
+				for(var j = 0; j < 9; j++){
+					r.push(0);
+				} // End for j
+				g.push(r);
+			} // End for i
+			
+			solve_sudoku(g);
+			dig(g,diff);
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					var e = document.getElementById("c" + i + j);
+					var f = $("#c" + i + j);
+					if(g[i][j]){
+						e.value = g[i][j];
+						e.readOnly = true;
+						f.removeClass("d");
+						f.addClass("d");
+					}
+					else{
+						e.value = "";
+						e.readOnly = false;
+						f.removeClass("d");
+					} // End if g[i][j]
+				} // End for j
+			} // End for i
+		} // End function
+		
+		function dig(grid,diff){
+			var choose = [1,2,4,5,7,8];
+			var x1 = Math.floor(Math.random() * 9);
+			var y1 = Math.floor(Math.random() * 9);
+			var xdiff = choose[Math.floor(Math.random() * 6)];
+			var ydiff = choose[Math.floor(Math.random() * 6)];
+			
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					var x = (x1 + 2*i + j*xdiff) % 9;
+					var y = (y1 + j*ydiff) % 9;
+					var temp1 = grid[x][y];
+					if(diff < 3){
+						var temp2 = grid[8-x][8-y];
+						if(diff < 2){
+							var temp3 = grid[8-x][y];
+							var temp4 = grid[x][8-y];
+						}
+					}
+					grid[x][y] = 0;
+					if(diff < 3){
+						grid[8-x][8-y] = 0;
+						if(diff < 2){
+							grid[8-x][y] = 0;
+							grid[x][8-y] = 0;
+						}
+					}
+					
+					if(numSolutions(grid) == 1) continue;
+					
+					grid[x][y] = temp1;
+					if(diff < 3){
+						grid[8-x][8-y] = temp2;
+						if(diff < 2){
+							grid[8-x][y] = temp3;
+							grid[x][8-y] = temp4;
+						}
+					} // End if diff
+				} // End for j
+			} // End for i
+		} // End function
+    </script>
+</head>
+<body>
+
+<div>
+<table>
+    <tr>
+        <td valign="top">
+            <form class="board" autocomplete="off">
+                <table id="iTab" cellspacing="0" cellpadding="0" border="0">
+                </table>
+            </form>
+        </td>
+        <td valign="middle">
+            <input type="button" value="Solve" onclick="javascript:solve()" />
+        </td>
+        <td valign="top">
+            <div class="board">
+                <table id="oTab" cellspacing="0" cellpadding="0">
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+</div>
+
+<script>
+	for(i = 0; i < 10; i++){
+		$("#iTab").append("<tr></tr>");
+		$("#oTab").append("<tr></tr>");
+	}
+	
+	for(i = 0; i < 9; i++){
+		for(j = 0; j < 9; j++){
+			$("#iTab tr").eq(i).append('<td><input class="c v h" id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c v h" id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+			j++;
+			$("#iTab tr").eq(i).append('<td><input class="c v h" id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c v h" id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+			j++;
+			$("#iTab tr").eq(i).append('<td><input class="c   h" id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c   h" id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+		}
+		i++;
+		for(j = 0; j < 9; j++){
+			$("#iTab tr").eq(i).append('<td><input class="c v h" id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c v h" id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+			j++;
+			$("#iTab tr").eq(i).append('<td><input class="c v h" id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c v h" id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+			j++;
+			$("#iTab tr").eq(i).append('<td><input class="c   h" id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c   h" id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+		}
+		i++;
+		for(j = 0; j < 9; j++){
+			$("#iTab tr").eq(i).append('<td><input class="c v  " id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c v  " id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+			j++;
+			$("#iTab tr").eq(i).append('<td><input class="c v  " id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c v  " id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+			j++;
+			$("#iTab tr").eq(i).append('<td><input class="c    " id="c' + i + j + '" maxlength="1" autocomplete="off" /></td>');
+			$("#oTab tr").eq(i).append('<td><input class="c    " id="d' + i + j + '" maxlength="1" readonly="readonly" autocomplete="off" /></td>');
+		}
+	}
+	
+	$("#iTab tr").last().append('<td align="center" colspan="2"><input type="button" value="2" onclick="javascript:make(1)" /></td>');
+	$("#iTab tr").last().append('<td align="center" colspan="2"><input type="button" value="1" onclick="javascript:make(2)" /></td>');
+	$("#iTab tr").last().append('<td align="center" colspan="2"><input type="button" value="0" onclick="javascript:make(3)" /></td>');
+	//$("#iTab tr").last().append('<td/></td>');
+	$("#iTab tr").last().append('<td align="center" colspan="3"><input type="reset" /></td>');
+	$("#oTab tr").last().append('<td align="center" colspan="9" id="message"></td>');
+</script>
+
+</body>
+</html>

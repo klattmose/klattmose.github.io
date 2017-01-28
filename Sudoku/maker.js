@@ -71,6 +71,7 @@ function make(diff){
 		setTimeout(function(i){make(diff)}, 10);
 	} // End if score
 	
+	alert("Made a " + diff + " pussle.");
 } // End function
 
 function switcheroo(grid){

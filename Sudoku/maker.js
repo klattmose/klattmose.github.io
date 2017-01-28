@@ -62,13 +62,16 @@ function make(diff){
 	
 	if(madeGrade == diff){
 		console.log(stringy);
-		if(!numMade[diff]) setTimeout(function(i){make(diff)}, 100);
-		upload(g,diff);
+		//if(!numMade[diff]) setTimeout(function(i){make(diff)}, 100);
+		//upload(g,diff);
 		document.getElementById("message").innerHTML = "";
+		
+		return g;
 	}
 	else{
 		console.log("Iteration    " + madeGrade);
-		setTimeout(function(i){make(diff)}, 10);
+		//setTimeout(function(i){make(diff)}, 10);
+		return make(diff)
 	} // End if score
 	
 } // End function

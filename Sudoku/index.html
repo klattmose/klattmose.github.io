@@ -399,7 +399,9 @@
 			highlighter = false;
 			currDiff = diff;
 			
-			document.getElementById("message").innerHTML = "Generating replacement...";
+			var g = make(diff)
+			
+			/*document.getElementById("message").innerHTML = "Generating replacement...";
 			setTimeout(function(i){make(diff)}, 100);
 			
 			var filePath = fileRoot + diff + "/" + numUsed[diff] + ".json";
@@ -409,7 +411,7 @@
 			xmlhttp.send(null);
 			var fileContent = xmlhttp.responseText;
 			
-			var g = JSON.parse(fileContent);
+			var g = JSON.parse(fileContent);*/
 			if(diff == "Extreme" || diff == "Very Tough") switcheroo(g);
 			for(var i = 0; i < 9; i++){
 				for(var j = 0; j < 9; j++){

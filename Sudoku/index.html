@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Sudoku Puzzler</title>
+	<link rel="shortcut icon" href="favicon.ico">
+    <style type="text/css">
+        .board input.c{
+            font-size: 15pt;
+            text-align: center;
+        }
+		
+        .c{
+            border: 1px black solid;
+            width: 1.2em;
+            height: 1.2em;
+        }
+		
+		.sel{
+			background-color: orange;
+		}
+		
+        .v{
+            border-right: 0;
+        }
+
+        .h{
+            border-bottom: 0;
+        }
+		
+		.win{
+			background-color: green;
+		}
+		
+		.d{
+			background-color : #E0E0E0;
+		}
+		
+		.wrong{
+			background-color: red;
+		}
+
+		.all{
+			background-color : #AAAAAA;
+		}
+
+		.hi{
+			background-color : blue;
+		}
+    </style>
+	<script src="jquery.js"></script>
+	<script src="dlxSolver.js"></script>
+	<script src="maker.js"></script>
+	<script src="grader.js"></script>
+	<script src="timer.js"></script>
+    <script type="text/javascript">
+		var selectedBox = "";
+		var highlighter = false;
+		var currDiff = "";
+		var name = "anonymous";
+		var fileRoot = "http://www-personal.engin.umd.umich.edu/~mklose/Sudoku/";
+		
+		var numUsed = {
+					"Very Easy" : 0,
+					Easy : 0,
+					Medium : 0,
+					Tough : 0,
+					"Very Tough" : 0,
+					Extreme : 0
+		}
+		
+		var numMade = {
+					"Very Easy" : 0,
+					Easy : 0,
+					Medium : 0,
+					Tough : 0,
+					"Very Tough" : 0,
+					Extreme : 0
+		}
+		
+		var isMobile = {
+			Android: function() {
+				return navigator.userAgent.match(/Android/i);
+			},
+			BlackBerry: function() {
+				return navigator.userAgent.match(/BlackBerry/i);
+			},
+			iOS: function() {
+				return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+			},
+			Opera: function() {
+				return navigator.userAgent.match(/Opera Mini/i);
+			},
+			Windows: function() {
+				return navigator.userAgent.match(/IEMobile/i);
+			},
+			any: function() {
+				return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+			}
+		};
+		
+		if(isMobile.any()) document.location = "./m/";
+		
+		function by(property,dir) {
+			return function (a,b) {
+				var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+				return result * dir;
+			}
+		}
+		
+		function solve(){
+			document.getElementById("message").innerHTML = "";
+			var g = [];
+			for(var i = 0; i < 9; i++){
+				var r = [];
+				for(var j = 0; j < 9; j++){
+					var e = document.getElementById("c"+i+j);
+					r.push(e.value);
+				} // End for j
+				g.push(r);
+			} // End for i
+			
+			var r = solve_sudoku(g);
+			if(r > 0){
+				for(var i = 0; i < 9; i++){
+					for(var j = 0; j < 9; j++){
+						var e = document.getElementById("c"+i+j);
+						e.value = g[i][j];
+					} // End for j
+					$("#" + (i+1) + "count").addClass("all");
+					$("#" + (i+1) + "sel").addClass("all");
+					document.getElementById((i+1) + "count").value = 9;
+				} // End for i
+				document.getElementById("0count").value = 0;
+				
+				if(r > 1){
+					document.getElementById("message").innerHTML = "more than one solution";
+				} // End if r
+			}
+			else{
+				for(var i = 0; i < 9; i++){
+					for(var j = 0; j < 9; j++){
+						var e = document.getElementById("c"+i+j);
+						e.value = g[i][j];
+					} // End for j
+					$("#" + (i+1) + "count").addClass("all");
+					$("#" + (i+1) + "sel").addClass("all");
+					document.getElementById((i+1) + "count").value = 9;
+				} // End for i
+				document.getElementById("0count").value = 0;
+				
+				document.getElementById("message").innerHTML = "no solution";
+			} // End if r
+			
+			win(0);
+		}
+		
+		function checkNum(val){
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					$("#c" + i + j).removeClass("wrong");
+				} // End for j
+			} // End for i
+			
+			var selId = selectedBox.id;
+			var x = parseInt(selId.charAt(1));
+			var y = parseInt(selId.charAt(2));
+			
+			for(var i = 0; i < 9; i++){
+				var nx = document.getElementById("c" + x + i);
+				var ny = document.getElementById("c" + i + y);
+				if(nx.value == val){
+					$(nx).addClass("wrong");
+					return 1;
+				} else if(ny.value == val){
+					$(ny).addClass("wrong");
+					return 1;
+				} // End if
+			} // End for i
+			
+			for(var i = x-x%3; i < 3+x-x%3; i++){
+				for(var j = y-y%3; j < 3+y-y%3; j++){
+					var nb = document.getElementById("c" + i + j);
+					if(nb.value == val){
+						$(nb).addClass("wrong");
+						return 1;
+					} // End if
+				} // End for j
+			} // End for i
+			
+			return 0;
+		} // End function
+		
+		function highlight(val){
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					e = document.getElementById("c" + i + j)
+					if(e.value){
+						$(e).addClass("hi");
+						if(e.value == val){
+							high(i,j);
+						} // End if value == val
+					} // End if value
+				} // End for j
+				$("#" + (i+1) + "sel").removeClass("hi");
+			} // End for i
+			
+			$("#" + val + "sel").addClass("hi");
+		} // End function
+		
+		function high(x,y){
+			for(var i = 0; i < 9; i++){
+				var nx = document.getElementById("c" + x + i);
+				var ny = document.getElementById("c" + i + y);
+				$(nx).addClass("hi");
+				$(ny).addClass("hi");
+			} // End for i
+			
+			for(var i = x-x%3; i < 3+x-x%3; i++){
+				for(var j = y-y%3; j < 3+y-y%3; j++){
+					var nb = document.getElementById("c" + i + j);
+					$(nb).addClass("hi");
+				} // End for j
+			} // End for i
+		} // End function
+		
+		function nohigh(){
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					$("#c" + i + j).removeClass("hi");
+				} // End for j
+			} // End for i
+		} // End function
+		
+		function selectC(tag){
+			if(selectedBox)	$(selectedBox).removeClass("sel");
+			selectedBox = tag;
+			nohigh();
+			
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					$("#c" + i + j).removeClass("wrong");
+				} // End for j
+			} // End for i
+			
+			if($(selectedBox).hasClass("d")){
+				selectedBox = "";
+				for(var i = 1; i <= 9; i++){
+					$("#" + i + "sel").removeClass("hi");
+				} // End for i
+				return;
+			}
+			$(selectedBox).addClass("sel");
+		} // End function
+		
+		function selectN(num){
+			nohigh();
+			
+			if(!num){
+				if(selectedBox){
+					var newn = document.getElementById("0count");
+					if($(selectedBox).hasClass("d")) return;
+					
+					if(selectedBox.value){
+						var a = selectedBox.value;
+						var old = document.getElementById(a + "count");
+						if(old.value == 9){
+							$("#" + a + "sel").removeClass("all");
+							$("#" + a + "count").removeClass("all");
+						}
+						old.value = old.value - 1;
+						selectedBox.value = "";
+						newn.value = Number(newn.value) + 1;
+					} // End if selectedBox.value
+					$(selectedBox).removeClass("sel");
+					selectedBox = "";
+				} // End if selectedBox
+				return;
+			} // End if !num
+			
+			if(selectedBox){
+				var newn = document.getElementById(num + "count");
+				if(newn.value == 9){
+					return;
+				} // End if newn.value
+				
+				if(checkNum(num)) return;
+				
+				if($(selectedBox).hasClass("d")) return;
+				if(selectedBox.value){
+					var a = selectedBox.value;
+					var old = document.getElementById(a + "count");
+					if(old.value == 9){
+						$("#" + a + "sel").removeClass("all");
+						$("#" + a + "count").removeClass("all");
+					}
+					old.value = old.value - 1;
+				}
+				else{
+					var old = document.getElementById("0count");
+					old.value = old.value - 1;
+				} // End if selectedBox.value
+				
+				selectedBox.value = num;
+				for(var i = 1; i <= 9; i++){
+					$("#" + i + "sel").removeClass("hi");
+				} // End for i
+				newn.value = Number(newn.value) + 1;
+				
+				if(newn.value == 9){
+					$("#" + num + "sel").addClass("all");
+					$("#" + num + "count").addClass("all");
+				} // End if newn.value
+				
+				$(selectedBox).removeClass("sel");
+			}
+			else{
+				highlight(num);
+				highlighter = true;
+			} // End if selectedBox
+			selectedBox = "";
+			
+			for(var i = 1; i <= 9; i++){
+				if(document.getElementById(i + "count").value != 9) return;
+			} // End for i
+			
+			win(1);
+		} // End function
+		
+		function win(legit){
+			stopTime();
+			document.getElementById("timeline").innerHTML = showTime(playTime);
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					$("#c" + i + j).addClass("win");
+				} // End for j
+			} // End for i
+			
+			var filePath = fileRoot + currDiff + "/leaderboard.json";
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("GET",filePath,false);
+			xmlhttp.send(null);
+			var fileContent = xmlhttp.responseText;
+			var lb = JSON.parse(fileContent);
+			
+			var displayStr = currDiff + ":\n";
+			
+			if(legit && playTime > 60){
+				if(highlighter){
+					filePath = fileRoot + currDiff + "/leaderboardHi.json";
+					xmlhttp = new XMLHttpRequest();
+					xmlhttp.open("GET",filePath,false);
+					xmlhttp.send(null);
+					fileContent = xmlhttp.responseText;
+					lb = JSON.parse(fileContent);
+					
+					if(playTime < lb[4]["time"]){
+						name = prompt("New high score!",name);
+						if(name != "null"){
+							lb[4]["name"] = name;
+							lb[4]["time"] = playTime;
+							lb.sort(by("time",1));
+							upScore(lb,currDiff,true);
+						} // End if name
+					} // End if playTime
+				}
+				else{
+					if(playTime < lb[4]["time"]){
+						name = prompt("New high score!",name);
+						if(name != "null"){
+							lb[4]["name"] = name;
+							lb[4]["time"] = playTime;
+							lb.sort(by("time",1));
+							upScore(lb,currDiff,false);
+						} // End if name
+					} // End if playTime
+				} // End if highlighter
+			} // End if legit
+			
+			for(var i = 0; i < 5; i++) displayStr += (i+1) + ". " + lb[i]["name"] + "       " + showTime(lb[i]["time"]) + "\n";
+			alert(displayStr);
+			
+		} // End function
+		
+		function upScore(lb,diff,hi){
+			var stringy = JSON.stringify(lb);
+			var ext = "";
+			if(hi) ext = "Hi";
+			
+			$.ajax({
+				type: "POST",
+				url: "uploadLeaderboard.php",
+				data: "&lb=" + stringy + "&diff=" + diff + "&hi=" + ext
+			});
+		} // End function
+		
+		function callMake(diff){
+			blankSlate();
+			highlighter = false;
+			currDiff = diff;
+			
+			document.getElementById("message").innerHTML = "Generating replacement...";
+			setTimeout(function(i){make(diff)}, 100);
+			
+			var filePath = fileRoot + diff + "/" + numUsed[diff] + ".json";
+			numUsed[diff]++;
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("GET",filePath,false);
+			xmlhttp.send(null);
+			var fileContent = xmlhttp.responseText;
+			
+			var g = JSON.parse(fileContent);
+			if(diff == "Extreme" || diff == "Very Tough") switcheroo(g);
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					var e = document.getElementById("c" + i + j);
+					var f = $("#c" + i + j);
+					f.removeClass("d");
+					
+					if(g[i][j]){
+						e.value = g[i][j];
+						f.addClass("d");
+					}
+					else{
+						e.value = "";
+					} // End if g[i][j]
+					
+					var h = document.getElementById(g[i][j] + "count");
+					h.value = parseInt(h.value) + 1;
+				} // End for j
+			} // End for i
+			startTimer();
+		} // End function
+    </script>
+</head>
+<body>
+
+<div>
+<table>
+    <tr>
+        <td valign="top">
+            <form class="board" autocomplete="off">
+                <table id="iTab" cellspacing="0" cellpadding="0" border="0">
+                </table>
+            </form>
+        </td>
+        <td valign="top">
+			<table>
+				<tr><td><input type="button" value="Easy" onclick="javascript:callMake('Easy')" /></td></tr>
+				<tr><td><input type="button" value="Medium" onclick="javascript:callMake('Medium')" /></td></tr>
+				<tr><td><input type="button" value="Tough" onclick="javascript:callMake('Tough')" /></td></tr>
+				<tr><td><input type="button" value="Very Tough" onclick="javascript:callMake('Very Tough')" /></td></tr>
+				<tr><td><input type="button" value="Extreme" onclick="javascript:callMake('Extreme')" /></td></tr>
+				<tr><td> &nbsp </td></tr>
+				<tr><td><input type="button" value="Grade" onclick='document.getElementById("message").innerHTML = gradePlay()' /></td></tr>
+				<tr><td><input type="button" value="Reset" onclick="javascript:reset()" /></td></tr>
+				<tr><td><input type="button" value="Solve" onclick="javascript:solve()" /></td></tr>
+				<tr><td><input type="button" value="Clear" onclick="javascript:blankSlate()" /></td></tr>
+			</table>
+        </td>
+    </tr>
+</table>
+</div>
+
+<script>
+	for(i = 0; i < 14; i++) $("#iTab").append("<tr></tr>");
+	var stringBegin = '<td><input class="c ';
+	var cellEnd = '" maxlength="1" onClick="selectC(this)" readonly="true"/></td>';
+	var inpEnd = ' maxlength="1" readonly="true"/></td>';
+	
+	for(i = 0; i < 9; i++){
+		for(j = 0; j < 9; j++){
+			$("#iTab tr").eq(i).append(stringBegin + 'v h" id="c' + i + j + cellEnd);
+			j++;
+			$("#iTab tr").eq(i).append(stringBegin + 'v h" id="c' + i + j + cellEnd);
+			j++;
+			$("#iTab tr").eq(i).append(stringBegin + '  h" id="c' + i + j + cellEnd);
+		}
+		i++;
+		for(j = 0; j < 9; j++){
+			$("#iTab tr").eq(i).append(stringBegin + 'v h" id="c' + i + j + cellEnd);
+			j++;
+			$("#iTab tr").eq(i).append(stringBegin + 'v h" id="c' + i + j + cellEnd);
+			j++;
+			$("#iTab tr").eq(i).append(stringBegin + '  h" id="c' + i + j + cellEnd);
+		}
+		i++;
+		for(j = 0; j < 9; j++){
+			$("#iTab tr").eq(i).append(stringBegin + 'v  " id="c' + i + j + cellEnd);
+			j++;
+			$("#iTab tr").eq(i).append(stringBegin + 'v  " id="c' + i + j + cellEnd);
+			j++;
+			$("#iTab tr").eq(i).append(stringBegin + '   " id="c' + i + j + cellEnd);
+		}
+	}
+	$("#iTab tr").eq(9).append('<td>&nbsp</td>');
+	
+	for(var i = 1; i <= 9; i++){
+		$("#iTab tr").eq(10).append(stringBegin + 'v h" id="' + i + 'sel" value="' + i + '" onClick="selectN(' + i + ')"' + inpEnd);
+		$("#iTab tr").eq(11).append(stringBegin + 'v  " id="' + i + 'count" value=0' + inpEnd);
+	}
+	$("#iTab tr").eq(10).append(stringBegin + '  h" id="0sel" value=" " onClick="selectN(0)"' + inpEnd);
+	$("#iTab tr").eq(11).append(stringBegin + '   " id="0count" value=0' + inpEnd);
+	
+	$("#iTab tr").eq(12).append('<td align="center" colspan="9" id="message"></td>');
+	$("#iTab tr").last().append('<td align="center" colspan="9" id="timeline"></td>');
+	
+	document.body.style.zoom = "200%";
+</script>
+
+</body>
+</html>

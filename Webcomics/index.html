@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Webcomic Reader</title>
+	<link rel="shortcut icon" href="favicon.ico">
+    <style type="text/css">
+        .board input.c{
+            font-size: 15pt;
+            text-align: center;
+        }
+		
+        .c{
+            border: 1px black solid;
+            width: 1.2em;
+            height: 1.2em;
+        }
+		
+		.sel{
+			background-color: orange;
+		}
+		
+        .v{
+            border-right: 0;
+        }
+
+        .h{
+            border-bottom: 0;
+        }
+		
+		.win{
+			background-color: green;
+		}
+		
+		.d{
+			background-color : #E0E0E0;
+		}
+		
+		.wrong{
+			background-color: red;
+		}
+
+		.all{
+			background-color : #AAAAAA;
+		}
+
+		.hi{
+			background-color : blue;
+		}
+    </style>
+	<script src="jquery.js"></script>
+	<script type="text/javascript">
+		var selectedBox = "";
+		var highlighter = false;
+		var currDiff = "";
+		var name = "anonymous";
+		var fileRoot = "https://klattmose.github.io/Sudoku/";
+		
+		function httpGet(theUrl) {
+			var xmlHttp = new XMLHttpRequest();
+			xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+			xmlHttp.send( null );
+			return xmlHttp.responseText;
+		}
+		
+		function refreshPage(url) {
+			var retHtml = httpGet(url);
+			scroll(0,0);
+			document.getElementById("content").innerHTML = retHtml;
+		}
+		
+		function get() {
+			refreshPage(document.getElementById("baseURL").value);
+		}
+		
+		function next() {
+			refreshPage(document.getElementById("nextURL").value);
+		}
+			blankSlate();
+			highlighter = false;
+			currDiff = diff;
+			
+			var g = make(diff)
+			
+			/*document.getElementById("message").innerHTML = "Generating replacement...";
+			setTimeout(function(i){make(diff)}, 100);
+			
+			var filePath = fileRoot + diff + "/" + numUsed[diff] + ".json";
+			numUsed[diff]++;
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("GET",filePath,false);
+			xmlhttp.send(null);
+			var fileContent = xmlhttp.responseText;
+			
+			var g = JSON.parse(fileContent);*/
+			if(diff == "Extreme" || diff == "Very Tough") switcheroo(g);
+			for(var i = 0; i < 9; i++){
+				for(var j = 0; j < 9; j++){
+					var e = document.getElementById("c" + i + j);
+					var f = $("#c" + i + j);
+					f.removeClass("d");
+					
+					if(g[i][j]){
+						e.value = g[i][j];
+						f.addClass("d");
+					}
+					else{
+						e.value = "";
+					} // End if g[i][j]
+					
+					var h = document.getElementById(g[i][j] + "count");
+					h.value = parseInt(h.value) + 1;
+				} // End for j
+			} // End for i
+			startTimer();
+		} // End function
+    </script>
+</head>
+<body>
+
+<div>
+    <div id="baseURLDiv">
+		<input id="baseURL" class="urlInput"/>
+	</div>
+	<div id="interestingItemDiv">
+	</div>
+	<div id="nextItemDiv">
+	</div>
+	<div id="nextURLDiv">
+		<input id="nextURL" class="urlInput"/>
+	</div>
+	<div id="ButtonsDiv">
+		<input type="button" value="Get" onclick="javascript:get()" />
+		<input type="button" value="Next" onclick="javascript:next()" />
+	</div>
+	<hr/>
+	<div id="content">This page requires javascript</div>
+	<div id="ButtonsDiv2">
+		<input type="button" value="Get" onclick="javascript:get()" />
+		<input type="button" value="Next" onclick="javascript:next()" />
+	</div>
+</div>
+
+</body>
+</html>

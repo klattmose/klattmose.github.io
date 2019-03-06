@@ -114,17 +114,6 @@ if (KlattmoseUtilities === undefined) {
 	}
 	
 	AddEvent(window, 'keydown', function(e){
-		if (!Game.OnAscend && Game.AscendTimer == 0)
-		{
-			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
-				{
-					eval(hotkey.script);
-				}
-			}
-		}
-		
 		if(KlattmoseUtilities.waitingForInput){
 			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
 			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
@@ -137,7 +126,17 @@ if (KlattmoseUtilities === undefined) {
 			if(KlattmoseUtilities.validateInput(e.keyCode).length > 0){
 				KlattmoseUtilities.waitingForInput = 0;
 			}
+			
+		} else if (!Game.OnAscend && Game.AscendTimer == 0) {
+			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+				var hotkey = KlattmoseUtilities.config.hotkeys[i];
+				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
+				{
+					eval(hotkey.script);
+				}
+			}
 		}
+		
 	});
 	
 	AddEvent(window, 'keyup', function(e){

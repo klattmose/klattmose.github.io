@@ -60,41 +60,48 @@ if (FortuneCookie === undefined) {
 	Game.Objects["Wizard tower"].minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
 	Game.Objects["Wizard tower"].minigame.magic = FortuneCookie.memoryMagic;
 	
+	
+	for(var i = 0; i < 3; i++){
+		var me;
+		if(i == 0) me = Game.Upgrades["Shimmering veil"];
+		if(i == 1) me = Game.Upgrades["Shimmering veil [off]"];
+		if(i == 2) me = Game.Upgrades["Shimmering veil [on]"];
+		
+		if(typeof me.descFunc != 'undefined') me.oldDescFunc = me.descFunc;
+		me.descFunc = function(){
+			var str;
+			if(this.oldDescFunc === undefined) str = this.desc;
+			else str = this.oldDescFunc();
+			
+			
+			if (Game.Has('Reinforced membrane')){
+				var durable = FortuneCookie.forecastMembrane('click', 0);
+				var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
+				
+				str += '<br/><br/>';
+				var durCount = FortuneCookie.countMembraneDurability('click');
+				var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
+				
+				if(durable)
+					str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==11?'>10':durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==11?'>10':durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				
+				if(golddurable)
+					str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==11?'>10':golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==11?'>10':golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+			}
+			return str;
+		}
+	}
+	
+	
 	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
 	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
 };
 
 
-for(var i = 0; i < 3; i++){
-	var me;
-	if(i == 0) me = Game.Upgrades["Shimmering veil"];
-	if(i == 1) me = Game.Upgrades["Shimmering veil [off]"];
-	if(i == 2) me = Game.Upgrades["Shimmering veil [on]"];
-	
-	me.descFunc = function(){
-		var str = this.desc;
-		
-		if (Game.Has('Reinforced membrane')){
-			var durable = FortuneCookie.forecastMembrane('click', 0);
-			var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
-			
-			str += '<br/><br/>';
-			var durCount = FortuneCookie.countMembraneDurability('click');
-			var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
-			
-			if(durable)
-				str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==11?'>10':durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-			else
-				str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==11?'>10':durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-			
-			if(golddurable)
-				str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==11?'>10':golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
-			else
-				str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==11?'>10':golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
-		}
-		return str;
-	}
-}
 
 FortuneCookie.forecastMembrane = function(context, offset){
 	if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + offset));

@@ -83,14 +83,14 @@ if (FortuneCookie === undefined) {
 				var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
 				
 				if(durable)
-					str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==11?'>10':durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+					str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
 				else
-					str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==11?'>10':durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+					str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
 				
 				if(golddurable)
-					str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==11?'>10':golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+					str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
 				else
-					str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==11?'>10':golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+					str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
 			}
 			return str;
 		}
@@ -118,10 +118,10 @@ FortuneCookie.countMembraneDurability = function(context){
 	var i;
 	var initialSuccess = FortuneCookie.forecastMembrane(context, 0);
 	
-	for(i = 1; i < 11; i++){
+	for(i = 1; i <= FortuneCookie.config.spellForecastLength; i++){
 		if(FortuneCookie.forecastMembrane(context, i) != initialSuccess) return i;
 	}
-	return 11;
+	return -1;
 }
 
 FortuneCookie.setForecastLength = function(length){

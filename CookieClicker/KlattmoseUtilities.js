@@ -37,7 +37,7 @@ if (KlattmoseUtilities === undefined) {
 			  "ctrl": false,
 			  "shift": false,
 			  "alt": false,
-			  "script": "if(Game.Objects[\"Wizard tower\"].amount > 40){Game.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - 40);}"
+			  "script": "var temp = Game.Objects[\"Wizard tower\"].minigame.magic;\nvar lvl=Math.max(Game.Objects[\"Wizard tower\"].level,1);\nfor(var i = 1; i < Game.Objects[\"Wizard tower\"].amount; i++){\n\tif(temp <= Math.floor(4+Math.pow(i,0.6)+Math.log((i+(lvl-1)*10)/15+1)*15)) \n\t\tGame.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - i);\n}"
 			},
 			{
 			  "keyCode": 52,

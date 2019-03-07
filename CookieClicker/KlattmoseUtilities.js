@@ -62,6 +62,14 @@ if (KlattmoseUtilities === undefined) {
 			  "shift": false,
 			  "alt": false,
 			  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
+			},
+			{
+			  "keyCode": 55,
+			  "nickname": "Pantheon Fix",
+			  "ctrl": false,
+			  "shift": false,
+			  "alt": false,
+			  "script": "var M = Game.Objects[\"Temple\"].minigame;\nM.slot = [M.slot[0], M.slot[1], M.slot[2]];"
 			}
 		  ]
 		}

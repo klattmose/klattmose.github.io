@@ -104,7 +104,6 @@ FortuneCookie.ReplaceNativeGrimoire = function() {
 	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
 		var M = Game.Objects['Wizard tower'].minigame;
 		
-		var cmActive = (typeof CM)!="undefined";
 		eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
 			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
 					FortuneCookie.spellForecast(me) + 

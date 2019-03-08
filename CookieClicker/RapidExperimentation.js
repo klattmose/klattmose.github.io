@@ -361,7 +361,9 @@ FortuneCookie.spellForecast=function(spell){
 				}else{
 					var gfdSpell = choose(spells);
 					var gfdBackfire = M.getFailChance(gfdSpell);
-					gfdBackfire = FortuneCookie.detectKUGamblerPatch() ? (gfdBackfire * 2) : Math.max(gfdBackfire, 0.5);
+					
+					if(FortuneCookie.detectKUGamblerPatch()) gfdBackfire *= 2;
+					else gfdBackfire = Math.max(gfdBackfire, 0.5);
 					
 					Math.seedrandom(Game.seed + '/' + (spellsCast + 1));
 					if(Math.random() < (1 - gfdBackfire)){

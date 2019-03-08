@@ -115,12 +115,14 @@ FortuneCookie.ReplaceNativeGrimoire = function() {
 		FortuneCookie.memorySpellsCast = minigame.spellsCast;
 		FortuneCookie.memorySpellTotal = minigame.spellsCastTotal;
 		FortuneCookie.memoryMagic = minigame.magic;
+		FortuneCookie.memoryGamblerWin = minigame.spells['gambler\'s fever dream'].win;
 		
 		minigame.launch();
 		
 		minigame.spellsCast = FortuneCookie.memorySpellsCast;
 		minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
 		minigame.magic = FortuneCookie.memoryMagic;
+		minigame.spells['gambler\'s fever dream'].win = FortuneCookie.memoryGamblerWin;
 		
 		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
 	}

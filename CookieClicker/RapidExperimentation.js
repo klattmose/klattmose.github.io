@@ -1,5 +1,5 @@
 Game.Win('Third-party');
-if (FortuneCookie === undefined) {
+//if (FortuneCookie === undefined) {
 	var FortuneCookie = {};
 	FortuneCookie.config = {};
 	FortuneCookie.config.spellForecastLength = 10;
@@ -118,7 +118,7 @@ if (FortuneCookie === undefined) {
 	
 	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
 	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
-};
+//};
 
 
 

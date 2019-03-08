@@ -26,7 +26,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
-		  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
+		  "script": "Game.Objects[\"Mine\"].sell(300); Game.Objects[\"Mine\"].buy(300);"
 		},
 		{
 		  "keyCode": 51,
@@ -59,11 +59,19 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "shift": false,
 		  "alt": false,
 		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
+		},
+		{
+		  "keyCode": 55,
+		  "nickname": "Collect Wrinklers",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.CollectWrinklers();"
 		}
 	  ],
 	  "patches": {
-		slotGodFix: 0,
-		gamblersFeverDreamFix: 0
+		"gamblersFeverDreamFix": 1,
+		"slotGodFix": 1
 	  }
 	}
 }

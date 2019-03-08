@@ -1,38 +1,19 @@
 Game.Win('Third-party');
-//if (FortuneCookie === undefined) {
-	var FortuneCookie = {};
-	FortuneCookie.config = {};
-	FortuneCookie.config.spellForecastLength = 10;
-	FortuneCookie.ConfigPrefix = "FortuneCookie";
-	
-	FortuneCookie.saveConfig = function(config){
-		localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
-	}
+var FortuneCookie = {};
 
-	FortuneCookie.loadConfig = function(){
-		if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
-			FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
-		}
-	}
-	
+FortuneCookie.Backup = {};
+FortuneCookie.config = {};
+FortuneCookie.config.spellForecastLength = 10;
+FortuneCookie.ConfigPrefix = "FortuneCookie";
+
+FortuneCookie.init = function(){
 	FortuneCookie.loadConfig();
 	
-	var wiz = Game.Objects["Wizard tower"];
-	// Loading fails if the Grimoire is not yet unlocked
-	if(!wiz.minigameLoaded){
-		wiz.minigameLoading=true;
-		setTimeout(function(wiz){return function(){
-			var script=document.createElement('script');
-			script.id='minigameScript-'+wiz.id;
-			Game.scriptBindings['minigameScript-'+wiz.id]=wiz;
-			script.setAttribute('src',wiz.minigameUrl+'?r='+Game.version);
-			script.onload=function(wiz,script){return function(){
-				if (!wiz.minigameLoaded) Game.scriptLoaded(wiz,script);
-			}}(wiz,'minigameScript-'+wiz.id);
-			document.head.appendChild(script);
-		}}(wiz),10);
+	FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
+	Game.scriptLoaded = function(who, script) {
+		FortuneCookie.Backup.scriptLoaded(who, script);
+		FortuneCookie.ReplaceNativeGrimoire();
 	}
-	
 	
 	FortuneCookie.oldUpdateMenu = Game.UpdateMenu;
 	Game.UpdateMenu = function(){
@@ -61,24 +42,7 @@ Game.Win('Third-party');
 		}
 	}
 	
-	var cmActive = (typeof CM)!="undefined";
-	eval((cmActive ? ("CM.Backup.GrimoireLaunchMod = " + CM.Backup.GrimoireLaunchMod.toString()) : ("Game.ObjectsById[7].minigame.launch = " + Game.ObjectsById[7].minigame.launch.toString()))
-		.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
-				FortuneCookie.spellForecast(me) + 
-				$1`
-		)
-	);
-	
-	FortuneCookie.memorySpellsCast = wiz.minigame.spellsCast;
-	FortuneCookie.memorySpellTotal = wiz.minigame.spellsCastTotal;
-	FortuneCookie.memoryMagic = wiz.minigame.magic;
-	
-	Game.ObjectsById[7].minigame.launch();
-	
-	wiz.minigame.spellsCast = FortuneCookie.memorySpellsCast;
-	wiz.minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
-	wiz.minigame.magic = FortuneCookie.memoryMagic;
-	
+	FortuneCookie.ReplaceNativeGrimoire();
 	
 	for(var i = 0; i < 3; i++){
 		var me;
@@ -115,12 +79,46 @@ Game.Win('Third-party');
 		}
 	}
 	
-	
 	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
 	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
-//};
+}
 
 
+FortuneCookie.saveConfig = function(config){
+	localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
+}
+
+FortuneCookie.loadConfig = function(){
+	if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
+		FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
+	}
+}
+
+FortuneCookie.ReplaceNativeGrimoire = function() {
+	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
+		var minigame = Game.Objects['Wizard tower'].minigame;
+		
+		var cmActive = (typeof CM)!="undefined";
+		eval((cmActive ? ("CM.Backup.GrimoireLaunchMod = " + CM.Backup.GrimoireLaunchMod.toString()) : ("Game.ObjectsById[7].minigame.launch = " + minigame.launch.toString()))
+			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
+					FortuneCookie.spellForecast(me) + 
+					$1`
+			)
+		);
+		
+		FortuneCookie.memorySpellsCast = minigame.spellsCast;
+		FortuneCookie.memorySpellTotal = minigame.spellsCastTotal;
+		FortuneCookie.memoryMagic = minigame.magic;
+		
+		minigame.launch();
+		
+		minigame.spellsCast = FortuneCookie.memorySpellsCast;
+		minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
+		minigame.magic = FortuneCookie.memoryMagic;
+		
+		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
+	}
+}
 
 FortuneCookie.forecastMembrane = function(context, offset){
 	if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + offset));
@@ -399,3 +397,6 @@ FortuneCookie.spellForecast=function(spell){
 	}
 	return spellOutcome;
 }
+
+
+FortuneCookie.init();

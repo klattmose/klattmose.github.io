@@ -1,85 +1,17 @@
 Game.Win('Third-party');
-if (KlattmoseUtilities === undefined) {
+if(KlattmoseUtilities === undefined) {
 	var KlattmoseUtilities = {};
 	
-	KlattmoseUtilities.saveConfig = function(config){
-		localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
-	}
-	
-	KlattmoseUtilities.loadConfig = function(){
-		if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
-			KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
-		}
-	}
-	
-	KlattmoseUtilities.restoreDefaultConfig = function(mode){
-		KlattmoseUtilities.config = {
-		  "hotkeys": [
-			{
-			  "keyCode": 49,
-			  "nickname": "Quickload",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "Game.LoadSave();"
-			},
-			{
-			  "keyCode": 50,
-			  "nickname": "Godzamok",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
-			},
-			{
-			  "keyCode": 51,
-			  "nickname": "Dump Wizards",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "var temp = Game.Objects[\"Wizard tower\"].minigame.magic;\nvar lvl=Math.max(Game.Objects[\"Wizard tower\"].level,1);\nfor(var i = 1; i < Game.Objects[\"Wizard tower\"].amount; i++){\n\tif(temp <= Math.floor(4+Math.pow(i,0.6)+Math.log((i+(lvl-1)*10)/15+1)*15)) \n\t\tGame.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - i);\n}"
-			},
-			{
-			  "keyCode": 52,
-			  "nickname": "Toggle Autoclicker",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "if(KlattmoseUtilities.autoClickerActive === undefined || KlattmoseUtilities.autoClickerActive == false){\n\tKlattmoseUtilities.autoClicker = setInterval(Game.ClickCookie, 10);\n\tKlattmoseUtilities.autoClickerActive = true;\n\tGame.Notify('Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoClicker);\n\tKlattmoseUtilities.autoClickerActive = false;\n\tGame.Notify('Autoclicker Off', '', '', 1, 1);\n}"
-			},
-			{
-			  "keyCode": 53,
-			  "nickname": "Toggle Golden Autoclicker",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "if(KlattmoseUtilities.autoGoldenClickerActive === undefined || KlattmoseUtilities.autoGoldenClickerActive == false){\n\tKlattmoseUtilities.autoGoldenClicker = setInterval(function() { Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } }) }, 500);\n\tKlattmoseUtilities.autoGoldenClickerActive = true;\n\tGame.Notify('Golden Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoGoldenClicker);\n\tKlattmoseUtilities.autoGoldenClickerActive = false;\n\tGame.Notify('Golden Autoclicker Off', '', '', 1, 1);\n}"
-			},
-			{
-			  "keyCode": 54,
-			  "nickname": "Sugar Lump Appraisal",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
-			},
-			{
-			  "keyCode": 55,
-			  "nickname": "Pantheon Fix",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "var M = Game.Objects[\"Temple\"].minigame;\nM.slot = [M.slot[0], M.slot[1], M.slot[2]];"
-			}
-		  ]
-		}
-		if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-	}
-	
-	KlattmoseUtilities.restoreDefaultConfig(1);
 	KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
 	KlattmoseUtilities.waitingForInput = 0;
 	
+	KlattmoseUtilities.toLoad = 1;
+}
+
+KlattmoseUtilities.init = function(){
+	KlattmoseUtilities.toLoad = 0;
+	
+	KlattmoseUtilities.restoreDefaultConfig(1);
 	KlattmoseUtilities.loadConfig();
 	
 	KlattmoseUtilities.oldUpdateMenu = Game.UpdateMenu;
@@ -164,6 +96,76 @@ if (KlattmoseUtilities === undefined) {
 	else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
 }
 
+
+KlattmoseUtilities.saveConfig = function(config){
+	localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
+}
+
+KlattmoseUtilities.loadConfig = function(){
+	if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
+		KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
+	}
+}
+
+KlattmoseUtilities.restoreDefaultConfig = function(mode){
+	KlattmoseUtilities.config = {
+	  "hotkeys": [
+		{
+		  "keyCode": 49,
+		  "nickname": "Quickload",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.LoadSave();"
+		},
+		{
+		  "keyCode": 50,
+		  "nickname": "Godzamok",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
+		},
+		{
+		  "keyCode": 51,
+		  "nickname": "Dump Wizards",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "var temp = Game.Objects[\"Wizard tower\"].minigame.magic;\nvar lvl=Math.max(Game.Objects[\"Wizard tower\"].level,1);\nfor(var i = 1; i < Game.Objects[\"Wizard tower\"].amount; i++){\n\tif(temp <= Math.floor(4+Math.pow(i,0.6)+Math.log((i+(lvl-1)*10)/15+1)*15)) \n\t\tGame.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - i);\n}"
+		},
+		{
+		  "keyCode": 52,
+		  "nickname": "Toggle Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "if(KlattmoseUtilities.autoClickerActive === undefined || KlattmoseUtilities.autoClickerActive == false){\n\tKlattmoseUtilities.autoClicker = setInterval(Game.ClickCookie, 10);\n\tKlattmoseUtilities.autoClickerActive = true;\n\tGame.Notify('Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoClicker);\n\tKlattmoseUtilities.autoClickerActive = false;\n\tGame.Notify('Autoclicker Off', '', '', 1, 1);\n}"
+		},
+		{
+		  "keyCode": 53,
+		  "nickname": "Toggle Golden Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "if(KlattmoseUtilities.autoGoldenClickerActive === undefined || KlattmoseUtilities.autoGoldenClickerActive == false){\n\tKlattmoseUtilities.autoGoldenClicker = setInterval(function() { Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } }) }, 500);\n\tKlattmoseUtilities.autoGoldenClickerActive = true;\n\tGame.Notify('Golden Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoGoldenClicker);\n\tKlattmoseUtilities.autoGoldenClickerActive = false;\n\tGame.Notify('Golden Autoclicker Off', '', '', 1, 1);\n}"
+		},
+		{
+		  "keyCode": 54,
+		  "nickname": "Sugar Lump Appraisal",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
+		}
+	  ]
+	}
+	if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+	
+	
+	
+
 KlattmoseUtilities.EditHotkey = function(i){
 	if(i < KlattmoseUtilities.config.hotkeys.length){
 		KlattmoseUtilities.tempHotkey = JSON.parse(JSON.stringify(KlattmoseUtilities.config.hotkeys[i]));
@@ -231,3 +233,6 @@ KlattmoseUtilities.validateInput = function(keyCode){
 	if(keyCode > 111 && keyCode < 124) return 'F' + (keyCode - 111);
 	return '';
 }
+
+
+if(KlattmoseUtilities.toLoad) KlattmoseUtilities.init();

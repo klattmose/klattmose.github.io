@@ -102,27 +102,15 @@ FortuneCookie.loadConfig = function(){
 
 FortuneCookie.ReplaceNativeGrimoire = function() {
 	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
-		var minigame = Game.Objects['Wizard tower'].minigame;
+		var M = Game.Objects['Wizard tower'].minigame;
 		
 		var cmActive = (typeof CM)!="undefined";
-		eval((cmActive ? ("CM.Backup.GrimoireLaunchMod = " + CM.Backup.GrimoireLaunchMod.toString()) : ("Game.ObjectsById[7].minigame.launch = " + minigame.launch.toString()))
+		eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
 			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
 					FortuneCookie.spellForecast(me) + 
 					$1`
 			)
 		);
-		
-		FortuneCookie.memorySpellsCast = minigame.spellsCast;
-		FortuneCookie.memorySpellTotal = minigame.spellsCastTotal;
-		FortuneCookie.memoryMagic = minigame.magic;
-		FortuneCookie.memoryGamblerWin = minigame.spells['gambler\'s fever dream'].win;
-		
-		minigame.launch();
-		
-		minigame.spellsCast = FortuneCookie.memorySpellsCast;
-		minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
-		minigame.magic = FortuneCookie.memoryMagic;
-		minigame.spells['gambler\'s fever dream'].win = FortuneCookie.memoryGamblerWin;
 		
 		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
 	}

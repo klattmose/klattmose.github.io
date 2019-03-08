@@ -1,24 +1,25 @@
 Game.Win('Third-party');
-if (FortuneCookie === undefined) {
+if(FortuneCookie === undefined){
 	var FortuneCookie = {};
+	
+	FortuneCookie.Backup = {};
 	FortuneCookie.config = {};
 	FortuneCookie.config.spellForecastLength = 10;
 	FortuneCookie.ConfigPrefix = "FortuneCookie";
 	
-	FortuneCookie.saveConfig = function(config){
-		localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
-	}
+	FortuneCookie.toLoad = 1;
+}
 
-	FortuneCookie.loadConfig = function(){
-		if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
-			FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
-		}
-	}
-	
+
+FortuneCookie.init = function(){
+	FortuneCookie.toLoad = 0;
 	FortuneCookie.loadConfig();
-	FortuneCookie.memorySpellsCast = Game.Objects["Wizard tower"].minigame.spellsCast;
-	FortuneCookie.memorySpellTotal = Game.Objects["Wizard tower"].minigame.spellsCastTotal;
-	FortuneCookie.memoryMagic = Game.Objects["Wizard tower"].minigame.magic;
+	
+	FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
+	Game.scriptLoaded = function(who, script) {
+		FortuneCookie.Backup.scriptLoaded(who, script);
+		FortuneCookie.ReplaceNativeGrimoire();
+	}
 	
 	FortuneCookie.oldUpdateMenu = Game.UpdateMenu;
 	Game.UpdateMenu = function(){
@@ -47,19 +48,7 @@ if (FortuneCookie === undefined) {
 		}
 	}
 	
-	var cmActive = (typeof CM)!="undefined";
-	eval((cmActive ? ("CM.Backup.GrimoireLaunchMod = " + CM.Backup.GrimoireLaunchMod.toString()) : ("Game.ObjectsById[7].minigame.launch = " + Game.ObjectsById[7].minigame.launch.toString()))
-		.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
-				FortuneCookie.spellForecast(me) + 
-				$1`
-		)
-	);
-	Game.ObjectsById[7].minigame.launch();
-	
-	Game.Objects["Wizard tower"].minigame.spellsCast = FortuneCookie.memorySpellsCast;
-	Game.Objects["Wizard tower"].minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
-	Game.Objects["Wizard tower"].minigame.magic = FortuneCookie.memoryMagic;
-	
+	FortuneCookie.ReplaceNativeGrimoire();
 	
 	for(var i = 0; i < 3; i++){
 		var me;
@@ -96,12 +85,46 @@ if (FortuneCookie === undefined) {
 		}
 	}
 	
-	
 	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
 	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
-};
+}
 
 
+FortuneCookie.saveConfig = function(config){
+	localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
+}
+
+FortuneCookie.loadConfig = function(){
+	if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
+		FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
+	}
+}
+
+FortuneCookie.ReplaceNativeGrimoire = function() {
+	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
+		var minigame = Game.Objects['Wizard tower'].minigame;
+		
+		var cmActive = (typeof CM)!="undefined";
+		eval((cmActive ? ("CM.Backup.GrimoireLaunchMod = " + CM.Backup.GrimoireLaunchMod.toString()) : ("Game.ObjectsById[7].minigame.launch = " + minigame.launch.toString()))
+			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
+					FortuneCookie.spellForecast(me) + 
+					$1`
+			)
+		);
+		
+		FortuneCookie.memorySpellsCast = minigame.spellsCast;
+		FortuneCookie.memorySpellTotal = minigame.spellsCastTotal;
+		FortuneCookie.memoryMagic = minigame.magic;
+		
+		minigame.launch();
+		
+		minigame.spellsCast = FortuneCookie.memorySpellsCast;
+		minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
+		minigame.magic = FortuneCookie.memoryMagic;
+		
+		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
+	}
+}
 
 FortuneCookie.forecastMembrane = function(context, offset){
 	if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + offset));
@@ -258,7 +281,7 @@ FortuneCookie.spellForecast=function(spell){
 	var spellOutcome = '<div width="100%"><b>Forecast:</b><br/>';
 	var M = Game.Objects["Wizard tower"].minigame;
 	var backfire = M.getFailChance(spell);
-	var spellsCast = Game.Objects["Wizard tower"].minigame.spellsCastTotal;
+	var spellsCast = M.spellsCastTotal;
 	var target = spellsCast + FortuneCookie.config.spellForecastLength;
 	var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0) + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
 	
@@ -380,3 +403,6 @@ FortuneCookie.spellForecast=function(spell){
 	}
 	return spellOutcome;
 }
+
+
+if(FortuneCookie.toLoad) FortuneCookie.init();

@@ -1,28 +1,39 @@
 Game.Win('Third-party');
-var FortuneCookie = {};
-
-FortuneCookie.Backup = {};
-FortuneCookie.config = {};
-FortuneCookie.config.spellForecastLength = 10;
-FortuneCookie.ConfigPrefix = "FortuneCookie";
-
-FortuneCookie.init = function(){
-	FortuneCookie.loadConfig();
+if(KlattmoseUtilities === undefined) {
+	var KlattmoseUtilities = {};
 	
-	FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
-	Game.scriptLoaded = function(who, script) {
-		FortuneCookie.Backup.scriptLoaded(who, script);
-		FortuneCookie.ReplaceNativeGrimoire();
-	}
+	KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
+	KlattmoseUtilities.waitingForInput = 0;
 	
-	FortuneCookie.oldUpdateMenu = Game.UpdateMenu;
+	KlattmoseUtilities.toLoad = 1;
+}
+
+KlattmoseUtilities.init = function(){
+	KlattmoseUtilities.toLoad = 0;
+	
+	KlattmoseUtilities.restoreDefaultConfig(1);
+	KlattmoseUtilities.loadConfig();
+	
+	KlattmoseUtilities.oldUpdateMenu = Game.UpdateMenu;
 	Game.UpdateMenu = function(){
-		FortuneCookie.oldUpdateMenu();
+		KlattmoseUtilities.oldUpdateMenu();
 		if(Game.onMenu === 'prefs') {
-			var str = '<div class="title">Fortune Cookie</div>' +
-					  '<div class="listing">'+
-					  Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
-					  '</div>';
+			var str =	'<div class="title">Klattmose Utilities</div>' + 
+						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
+											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>';
+			
+			
+			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+				var hotkey = KlattmoseUtilities.config.hotkeys[i];
+				str +=	'<div class="listing">' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+						'</div>';
+			}
+			
+			str += '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>'
 			
 			var div = document.createElement('div');
 			div.innerHTML = str;
@@ -42,361 +53,186 @@ FortuneCookie.init = function(){
 		}
 	}
 	
-	FortuneCookie.ReplaceNativeGrimoire();
-	
-	for(var i = 0; i < 3; i++){
-		var me;
-		if(i == 0) me = Game.Upgrades["Shimmering veil"];
-		if(i == 1) me = Game.Upgrades["Shimmering veil [off]"];
-		if(i == 2) me = Game.Upgrades["Shimmering veil [on]"];
-		
-		if(typeof me.descFunc != 'undefined') me.oldDescFunc = me.descFunc;
-		me.descFunc = function(){
-			var str;
-			if(this.oldDescFunc === undefined) str = this.desc;
-			else str = this.oldDescFunc();
+	AddEvent(window, 'keydown', function(e){
+		if(KlattmoseUtilities.waitingForInput){
+			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
+			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
+			KlattmoseUtilities.tempHotkey.alt = e.altKey;
+			KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
 			
+			var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
 			
-			if (Game.Has('Reinforced membrane')){
-				var durable = FortuneCookie.forecastMembrane('click', 0);
-				var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
-				
-				str += '<br/><br/>';
-				var durCount = FortuneCookie.countMembraneDurability('click');
-				var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
-				
-				if(durable)
-					str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-				else
-					str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-				
-				if(golddurable)
-					str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
-				else
-					str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+			l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
+			if(KlattmoseUtilities.validateInput(e.keyCode).length > 0){
+				KlattmoseUtilities.waitingForInput = 0;
 			}
-			return str;
+			
+		} else if (!Game.OnAscend && Game.AscendTimer == 0) {
+			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+				var hotkey = KlattmoseUtilities.config.hotkeys[i];
+				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
+				{
+					eval(hotkey.script);
+				}
+			}
 		}
-	}
+		
+	});
 	
-	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
-	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
-}
-
-
-FortuneCookie.saveConfig = function(config){
-	localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
-}
-
-FortuneCookie.loadConfig = function(){
-	if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
-		FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
-	}
-}
-
-FortuneCookie.ReplaceNativeGrimoire = function() {
-	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
-		var minigame = Game.Objects['Wizard tower'].minigame;
-		
-		var cmActive = (typeof CM)!="undefined";
-		eval((cmActive ? ("CM.Backup.GrimoireLaunchMod = " + CM.Backup.GrimoireLaunchMod.toString()) : ("Game.ObjectsById[7].minigame.launch = " + minigame.launch.toString()))
-			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
-					FortuneCookie.spellForecast(me) + 
-					$1`
-			)
-		);
-		
-		FortuneCookie.memorySpellsCast = minigame.spellsCast;
-		FortuneCookie.memorySpellTotal = minigame.spellsCastTotal;
-		FortuneCookie.memoryMagic = minigame.magic;
-		
-		minigame.launch();
-		
-		minigame.spellsCast = FortuneCookie.memorySpellsCast;
-		minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
-		minigame.magic = FortuneCookie.memoryMagic;
-		
-		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
-	}
-}
-
-FortuneCookie.forecastMembrane = function(context, offset){
-	if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + offset));
-	else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
+	AddEvent(window, 'keyup', function(e){
+		if(KlattmoseUtilities.waitingForInput){
+			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
+			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
+			KlattmoseUtilities.tempHotkey.alt = e.altKey;
+			KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
+			
+			var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
+			
+			l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
+		}
+	});
 	
-	if (Math.random() < 0.1){
-		return true;
-	} else {
-		return false;
+	if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');
+	else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
+}
+
+
+KlattmoseUtilities.saveConfig = function(config){
+	localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
+}
+
+KlattmoseUtilities.loadConfig = function(){
+	if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
+		KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
 	}
 }
 
-FortuneCookie.countMembraneDurability = function(context){
-	var i;
-	var initialSuccess = FortuneCookie.forecastMembrane(context, 0);
-	
-	for(i = 1; i <= FortuneCookie.config.spellForecastLength; i++){
-		if(FortuneCookie.forecastMembrane(context, i) != initialSuccess) return i;
-	}
-	return -1;
-}
-
-FortuneCookie.setForecastLength = function(length){
-	FortuneCookie.config.spellForecastLength = length;
-	FortuneCookie.saveConfig(FortuneCookie.config);
-}
-
-FortuneCookie.FateChecker = function(spellCount, idx, backfire){
-	var res = '';
-	var FTHOFcookie = '';
-	Math.seedrandom(Game.seed + '/' + spellCount);
-	roll = Math.random();
-	
-	if(roll < (1 - backfire)){
-		/* Random is called a few times in setting up the golden cookie */
-		if (idx > 0) Math.random();
-		if (idx > 1) Math.random();
-		Math.random();
-		Math.random();
-		
-		var choices = [];
-		choices.push('Frenzy','Lucky');
-		if (!Game.hasBuff('Dragonflight')) choices.push('Click Frenzy');
-		if (Math.random() < 0.1) choices.push('Cookie Storm','Cookie Storm','Blab');
-		if (Game.BuildingsOwned >= 10 && Math.random() < 0.25) choices.push('Building Special');
-		if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
-		if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
-		
-		FTHOFcookie = choose(choices);
-		res = '<span class="green">' + FTHOFcookie + '</span><br/>';
-		
-	} else {
-		/* Random is called a few times in setting up the golden cookie */
-		if (idx > 0) Math.random();
-		if (idx > 1) Math.random();
-		Math.random();
-		Math.random();
-		
-		var choices = [];
-		choices.push('Clot','Ruin');
-		if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
-		if (Math.random() < 0.003) choices.push('Free Sugar Lump');
-		if (Math.random() < 0.1) choices=['Blab'];
-		
-		FTHOFcookie = choose(choices);
-		res = '<span class="red">' + FTHOFcookie + '</span><br/>';
-		
-	}
-	
-	if(FTHOFcookie == 'Free Sugar Lump') res = '<span style="color:#DAA520;">' + FTHOFcookie + '</span><br/>';
-	return '<td>' + res + '</td>';
-}
-
-FortuneCookie.gamblerFateChecker = function(spellCount, idx, forceTrue){
-	var res = '';
-	Math.seedrandom(Game.seed + '/' + spellCount);
-	roll = Math.random();
-	
-	if(forceTrue){
-		/* Random is called a few times in setting up the golden cookie */
-		if (idx > 0) Math.random();
-		if (idx > 1) Math.random();
-		Math.random();
-		Math.random();
-		
-		var choices = [];
-		choices.push('Frenzy','Lucky');
-		if (!Game.hasBuff('Dragonflight')) choices.push('Click Frenzy');
-		if (Math.random() < 0.1) choices.push('Cookie Storm','Cookie Storm','Blab');
-		if (Game.BuildingsOwned >= 10 && Math.random() < 0.25) choices.push('Building Special');
-		if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
-		if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
-		
-		return choose(choices);
-		
-	} else {
-		/* Random is called a few times in setting up the golden cookie */
-		if (idx > 0) Math.random();
-		if (idx > 1) Math.random();
-		Math.random();
-		Math.random();
-		
-		var choices = [];
-		choices.push('Clot','Ruin');
-		if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
-		if (Math.random() < 0.003) choices.push('Free Sugar Lump');
-		if (Math.random() < 0.1) choices = ['Blab'];
-		
-		return choose(choices);
-		
-	}
-}
-
-FortuneCookie.gamblerEdificeChecker = function(spellCount, forceTrue){
-	Math.seedrandom(Game.seed + '/' + spellCount);
-	Math.random();
-	if(forceTrue){
-		var buildings = [];
-		var max = 0;
-		var n = 0;
-		for (var i in Game.Objects)
+KlattmoseUtilities.restoreDefaultConfig = function(mode){
+	KlattmoseUtilities.config = {
+	  "hotkeys": [
 		{
-			if (Game.Objects[i].amount > max) max = Game.Objects[i].amount;
-			if (Game.Objects[i].amount > 0) n++;
+		  "keyCode": 49,
+		  "nickname": "Quickload",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.LoadSave();"
+		},
+		{
+		  "keyCode": 50,
+		  "nickname": "Godzamok",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
+		},
+		{
+		  "keyCode": 51,
+		  "nickname": "Dump Wizards",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "var temp = Game.Objects[\"Wizard tower\"].minigame.magic;\nvar lvl=Math.max(Game.Objects[\"Wizard tower\"].level,1);\nfor(var i = 1; i < Game.Objects[\"Wizard tower\"].amount; i++){\n\tif(temp <= Math.floor(4+Math.pow(i,0.6)+Math.log((i+(lvl-1)*10)/15+1)*15)) \n\t\tGame.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - i);\n}"
+		},
+		{
+		  "keyCode": 52,
+		  "nickname": "Toggle Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "if(KlattmoseUtilities.autoClickerActive === undefined || KlattmoseUtilities.autoClickerActive == false){\n\tKlattmoseUtilities.autoClicker = setInterval(Game.ClickCookie, 10);\n\tKlattmoseUtilities.autoClickerActive = true;\n\tGame.Notify('Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoClicker);\n\tKlattmoseUtilities.autoClickerActive = false;\n\tGame.Notify('Autoclicker Off', '', '', 1, 1);\n}"
+		},
+		{
+		  "keyCode": 53,
+		  "nickname": "Toggle Golden Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "if(KlattmoseUtilities.autoGoldenClickerActive === undefined || KlattmoseUtilities.autoGoldenClickerActive == false){\n\tKlattmoseUtilities.autoGoldenClicker = setInterval(function() { Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } }) }, 500);\n\tKlattmoseUtilities.autoGoldenClickerActive = true;\n\tGame.Notify('Golden Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoGoldenClicker);\n\tKlattmoseUtilities.autoGoldenClickerActive = false;\n\tGame.Notify('Golden Autoclicker Off', '', '', 1, 1);\n}"
+		},
+		{
+		  "keyCode": 54,
+		  "nickname": "Sugar Lump Appraisal",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
 		}
-		for (var i in Game.Objects){
-			if ((Game.Objects[i].amount<max || n == 1) && Game.Objects[i].getPrice() <= Game.cookies * 2 && Game.Objects[i].amount < 400) 
-				buildings.push(Game.Objects[i]);
-		}
-		
-		if (buildings.length == 0){
-			return "Nothing";
-		}else{
-			var building = choose(buildings);
-			return building.name;
-		}
-	} else {
-		if (Game.BuildingsOwned == 0){
-			return "Nothing";
-		} else {
-			var buildings = [];
-			for (var i in Game.Objects){
-				if (Game.Objects[i].amount > 0) 
-					buildings.push(Game.Objects[i]);
-			}
-			var building=choose(buildings);
-			return building.name;
-		}
+	  ]
 	}
+	if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
 }
-
-FortuneCookie.spellForecast=function(spell){
-	if(FortuneCookie.config.spellForecastLength == 0) return '';
-	var spellOutcome = '<div width="100%"><b>Forecast:</b><br/>';
-	var M = Game.Objects["Wizard tower"].minigame;
-	var backfire = M.getFailChance(spell);
-	var spellsCast = M.spellsCastTotal;
-	var target = spellsCast + FortuneCookie.config.spellForecastLength;
-	var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0) + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
 	
-	switch(spell.name){
-		case "Force the Hand of Fate":
-			
-			spellOutcome += '<table width="100%"><tr>';
-			for(var i = 0; i < 3; i++)
-				spellOutcome += '<td width="33%">' + ((i == idx) ? 'Active' : '') + '</td>';
-			spellOutcome += '</tr><br/>';
-			
-			while(spellsCast < target){
-				spellOutcome += '<tr>';
-				for(var i = 0; i < 3; i++)
-					spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire);
-				spellOutcome += '</tr>';
-				
-				spellsCast += 1;
-				Math.seedrandom();
-			}
-			spellOutcome += '</table></div>';
-			break;
-		
-		case "Spontaneous Edifice":
-			while(spellsCast < target){
-				Math.seedrandom(Game.seed + '/' + spellsCast);
-				if(Math.random() < (1 - backfire)){
-					var buildings = [];
-					var max = 0;
-					var n = 0;
-					for (var i in Game.Objects)
-					{
-						if (Game.Objects[i].amount > max) max = Game.Objects[i].amount;
-						if (Game.Objects[i].amount > 0) n++;
-					}
-					for (var i in Game.Objects){
-						if ((Game.Objects[i].amount < max || n == 1) && Game.Objects[i].getPrice() <= Game.cookies * 2 && Game.Objects[i].amount < 400) 
-							buildings.push(Game.Objects[i]);
-					}
-					
-					if (buildings.length == 0){
-						spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No buildings to improve!</span><br/>';
-					}else{
-						var building = choose(buildings);
-						spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
-					}
-				}else{
-					if (Game.BuildingsOwned == 0){
-						spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Backfired, but no buildings to destroy!</span><br/>';
-					}else{
-						var buildings = [];
-						for (var i in Game.Objects){
-							if (Game.Objects[i].amount > 0) 
-								buildings.push(Game.Objects[i]);
-						}
-						var building=choose(buildings);
-						spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
-					}
-				}
-				spellsCast += 1;
-				Math.seedrandom();
-			}
-			break;
-			
-		case "Gambler's Fever Dream":
-			while(spellsCast < target){
-				Math.seedrandom(Game.seed + '/' + spellsCast);
-				
-				var spells = [];
-				var selfCost = M.getSpellCost(M.spells["gambler's fever dream"]);
-				for (var i in M.spells){
-					if (i != "gambler's fever dream" && (M.magic-selfCost) >= M.getSpellCost(M.spells[i]) * 0.5) 
-						spells.push(M.spells[i]);
-				}
-				if (spells.length == 0){
-					spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No eligible spells!</span><br/>';
-				}else{
-					var gfdSpell = choose(spells);
-					var gfdBackfire = M.getFailChance(gfdSpell);
-					Math.seedrandom(Game.seed + '/' + (spellsCast + 1));
-					if(Math.random() < (1 - Math.max(gfdBackfire, 0.5))){
-						spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
-						if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, true) + ')';
-						if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, true) + ')';
-						spellOutcome += '</span><br/>';
-					}else{
-						spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
-						if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, false) + ')';
-						if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, false) + ')';
-						spellOutcome += '</span><br/>';
-					}
-				}
-				
-				spellsCast+=1;
-				Math.seedrandom();
-			}
-			break;
-			
-		case "Conjure Baked Goods":
-		case "Stretch Time":
-		case "Haggler's Charm":
-		case "Summon Crafty Pixies":
-		case "Resurrect Abomination":
-		case "Diminish Ineptitude":
-			while(spellsCast < target){
-				Math.seedrandom(Game.seed + '/' + spellsCast);
-				if(Math.random() < (1 - backfire))
-					spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Success</span><br/>';
-				else
-					spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Backfire</span><br/>';
-				
-				spellsCast += 1;
-				Math.seedrandom();
-			}
-			break;
-			
-		default:
-			spellOutcome = "";
+	
+	
+
+KlattmoseUtilities.EditHotkey = function(i){
+	if(i < KlattmoseUtilities.config.hotkeys.length){
+		KlattmoseUtilities.tempHotkey = JSON.parse(JSON.stringify(KlattmoseUtilities.config.hotkeys[i]));
+	} else {
+		KlattmoseUtilities.tempHotkey = {keyCode:0, nickname:'New hotkey', ctrl:false, shift:false, alt:false, script:''};
 	}
-	return spellOutcome;
+	
+	var hotkey = KlattmoseUtilities.tempHotkey;
+	
+	var str = '<h3>Edit Hotkey</h3><div class="block" style="overflow: auto;">';
+	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 125px;"></div><br/>';
+	str += '<div class="listing" style="float: left;">Key Binding: <a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></div></div>';
+	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
+	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
+	str += hotkey.script;
+	str += '</textarea></div></div>';
+	
+	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewKeybinding(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
+					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']]);
+}
+
+KlattmoseUtilities.getNewKeybinding = function(i){
+	var hotkey = KlattmoseUtilities.config.hotkeys[i];
+	l('keybindEditor').innerHTML = '...';
+	KlattmoseUtilities.waitingForInput = 1;
+}
+
+KlattmoseUtilities.saveNewKeybinding = function(i){
+	KlattmoseUtilities.waitingForInput = 0;
+	if(KlattmoseUtilities.validateInput(KlattmoseUtilities.tempHotkey.keyCode).length == 0) return;
+	
+	KlattmoseUtilities.tempHotkey.nickname = l('nicknameEditor').value;
+	KlattmoseUtilities.tempHotkey.script = l('textareaPrompt').value;
+	KlattmoseUtilities.config.hotkeys[i] = KlattmoseUtilities.tempHotkey;
+	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+
+KlattmoseUtilities.exportConfig = function(){
+	Game.prefs.showBackupWarning = 0;
+	Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+				JSON.stringify(KlattmoseUtilities.config, null, 2) + 
+				'</textarea></div>',['All done!']);
+	l('textareaPrompt').focus();
+	l('textareaPrompt').select();
+}
+
+KlattmoseUtilities.importConfig = function(){
+	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt();}'], 'Nevermind']);
+	l('textareaPrompt').focus();
+}
+
+KlattmoseUtilities.getKeybindString = function(hotkey){
+	var res = '';
+	res += hotkey.ctrl?'Ctrl+':'';
+	res += hotkey.shift?'Shift+':'';
+	res += hotkey.alt?'Alt+':'';
+	
+	return res + KlattmoseUtilities.validateInput(hotkey.keyCode);
+}
+
+KlattmoseUtilities.validateInput = function(keyCode){
+	if((keyCode > 47 && keyCode < 58) || (keyCode > 64 && keyCode < 91)) return String.fromCharCode(keyCode);
+	if(keyCode > 95 && keyCode < 106) return 'Num ' + (keyCode - 96);
+	if(keyCode > 111 && keyCode < 124) return 'F' + (keyCode - 111);
+	return '';
 }
 
 
-FortuneCookie.init();
+if(KlattmoseUtilities.toLoad) KlattmoseUtilities.init();

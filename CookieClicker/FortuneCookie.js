@@ -115,12 +115,14 @@ FortuneCookie.ReplaceNativeGrimoire = function() {
 		FortuneCookie.memorySpellsCast = minigame.spellsCast;
 		FortuneCookie.memorySpellTotal = minigame.spellsCastTotal;
 		FortuneCookie.memoryMagic = minigame.magic;
+		FortuneCookie.memoryGamblerWin = minigame.spells['gambler\'s fever dream'].win;
 		
 		minigame.launch();
 		
 		minigame.spellsCast = FortuneCookie.memorySpellsCast;
 		minigame.spellsCastTotal = FortuneCookie.memorySpellTotal;
 		minigame.magic = FortuneCookie.memoryMagic;
+		minigame.spells['gambler\'s fever dream'].win = FortuneCookie.memoryGamblerWin;
 		
 		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
 	}
@@ -361,8 +363,12 @@ FortuneCookie.spellForecast=function(spell){
 				}else{
 					var gfdSpell = choose(spells);
 					var gfdBackfire = M.getFailChance(gfdSpell);
+					
+					if(FortuneCookie.detectKUGamblerPatch()) gfdBackfire *= 2;
+					else gfdBackfire = Math.max(gfdBackfire, 0.5);
+					
 					Math.seedrandom(Game.seed + '/' + (spellsCast + 1));
-					if(Math.random() < (1 - Math.max(gfdBackfire, 0.5))){
+					if(Math.random() < (1 - gfdBackfire)){
 						spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
 						if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, true) + ')';
 						if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, true) + ')';
@@ -402,6 +408,14 @@ FortuneCookie.spellForecast=function(spell){
 			spellOutcome = "";
 	}
 	return spellOutcome;
+}
+
+FortuneCookie.detectKUGamblerPatch = function(){
+	if(typeof KlattmoseUtilities == 'undefined') return false;
+	if(typeof KlattmoseUtilities.config == 'undefined') return false;
+	if(typeof KlattmoseUtilities.config.patches == 'undefined') return false;
+	
+	return KlattmoseUtilities.config.patches.gamblersFeverDreamFix == 1;
 }
 
 

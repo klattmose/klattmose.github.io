@@ -26,7 +26,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
-		  "script": "Game.Objects[\"Mine\"].sell(300); Game.Objects[\"Mine\"].buy(300);"
+		  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
 		},
 		{
 		  "keyCode": 51,
@@ -70,8 +70,8 @@ KlattmoseUtilities.defaultConfig = function(){
 		}
 	  ],
 	  "patches": {
-		"gamblersFeverDreamFix": 1,
-		"slotGodFix": 1
+		"gamblersFeverDreamFix": 0,
+		"slotGodFix": 0
 	  }
 	}
 }

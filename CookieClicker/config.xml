@@ -1,0 +1,18 @@
+<root directory="https://orteil.dashnet.org/cookieclicker/">
+	<files>
+		<file>index.html</file>
+		<file>base64.js</file>
+		<file>main.js</file>
+		<file>minigameGarden.js</file>
+		<file>minigameGrimoire.js</file>
+		<file>minigamePantheon.js</file>
+		<file>showads.js</file>
+		<file>style.css</file>
+		<file>cookieconsent.css</file>
+		<file>cookieconsent.js</file>
+		<file>css.css</file>
+	</files>
+	<directories>
+		<directory>img</directory>
+	</directories>
+</root>

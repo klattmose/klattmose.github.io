@@ -813,7 +813,7 @@ input[type=range]:active::-ms-thumb,input[type=range]:hover::-ms-thumb {backgrou
 .framed q:before
 {
 	display:inline-block;
-	content:"‚Äú";
+	content:"ì";
 	font-size:14px;
 	font-family:Georgia;
 	font-weight:bold;
@@ -821,7 +821,7 @@ input[type=range]:active::-ms-thumb,input[type=range]:hover::-ms-thumb {backgrou
 .framed q:after
 {
 	display:inline-block;
-	content:"‚Äù";
+	content:"î";
 	font-size:14px;
 	font-family:Georgia;
 	font-weight:bold;

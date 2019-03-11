@@ -67,6 +67,14 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "shift": false,
 		  "alt": false,
 		  "script": "Game.CollectWrinklers();"
+		},
+		{
+		  "keyCode": 76,
+		  "nickname": "Perfect Lump Harvest",
+		  "ctrl": true,
+		  "shift": true,
+		  "alt": false,
+		  "script": "if(Game.canLumps() && ((Date.now()-Game.lumpT) > Game.lumpMatureAge)){\n\tvar typ = Game.lumpCurrentType;\n\tvar target = Game.lumps;\n\tif(typ == 0) target += 1;\n\telse if(typ == 1) target += 2;\n\telse if(typ == 2) target += 7;\n\telse if(typ == 3) target += 2;\n\telse if(typ == 4) target += 3;\n\n\twhile(Game.lumps != target || Game.lumpCurrentType != 2){\n\t\tGame.LoadSave();\n\t\tGame.clickLump();\n\t}\n\tGame.Notify('A perfect harvest!', '', [29, 16])\n}else{\n\tGame.Notify('Cannot harvest sugar lump.', '', [29, 14])\n}"
 		}
 	  ],
 	  "patches": {

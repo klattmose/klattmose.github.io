@@ -1,4 +1,4 @@
-if(Game.canLumps() && age > Game.lumpMatureAge){
+if(Game.canLumps() && ((Date.now()-Game.lumpT) > Game.lumpMatureAge)){
 	var typ = Game.lumpCurrentType;
 	var target = Game.lumps;
 	if(typ == 0) target += 1;

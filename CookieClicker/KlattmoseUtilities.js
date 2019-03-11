@@ -1,87 +1,130 @@
 Game.Win('Third-party');
-if (KlattmoseUtilities === undefined) {
+if(KlattmoseUtilities === undefined) {
 	var KlattmoseUtilities = {};
 	
-	KlattmoseUtilities.saveConfig = function(config){
-		localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
-	}
-	
-	KlattmoseUtilities.loadConfig = function(){
-		if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
-			KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
-		}
-	}
-	
-	KlattmoseUtilities.restoreDefaultConfig = function(mode){
-		KlattmoseUtilities.config = {
-		  "hotkeys": [
-			{
-			  "keyCode": 49,
-			  "nickname": "Quickload",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "Game.LoadSave();"
-			},
-			{
-			  "keyCode": 50,
-			  "nickname": "Godzamok",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
-			},
-			{
-			  "keyCode": 51,
-			  "nickname": "Dump Wizards",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "if(Game.Objects[\"Wizard tower\"].amount > 40){Game.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - 40);}"
-			},
-			{
-			  "keyCode": 52,
-			  "nickname": "Toggle Autoclicker",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "if(KlattmoseUtilities.autoClickerActive === undefined || KlattmoseUtilities.autoClickerActive == false){\n\tKlattmoseUtilities.autoClicker = setInterval(Game.ClickCookie, 10);\n\tKlattmoseUtilities.autoClickerActive = true;\n\tGame.Notify('Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoClicker);\n\tKlattmoseUtilities.autoClickerActive = false;\n\tGame.Notify('Autoclicker Off', '', '', 1, 1);\n}"
-			},
-			{
-			  "keyCode": 53,
-			  "nickname": "Toggle Golden Autoclicker",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "if(KlattmoseUtilities.autoGoldenClickerActive === undefined || KlattmoseUtilities.autoGoldenClickerActive == false){\n\tKlattmoseUtilities.autoGoldenClicker = setInterval(function() { Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } }) }, 500);\n\tKlattmoseUtilities.autoGoldenClickerActive = true;\n\tGame.Notify('Golden Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoGoldenClicker);\n\tKlattmoseUtilities.autoGoldenClickerActive = false;\n\tGame.Notify('Golden Autoclicker Off', '', '', 1, 1);\n}"
-			},
-			{
-			  "keyCode": 54,
-			  "nickname": "Sugar Lump Appraisal",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "var temp = Game.lumpCurrentType;\nif (temp == 0) temp = 'normal';\nelse if (temp == 1) temp = 'bifurcated';\nelse if (temp == 2) temp = 'golden';\nelse if (temp == 3) temp = 'meaty';\nelse if (temp == 4) temp = 'caramelized';\nGame.Notify('A ' + temp + ' sugar lump is growing!', '', '', 1, 1);"
-			}
-		  ]
-		}
-		if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-	}
-	
-	KlattmoseUtilities.restoreDefaultConfig(1);
+	KlattmoseUtilities.Backup = {};
 	KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
 	KlattmoseUtilities.waitingForInput = 0;
 	
+	KlattmoseUtilities.toLoad = 1;
+}
+
+KlattmoseUtilities.defaultConfig = function(){
+	return {
+	  "hotkeys": [
+		{
+		  "keyCode": 49,
+		  "nickname": "Quickload",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.LoadSave();"
+		},
+		{
+		  "keyCode": 50,
+		  "nickname": "Godzamok",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
+		},
+		{
+		  "keyCode": 51,
+		  "nickname": "Dump Wizards",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "var temp = Game.Objects[\"Wizard tower\"].minigame.magic;\nvar lvl=Math.max(Game.Objects[\"Wizard tower\"].level,1);\nfor(var i = 1; i < Game.Objects[\"Wizard tower\"].amount; i++){\n\tif(temp <= Math.floor(4+Math.pow(i,0.6)+Math.log((i+(lvl-1)*10)/15+1)*15)) \n\t\tGame.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - i);\n}"
+		},
+		{
+		  "keyCode": 52,
+		  "nickname": "Toggle Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "if(KlattmoseUtilities.autoClickerActive === undefined || KlattmoseUtilities.autoClickerActive == false){\n\tKlattmoseUtilities.autoClicker = setInterval(Game.ClickCookie, 10);\n\tKlattmoseUtilities.autoClickerActive = true;\n\tGame.Notify('Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoClicker);\n\tKlattmoseUtilities.autoClickerActive = false;\n\tGame.Notify('Autoclicker Off', '', '', 1, 1);\n}"
+		},
+		{
+		  "keyCode": 53,
+		  "nickname": "Toggle Golden Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "if(KlattmoseUtilities.autoGoldenClickerActive === undefined || KlattmoseUtilities.autoGoldenClickerActive == false){\n\tKlattmoseUtilities.autoGoldenClicker = setInterval(function() { Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } }) }, 500);\n\tKlattmoseUtilities.autoGoldenClickerActive = true;\n\tGame.Notify('Golden Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoGoldenClicker);\n\tKlattmoseUtilities.autoGoldenClickerActive = false;\n\tGame.Notify('Golden Autoclicker Off', '', '', 1, 1);\n}"
+		},
+		{
+		  "keyCode": 54,
+		  "nickname": "Sugar Lump Appraisal",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
+		},
+		{
+		  "keyCode": 55,
+		  "nickname": "Collect Wrinklers",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.CollectWrinklers();"
+		}
+	  ],
+	  "patches": {
+		"gamblersFeverDreamFix": 0,
+		"slotGodFix": 0
+	  }
+	}
+}
+
+KlattmoseUtilities.init = function(){
+	KlattmoseUtilities.toLoad = 0;
+	
+	KlattmoseUtilities.restoreDefaultConfig(1);
 	KlattmoseUtilities.loadConfig();
+	
+	KlattmoseUtilities.Backup.scriptLoaded = Game.scriptLoaded;
+	Game.scriptLoaded = function(who, script) {
+		KlattmoseUtilities.Backup.scriptLoaded(who, script);
+		KlattmoseUtilities.ReplaceNativeGarden();
+		KlattmoseUtilities.ReplaceNativePantheon();
+		KlattmoseUtilities.ReplaceNativeGrimoire();
+	}
+	
+	KlattmoseUtilities.ReplaceNativeGarden();
+	KlattmoseUtilities.ReplaceNativePantheon();
+	KlattmoseUtilities.ReplaceNativeGrimoire();
 	
 	KlattmoseUtilities.oldUpdateMenu = Game.UpdateMenu;
 	Game.UpdateMenu = function(){
 		KlattmoseUtilities.oldUpdateMenu();
+		
+		if(KlattmoseUtilities.config.hotkeys === undefined) KlattmoseUtilities.config.hotkeys = {};
+		if(KlattmoseUtilities.config.patches === undefined) KlattmoseUtilities.config.patches = {};
+		
+		var writeHeader = function(text) {
+			var div = document.createElement('div');
+			div.className = 'listing';
+			div.style.padding = '5px 16px';
+			div.style.opacity = '0.7';
+			div.style.fontSize = '17px';
+			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
+			div.textContent = text;
+			return div.outerHTML;
+		}
+		
+		var WriteButton = function(patchName, button, on, off, callback, invert){
+			var invert = invert ? 1 : 0;
+			if (!callback) callback = '';
+			callback += 'PlaySound(\'snd/tick.mp3\');';
+			return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
+		}
+		
 		if(Game.onMenu === 'prefs') {
 			var str =	'<div class="title">Klattmose Utilities</div>' + 
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
-											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>';
+											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
+						writeHeader("Hotkeys");
 			
 			
 			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
@@ -93,7 +136,13 @@ if (KlattmoseUtilities === undefined) {
 						'</div>';
 			}
 			
-			str += '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>'
+			str += '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
+				   writeHeader("Optional Patches");
+			
+			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div><br>';
+			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div><br>';
+			
+			
 			
 			var div = document.createElement('div');
 			div.innerHTML = str;
@@ -114,17 +163,6 @@ if (KlattmoseUtilities === undefined) {
 	}
 	
 	AddEvent(window, 'keydown', function(e){
-		if (!Game.OnAscend && Game.AscendTimer == 0)
-		{
-			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
-				{
-					eval(hotkey.script);
-				}
-			}
-		}
-		
 		if(KlattmoseUtilities.waitingForInput){
 			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
 			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
@@ -137,7 +175,17 @@ if (KlattmoseUtilities === undefined) {
 			if(KlattmoseUtilities.validateInput(e.keyCode).length > 0){
 				KlattmoseUtilities.waitingForInput = 0;
 			}
+			
+		} else if (!Game.OnAscend && Game.AscendTimer == 0) {
+			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+				var hotkey = KlattmoseUtilities.config.hotkeys[i];
+				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
+				{
+					eval(hotkey.script);
+				}
+			}
 		}
+		
 	});
 	
 	AddEvent(window, 'keyup', function(e){
@@ -157,6 +205,29 @@ if (KlattmoseUtilities === undefined) {
 	else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
 }
 
+
+//***********************************
+//    Configuration
+//***********************************
+KlattmoseUtilities.saveConfig = function(config){
+	localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
+}
+
+KlattmoseUtilities.loadConfig = function(){
+	if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
+		KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
+	}
+}
+
+KlattmoseUtilities.restoreDefaultConfig = function(mode){
+	KlattmoseUtilities.config = KlattmoseUtilities.defaultConfig();
+	if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+
+
+//***********************************
+//    Hotkey Functions
+//***********************************
 KlattmoseUtilities.EditHotkey = function(i){
 	if(i < KlattmoseUtilities.config.hotkeys.length){
 		KlattmoseUtilities.tempHotkey = JSON.parse(JSON.stringify(KlattmoseUtilities.config.hotkeys[i]));
@@ -224,3 +295,109 @@ KlattmoseUtilities.validateInput = function(keyCode){
 	if(keyCode > 111 && keyCode < 124) return 'F' + (keyCode - 111);
 	return '';
 }
+
+
+//***********************************
+//    Optional Patches
+//***********************************
+KlattmoseUtilities.patches = {};
+
+KlattmoseUtilities.patches.Toggle = function(patchName, button, on, off, invert){
+	if (KlattmoseUtilities.config.patches[patchName]){
+		l(button).innerHTML = off;
+		KlattmoseUtilities.config.patches[patchName] = 0;
+	}else{
+		l(button).innerHTML = on;
+		KlattmoseUtilities.config.patches[patchName] = 1;
+	}
+	
+	l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
+	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+
+
+KlattmoseUtilities.ReplaceNativeGarden = function() {
+	if (!KlattmoseUtilities.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {
+		var M = Game.Objects["Farm"].minigame;
+		
+		KlattmoseUtilities.HasReplaceNativeGardenLaunch = true;
+	}
+}
+
+KlattmoseUtilities.ReplaceNativePantheon = function() {
+	if (!KlattmoseUtilities.HasReplaceNativePantheonLaunch && Game.Objects["Temple"].minigameLoaded) {
+		var M = Game.Objects["Temple"].minigame;
+		
+		KlattmoseUtilities.patches.slotGodFix = {};
+		KlattmoseUtilities.patches.slotGodFix.oldFunction = M.slotGod;
+		
+		
+		KlattmoseUtilities.patches.slotGodFix.newFunction = function(god, slot){
+			if(slot == god.slot) return false;
+			
+			if(slot == -1) M.slot[god.slot] = -1;
+			else if(M.slot[slot] != -1) M.godsById[M.slot[slot]].slot = god.slot;
+			
+			if(god.slot != -1 && slot != -1) M.slot[god.slot] = M.slot[slot];
+			if(slot != -1) M.slot[slot] = god.id;
+			
+			god.slot = slot;
+			Game.recalculateGains = true;
+		}
+		
+		
+		M.slotGod = function(god, slot){
+			if(KlattmoseUtilities.config.patches.slotGodFix) KlattmoseUtilities.patches.slotGodFix.newFunction(god, slot);
+			else KlattmoseUtilities.patches.slotGodFix.oldFunction(god, slot);
+		}
+		
+		KlattmoseUtilities.HasReplaceNativePantheonLaunch = true;
+	}
+}
+
+KlattmoseUtilities.ReplaceNativeGrimoire = function() {
+	if (!KlattmoseUtilities.HasReplaceNativeGrimoireLaunch && Game.Objects["Wizard tower"].minigameLoaded) {
+		var M = Game.Objects["Wizard tower"].minigame;
+		
+		KlattmoseUtilities.patches.gamblersFeverDreamFix = {};
+		KlattmoseUtilities.patches.gamblersFeverDreamFix.oldFunction = M.spells['gambler\'s fever dream'].win;
+		
+		
+		KlattmoseUtilities.patches.gamblersFeverDreamFix.newFunction = function(){
+			var spells=[];
+			var selfCost=M.getSpellCost(M.spells['gambler\'s fever dream']);
+			for (var i in M.spells)
+			{if (i!='gambler\'s fever dream' && (M.magic-selfCost)>=M.getSpellCost(M.spells[i])*0.5) spells.push(M.spells[i]);}
+			if (spells.length==0){Game.Popup('<div style="font-size:80%;">No eligible spells!</div>',Game.mouseX,Game.mouseY);return -1;}
+			var spell=choose(spells);
+			var cost=M.getSpellCost(spell)*0.5;
+			setTimeout(function(spell,cost,seed){return function(){
+				if (Game.seed!=seed) return false;
+				var out=M.castSpell(spell,{cost:cost,failChanceMult:2,passthrough:true});
+				if (!out)
+				{
+					M.magic+=selfCost;
+					setTimeout(function(){
+						Game.Popup('<div style="font-size:80%;">That\'s too bad!<br>Magic refunded.</div>',Game.mouseX,Game.mouseY);
+					},1500);
+				}
+			}}(spell,cost,Game.seed),1000);
+			Game.Popup('<div style="font-size:80%;">Casting '+spell.name+'<br>for '+Beautify(cost)+' magic...</div>',Game.mouseX,Game.mouseY);
+		}
+		
+		
+		M.spells['gambler\'s fever dream'].win = function(){
+			if(KlattmoseUtilities.config.patches.gamblersFeverDreamFix) KlattmoseUtilities.patches.gamblersFeverDreamFix.newFunction();
+			else KlattmoseUtilities.patches.gamblersFeverDreamFix.oldFunction();
+		}
+		
+		KlattmoseUtilities.HasReplaceNativeGrimoireLaunch = true;
+	}
+}
+
+
+
+
+
+
+if(KlattmoseUtilities.toLoad) KlattmoseUtilities.init();

@@ -3,6 +3,8 @@ if(KlattmoseUtilities === undefined) {
 	var KlattmoseUtilities = {};
 	
 	KlattmoseUtilities.Backup = {};
+	KlattmoseUtilities.Repeaters = {};
+	KlattmoseUtilities.RepeaterFlags = {};
 	KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
 	KlattmoseUtilities.waitingForInput = 0;
 	
@@ -38,22 +40,6 @@ KlattmoseUtilities.defaultConfig = function(){
 		},
 		{
 		  "keyCode": 52,
-		  "nickname": "Toggle Autoclicker",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "if(KlattmoseUtilities.autoClickerActive === undefined || KlattmoseUtilities.autoClickerActive == false){\n\tKlattmoseUtilities.autoClicker = setInterval(Game.ClickCookie, 10);\n\tKlattmoseUtilities.autoClickerActive = true;\n\tGame.Notify('Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoClicker);\n\tKlattmoseUtilities.autoClickerActive = false;\n\tGame.Notify('Autoclicker Off', '', '', 1, 1);\n}"
-		},
-		{
-		  "keyCode": 53,
-		  "nickname": "Toggle Golden Autoclicker",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "if(KlattmoseUtilities.autoGoldenClickerActive === undefined || KlattmoseUtilities.autoGoldenClickerActive == false){\n\tKlattmoseUtilities.autoGoldenClicker = setInterval(function() { Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } }) }, 500);\n\tKlattmoseUtilities.autoGoldenClickerActive = true;\n\tGame.Notify('Golden Autoclicker Active!', '', '', 1, 1);\n} else {\n\tclearInterval(KlattmoseUtilities.autoGoldenClicker);\n\tKlattmoseUtilities.autoGoldenClickerActive = false;\n\tGame.Notify('Golden Autoclicker Off', '', '', 1, 1);\n}"
-		},
-		{
-		  "keyCode": 54,
 		  "nickname": "Sugar Lump Appraisal",
 		  "ctrl": false,
 		  "shift": false,
@@ -61,11 +47,30 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
 		},
 		{
-		  "keyCode": 55,
+		  "keyCode": 81,
+		  "nickname": "Toggle Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "period": "10",
+		  "script": "Game.ClickCookie();"
+		},
+		{
+		  "keyCode": 87,
+		  "nickname": "Toggle Golden Autoclicker",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "period": "500",
+		  "script": "Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } })"
+		},
+		{
+		  "keyCode": 69,
 		  "nickname": "Collect Wrinklers",
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
+		  "period": "60000",
 		  "script": "Game.CollectWrinklers();"
 		},
 		{
@@ -74,6 +79,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "ctrl": true,
 		  "shift": true,
 		  "alt": false,
+		  "period": 3600000,
 		  "script": "if(Game.canLumps() && ((Date.now()-Game.lumpT) > Game.lumpMatureAge)){\n\tvar typ = Game.lumpCurrentType;\n\tvar target = Game.lumps;\n\tif(typ == 0) target += 1;\n\telse if(typ == 1) target += 2;\n\telse if(typ == 2) target += 7;\n\telse if(typ == 3) target += 2;\n\telse if(typ == 4) target += 3;\n\n\twhile(Game.lumps != target || Game.lumpCurrentType != 2){\n\t\tGame.LoadSave();\n\t\tGame.clickLump();\n\t}\n\tGame.Notify('A perfect harvest!', '', [29, 16])\n}else{\n\tGame.Notify('Cannot harvest sugar lump.', '', [29, 14])\n}"
 		}
 	  ],
@@ -131,20 +137,31 @@ KlattmoseUtilities.init = function(){
 			var str =	'<div class="title">Klattmose Utilities</div>' + 
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
-											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
-						writeHeader("Hotkeys");
+											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div><hr/>' + 
+						writeHeader("Hotkeys") + '<div class="listing"><p>Single fire</p></div>';
 			
+			var repStr = '<div class="listing"><p>Repeaters</p></div>';
 			
 			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
 				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				str +=	'<div class="listing">' + 
+				
+				if(hotkey.period === undefined){
+					str += '<div class="listing">' + 
 						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
 						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
 						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
 						'</div>';
+				} else {
+					repStr += '<div class="listing">' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+						'</div>';
+				}
 			}
+			str += repStr;
 			
-			str += '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
+			str += '<br/><div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div><hr/>' + 
 				   writeHeader("Optional Patches");
 			
 			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div><br>';
@@ -189,7 +206,20 @@ KlattmoseUtilities.init = function(){
 				var hotkey = KlattmoseUtilities.config.hotkeys[i];
 				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
 				{
-					eval(hotkey.script);
+					if(hotkey.period === undefined){
+						eval(hotkey.script);
+					}else{
+						var script = hotkey.script;
+						if(KlattmoseUtilities.RepeaterFlags[hotkey.nickname] === undefined || KlattmoseUtilities.Repeaters[hotkey.nickname] == false){
+							KlattmoseUtilities.Repeaters[hotkey.nickname] = setInterval(function(){ eval(script) }, hotkey.period);
+							KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = true;
+							Game.Notify(hotkey.nickname + ' Active!', '', '', 1, 1);
+						} else {
+							clearInterval(KlattmoseUtilities.Repeaters[hotkey.nickname]);
+							KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = false;
+							Game.Notify(hotkey.nickname + ' Off', '', '', 1, 1);
+						}
+					}
 				}
 			}
 		}
@@ -248,6 +278,7 @@ KlattmoseUtilities.EditHotkey = function(i){
 	var str = '<h3>Edit Hotkey</h3><div class="block" style="overflow: auto;">';
 	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 125px;"></div><br/>';
 	str += '<div class="listing" style="float: left;">Key Binding: <a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></div></div>';
+	str += '<div class="listing" style="float: left;">Period (ms): <input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 125px;"></div><br/>';
 	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
 	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
 	str += hotkey.script;
@@ -268,6 +299,8 @@ KlattmoseUtilities.saveNewKeybinding = function(i){
 	if(KlattmoseUtilities.validateInput(KlattmoseUtilities.tempHotkey.keyCode).length == 0) return;
 	
 	KlattmoseUtilities.tempHotkey.nickname = l('nicknameEditor').value;
+	KlattmoseUtilities.tempHotkey.period = l('periodEditor').value;
+	if(isNaN(KlattmoseUtilities.tempHotkey.period) || KlattmoseUtilities.tempHotkey.period.length == 0) delete KlattmoseUtilities.tempHotkey.period;
 	KlattmoseUtilities.tempHotkey.script = l('textareaPrompt').value;
 	KlattmoseUtilities.config.hotkeys[i] = KlattmoseUtilities.tempHotkey;
 	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);

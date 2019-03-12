@@ -39,7 +39,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "var temp = Game.Objects[\"Wizard tower\"].minigame.magic;\nvar lvl=Math.max(Game.Objects[\"Wizard tower\"].level,1);\nfor(var i = 1; i < Game.Objects[\"Wizard tower\"].amount; i++){\n\tif(temp <= Math.floor(4+Math.pow(i,0.6)+Math.log((i+(lvl-1)*10)/15+1)*15)) \n\t\tGame.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - i);\n}"
 		},
 		{
-		  "keyCode": 54,
+		  "keyCode": 52,
 		  "nickname": "Sugar Lump Appraisal",
 		  "ctrl": false,
 		  "shift": false,
@@ -47,30 +47,30 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
 		},
 		{
-		  "keyCode": 52,
+		  "keyCode": 81,
 		  "nickname": "Toggle Autoclicker",
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
-		  period: 10,
+		  "period": "10",
 		  "script": "Game.ClickCookie();"
 		},
 		{
-		  "keyCode": 53,
+		  "keyCode": 87,
 		  "nickname": "Toggle Golden Autoclicker",
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
-		  period: 500,
+		  "period": "500",
 		  "script": "Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } })"
 		},
 		{
-		  "keyCode": 55,
+		  "keyCode": 69,
 		  "nickname": "Collect Wrinklers",
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
-		  period: 60000,
+		  "period": "60000",
 		  "script": "Game.CollectWrinklers();"
 		},
 		{
@@ -79,7 +79,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "ctrl": true,
 		  "shift": true,
 		  "alt": false,
-		  period: 3600000,
+		  "period": 3600000,
 		  "script": "if(Game.canLumps() && ((Date.now()-Game.lumpT) > Game.lumpMatureAge)){\n\tvar typ = Game.lumpCurrentType;\n\tvar target = Game.lumps;\n\tif(typ == 0) target += 1;\n\telse if(typ == 1) target += 2;\n\telse if(typ == 2) target += 7;\n\telse if(typ == 3) target += 2;\n\telse if(typ == 4) target += 3;\n\n\twhile(Game.lumps != target || Game.lumpCurrentType != 2){\n\t\tGame.LoadSave();\n\t\tGame.clickLump();\n\t}\n\tGame.Notify('A perfect harvest!', '', [29, 16])\n}else{\n\tGame.Notify('Cannot harvest sugar lump.', '', [29, 14])\n}"
 		}
 	  ],

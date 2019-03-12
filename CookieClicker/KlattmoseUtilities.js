@@ -137,7 +137,7 @@ KlattmoseUtilities.init = function(){
 			var str =	'<div class="title">Klattmose Utilities</div>' + 
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
-											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div><hr/>' + 
+											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div><br/><br/>' + 
 						writeHeader("Hotkeys") + '<div class="listing"><p>Single fire</p></div>';
 			
 			var repStr = '<div class="listing"><p>Repeaters</p></div>';
@@ -161,7 +161,7 @@ KlattmoseUtilities.init = function(){
 			}
 			str += repStr;
 			
-			str += '<br/><div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div><hr/>' + 
+			str += '<br/><div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div><br/><br/>' + 
 				   writeHeader("Optional Patches");
 			
 			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div><br>';

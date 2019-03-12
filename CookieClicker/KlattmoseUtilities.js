@@ -48,7 +48,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		},
 		{
 		  "keyCode": 81,
-		  "nickname": "Toggle Autoclicker",
+		  "nickname": "Autoclicker",
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
@@ -57,7 +57,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		},
 		{
 		  "keyCode": 87,
-		  "nickname": "Toggle Golden Autoclicker",
+		  "nickname": "Golden Autoclicker",
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
@@ -66,7 +66,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		},
 		{
 		  "keyCode": 69,
-		  "nickname": "Collect Wrinklers",
+		  "nickname": "Wrinkler Harvest",
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
@@ -79,7 +79,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "ctrl": true,
 		  "shift": true,
 		  "alt": false,
-		  "period": 3600000,
+		  "period": "60000",
 		  "script": "if(Game.canLumps() && ((Date.now()-Game.lumpT) > Game.lumpMatureAge)){\n\tvar typ = Game.lumpCurrentType;\n\tvar target = Game.lumps;\n\tif(typ == 0) target += 1;\n\telse if(typ == 1) target += 2;\n\telse if(typ == 2) target += 7;\n\telse if(typ == 3) target += 2;\n\telse if(typ == 4) target += 3;\n\n\twhile(Game.lumps != target || Game.lumpCurrentType != 2){\n\t\tGame.LoadSave();\n\t\tGame.clickLump();\n\t}\n\tGame.Notify('A perfect harvest!', '', [29, 16])\n}else{\n\tGame.Notify('Cannot harvest sugar lump.', '', [29, 14])\n}"
 		}
 	  ],
@@ -138,7 +138,8 @@ KlattmoseUtilities.init = function(){
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
 						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
 											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
-						writeHeader("Hotkeys") + '<div class="listing"><p>Single fire</p></div>';
+						writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
+						'<div class="listing"><p>Single fire</p></div>';
 			
 			var repStr = '<div class="listing"><p>Repeaters</p></div>';
 			
@@ -161,8 +162,7 @@ KlattmoseUtilities.init = function(){
 			}
 			str += repStr;
 			
-			str += '<br/><div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
-				   writeHeader("Optional Patches");
+			str += writeHeader("Optional Patches");
 			
 			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div><br>';
 			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div><br>';

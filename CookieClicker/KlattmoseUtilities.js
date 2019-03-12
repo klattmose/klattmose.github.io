@@ -210,7 +210,7 @@ KlattmoseUtilities.init = function(){
 						eval(hotkey.script);
 					}else{
 						var script = hotkey.script;
-						if(KlattmoseUtilities.RepeaterFlags[hotkey.nickname] === undefined || KlattmoseUtilities.Repeaters[hotkey.nickname] == false){
+						if(KlattmoseUtilities.RepeaterFlags[hotkey.nickname] === undefined || KlattmoseUtilities.RepeaterFlags[hotkey.nickname] == false){
 							KlattmoseUtilities.Repeaters[hotkey.nickname] = setInterval(function(){ eval(script) }, hotkey.period);
 							KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = true;
 							Game.Notify(hotkey.nickname + ' Active!', '', '', 1, 1);

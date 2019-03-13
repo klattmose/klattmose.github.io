@@ -332,7 +332,7 @@ KlattmoseUtilities.exportConfig = function(){
 
 KlattmoseUtilities.importConfig = function(){
 	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt();}'], 'Nevermind']);
+				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
 	l('textareaPrompt').focus();
 }
 

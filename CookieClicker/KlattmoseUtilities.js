@@ -112,7 +112,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "ctrl": false,
 		  "shift": false,
 		  "alt": false,
-		  "script": "for(var i = 0; i < Game.ObjectsById.length; i++){\n\tif(l(\"productPrice\" + i).getAttribute(\"style\") == \"color: rgb(0, 255, 0);\"){\n\t\tvar obj = Game.ObjectsById[i];\n\t\tif(obj.price < Game.cookies) {\n\t\t\tobj.buy(1);\n\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t}\n\t}\n}",
+		  "script": "if(typeof CM == 'undefined' || typeof CM.Cache == 'undefined'){}\nelse{\n\tfor (var i in CM.Cache['Objects']) {\n\t\tif(CM.Cache['Objects'][i].color == 'Green'){\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(obj.price < Game.cookies) {\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
 		  "period": "1000"
 		}
 	  ],

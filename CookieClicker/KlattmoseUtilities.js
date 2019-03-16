@@ -96,6 +96,24 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "alt": false,
 		  "period": "60000",
 		  "script": "Game.CollectWrinklers();"
+		},
+		{
+		  "keyCode": 82,
+		  "nickname": "Autospell",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "var M = Game.Objects[\"Wizard tower\"].minigame;\nif(M.magic == M.magicM) M.castSpell(M.spells[\"haggler's charm\"]);",
+		  "period": "1000"
+		},
+		{
+		  "keyCode": 84,
+		  "nickname": "Cookie Monster Autobuy",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "for(var i = 0; i < Game.ObjectsById.length; i++){\n\tif(l(\"productPrice\" + i).getAttribute(\"style\") == \"color: rgb(0, 255, 0);\"){\n\t\tvar obj = Game.ObjectsById[i];\n\t\tif(obj.price < Game.cookies) {\n\t\t\tobj.buy(1);\n\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t}\n\t}\n}",
+		  "period": "1000"
 		}
 	  ],
 	  "patches": {
@@ -179,8 +197,8 @@ KlattmoseUtilities.init = function(){
 			
 			str += writeHeader("Optional Patches");
 			
-			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div><br>';
-			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div><br>';
+			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
+			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
 			
 			
 			

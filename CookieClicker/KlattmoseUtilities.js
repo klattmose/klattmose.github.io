@@ -71,7 +71,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
 		},
 		{
-		  "keyCode": 81,
+		  "keyCode": 97,
 		  "nickname": "Autoclicker",
 		  "ctrl": false,
 		  "shift": false,
@@ -80,7 +80,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "Game.ClickCookie();"
 		},
 		{
-		  "keyCode": 87,
+		  "keyCode": 98,
 		  "nickname": "Golden Autoclicker",
 		  "ctrl": false,
 		  "shift": false,
@@ -89,7 +89,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } })"
 		},
 		{
-		  "keyCode": 69,
+		  "keyCode": 99,
 		  "nickname": "Wrinkler Harvest",
 		  "ctrl": false,
 		  "shift": false,
@@ -98,7 +98,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "Game.CollectWrinklers();"
 		},
 		{
-		  "keyCode": 82,
+		  "keyCode": 100,
 		  "nickname": "Autospell",
 		  "ctrl": false,
 		  "shift": false,
@@ -107,7 +107,7 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "period": "1000"
 		},
 		{
-		  "keyCode": 84,
+		  "keyCode": 101,
 		  "nickname": "Cookie Monster Autobuy",
 		  "ctrl": false,
 		  "shift": false,

@@ -274,7 +274,7 @@ KlattmoseUtilities.init = function(){
 		}
 	});
 	
-	
+	/*  Can't figure this shit out
 	//***********************************
 	//    Insert into Agronomicon
 	//***********************************
@@ -294,9 +294,9 @@ KlattmoseUtilities.init = function(){
                                                                 plantsNextTick, cant_change) {
 			var plant_id = this.garden.plot[y + y_offset][x + x_offset][0] - 1;
 			var plant = (plant_id >= 0 ? this.garden.plantsById[plant_id] : null);
-			if(cant_change) {
+			if(!KlattmoseUtilities.config.patches.gardenOrderofOperations && cant_change) {
 				if(plant !== null) {
-					var is_mature = KlattmoseUtilities.config.patches.gardenOrderofOperations ? true : this.garden.plot[y + y_offset][x + x_offset][1] >= plant.mature;
+					var is_mature = this.garden.plot[y + y_offset][x + x_offset][1] >= plant.mature;
 					++neighs[plant.key];
 					if(is_mature) {
 						++neighsM[plant.key];
@@ -336,7 +336,7 @@ KlattmoseUtilities.init = function(){
 		}
 	}
 	
-	if(AcharvaksAgronomicon.isLoaded) (AcharvaksAgronomicon.postloadHooks[AgroPosition])(AcharvaksAgronomicon);
+	if(AcharvaksAgronomicon.isLoaded) (AcharvaksAgronomicon.postloadHooks[AgroPosition])(AcharvaksAgronomicon);*/
 	
 	
 	if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');

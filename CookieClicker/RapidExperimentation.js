@@ -282,7 +282,7 @@ KlattmoseUtilities.init = function(){
 		AcharvaksAgronomicon = {};
 		AcharvaksAgronomicon.postloadHooks = [];
 	}else{
-		if(AcharvaksAgronomicon.postloadHooks == "undefined") AcharvaksAgronomicon.postloadHooks = [];
+		if(typeof AcharvaksAgronomicon.postloadHooks == "undefined") AcharvaksAgronomicon.postloadHooks = [];
 	}
 	var AgroPosition = AcharvaksAgronomicon.postloadHooks.length;
 	

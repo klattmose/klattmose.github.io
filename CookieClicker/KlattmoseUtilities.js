@@ -274,7 +274,7 @@ KlattmoseUtilities.init = function(){
 		}
 	});
 	
-	/*  Can't figure this shit out
+	
 	//***********************************
 	//    Insert into Agronomicon
 	//***********************************
@@ -282,13 +282,53 @@ KlattmoseUtilities.init = function(){
 		AcharvaksAgronomicon = {};
 		AcharvaksAgronomicon.postloadHooks = [];
 	}else{
-		if(AcharvaksAgronomicon.postloadHooks == "undefined") AcharvaksAgronomicon.postloadHooks = [];
+		if(typeof AcharvaksAgronomicon.postloadHooks == "undefined") AcharvaksAgronomicon.postloadHooks = [];
 	}
 	var AgroPosition = AcharvaksAgronomicon.postloadHooks.length;
 	
 	AcharvaksAgronomicon.postloadHooks[AgroPosition] = function(Agronomicon){
 		var M = Game.Objects["Farm"].minigame;
 		var wrap = M.AcharvaksAgronomicon.wrapper;
+		
+		var calcProbAgingGT = function(N, ageTick, ageTickR, ageBoost) {
+			if(N % 1 != 0) {
+				throw "In calcProbAgingGT, N must be an integer, got " + N;
+			}
+			if(N <= 0) {
+				return 1;
+			}
+			ageTick *= ageBoost;
+			ageTickR *= ageBoost;
+			var p1 = 0;
+			var p2 = 0;
+			var p3 = 0;
+			if(ageTickR > 0) {
+				// Probability that ageTick + ageTickR * Math.random() will be less than N - 1
+				p1 = (N - 1 - ageTick) / ageTickR;
+				p1 = Math.min(Math.max(p1, 0), 1);
+				
+				// Probability that ageTick + ageTickR * Math.random() will be greater than N
+				p2 = (ageTickR - N + ageTick) / ageTickR;
+				p2 = Math.min(Math.max(p2, 0), 1);
+			} else {
+				p1 = (ageTick < N - 1 ? 1 : 0);
+				p2 = (ageTick >= N ? 1 : 0);
+			}
+
+			if(p1 + p2 < 1) {
+				/*
+				 * Probability that if ageTick + ageTickR * Math.random() is between N - 1 and N,
+				 * it will be rounded to N. I hope my analysis of the probability disribution was
+				 * correct.
+				 */
+				 var a = (ageTick < N - 1 ? 0 : ageTick % 1);
+				 var b = (ageTick + ageTickR < N ? ageTickR % 1 : 1 - a);
+				 p3 = (1 - p1 - p2) * (a + b / 2);
+			}
+			
+			return p2 + p3;
+		}
+		
 		
 		wrap.calcPartMutationProbability = function(x, y, x_offset, y_offset, prior_prob, neighs, neighsM,
                                                                 plantsNextTick, cant_change) {
@@ -334,9 +374,157 @@ KlattmoseUtilities.init = function(){
 				}
 			}
 		}
+		
+		
+		wrap.recalculateTileAge = function(x, y, loops) {
+			var s = this.tileStatus[y][x];
+			if(!this.garden.isTileUnlocked(x, y)) {
+				if(s.unlocked) {
+					// The tile somehow became locked
+					s.plant = null;
+					s.probGrowthNextTick = 0;
+					s.probDeathNextTick = 0;
+					s.probEmptyNextTick = 0;
+					s.underEffects = false;
+				}
+			} else {
+				s.unlocked = true;
+				for(var key in s.plantsNextTick) {
+					var ss = s.plantsNextTick[key];
+					ss.probMature = 0;
+					ss.probImmature = 0;
+				}
+				var tile = this.garden.plot[y][x];
+				var tile_boost = this.garden.plotBoost[y][x];
+				s.underEffects = (tile_boost[0] !== 1 || tile_boost[2] !== 1);
+				if(tile[0] === 0) {
+					s.plant = null;
+					s.probGrowthNextTick = 0;
+					s.probDeathNextTick = 0;
+				} else {
+					s.plant = this.garden.plantsById[tile[0]-1];
+					s.probGrowthNextTick = calcProbAgingGT(1, s.plant.ageTick, s.plant.ageTickR, tile_boost[0]);
+					s.probDeathNextTick = (s.plant.immortal ? 0 : calcProbAgingGT(100 - tile[1], s.plant.ageTick, s.plant.ageTickR, tile_boost[0]));
+				}
+				if(s.plant) {
+					// Contamination
+					var prob_contam = 0;
+					var baseContamProbs = this.baseContamProbsBySoilId[this.garden.soil];
+					if(s.probDeathNextTick < 1 && !s.plant.noContam) {
+						var mcn = this.getMatureCardinalNeighbors(x, y);
+						for(key in baseContamProbs) {
+							if(baseContamProbs[key] && s.plant.key !== key && mcn[key]) {
+								var newplant = this.garden.plants[key];
+								var this_prob_contam = (1 - s.probDeathNextTick) * baseContamProbs[key]
+													   * Math.min(((newplant.weed || newplant.fungus) ? tile_boost[2] : 1), 1);
+								s.plantsNextTick[key].probImmature = this_prob_contam;
+								prob_contam += this_prob_contam;
+							}
+						}
+					}
+					// Total probability of the tile being empty
+					s.probEmptyNextTick = s.probDeathNextTick * (1 - prob_contam);
+					// Maturity
+					if(tile[1] >= s.plant.mature) {
+						s.plantsNextTick[s.plant.key].probMature = (1 - s.probDeathNextTick) * (1 - prob_contam);
+					} else {
+						var prob_mature = calcProbAgingGT(Math.ceil(s.plant.mature - tile[1]), s.plant.ageTick,
+															s.plant.ageTickR, tile_boost[0]);
+						s.plantsNextTick[s.plant.key].probImmature = (1 - s.probDeathNextTick)
+																		* (1 - prob_contam) * (1 - prob_mature);
+						s.plantsNextTick[s.plant.key].probMature = (1 - s.probDeathNextTick) * (1 - prob_contam) * prob_mature;
+					}
+				} 
+			}
+		}
+		
+		
+		wrap.recalculateTileSpread = function(x, y, loops) {
+			var s = this.tileStatus[y][x];
+			if(!this.garden.isTileUnlocked(x, y)) {
+				if(s.unlocked) {
+					// The tile somehow became locked
+					s.plant = null;
+					s.probGrowthNextTick = 0;
+					s.probDeathNextTick = 0;
+					s.probEmptyNextTick = 0;
+					s.underEffects = false;
+				}
+			} else {
+				s.unlocked = true;
+				var tile_boost = this.garden.plotBoost[y][x];
+				
+				if(!s.plant) {
+					// If there is no plant, calculate mutations and weeds
+					// A plant cannot die and be replaced on the same tick
+					var prob_empty = 1;
+					if(loops > 0) { // Maybe there will be some need to call this function with loops = 0
+						this.callNextOffset(x, y, 0, 0, 1, this.zeroPlantMaps[0], this.zeroPlantMaps[1], s.plantsNextTick);
+						for(var key in s.plantsNextTick) {
+							var p = s.plantsNextTick[key];
+							prob_empty -= p.probImmature;
+							if(loops > 1) {
+								// Since .probMature must be 0, we use it to temorarily store this probability
+								p.probMature = p.probImmature;
+							}
+						}
+						if(loops > 1) {
+							for(var loop = 2; loop <= loops; ++loop) {
+								var new_prob_empty = 1;
+								for(key in s.plantsNextTick) {
+									var p = s.plantsNextTick[key];
+									p.probImmature += prob_empty * p.probMature;
+									new_prob_empty -= p.probImmature;
+								}
+								prob_empty = new_prob_empty;
+							}
+							for(key in s.plantsNextTick) {
+								s.plantsNextTick[key].probMature = 0;
+							}
+						}
+					}
+					// Weeds
+					if(prob_empty > 0 && this.weedKey) {
+						var prob_nn = this.calcProbNoNeighbors(x, y);
+						if(prob_nn > 0) {
+							var wp = this.weedProb * prob_empty * prob_nn * this.garden.soilsById[this.garden.soil].weedMult * tile_boost[2];
+							s.plantsNextTick[this.weedKey].probImmature += wp;
+							prob_empty *= (1 - wp);
+						}
+					}
+					// Final probability that it'll remain empty
+					s.probEmptyNextTick = prob_empty;
+				}
+			}
+		}
+		
+		
+		wrap.recalculateAllTiles = function(loops) {
+			// Doesn't account for the possibility that x or y can ALWAYS be greater than 0,
+			// but in unmodded game it's impossible
+			if(KlattmoseUtilities.config.patches.gardenOrderofOperations){
+				for(var y = 0; y < this.maxPlotHeight; ++y) {
+					for(var x = 0; x < this.maxPlotWidth; ++x) {
+						this.recalculateTileAge(x, y, loops);
+					}
+				}
+				for(var y = 0; y < this.maxPlotHeight; ++y) {
+					for(var x = 0; x < this.maxPlotWidth; ++x) {
+						this.recalculateTileSpread(x, y, loops);
+					}
+				}
+			}else{
+				for(var y = 0; y < this.maxPlotHeight; ++y) {
+					for(var x = 0; x < this.maxPlotWidth; ++x) {
+						this.recalculateTile(x, y, loops);
+					}
+				}
+			}
+		}
+		
 	}
 	
-	if(AcharvaksAgronomicon.isLoaded) (AcharvaksAgronomicon.postloadHooks[AgroPosition])(AcharvaksAgronomicon);*/
+	if(AcharvaksAgronomicon.isLoaded) (AcharvaksAgronomicon.postloadHooks[AgroPosition])(AcharvaksAgronomicon);
 	
 	
 	if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');

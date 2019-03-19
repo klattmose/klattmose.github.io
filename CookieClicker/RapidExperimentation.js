@@ -120,7 +120,13 @@ KlattmoseUtilities.defaultConfig = function(){
 		"gardenOrderofOperations": 0,
 		"gamblersFeverDreamFix": 0,
 		"slotGodFix": 0
-	  }
+	  },
+	  "onLoadFunctions": [
+		{
+			"nickname": "Load Fortune Cookie",
+			"script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/FortuneCookie.js');"
+		}
+	  ]
 	}
 }
 
@@ -141,86 +147,7 @@ KlattmoseUtilities.init = function(){
 	KlattmoseUtilities.ReplaceNativeGarden();
 	KlattmoseUtilities.ReplaceNativePantheon();
 	KlattmoseUtilities.ReplaceNativeGrimoire();
-	
-	KlattmoseUtilities.oldUpdateMenu = Game.UpdateMenu;
-	Game.UpdateMenu = function(){
-		KlattmoseUtilities.oldUpdateMenu();
-		
-		if(KlattmoseUtilities.config.hotkeys === undefined) KlattmoseUtilities.config.hotkeys = {};
-		if(KlattmoseUtilities.config.patches === undefined) KlattmoseUtilities.config.patches = {};
-		
-		var writeHeader = function(text) {
-			var div = document.createElement('div');
-			div.className = 'listing';
-			div.style.padding = '5px 16px';
-			div.style.opacity = '0.7';
-			div.style.fontSize = '17px';
-			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
-			div.textContent = text;
-			return div.outerHTML;
-		}
-		
-		var WriteButton = function(patchName, button, on, off, callback, invert){
-			var invert = invert ? 1 : 0;
-			if (!callback) callback = '';
-			callback += 'PlaySound(\'snd/tick.mp3\');';
-			return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
-		}
-		
-		if(Game.onMenu === 'prefs') {
-			var str =	'<div class="title">Klattmose Utilities</div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
-											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
-						writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
-						'<div class="listing"><p>Single fire</p></div>';
-			
-			var repStr = '<div class="listing"><p>Repeaters</p></div>';
-			
-			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				
-				if(hotkey.period === undefined){
-					str += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				} else {
-					repStr += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				}
-			}
-			str += repStr;
-			
-			str += writeHeader("Optional Patches");
-			
-			str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
-			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
-			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
-			
-			
-			
-			var div = document.createElement('div');
-			div.innerHTML = str;
-			var menu = document.getElementById('menu');
-			if(menu) {
-				menu = menu.getElementsByClassName('subsection')[0];
-				if(menu) {
-					var padding = menu.getElementsByTagName('div');
-					padding = padding[padding.length - 1];
-					if(padding) {
-						menu.insertBefore(div, padding);
-					} else {
-						menu.appendChild(div);
-					}
-				}
-			}
-		}
-	}
+	KlattmoseUtilities.ReplaceGameMenu();
 	
 	AddEvent(window, 'keydown', function(e){
 		if(KlattmoseUtilities.waitingForInput){
@@ -527,8 +454,128 @@ KlattmoseUtilities.init = function(){
 	if(AcharvaksAgronomicon.isLoaded) (AcharvaksAgronomicon.postloadHooks[AgroPosition])(AcharvaksAgronomicon);
 	
 	
+	//***********************************
+	//    Post-Load Hooks 
+	//    To support other mods interfacing with this one
+	//***********************************
+	if(KlattmoseUtilities.postloadHooks) {
+		for(var i = 0; i < Agronomicon.postloadHooks.length; ++i) {
+			(Agronomicon.postloadHooks[i])(Agronomicon);
+		}
+	}
+	
+	
+	//***********************************
+	//    On-Load Functions run now
+	//***********************************
+	if(KlattmoseUtilities.config.onLoadFunctions === undefined) KlattmoseUtilities.config.onLoadFunctions = {};
+	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
+		var onLoadFunction = KlattmoseUtilities.config.onLoadFunctions[i];
+		eval(onLoadFunction.script);
+	}
+	
 	if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');
 	else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
+}
+
+
+//***********************************
+//    Menu Replacer
+//***********************************
+KlattmoseUtilities.ReplaceGameMenu = function(){
+	KlattmoseUtilities.oldUpdateMenu = Game.UpdateMenu;
+	
+	Game.UpdateMenu = function(){
+		KlattmoseUtilities.oldUpdateMenu();
+		
+		if(KlattmoseUtilities.config.hotkeys === undefined) KlattmoseUtilities.config.hotkeys = {};
+		if(KlattmoseUtilities.config.patches === undefined) KlattmoseUtilities.config.patches = {};
+		
+		var writeHeader = function(text) {
+			var div = document.createElement('div');
+			div.className = 'listing';
+			div.style.padding = '5px 16px';
+			div.style.opacity = '0.7';
+			div.style.fontSize = '17px';
+			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
+			div.textContent = text;
+			return div.outerHTML;
+		}
+		
+		var WriteButton = function(patchName, button, on, off, callback, invert){
+			var invert = invert ? 1 : 0;
+			if (!callback) callback = '';
+			callback += 'PlaySound(\'snd/tick.mp3\');';
+			return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
+		}
+		
+		if(Game.onMenu === 'prefs') {
+			var str =	'<div class="title">Klattmose Utilities</div>' + 
+						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
+											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
+						writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
+						'<div class="listing"><p>Single fire</p></div>';
+			
+			var repStr = '<div class="listing"><p>Repeaters</p></div>';
+			
+			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+				var hotkey = KlattmoseUtilities.config.hotkeys[i];
+				
+				if(hotkey.period === undefined){
+					str += '<div class="listing">' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+						'</div>';
+				} else {
+					repStr += '<div class="listing">' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+						'</div>';
+				}
+			}
+			str += repStr;
+			
+			
+			str += writeHeader("On-Load Functions") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + KlattmoseUtilities.config.onLoadFunctions.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>';
+			for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
+				var onLoadFunction = KlattmoseUtilities.config.onLoadFunctions[i];
+				
+				str += '<div class="listing">' + 
+					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunction.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+					'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
+					'</div>';
+			}
+			
+			
+			str += writeHeader("Optional Patches");
+			
+			str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
+			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
+			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
+			
+			
+			
+			var div = document.createElement('div');
+			div.innerHTML = str;
+			var menu = document.getElementById('menu');
+			if(menu) {
+				menu = menu.getElementsByClassName('subsection')[0];
+				if(menu) {
+					var padding = menu.getElementsByTagName('div');
+					padding = padding[padding.length - 1];
+					if(padding) {
+						menu.insertBefore(div, padding);
+					} else {
+						menu.appendChild(div);
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -548,6 +595,52 @@ KlattmoseUtilities.loadConfig = function(){
 KlattmoseUtilities.restoreDefaultConfig = function(mode){
 	KlattmoseUtilities.config = KlattmoseUtilities.defaultConfig();
 	if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+
+KlattmoseUtilities.exportConfig = function(){
+	Game.prefs.showBackupWarning = 0;
+	Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+				JSON.stringify(KlattmoseUtilities.config, null, 2) + 
+				'</textarea></div>',['All done!']);
+	l('textareaPrompt').focus();
+	l('textareaPrompt').select();
+}
+
+KlattmoseUtilities.importConfig = function(){
+	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+	l('textareaPrompt').focus();
+}
+
+
+//***********************************
+//    On-Load Function Functions
+//***********************************
+KlattmoseUtilities.EditOnLoadFunction = function(i){
+	if(i < KlattmoseUtilities.config.onLoadFunctions.length){
+		KlattmoseUtilities.tempOnLoadFunction = JSON.parse(JSON.stringify(KlattmoseUtilities.config.onLoadFunctions[i]));
+	} else {
+		KlattmoseUtilities.tempOnLoadFunction = {nickname:'New On-Load Function', script:''};
+	}
+	
+	var onLoadFunction = KlattmoseUtilities.tempOnLoadFunction;
+	
+	var str = '<h3>Edit On-Load Function</h3><div class="block" style="overflow: auto;">';
+	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + onLoadFunction.nickname + '" style="width: 125px;"></div></div><br/>';
+	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
+	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
+	str += onLoadFunction.script;
+	str += '</textarea></div></div>';
+	
+	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewOnLoadFunction(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
+					  ['Nevermind', 'Game.ClosePrompt();']]);
+}
+
+KlattmoseUtilities.saveNewOnLoadFunction = function(i){
+	KlattmoseUtilities.tempOnLoadFunction.nickname = l('nicknameEditor').value;
+	KlattmoseUtilities.tempOnLoadFunction.script = l('textareaPrompt').value;
+	KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction;
+	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
 }
 
 
@@ -592,21 +685,6 @@ KlattmoseUtilities.saveNewKeybinding = function(i){
 	KlattmoseUtilities.tempHotkey.script = l('textareaPrompt').value;
 	KlattmoseUtilities.config.hotkeys[i] = KlattmoseUtilities.tempHotkey;
 	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-}
-
-KlattmoseUtilities.exportConfig = function(){
-	Game.prefs.showBackupWarning = 0;
-	Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-				JSON.stringify(KlattmoseUtilities.config, null, 2) + 
-				'</textarea></div>',['All done!']);
-	l('textareaPrompt').focus();
-	l('textareaPrompt').select();
-}
-
-KlattmoseUtilities.importConfig = function(){
-	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
-	l('textareaPrompt').focus();
 }
 
 KlattmoseUtilities.getKeybindString = function(hotkey){

@@ -109,8 +109,9 @@ KlattmoseUtilities.defaultConfig = function(){
 	  ],
 	  "patches": {
 		"gardenOrderofOperations": 0,
+		"slotGodFix": 0,
 		"gamblersFeverDreamFix": 0,
-		"slotGodFix": 0
+		"acceleratedGarden": 0
 	  },
 	  "onLoadFunctions": [
 		{
@@ -250,6 +251,7 @@ KlattmoseUtilities.ReplaceGameMenu = function(){
 			str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
 			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
 			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
+			str += '<div class="listing">' + WriteButton('acceleratedGarden', 'acceleratedGardenButton', "Accelerated Garden ON", "Accelerated Garden OFF", '') + '<label>The long lived garden plants age faster.</label></div>';
 			
 			
 			
@@ -981,6 +983,13 @@ KlattmoseUtilities.ReplaceNativeGrimoire = function() {
 	}
 }
 
+
+KlattmoseUtilities.patches.acceleratedGarden = {};
+KlattmoseUtilities.patches.acceleratedGarden.oldFunction = randomFloor;
+randomFloor = function(x){
+	if(KlattmoseUtilities.config.patches.acceleratedGarden) return Math.ceil(x);
+	else return KlattmoseUtilities.patches.acceleratedGarden.oldFunction(x);
+}
 
 
 

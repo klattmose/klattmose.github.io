@@ -145,57 +145,9 @@ KlattmoseUtilities.init = function(){
 	KlattmoseUtilities.ReplaceNativeGrimoire();
 	KlattmoseUtilities.ReplaceGameMenu();
 	
-	AddEvent(window, 'keydown', function(e){
-		if(KlattmoseUtilities.waitingForInput){
-			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
-			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
-			KlattmoseUtilities.tempHotkey.alt = e.altKey;
-			KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
-			
-			var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
-			
-			l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
-			if(KlattmoseUtilities.validateInput(e.keyCode).length > 0){
-				KlattmoseUtilities.waitingForInput = 0;
-			}
-			
-		} else if (!Game.OnAscend && Game.AscendTimer == 0) {
-			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
-				{
-					if(hotkey.period === undefined){
-						hotkey.function();
-					}else{
-						//var script = hotkey.script;
-						if(KlattmoseUtilities.RepeaterFlags[hotkey.nickname] === undefined || KlattmoseUtilities.RepeaterFlags[hotkey.nickname] == false){
-							KlattmoseUtilities.Repeaters[hotkey.nickname] = setInterval(hotkey.function, hotkey.period);
-							KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = true;
-							Game.Notify(hotkey.nickname + ' Active!', '', '', 1, 1);
-						} else {
-							clearInterval(KlattmoseUtilities.Repeaters[hotkey.nickname]);
-							KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = false;
-							Game.Notify(hotkey.nickname + ' Off', '', '', 1, 1);
-						}
-					}
-				}
-			}
-		}
-		
-	});
+	AddEvent(window, 'keydown', KlattmoseUtilities.keydown);
 	
-	AddEvent(window, 'keyup', function(e){
-		if(KlattmoseUtilities.waitingForInput){
-			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
-			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
-			KlattmoseUtilities.tempHotkey.alt = e.altKey;
-			KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
-			
-			var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
-			
-			l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
-		}
-	});
+	AddEvent(window, 'keyup', KlattmoseUtilities.keyup);
 	
 	
 	//***********************************
@@ -383,14 +335,16 @@ KlattmoseUtilities.EditOnLoadFunction = function(i){
 	var onLoadFunction = KlattmoseUtilities.tempOnLoadFunction;
 	
 	var str = '<h3>Edit On-Load Function</h3><div class="block" style="overflow: auto;">';
-	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + onLoadFunction.nickname + '" style="width: 125px;"></div></div><br/>';
+	str += '<table style="width:80%;">';
+	str += '<tr><td style="text-align:right; width:45%;">Nickname:</td><td style="width:5%;"></td><td style="text-align:left; width:50%;"><input id="nicknameEditor" class="option" type="text" value="' + onLoadFunction.nickname + '" style="width: 200px;" /></td></tr>';
+	str += '</table></div>'
 	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
-	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
+	str += '<div><textarea id="textareaPrompt" style="width:100%;height:200px;">';
 	str += onLoadFunction.script;
 	str += '</textarea></div></div>';
 	
 	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewOnLoadFunction(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-					  ['Nevermind', 'Game.ClosePrompt();']]);
+					  ['Nevermind', 'Game.ClosePrompt();']], 0, 'widePrompt');
 }
 
 KlattmoseUtilities.saveNewOnLoadFunction = function(i){
@@ -414,16 +368,18 @@ KlattmoseUtilities.EditHotkey = function(i){
 	var hotkey = KlattmoseUtilities.tempHotkey;
 	
 	var str = '<h3>Edit Hotkey</h3><div class="block" style="overflow: auto;">';
-	str += '<div class="listing" style="text-align: left;width:80%;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 125px;"></div>';
-	str += '<div class="listing" style="text-align: left;width:80%;">Key Binding: <a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></div>';
-	str += '<div class="listing" style="text-align: left;width:80%;">Period (ms): <input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 125px;"></div></div>';
+	str += '<table style="width:80%;">';
+	str += '<tr><td style="text-align:right; width:45%;">Nickname:</td><td style="width:5%;"></td><td style="text-align:left; width:50%;"><input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 200px;" /></td></tr>';
+	str += '<tr><td style="text-align:right;">Key Binding:</td><td></td><td style="text-align:left;"><a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></td></tr>';
+	str += '<tr><td style="text-align:right;">Period (ms):</td><td></td><td style="text-align:left;"><input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 50px;" /></td></tr>';
+	str += '</table></div>'
 	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
-	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
+	str += '<div><textarea id="textareaPrompt" style="width:100%;height:200px;">';
 	str += hotkey.script;
 	str += '</textarea></div></div>';
 	
 	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewKeybinding(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']],0,'widePrompt');
+					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']], 0, 'widePrompt');
 }
 
 KlattmoseUtilities.getNewKeybinding = function(i){
@@ -458,6 +414,58 @@ KlattmoseUtilities.validateInput = function(keyCode){
 	if(keyCode > 95 && keyCode < 106) return 'Num ' + (keyCode - 96);
 	if(keyCode > 111 && keyCode < 124) return 'F' + (keyCode - 111);
 	return '';
+}
+
+KlattmoseUtilities.keydown = function(e){
+	if(KlattmoseUtilities.waitingForInput){
+		KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
+		KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
+		KlattmoseUtilities.tempHotkey.alt = e.altKey;
+		KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
+		
+		var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
+		
+		l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
+		if(KlattmoseUtilities.validateInput(e.keyCode).length > 0){
+			KlattmoseUtilities.waitingForInput = 0;
+		}
+		
+	} else if (!Game.OnAscend && Game.AscendTimer == 0) {
+		for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+			var hotkey = KlattmoseUtilities.config.hotkeys[i];
+			if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
+			{
+				if(hotkey.period === undefined){
+					hotkey.function();
+				}else{
+					//var script = hotkey.script;
+					if(KlattmoseUtilities.RepeaterFlags[hotkey.nickname] === undefined || KlattmoseUtilities.RepeaterFlags[hotkey.nickname] == false){
+						KlattmoseUtilities.Repeaters[hotkey.nickname] = setInterval(hotkey.function, hotkey.period);
+						KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = true;
+						Game.Notify(hotkey.nickname + ' Active!', '', '', 1, 1);
+					} else {
+						clearInterval(KlattmoseUtilities.Repeaters[hotkey.nickname]);
+						KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = false;
+						Game.Notify(hotkey.nickname + ' Off', '', '', 1, 1);
+					}
+				}
+			}
+		}
+	}
+	
+}
+
+KlattmoseUtilities.keyup = function(e){
+	if(KlattmoseUtilities.waitingForInput){
+		KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
+		KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
+		KlattmoseUtilities.tempHotkey.alt = e.altKey;
+		KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
+		
+		var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
+		
+		l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
+	}
 }
 
 

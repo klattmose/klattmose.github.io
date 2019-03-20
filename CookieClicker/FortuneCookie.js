@@ -121,7 +121,7 @@ FortuneCookie.initMembraneForecast = function(){
 			else str = this.oldDescFunc();
 			
 			
-			if (Game.Has('Reinforced membrane')){
+			if (Game.Has('Reinforced membrane') && FortuneCookie.config.spellForecastLength){
 				var durable = FortuneCookie.forecastMembrane('click', 0);
 				var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
 				

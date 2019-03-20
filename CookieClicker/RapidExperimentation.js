@@ -1,254 +1,73 @@
 Game.Win('Third-party');
-if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
-if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
+if(FortuneCookie === undefined) var FortuneCookie = {};
 
-KlattmoseUtilities.defaultConfig = function(){
-	return {
-	  "hotkeys": [
-		{
-		  "keyCode": 79,
-		  "nickname": "Options Menu",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "Game.ShowMenu('prefs');"
-		},
-		{
-		  "keyCode": 83,
-		  "nickname": "Stats Menu",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "Game.ShowMenu('stats');"
-		},
-		{
-		  "keyCode": 73,
-		  "nickname": "Info Menu",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "Game.ShowMenu('log');"
-		},
-		{
-		  "keyCode": 49,
-		  "nickname": "Quickload",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "Game.LoadSave();"
-		},
-		{
-		  "keyCode": 50,
-		  "nickname": "Godzamok",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
-		},
-		{
-		  "keyCode": 51,
-		  "nickname": "Dump Wizards",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "var temp = Game.Objects[\"Wizard tower\"].minigame.magic;\nvar lvl=Math.max(Game.Objects[\"Wizard tower\"].level,1);\nfor(var i = 1; i < Game.Objects[\"Wizard tower\"].amount; i++){\n\tif(temp <= Math.floor(4+Math.pow(i,0.6)+Math.log((i+(lvl-1)*10)/15+1)*15)) \n\t\tGame.Objects[\"Wizard tower\"].sell(Game.Objects[\"Wizard tower\"].amount - i);\n}"
-		},
-		{
-		  "keyCode": 52,
-		  "nickname": "Sugar Lump Appraisal",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
-		},
-		{
-		  "keyCode": 97,
-		  "nickname": "Autoclicker",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "period": "10",
-		  "script": "Game.ClickCookie();"
-		},
-		{
-		  "keyCode": 98,
-		  "nickname": "Golden Autoclicker",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "period": "500",
-		  "script": "Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } })"
-		},
-		{
-		  "keyCode": 99,
-		  "nickname": "Wrinkler Harvest",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "period": "60000",
-		  "script": "Game.CollectWrinklers();"
-		},
-		{
-		  "keyCode": 100,
-		  "nickname": "Autospell",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "var M = Game.Objects[\"Wizard tower\"].minigame;\nif(M.magic == M.magicM) M.castSpell(M.spells[\"haggler's charm\"]);",
-		  "period": "1000"
-		},
-		{
-		  "keyCode": 101,
-		  "nickname": "Cookie Monster Autobuy",
-		  "ctrl": false,
-		  "shift": false,
-		  "alt": false,
-		  "script": "if(typeof CM == 'undefined' || typeof CM.Cache == 'undefined'){}\nelse{\n\tvar waitForUpgrade = false;\n\tfor (var i in CM.Cache['Upgrades']) {\n\t\tvar obj = Game.Upgrades[i];\n\t\tif((CM.Cache['Upgrades'][i].color == 'Green' || CM.Cache['Upgrades'][i].color == 'Blue') && obj.pool != \"toggle\"){\n\t\t\tif(obj.getPrice() < Game.cookies) {\n\t\t\t\tobj.buy();\n\t\t\t\tGame.Notify('Bought ' + obj.name, '', '', 1, 1);\n\t\t\t\twaitForUpgrade = false;\n\t\t\t}else{\n\t\t\t\twaitForUpgrade = true;\n\t\t\t}\n\t\t}\n\t}\n\tif(!waitForUpgrade){\n\t\tfor (var i in CM.Cache['Objects']) {\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(CM.Cache['Objects'][i].color == 'Green' && obj.price < Game.cookies){\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
-		  "period": "1000"
-		}
-	  ],
-	  "patches": {
-		"gardenOrderofOperations": 0,
-		"gamblersFeverDreamFix": 0,
-		"slotGodFix": 0
-	  },
-	  "onLoadFunctions": [
-		{
-			"nickname": "Load Fortune Cookie",
-			"script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/FortuneCookie.js');"
-		}
-	  ]
-	}
-}
 
-KlattmoseUtilities.init = function(){
-	KlattmoseUtilities.isLoaded = 1;
-	KlattmoseUtilities.Backup = {};
-	KlattmoseUtilities.Repeaters = {};
-	KlattmoseUtilities.RepeaterFlags = {};
-	KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
-	KlattmoseUtilities.waitingForInput = 0;
+FortuneCookie.init = function(){
+	FortuneCookie.isLoaded = 1;
+	FortuneCookie.Backup = {};
+	FortuneCookie.config = {};
+	FortuneCookie.config.spellForecastLength = 10;
+	FortuneCookie.ConfigPrefix = "FortuneCookie";
+	FortuneCookie.loadConfig();
 	
-	KlattmoseUtilities.restoreDefaultConfig(1);
-	KlattmoseUtilities.loadConfig();
-	
-	KlattmoseUtilities.Backup.scriptLoaded = Game.scriptLoaded;
+	FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
 	Game.scriptLoaded = function(who, script) {
-		KlattmoseUtilities.Backup.scriptLoaded(who, script);
-		KlattmoseUtilities.ReplaceNativeGarden();
-		KlattmoseUtilities.ReplaceNativePantheon();
-		KlattmoseUtilities.ReplaceNativeGrimoire();
+		FortuneCookie.Backup.scriptLoaded(who, script);
+		FortuneCookie.ReplaceNativeGrimoire();
 	}
 	
-	KlattmoseUtilities.ReplaceNativeGarden();
-	KlattmoseUtilities.ReplaceNativePantheon();
-	KlattmoseUtilities.ReplaceNativeGrimoire();
-	KlattmoseUtilities.ReplaceGameMenu();
-	
-	AddEvent(window, 'keydown', KlattmoseUtilities.keydown);
-	
-	AddEvent(window, 'keyup', KlattmoseUtilities.keyup);
+	FortuneCookie.ReplaceNativeGrimoire();
+	FortuneCookie.ReplaceGameMenu();
+	FortuneCookie.initMembraneForecast();
 	
 	
 	//***********************************
 	//    Post-Load Hooks 
 	//    To support other mods interfacing with this one
 	//***********************************
-	if(KlattmoseUtilities.postloadHooks) {
-		for(var i = 0; i < Agronomicon.postloadHooks.length; ++i) {
-			(Agronomicon.postloadHooks[i])(Agronomicon);
+	if(FortuneCookie.postloadHooks) {
+		for(var i = 0; i < FortuneCookie.postloadHooks.length; ++i) {
+			(FortuneCookie.postloadHooks[i])();
 		}
 	}
 	
-	
-	//***********************************
-	//    On-Load Functions run now
-	//***********************************
-	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-		KlattmoseUtilities.config.onLoadFunctions[i].function();
-	}
-	
-	if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');
-	else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
+	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
+	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
 }
 
 
 //***********************************
-//    Menu Replacer
+//    Configuration
 //***********************************
-KlattmoseUtilities.ReplaceGameMenu = function(){
-	KlattmoseUtilities.Backup.UpdateMenu = Game.UpdateMenu;
+FortuneCookie.saveConfig = function(config){
+	localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
+}
+
+FortuneCookie.loadConfig = function(){
+	if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
+		FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
+	}
+}
+
+FortuneCookie.setForecastLength = function(length){
+	FortuneCookie.config.spellForecastLength = length;
+	FortuneCookie.saveConfig(FortuneCookie.config);
+}
+
+
+//***********************************
+//    Replacement
+//***********************************
+FortuneCookie.ReplaceGameMenu = function(){
+	FortuneCookie.oldUpdateMenu = Game.UpdateMenu;
 	
 	Game.UpdateMenu = function(){
-		KlattmoseUtilities.Backup.UpdateMenu();
-		
-		var writeHeader = function(text) {
-			var div = document.createElement('div');
-			div.className = 'listing';
-			div.style.padding = '5px 16px';
-			div.style.opacity = '0.7';
-			div.style.fontSize = '17px';
-			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
-			div.textContent = text;
-			return div.outerHTML;
-		}
-		
-		var WriteButton = function(patchName, button, on, off, callback, invert){
-			var invert = invert ? 1 : 0;
-			if (!callback) callback = '';
-			callback += 'PlaySound(\'snd/tick.mp3\');';
-			return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
-		}
-		
+		FortuneCookie.oldUpdateMenu();
 		if(Game.onMenu === 'prefs') {
-			var str =	'<div class="title">Klattmose Utilities</div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
-											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
-						writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
-						'<div class="listing"><p>Single fire</p></div>';
-			
-			var repStr = '<div class="listing"><p>Repeaters</p></div>';
-			
-			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				
-				if(hotkey.period === undefined){
-					str += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				} else {
-					repStr += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				}
-			}
-			str += repStr;
-			
-			
-			str += writeHeader("On-Load Functions") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + KlattmoseUtilities.config.onLoadFunctions.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>';
-			for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-				var onLoadFunction = KlattmoseUtilities.config.onLoadFunctions[i];
-				
-				str += '<div class="listing">' + 
-					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunction.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-					'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
-					'</div>';
-			}
-			
-			
-			str += writeHeader("Optional Patches");
-			
-			str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
-			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
-			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
-			
-			
+			var str = '<div class="title">Fortune Cookie</div>' +
+					  '<div class="listing">'+
+					  Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
+					  '</div>';
 			
 			var div = document.createElement('div');
 			div.innerHTML = str;
@@ -269,716 +88,350 @@ KlattmoseUtilities.ReplaceGameMenu = function(){
 	}
 }
 
-
-//***********************************
-//    Configuration
-//***********************************
-KlattmoseUtilities.saveConfig = function(config){
-	localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
-	KlattmoseUtilities.functionalize();
-}
-
-KlattmoseUtilities.loadConfig = function(){
-	if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
-		KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
-		KlattmoseUtilities.functionalize();
+FortuneCookie.ReplaceNativeGrimoire = function() {
+	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
+		var M = Game.Objects['Wizard tower'].minigame;
+		
+		eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
+			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
+					FortuneCookie.spellForecast(me) + 
+					$1`
+			)
+		);
+		
+		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
 	}
 }
 
-KlattmoseUtilities.restoreDefaultConfig = function(mode){
-	KlattmoseUtilities.config = KlattmoseUtilities.defaultConfig();
-	if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+
+//***********************************
+//    Membrane Forecast
+//***********************************
+FortuneCookie.initMembraneForecast = function(){
+	for(var i = 0; i < 3; i++){
+		var me;
+		if(i == 0) me = Game.Upgrades["Shimmering veil"];
+		if(i == 1) me = Game.Upgrades["Shimmering veil [off]"];
+		if(i == 2) me = Game.Upgrades["Shimmering veil [on]"];
+		
+		if(typeof me.descFunc != 'undefined') me.oldDescFunc = me.descFunc;
+		me.descFunc = function(){
+			var str;
+			if(this.oldDescFunc === undefined) str = this.desc;
+			else str = this.oldDescFunc();
+			
+			
+			if (Game.Has('Reinforced membrane')){
+				var durable = FortuneCookie.forecastMembrane('click', 0);
+				var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
+				
+				str += '<br/><br/>';
+				var durCount = FortuneCookie.countMembraneDurability('click');
+				var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
+				
+				if(durable)
+					str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				
+				if(golddurable)
+					str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+			}
+			return str;
+		}
+	}
+}
+
+FortuneCookie.forecastMembrane = function(context, offset){
+	if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + offset));
+	else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
 	
-	KlattmoseUtilities.functionalize();
-}
-
-KlattmoseUtilities.exportConfig = function(){
-	Game.prefs.showBackupWarning = 0;
-	Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-				JSON.stringify(KlattmoseUtilities.config, null, 2) + 
-				'</textarea></div>',['All done!']);
-	l('textareaPrompt').focus();
-	l('textareaPrompt').select();
-}
-
-KlattmoseUtilities.importConfig = function(){
-	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); KlattmoseUtilities.functionalize(); Game.UpdateMenu();}'], 'Nevermind']);
-	l('textareaPrompt').focus();
-}
-
-KlattmoseUtilities.functionalize = function(){
-	// In case any of these are left out
-	if(KlattmoseUtilities.config.hotkeys === undefined) KlattmoseUtilities.config.hotkeys = {};
-	if(KlattmoseUtilities.config.patches === undefined) KlattmoseUtilities.config.patches = {};
-	if(KlattmoseUtilities.config.onLoadFunctions === undefined) KlattmoseUtilities.config.onLoadFunctions = {};
-	
-	for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-		eval("KlattmoseUtilities.config.hotkeys[" + i + "].function = function(){" + KlattmoseUtilities.config.hotkeys[i].script + "}");
-	}
-	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-		eval("KlattmoseUtilities.config.onLoadFunctions[" + i + "].function = function(){" + KlattmoseUtilities.config.onLoadFunctions[i].script + "}");
-	}
-}
-
-
-//***********************************
-//    On-Load Function Functions
-//***********************************
-KlattmoseUtilities.EditOnLoadFunction = function(i){
-	if(i < KlattmoseUtilities.config.onLoadFunctions.length){
-		KlattmoseUtilities.tempOnLoadFunction = JSON.parse(JSON.stringify(KlattmoseUtilities.config.onLoadFunctions[i]));
+	if (Math.random() < 0.1){
+		return true;
 	} else {
-		KlattmoseUtilities.tempOnLoadFunction = {nickname:'New On-Load Function', script:''};
+		return false;
 	}
-	
-	var onLoadFunction = KlattmoseUtilities.tempOnLoadFunction;
-	
-	var str = '<h3>Edit On-Load Function</h3><div class="block" style="overflow: auto;">';
-	str += '<table style="width:80%;">';
-	str += '<tr><td style="text-align:right; width:45%;">Nickname:</td><td style="width:5%;"></td><td style="text-align:left; width:50%;"><input id="nicknameEditor" class="option" type="text" value="' + onLoadFunction.nickname + '" style="width: 200px;" /></td></tr>';
-	str += '</table></div>'
-	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
-	str += '<div><textarea id="textareaPrompt" style="width:100%;height:200px;">';
-	str += onLoadFunction.script;
-	str += '</textarea></div></div>';
-	
-	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewOnLoadFunction(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-					  ['Nevermind', 'Game.ClosePrompt();']], 0, 'widePrompt');
 }
 
-KlattmoseUtilities.saveNewOnLoadFunction = function(i){
-	KlattmoseUtilities.tempOnLoadFunction.nickname = l('nicknameEditor').value;
-	KlattmoseUtilities.tempOnLoadFunction.script = l('textareaPrompt').value;
-	KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction;
-	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+FortuneCookie.countMembraneDurability = function(context){
+	var i;
+	var initialSuccess = FortuneCookie.forecastMembrane(context, 0);
+	
+	for(i = 1; i <= FortuneCookie.config.spellForecastLength; i++){
+		if(FortuneCookie.forecastMembrane(context, i) != initialSuccess) return i;
+	}
+	return -1;
 }
 
 
 //***********************************
-//    Hotkey Functions
+//    Grimoire forecast
 //***********************************
-KlattmoseUtilities.EditHotkey = function(i){
-	if(i < KlattmoseUtilities.config.hotkeys.length){
-		KlattmoseUtilities.tempHotkey = JSON.parse(JSON.stringify(KlattmoseUtilities.config.hotkeys[i]));
-	} else {
-		KlattmoseUtilities.tempHotkey = {keyCode:0, nickname:'New hotkey', ctrl:false, shift:false, alt:false, script:''};
-	}
-	
-	var hotkey = KlattmoseUtilities.tempHotkey;
-	
-	var str = '<h3>Edit Hotkey</h3><div class="block" style="overflow: auto;">';
-	str += '<table style="width:80%;">';
-	str += '<tr><td style="text-align:right; width:45%;">Nickname:</td><td style="width:5%;"></td><td style="text-align:left; width:50%;"><input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 200px;" /></td></tr>';
-	str += '<tr><td style="text-align:right;">Key Binding:</td><td></td><td style="text-align:left;"><a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></td></tr>';
-	str += '<tr><td style="text-align:right;">Period (ms):</td><td></td><td style="text-align:left;"><input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 50px;" /></td></tr>';
-	str += '</table></div>'
-	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
-	str += '<div><textarea id="textareaPrompt" style="width:100%;height:200px;">';
-	str += hotkey.script;
-	str += '</textarea></div></div>';
-	
-	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewKeybinding(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']], 0, 'widePrompt');
-}
-
-KlattmoseUtilities.getNewKeybinding = function(i){
-	var hotkey = KlattmoseUtilities.config.hotkeys[i];
-	l('keybindEditor').innerHTML = '...';
-	KlattmoseUtilities.waitingForInput = 1;
-}
-
-KlattmoseUtilities.saveNewKeybinding = function(i){
-	KlattmoseUtilities.waitingForInput = 0;
-	if(KlattmoseUtilities.validateInput(KlattmoseUtilities.tempHotkey.keyCode).length == 0) return;
-	
-	KlattmoseUtilities.tempHotkey.nickname = l('nicknameEditor').value;
-	KlattmoseUtilities.tempHotkey.period = l('periodEditor').value;
-	if(isNaN(KlattmoseUtilities.tempHotkey.period) || KlattmoseUtilities.tempHotkey.period.length == 0) delete KlattmoseUtilities.tempHotkey.period;
-	KlattmoseUtilities.tempHotkey.script = l('textareaPrompt').value;
-	KlattmoseUtilities.config.hotkeys[i] = KlattmoseUtilities.tempHotkey;
-	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-}
-
-KlattmoseUtilities.getKeybindString = function(hotkey){
+FortuneCookie.FateChecker = function(spellCount, idx, backfire){
 	var res = '';
-	res += hotkey.ctrl?'Ctrl+':'';
-	res += hotkey.shift?'Shift+':'';
-	res += hotkey.alt?'Alt+':'';
+	var FTHOFcookie = '';
+	Math.seedrandom(Game.seed + '/' + spellCount);
+	roll = Math.random();
 	
-	return res + KlattmoseUtilities.validateInput(hotkey.keyCode);
+	if(roll < (1 - backfire)){
+		/* Random is called a few times in setting up the golden cookie */
+		if (idx > 0) Math.random();
+		if (idx > 1) Math.random();
+		Math.random();
+		Math.random();
+		
+		var choices = [];
+		choices.push('Frenzy','Lucky');
+		if (!Game.hasBuff('Dragonflight')) choices.push('Click Frenzy');
+		if (Math.random() < 0.1) choices.push('Cookie Storm','Cookie Storm','Blab');
+		if (Game.BuildingsOwned >= 10 && Math.random() < 0.25) choices.push('Building Special');
+		if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
+		if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
+		
+		FTHOFcookie = choose(choices);
+		res = '<span class="green">' + FTHOFcookie + '</span><br/>';
+		
+	} else {
+		/* Random is called a few times in setting up the golden cookie */
+		if (idx > 0) Math.random();
+		if (idx > 1) Math.random();
+		Math.random();
+		Math.random();
+		
+		var choices = [];
+		choices.push('Clot','Ruin');
+		if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
+		if (Math.random() < 0.003) choices.push('Free Sugar Lump');
+		if (Math.random() < 0.1) choices=['Blab'];
+		
+		FTHOFcookie = choose(choices);
+		res = '<span class="red">' + FTHOFcookie + '</span><br/>';
+		
+	}
+	
+	if(FTHOFcookie == 'Free Sugar Lump') res = '<span style="color:#DAA520;">' + FTHOFcookie + '</span><br/>';
+	return '<td>' + res + '</td>';
 }
 
-KlattmoseUtilities.validateInput = function(keyCode){
-	if((keyCode > 47 && keyCode < 58) || (keyCode > 64 && keyCode < 91)) return String.fromCharCode(keyCode);
-	if(keyCode > 95 && keyCode < 106) return 'Num ' + (keyCode - 96);
-	if(keyCode > 111 && keyCode < 124) return 'F' + (keyCode - 111);
-	return '';
+FortuneCookie.gamblerFateChecker = function(spellCount, idx, forceTrue){
+	var res = '';
+	Math.seedrandom(Game.seed + '/' + spellCount);
+	roll = Math.random();
+	
+	if(forceTrue){
+		/* Random is called a few times in setting up the golden cookie */
+		if (idx > 0) Math.random();
+		if (idx > 1) Math.random();
+		Math.random();
+		Math.random();
+		
+		var choices = [];
+		choices.push('Frenzy','Lucky');
+		if (!Game.hasBuff('Dragonflight')) choices.push('Click Frenzy');
+		if (Math.random() < 0.1) choices.push('Cookie Storm','Cookie Storm','Blab');
+		if (Game.BuildingsOwned >= 10 && Math.random() < 0.25) choices.push('Building Special');
+		if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
+		if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
+		
+		return choose(choices);
+		
+	} else {
+		/* Random is called a few times in setting up the golden cookie */
+		if (idx > 0) Math.random();
+		if (idx > 1) Math.random();
+		Math.random();
+		Math.random();
+		
+		var choices = [];
+		choices.push('Clot','Ruin');
+		if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
+		if (Math.random() < 0.003) choices.push('Free Sugar Lump');
+		if (Math.random() < 0.1) choices = ['Blab'];
+		
+		return choose(choices);
+		
+	}
 }
 
-KlattmoseUtilities.keydown = function(e){
-	if(KlattmoseUtilities.waitingForInput){
-		KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
-		KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
-		KlattmoseUtilities.tempHotkey.alt = e.altKey;
-		KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
-		
-		var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
-		
-		l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
-		if(KlattmoseUtilities.validateInput(e.keyCode).length > 0){
-			KlattmoseUtilities.waitingForInput = 0;
+FortuneCookie.gamblerEdificeChecker = function(spellCount, forceTrue){
+	Math.seedrandom(Game.seed + '/' + spellCount);
+	Math.random();
+	if(forceTrue){
+		var buildings = [];
+		var max = 0;
+		var n = 0;
+		for (var i in Game.Objects)
+		{
+			if (Game.Objects[i].amount > max) max = Game.Objects[i].amount;
+			if (Game.Objects[i].amount > 0) n++;
+		}
+		for (var i in Game.Objects){
+			if ((Game.Objects[i].amount<max || n == 1) && Game.Objects[i].getPrice() <= Game.cookies * 2 && Game.Objects[i].amount < 400) 
+				buildings.push(Game.Objects[i]);
 		}
 		
-	} else if (!Game.OnAscend && Game.AscendTimer == 0) {
-		for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-			var hotkey = KlattmoseUtilities.config.hotkeys[i];
-			if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
-			{
-				if(hotkey.period === undefined){
-					hotkey.function();
+		if (buildings.length == 0){
+			return "Nothing";
+		}else{
+			var building = choose(buildings);
+			return building.name;
+		}
+	} else {
+		if (Game.BuildingsOwned == 0){
+			return "Nothing";
+		} else {
+			var buildings = [];
+			for (var i in Game.Objects){
+				if (Game.Objects[i].amount > 0) 
+					buildings.push(Game.Objects[i]);
+			}
+			var building=choose(buildings);
+			return building.name;
+		}
+	}
+}
+
+FortuneCookie.spellForecast=function(spell){
+	if(FortuneCookie.config.spellForecastLength == 0) return '';
+	var spellOutcome = '<div width="100%"><b>Forecast:</b><br/>';
+	var M = Game.Objects["Wizard tower"].minigame;
+	var backfire = M.getFailChance(spell);
+	var spellsCast = M.spellsCastTotal;
+	var target = spellsCast + FortuneCookie.config.spellForecastLength;
+	var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0) + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
+	
+	switch(spell.name){
+		case "Force the Hand of Fate":
+			
+			spellOutcome += '<table width="100%"><tr>';
+			for(var i = 0; i < 3; i++)
+				spellOutcome += '<td width="33%">' + ((i == idx) ? 'Active' : '') + '</td>';
+			spellOutcome += '</tr><br/>';
+			
+			while(spellsCast < target){
+				spellOutcome += '<tr>';
+				for(var i = 0; i < 3; i++)
+					spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire);
+				spellOutcome += '</tr>';
+				
+				spellsCast += 1;
+				Math.seedrandom();
+			}
+			spellOutcome += '</table></div>';
+			break;
+		
+		case "Spontaneous Edifice":
+			while(spellsCast < target){
+				Math.seedrandom(Game.seed + '/' + spellsCast);
+				if(Math.random() < (1 - backfire)){
+					var buildings = [];
+					var max = 0;
+					var n = 0;
+					for (var i in Game.Objects)
+					{
+						if (Game.Objects[i].amount > max) max = Game.Objects[i].amount;
+						if (Game.Objects[i].amount > 0) n++;
+					}
+					for (var i in Game.Objects){
+						if ((Game.Objects[i].amount < max || n == 1) && Game.Objects[i].getPrice() <= Game.cookies * 2 && Game.Objects[i].amount < 400) 
+							buildings.push(Game.Objects[i]);
+					}
+					
+					if (buildings.length == 0){
+						spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No buildings to improve!</span><br/>';
+					}else{
+						var building = choose(buildings);
+						spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
+					}
 				}else{
-					//var script = hotkey.script;
-					if(KlattmoseUtilities.RepeaterFlags[hotkey.nickname] === undefined || KlattmoseUtilities.RepeaterFlags[hotkey.nickname] == false){
-						KlattmoseUtilities.Repeaters[hotkey.nickname] = setInterval(hotkey.function, hotkey.period);
-						KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = true;
-						Game.Notify(hotkey.nickname + ' Active!', '', '', 1, 1);
-					} else {
-						clearInterval(KlattmoseUtilities.Repeaters[hotkey.nickname]);
-						KlattmoseUtilities.RepeaterFlags[hotkey.nickname] = false;
-						Game.Notify(hotkey.nickname + ' Off', '', '', 1, 1);
+					if (Game.BuildingsOwned == 0){
+						spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Backfired, but no buildings to destroy!</span><br/>';
+					}else{
+						var buildings = [];
+						for (var i in Game.Objects){
+							if (Game.Objects[i].amount > 0) 
+								buildings.push(Game.Objects[i]);
+						}
+						var building=choose(buildings);
+						spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
 					}
 				}
+				spellsCast += 1;
+				Math.seedrandom();
 			}
-		}
-	}
-	
-}
-
-KlattmoseUtilities.keyup = function(e){
-	if(KlattmoseUtilities.waitingForInput){
-		KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
-		KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
-		KlattmoseUtilities.tempHotkey.alt = e.altKey;
-		KlattmoseUtilities.tempHotkey.keyCode = e.keyCode;
-		
-		var temp = KlattmoseUtilities.getKeybindString(KlattmoseUtilities.tempHotkey);
-		
-		l('keybindEditor').innerHTML = ((temp.length > 0) ? temp : '...');
-	}
-}
-
-
-//***********************************
-//    Optional Patches
-//***********************************
-KlattmoseUtilities.patches.Toggle = function(patchName, button, on, off, invert){
-	if (KlattmoseUtilities.config.patches[patchName]){
-		l(button).innerHTML = off;
-		KlattmoseUtilities.config.patches[patchName] = 0;
-	}else{
-		l(button).innerHTML = on;
-		KlattmoseUtilities.config.patches[patchName] = 1;
-	}
-	
-	l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
-	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-}
-
-
-KlattmoseUtilities.ReplaceNativeGarden = function() {
-	KlattmoseUtilities.HasReplaceAgronomicon = false;
-	if (!KlattmoseUtilities.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {
-		var M = Game.Objects["Farm"].minigame;
-		
-		KlattmoseUtilities.patches.gardenOrderofOperations = {};
-		KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction = M.logic;
-		
-		
-		KlattmoseUtilities.patches.gardenOrderofOperations.newFunction = function(){
-			//run each frame
-			var now=Date.now();
+			break;
 			
-			if (!M.freeze)
-			{
-				M.nextStep=Math.min(M.nextStep,now+(M.stepT)*1000);
-				if (now>=M.nextStep)
-				{
-					M.computeStepT();
-					M.nextStep=now+M.stepT*1000;
-					
-					M.computeBoostPlot();
-					M.computeMatures();
-					
-					var weedMult=M.soilsById[M.soil].weedMult;
-					
-					var loops=1;
-					if (M.soilsById[M.soil].key=='woodchips') loops=3;
-					loops*=M.loopsMult;
-					M.loopsMult=1;
-					
-					for (var y=0;y<6;y++)
-					{
-						for (var x=0;x<6;x++)
-						{
-							if (M.isTileUnlocked(x,y))
-							{
-								var tile=M.plot[y][x];
-								var me=M.plantsById[tile[0]-1];
-								if (tile[0]>0)
-								{
-									//age
-									tile[1]+=randomFloor((me.ageTick+me.ageTickR*Math.random())*M.plotBoost[y][x][0]);
-									tile[1]=Math.max(tile[1],0);
-									if (me.immortal) tile[1]=Math.min(me.mature+1,tile[1]);
-									else if (tile[1]>=100)
-									{
-										//die of old age
-										M.plot[y][x]=[0,0];
-										if (me.onDie) me.onDie(x,y);
-										if (M.soilsById[M.soil].key=='pebbles' && Math.random()<0.35)
-										{
-											if (M.unlockSeed(me)) Game.Popup('Unlocked '+me.name+' seed.',Game.mouseX,Game.mouseY);
-										}
-									}
-									else if (!me.noContam)
-									{
-										//other plant contamination
-										//only occurs in cardinal directions
-										//immortal plants and plants with noContam are immune
-										
-										var list=[];
-										for (var i in M.plantContam)
-										{
-											if (Math.random()<M.plantContam[i] && (!M.plants[i].weed || Math.random()<weedMult)) list.push(i);
-										}
-										var contam=choose(list);
-										
-										if (contam && me.key!=contam)
-										{
-											if ((!M.plants[contam].weed && !M.plants[contam].fungus) || Math.random()<M.plotBoost[y][x][2])
-											{
-												var any=0;
-												var neighs={};//all surrounding plants
-												var neighsM={};//all surrounding mature plants
-												for (var i in M.plants){neighs[i]=0;}
-												for (var i in M.plants){neighsM[i]=0;}
-												var neigh=M.getTile(x,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												var neigh=M.getTile(x,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												var neigh=M.getTile(x-1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												var neigh=M.getTile(x+1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												
-												if (neighsM[contam]>=1) M.plot[y][x]=[M.plants[contam].id+1,0];
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					for (var y=0;y<6;y++)
-					{
-						for (var x=0;x<6;x++)
-						{
-							if (M.isTileUnlocked(x,y))
-							{
-								var tile=M.plot[y][x];
-								var me=M.plantsById[tile[0]-1];
-								if (tile[0]>0){}
-								else
-								{
-									//plant spreading and mutation
-									//happens on all 8 tiles around this one
-									for (var loop=0;loop<loops;loop++)
-									{
-										var any=0;
-										var neighs={};//all surrounding plants
-										var neighsM={};//all surrounding mature plants
-										for (var i in M.plants){neighs[i]=0;}
-										for (var i in M.plants){neighsM[i]=0;}
-										var neigh=M.getTile(x,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x-1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x+1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x-1,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x-1,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x+1,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x+1,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										if (any>0)
-										{
-											var muts=M.getMuts(neighs,neighsM);
-											
-											var list=[];
-											for (var ii=0;ii<muts.length;ii++)
-											{
-												if (Math.random()<muts[ii][1] && (!M.plants[muts[ii][0]].weed || Math.random()<weedMult) && ((!M.plants[muts[ii][0]].weed && !M.plants[muts[ii][0]].fungus) || Math.random()<M.plotBoost[y][x][2])) list.push(muts[ii][0]);
-											}
-											if (list.length>0) M.plot[y][x]=[M.plants[choose(list)].id+1,0];
-										}
-										else if (loop==0)
-										{
-											//weeds in empty tiles (no other plants must be nearby)
-											var chance=0.002*weedMult*M.plotBoost[y][x][2];
-											if (Math.random()<chance) M.plot[y][x]=[M.plants['meddleweed'].id+1,0];
-										}
-									}
-								}
-							}
-						}
-					}
-					M.toRebuild=true;
-					M.toCompute=true;
-				}
-			}
-			if (M.toRebuild) M.buildPlot();
-			if (M.toCompute) M.computeEffs();
-			
-			if (Game.keys[27])//esc
-			{
-				if (M.seedSelected>-1) M.plantsById[M.seedSelected].l.classList.remove('on');
-				M.seedSelected=-1;
-			}
-		}
-		
-		
-		M.logic = function(){
-			if(KlattmoseUtilities.config.patches.gardenOrderofOperations) KlattmoseUtilities.patches.gardenOrderofOperations.newFunction();
-			else KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction();
-		}
-		
-		
-		//***********************************
-		//    Insert into Agronomicon
-		//***********************************
-		KlattmoseUtilities.patches.AgronomiconInjection();
-		KlattmoseUtilities.HasReplaceNativeGardenLaunch = true;
-	}
-}
-
-KlattmoseUtilities.patches.AgronomiconInjection = function(){
-	if(typeof AcharvaksAgronomicon == "undefined"){
-		AcharvaksAgronomicon = {};
-		AcharvaksAgronomicon.postloadHooks = [];
-	}else{
-		if(typeof AcharvaksAgronomicon.postloadHooks == "undefined") AcharvaksAgronomicon.postloadHooks = [];
-	}
-	var AgroPosition = AcharvaksAgronomicon.postloadHooks.length;
-	
-	AcharvaksAgronomicon.postloadHooks[AgroPosition] = function(Agronomicon){
-		var M = Game.Objects["Farm"].minigame;
-		var wrap = M.AcharvaksAgronomicon.wrapper;
-		
-		var calcProbAgingGT = function(N, ageTick, ageTickR, ageBoost) {
-			if(N % 1 != 0) {
-				throw "In calcProbAgingGT, N must be an integer, got " + N;
-			}
-			if(N <= 0) {
-				return 1;
-			}
-			ageTick *= ageBoost;
-			ageTickR *= ageBoost;
-			var p1 = 0;
-			var p2 = 0;
-			var p3 = 0;
-			if(ageTickR > 0) {
-				// Probability that ageTick + ageTickR * Math.random() will be less than N - 1
-				p1 = (N - 1 - ageTick) / ageTickR;
-				p1 = Math.min(Math.max(p1, 0), 1);
+		case "Gambler's Fever Dream":
+			while(spellsCast < target){
+				Math.seedrandom(Game.seed + '/' + spellsCast);
 				
-				// Probability that ageTick + ageTickR * Math.random() will be greater than N
-				p2 = (ageTickR - N + ageTick) / ageTickR;
-				p2 = Math.min(Math.max(p2, 0), 1);
-			} else {
-				p1 = (ageTick < N - 1 ? 1 : 0);
-				p2 = (ageTick >= N ? 1 : 0);
-			}
-
-			if(p1 + p2 < 1) {
-				/*
-				 * Probability that if ageTick + ageTickR * Math.random() is between N - 1 and N,
-				 * it will be rounded to N. I hope my analysis of the probability disribution was
-				 * correct.
-				 */
-				 var a = (ageTick < N - 1 ? 0 : ageTick % 1);
-				 var b = (ageTick + ageTickR < N ? ageTickR % 1 : 1 - a);
-				 p3 = (1 - p1 - p2) * (a + b / 2);
-			}
-			
-			return p2 + p3;
-		}
-		
-		
-		wrap.calcPartMutationProbability = function(x, y, x_offset, y_offset, prior_prob, neighs, neighsM,
-                                                                plantsNextTick, cant_change) {
-			var plant_id = this.garden.plot[y + y_offset][x + x_offset][0] - 1;
-			var plant = (plant_id >= 0 ? this.garden.plantsById[plant_id] : null);
-			if(!KlattmoseUtilities.config.patches.gardenOrderofOperations && cant_change) {
-				if(plant !== null) {
-					var is_mature = this.garden.plot[y + y_offset][x + x_offset][1] >= plant.mature;
-					++neighs[plant.key];
-					if(is_mature) {
-						++neighsM[plant.key];
-					}
-					this.callNextOffset(x, y, x_offset, y_offset, prior_prob, neighs, neighsM, plantsNextTick);
-					--neighs[plant.key];
-					if(is_mature) {
-						--neighsM[plant.key];
-					}
-				} else {
-					return this.callNextOffset(x, y, x_offset, y_offset, prior_prob, neighs, neighsM, plantsNextTick);
+				var spells = [];
+				var selfCost = M.getSpellCost(M.spells["gambler's fever dream"]);
+				for (var i in M.spells){
+					if (i != "gambler's fever dream" && (M.magic-selfCost) >= M.getSpellCost(M.spells[i]) * 0.5) 
+						spells.push(M.spells[i]);
 				}
-			} else {
-				var ts = this.tileStatus[y + y_offset][x + x_offset];
-				for(var i = 0; i < this.plantKeys.length; ++i) {
-					var key = this.plantKeys[i];
-					var pnt = ts.plantsNextTick[key];
-					if(!pnt.prevented) {
-						if(pnt.probImmature > 0) {
-							++neighs[key];
-							this.callNextOffset(x, y, x_offset, y_offset, prior_prob * pnt.probImmature, neighs, neighsM, plantsNextTick);
-							--neighs[key];
-						}
-						if(pnt.probMature > 0) {
-							++neighs[key];
-							++neighsM[key];
-							this.callNextOffset(x, y, x_offset, y_offset, prior_prob * pnt.probMature, neighs, neighsM, plantsNextTick);
-							--neighsM[key];
-							--neighs[key];
-						}
+				if (spells.length == 0){
+					spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No eligible spells!</span><br/>';
+				}else{
+					var gfdSpell = choose(spells);
+					var gfdBackfire = M.getFailChance(gfdSpell);
+					
+					if(FortuneCookie.detectKUGamblerPatch()) gfdBackfire *= 2;
+					else gfdBackfire = Math.max(gfdBackfire, 0.5);
+					
+					Math.seedrandom(Game.seed + '/' + (spellsCast + 1));
+					if(Math.random() < (1 - gfdBackfire)){
+						spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
+						if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, true) + ')';
+						if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, true) + ')';
+						spellOutcome += '</span><br/>';
+					}else{
+						spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
+						if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, false) + ')';
+						if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, false) + ')';
+						spellOutcome += '</span><br/>';
 					}
 				}
-				if(ts.probEmptyNextTick > 0) {
-					this.callNextOffset(x, y, x_offset, y_offset, prior_prob * ts.probEmptyNextTick, neighs, neighsM, plantsNextTick);
-				}
-			}
-		}
-		
-		
-		wrap.recalculateTileAge = function(x, y, loops) {
-			var s = this.tileStatus[y][x];
-			if(!this.garden.isTileUnlocked(x, y)) {
-				if(s.unlocked) {
-					// The tile somehow became locked
-					s.plant = null;
-					s.probGrowthNextTick = 0;
-					s.probDeathNextTick = 0;
-					s.probEmptyNextTick = 0;
-					s.underEffects = false;
-				}
-			} else {
-				s.unlocked = true;
-				for(var key in s.plantsNextTick) {
-					var ss = s.plantsNextTick[key];
-					ss.probMature = 0;
-					ss.probImmature = 0;
-				}
-				var tile = this.garden.plot[y][x];
-				var tile_boost = this.garden.plotBoost[y][x];
-				s.underEffects = (tile_boost[0] !== 1 || tile_boost[2] !== 1);
-				if(tile[0] === 0) {
-					s.plant = null;
-					s.probGrowthNextTick = 0;
-					s.probDeathNextTick = 0;
-				} else {
-					s.plant = this.garden.plantsById[tile[0]-1];
-					s.probGrowthNextTick = calcProbAgingGT(1, s.plant.ageTick, s.plant.ageTickR, tile_boost[0]);
-					s.probDeathNextTick = (s.plant.immortal ? 0 : calcProbAgingGT(100 - tile[1], s.plant.ageTick, s.plant.ageTickR, tile_boost[0]));
-				}
-				if(s.plant) {
-					// Contamination
-					var prob_contam = 0;
-					var baseContamProbs = this.baseContamProbsBySoilId[this.garden.soil];
-					if(s.probDeathNextTick < 1 && !s.plant.noContam) {
-						var mcn = this.getMatureCardinalNeighbors(x, y);
-						for(key in baseContamProbs) {
-							if(baseContamProbs[key] && s.plant.key !== key && mcn[key]) {
-								var newplant = this.garden.plants[key];
-								var this_prob_contam = (1 - s.probDeathNextTick) * baseContamProbs[key]
-													   * Math.min(((newplant.weed || newplant.fungus) ? tile_boost[2] : 1), 1);
-								s.plantsNextTick[key].probImmature = this_prob_contam;
-								prob_contam += this_prob_contam;
-							}
-						}
-					}
-					// Total probability of the tile being empty
-					s.probEmptyNextTick = s.probDeathNextTick * (1 - prob_contam);
-					// Maturity
-					if(tile[1] >= s.plant.mature) {
-						s.plantsNextTick[s.plant.key].probMature = (1 - s.probDeathNextTick) * (1 - prob_contam);
-					} else {
-						var prob_mature = calcProbAgingGT(Math.ceil(s.plant.mature - tile[1]), s.plant.ageTick,
-															s.plant.ageTickR, tile_boost[0]);
-						s.plantsNextTick[s.plant.key].probImmature = (1 - s.probDeathNextTick)
-																		* (1 - prob_contam) * (1 - prob_mature);
-						s.plantsNextTick[s.plant.key].probMature = (1 - s.probDeathNextTick) * (1 - prob_contam) * prob_mature;
-					}
-				} 
-			}
-		}
-		
-		
-		wrap.recalculateTileSpread = function(x, y, loops) {
-			var s = this.tileStatus[y][x];
-			if(!this.garden.isTileUnlocked(x, y)) {
-				if(s.unlocked) {
-					// The tile somehow became locked
-					s.plant = null;
-					s.probGrowthNextTick = 0;
-					s.probDeathNextTick = 0;
-					s.probEmptyNextTick = 0;
-					s.underEffects = false;
-				}
-			} else {
-				s.unlocked = true;
-				var tile_boost = this.garden.plotBoost[y][x];
 				
-				if(!s.plant) {
-					// If there is no plant, calculate mutations and weeds
-					// A plant cannot die and be replaced on the same tick
-					var prob_empty = 1;
-					if(loops > 0) { // Maybe there will be some need to call this function with loops = 0
-						this.callNextOffset(x, y, 0, 0, 1, this.zeroPlantMaps[0], this.zeroPlantMaps[1], s.plantsNextTick);
-						for(var key in s.plantsNextTick) {
-							var p = s.plantsNextTick[key];
-							prob_empty -= p.probImmature;
-							if(loops > 1) {
-								// Since .probMature must be 0, we use it to temorarily store this probability
-								p.probMature = p.probImmature;
-							}
-						}
-						if(loops > 1) {
-							for(var loop = 2; loop <= loops; ++loop) {
-								var new_prob_empty = 1;
-								for(key in s.plantsNextTick) {
-									var p = s.plantsNextTick[key];
-									p.probImmature += prob_empty * p.probMature;
-									new_prob_empty -= p.probImmature;
-								}
-								prob_empty = new_prob_empty;
-							}
-							for(key in s.plantsNextTick) {
-								s.plantsNextTick[key].probMature = 0;
-							}
-						}
-					}
-					// Weeds
-					if(prob_empty > 0 && this.weedKey) {
-						var prob_nn = this.calcProbNoNeighbors(x, y);
-						if(prob_nn > 0) {
-							var wp = this.weedProb * prob_empty * prob_nn * this.garden.soilsById[this.garden.soil].weedMult * tile_boost[2];
-							s.plantsNextTick[this.weedKey].probImmature += wp;
-							prob_empty *= (1 - wp);
-						}
-					}
-					// Final probability that it'll remain empty
-					s.probEmptyNextTick = prob_empty;
-				}
+				spellsCast+=1;
+				Math.seedrandom();
 			}
-		}
-		
-		
-		wrap.recalculateAllTiles = function(loops) {
-			// Doesn't account for the possibility that x or y can ALWAYS be greater than 0,
-			// but in unmodded game it's impossible
-			if(KlattmoseUtilities.config.patches.gardenOrderofOperations){
-				for(var y = 0; y < this.maxPlotHeight; ++y) {
-					for(var x = 0; x < this.maxPlotWidth; ++x) {
-						this.recalculateTileAge(x, y, loops);
-					}
-				}
-				for(var y = 0; y < this.maxPlotHeight; ++y) {
-					for(var x = 0; x < this.maxPlotWidth; ++x) {
-						this.recalculateTileSpread(x, y, loops);
-					}
-				}
-			}else{
-				for(var y = 0; y < this.maxPlotHeight; ++y) {
-					for(var x = 0; x < this.maxPlotWidth; ++x) {
-						this.recalculateTile(x, y, loops);
-					}
-				}
+			break;
+			
+		case "Conjure Baked Goods":
+		case "Stretch Time":
+		case "Haggler's Charm":
+		case "Summon Crafty Pixies":
+		case "Resurrect Abomination":
+		case "Diminish Ineptitude":
+			while(spellsCast < target){
+				Math.seedrandom(Game.seed + '/' + spellsCast);
+				if(Math.random() < (1 - backfire))
+					spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Success</span><br/>';
+				else
+					spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Backfire</span><br/>';
+				
+				spellsCast += 1;
+				Math.seedrandom();
 			}
-		}
-		
+			break;
+			
+		default:
+			spellOutcome = "";
 	}
+	return spellOutcome;
+}
+
+FortuneCookie.detectKUGamblerPatch = function(){
+	if(typeof KlattmoseUtilities == 'undefined') return false;
+	if(typeof KlattmoseUtilities.config == 'undefined') return false;
+	if(typeof KlattmoseUtilities.config.patches == 'undefined') return false;
 	
-	if(AcharvaksAgronomicon.isLoaded) (AcharvaksAgronomicon.postloadHooks[AgroPosition])(AcharvaksAgronomicon);
+	return KlattmoseUtilities.config.patches.gamblersFeverDreamFix == 1;
 }
 
 
-KlattmoseUtilities.ReplaceNativePantheon = function() {
-	if (!KlattmoseUtilities.HasReplaceNativePantheonLaunch && Game.Objects["Temple"].minigameLoaded) {
-		var M = Game.Objects["Temple"].minigame;
-		
-		KlattmoseUtilities.patches.slotGodFix = {};
-		KlattmoseUtilities.patches.slotGodFix.oldFunction = M.slotGod;
-		
-		
-		KlattmoseUtilities.patches.slotGodFix.newFunction = function(god, slot){
-			if(slot == god.slot) return false;
-			
-			if(slot == -1) M.slot[god.slot] = -1;
-			else if(M.slot[slot] != -1) M.godsById[M.slot[slot]].slot = god.slot;
-			
-			if(god.slot != -1 && slot != -1) M.slot[god.slot] = M.slot[slot];
-			if(slot != -1) M.slot[slot] = god.id;
-			
-			god.slot = slot;
-			Game.recalculateGains = true;
-		}
-		
-		
-		M.slotGod = function(god, slot){
-			if(KlattmoseUtilities.config.patches.slotGodFix) KlattmoseUtilities.patches.slotGodFix.newFunction(god, slot);
-			else KlattmoseUtilities.patches.slotGodFix.oldFunction(god, slot);
-		}
-		
-		KlattmoseUtilities.HasReplaceNativePantheonLaunch = true;
-	}
-}
-
-
-KlattmoseUtilities.ReplaceNativeGrimoire = function() {
-	if (!KlattmoseUtilities.HasReplaceNativeGrimoireLaunch && Game.Objects["Wizard tower"].minigameLoaded) {
-		var M = Game.Objects["Wizard tower"].minigame;
-		
-		KlattmoseUtilities.patches.gamblersFeverDreamFix = {};
-		KlattmoseUtilities.patches.gamblersFeverDreamFix.oldFunction = M.spells['gambler\'s fever dream'].win;
-		
-		
-		KlattmoseUtilities.patches.gamblersFeverDreamFix.newFunction = function(){
-			var spells=[];
-			var selfCost=M.getSpellCost(M.spells['gambler\'s fever dream']);
-			for (var i in M.spells)
-			{if (i!='gambler\'s fever dream' && (M.magic-selfCost)>=M.getSpellCost(M.spells[i])*0.5) spells.push(M.spells[i]);}
-			if (spells.length==0){Game.Popup('<div style="font-size:80%;">No eligible spells!</div>',Game.mouseX,Game.mouseY);return -1;}
-			var spell=choose(spells);
-			var cost=M.getSpellCost(spell)*0.5;
-			setTimeout(function(spell,cost,seed){return function(){
-				if (Game.seed!=seed) return false;
-				var out=M.castSpell(spell,{cost:cost,failChanceMult:2,passthrough:true});
-				if (!out)
-				{
-					M.magic+=selfCost;
-					setTimeout(function(){
-						Game.Popup('<div style="font-size:80%;">That\'s too bad!<br>Magic refunded.</div>',Game.mouseX,Game.mouseY);
-					},1500);
-				}
-			}}(spell,cost,Game.seed),1000);
-			Game.Popup('<div style="font-size:80%;">Casting '+spell.name+'<br>for '+Beautify(cost)+' magic...</div>',Game.mouseX,Game.mouseY);
-		}
-		
-		
-		M.spells['gambler\'s fever dream'].win = function(){
-			if(KlattmoseUtilities.config.patches.gamblersFeverDreamFix) KlattmoseUtilities.patches.gamblersFeverDreamFix.newFunction();
-			else KlattmoseUtilities.patches.gamblersFeverDreamFix.oldFunction();
-		}
-		
-		KlattmoseUtilities.HasReplaceNativeGrimoireLaunch = true;
-	}
-}
-
-
-
-
-if(!KlattmoseUtilities.isLoaded) KlattmoseUtilities.init();
+if(!FortuneCookie.isLoaded) FortuneCookie.init();

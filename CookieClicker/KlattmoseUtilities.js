@@ -158,8 +158,8 @@ KlattmoseUtilities.init = function(){
 	//    To support other mods interfacing with this one
 	//***********************************
 	if(KlattmoseUtilities.postloadHooks) {
-		for(var i = 0; i < Agronomicon.postloadHooks.length; ++i) {
-			(Agronomicon.postloadHooks[i])(Agronomicon);
+		for(var i = 0; i < KlattmoseUtilities.postloadHooks.length; ++i) {
+			(KlattmoseUtilities.postloadHooks[i])();
 		}
 	}
 	

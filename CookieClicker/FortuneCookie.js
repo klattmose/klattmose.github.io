@@ -1,18 +1,13 @@
 Game.Win('Third-party');
-if(FortuneCookie === undefined){
-	var FortuneCookie = {};
-	
+if(FortuneCookie === undefined) var FortuneCookie = {};
+
+
+FortuneCookie.init = function(){
+	FortuneCookie.isLoaded = 1;
 	FortuneCookie.Backup = {};
 	FortuneCookie.config = {};
 	FortuneCookie.config.spellForecastLength = 10;
 	FortuneCookie.ConfigPrefix = "FortuneCookie";
-	
-	FortuneCookie.toLoad = 1;
-}
-
-
-FortuneCookie.init = function(){
-	FortuneCookie.toLoad = 0;
 	FortuneCookie.loadConfig();
 	
 	FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
@@ -21,7 +16,51 @@ FortuneCookie.init = function(){
 		FortuneCookie.ReplaceNativeGrimoire();
 	}
 	
+	FortuneCookie.ReplaceNativeGrimoire();
+	FortuneCookie.ReplaceGameMenu();
+	FortuneCookie.initMembraneForecast();
+	
+	
+	//***********************************
+	//    Post-Load Hooks 
+	//    To support other mods interfacing with this one
+	//***********************************
+	if(FortuneCookie.postloadHooks) {
+		for(var i = 0; i < FortuneCookie.postloadHooks.length; ++i) {
+			(FortuneCookie.postloadHooks[i])();
+		}
+	}
+	
+	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
+	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
+}
+
+
+//***********************************
+//    Configuration
+//***********************************
+FortuneCookie.saveConfig = function(config){
+	localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
+}
+
+FortuneCookie.loadConfig = function(){
+	if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
+		FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
+	}
+}
+
+FortuneCookie.setForecastLength = function(length){
+	FortuneCookie.config.spellForecastLength = length;
+	FortuneCookie.saveConfig(FortuneCookie.config);
+}
+
+
+//***********************************
+//    Replacement
+//***********************************
+FortuneCookie.ReplaceGameMenu = function(){
 	FortuneCookie.oldUpdateMenu = Game.UpdateMenu;
+	
 	Game.UpdateMenu = function(){
 		FortuneCookie.oldUpdateMenu();
 		if(Game.onMenu === 'prefs') {
@@ -47,9 +86,28 @@ FortuneCookie.init = function(){
 			}
 		}
 	}
-	
-	FortuneCookie.ReplaceNativeGrimoire();
-	
+}
+
+FortuneCookie.ReplaceNativeGrimoire = function() {
+	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
+		var M = Game.Objects['Wizard tower'].minigame;
+		
+		eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
+			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
+					FortuneCookie.spellForecast(me) + 
+					$1`
+			)
+		);
+		
+		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
+	}
+}
+
+
+//***********************************
+//    Membrane Forecast
+//***********************************
+FortuneCookie.initMembraneForecast = function(){
 	for(var i = 0; i < 3; i++){
 		var me;
 		if(i == 0) me = Game.Upgrades["Shimmering veil"];
@@ -84,35 +142,6 @@ FortuneCookie.init = function(){
 			return str;
 		}
 	}
-	
-	if (Game.prefs.popups) Game.Popup('Fortune Cookie loaded!');
-	else Game.Notify('Fortune Cookie loaded!', '', '', 1, 1);
-}
-
-
-FortuneCookie.saveConfig = function(config){
-	localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
-}
-
-FortuneCookie.loadConfig = function(){
-	if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
-		FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
-	}
-}
-
-FortuneCookie.ReplaceNativeGrimoire = function() {
-	if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
-		var M = Game.Objects['Wizard tower'].minigame;
-		
-		eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
-			.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
-					FortuneCookie.spellForecast(me) + 
-					$1`
-			)
-		);
-		
-		FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
-	}
 }
 
 FortuneCookie.forecastMembrane = function(context, offset){
@@ -136,11 +165,10 @@ FortuneCookie.countMembraneDurability = function(context){
 	return -1;
 }
 
-FortuneCookie.setForecastLength = function(length){
-	FortuneCookie.config.spellForecastLength = length;
-	FortuneCookie.saveConfig(FortuneCookie.config);
-}
 
+//***********************************
+//    Grimoire forecast
+//***********************************
 FortuneCookie.FateChecker = function(spellCount, idx, backfire){
 	var res = '';
 	var FTHOFcookie = '';
@@ -406,4 +434,4 @@ FortuneCookie.detectKUGamblerPatch = function(){
 }
 
 
-if(FortuneCookie.toLoad) FortuneCookie.init();
+if(!FortuneCookie.isLoaded) FortuneCookie.init();

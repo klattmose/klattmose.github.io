@@ -414,16 +414,16 @@ KlattmoseUtilities.EditHotkey = function(i){
 	var hotkey = KlattmoseUtilities.tempHotkey;
 	
 	var str = '<h3>Edit Hotkey</h3><div class="block" style="overflow: auto;">';
-	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 125px;"></div><br/>';
-	str += '<div class="listing" style="float: left;">Key Binding: <a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></div></div>';
-	str += '<div class="listing" style="float: left;">Period (ms): <input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 125px;"></div><br/>';
+	str += '<div class="listing" style="text-align: left;width:80%;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 125px;"></div>';
+	str += '<div class="listing" style="text-align: left;width:80%;">Key Binding: <a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></div>';
+	str += '<div class="listing" style="text-align: left;width:80%;">Period (ms): <input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 125px;"></div></div>';
 	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
 	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
 	str += hotkey.script;
 	str += '</textarea></div></div>';
 	
 	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewKeybinding(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']]);
+					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']],0,'widePrompt');
 }
 
 KlattmoseUtilities.getNewKeybinding = function(i){

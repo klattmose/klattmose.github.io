@@ -1,15 +1,6 @@
 Game.Win('Third-party');
-if(KlattmoseUtilities === undefined) {
-	var KlattmoseUtilities = {};
-	
-	KlattmoseUtilities.Backup = {};
-	KlattmoseUtilities.Repeaters = {};
-	KlattmoseUtilities.RepeaterFlags = {};
-	KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
-	KlattmoseUtilities.waitingForInput = 0;
-	
-	KlattmoseUtilities.toLoad = 1;
-}
+if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
+if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 
 KlattmoseUtilities.defaultConfig = function(){
 	return {
@@ -131,7 +122,12 @@ KlattmoseUtilities.defaultConfig = function(){
 }
 
 KlattmoseUtilities.init = function(){
-	KlattmoseUtilities.toLoad = 0;
+	KlattmoseUtilities.isLoaded = 1;
+	KlattmoseUtilities.Backup = {};
+	KlattmoseUtilities.Repeaters = {};
+	KlattmoseUtilities.RepeaterFlags = {};
+	KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
+	KlattmoseUtilities.waitingForInput = 0;
 	
 	KlattmoseUtilities.restoreDefaultConfig(1);
 	KlattmoseUtilities.loadConfig();
@@ -203,8 +199,455 @@ KlattmoseUtilities.init = function(){
 	
 	
 	//***********************************
-	//    Insert into Agronomicon
+	//    Post-Load Hooks 
+	//    To support other mods interfacing with this one
 	//***********************************
+	if(KlattmoseUtilities.postloadHooks) {
+		for(var i = 0; i < Agronomicon.postloadHooks.length; ++i) {
+			(Agronomicon.postloadHooks[i])(Agronomicon);
+		}
+	}
+	
+	
+	//***********************************
+	//    On-Load Functions run now
+	//***********************************
+	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
+		KlattmoseUtilities.config.onLoadFunctions[i].function();
+	}
+	
+	if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');
+	else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
+}
+
+
+//***********************************
+//    Menu Replacer
+//***********************************
+KlattmoseUtilities.ReplaceGameMenu = function(){
+	KlattmoseUtilities.Backup.UpdateMenu = Game.UpdateMenu;
+	
+	Game.UpdateMenu = function(){
+		KlattmoseUtilities.Backup.UpdateMenu();
+		
+		var writeHeader = function(text) {
+			var div = document.createElement('div');
+			div.className = 'listing';
+			div.style.padding = '5px 16px';
+			div.style.opacity = '0.7';
+			div.style.fontSize = '17px';
+			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
+			div.textContent = text;
+			return div.outerHTML;
+		}
+		
+		var WriteButton = function(patchName, button, on, off, callback, invert){
+			var invert = invert ? 1 : 0;
+			if (!callback) callback = '';
+			callback += 'PlaySound(\'snd/tick.mp3\');';
+			return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
+		}
+		
+		if(Game.onMenu === 'prefs') {
+			var str =	'<div class="title">Klattmose Utilities</div>' + 
+						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
+											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
+						writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
+						'<div class="listing"><p>Single fire</p></div>';
+			
+			var repStr = '<div class="listing"><p>Repeaters</p></div>';
+			
+			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+				var hotkey = KlattmoseUtilities.config.hotkeys[i];
+				
+				if(hotkey.period === undefined){
+					str += '<div class="listing">' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+						'</div>';
+				} else {
+					repStr += '<div class="listing">' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+						'</div>';
+				}
+			}
+			str += repStr;
+			
+			
+			str += writeHeader("On-Load Functions") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + KlattmoseUtilities.config.onLoadFunctions.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>';
+			for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
+				var onLoadFunction = KlattmoseUtilities.config.onLoadFunctions[i];
+				
+				str += '<div class="listing">' + 
+					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunction.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+					'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
+					'</div>';
+			}
+			
+			
+			str += writeHeader("Optional Patches");
+			
+			str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
+			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
+			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
+			
+			
+			
+			var div = document.createElement('div');
+			div.innerHTML = str;
+			var menu = document.getElementById('menu');
+			if(menu) {
+				menu = menu.getElementsByClassName('subsection')[0];
+				if(menu) {
+					var padding = menu.getElementsByTagName('div');
+					padding = padding[padding.length - 1];
+					if(padding) {
+						menu.insertBefore(div, padding);
+					} else {
+						menu.appendChild(div);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+//***********************************
+//    Configuration
+//***********************************
+KlattmoseUtilities.saveConfig = function(config){
+	localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
+	KlattmoseUtilities.functionalize();
+}
+
+KlattmoseUtilities.loadConfig = function(){
+	if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
+		KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
+		KlattmoseUtilities.functionalize();
+	}
+}
+
+KlattmoseUtilities.restoreDefaultConfig = function(mode){
+	KlattmoseUtilities.config = KlattmoseUtilities.defaultConfig();
+	if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+	
+	KlattmoseUtilities.functionalize();
+}
+
+KlattmoseUtilities.exportConfig = function(){
+	Game.prefs.showBackupWarning = 0;
+	Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+				JSON.stringify(KlattmoseUtilities.config, null, 2) + 
+				'</textarea></div>',['All done!']);
+	l('textareaPrompt').focus();
+	l('textareaPrompt').select();
+}
+
+KlattmoseUtilities.importConfig = function(){
+	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); KlattmoseUtilities.functionalize(); Game.UpdateMenu();}'], 'Nevermind']);
+	l('textareaPrompt').focus();
+}
+
+KlattmoseUtilities.functionalize = function(){
+	// In case any of these are left out
+	if(KlattmoseUtilities.config.hotkeys === undefined) KlattmoseUtilities.config.hotkeys = {};
+	if(KlattmoseUtilities.config.patches === undefined) KlattmoseUtilities.config.patches = {};
+	if(KlattmoseUtilities.config.onLoadFunctions === undefined) KlattmoseUtilities.config.onLoadFunctions = {};
+	
+	for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+		eval("KlattmoseUtilities.config.hotkeys[" + i + "].function = function(){" + KlattmoseUtilities.config.hotkeys[i].script + "}");
+	}
+	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
+		eval("KlattmoseUtilities.config.onLoadFunctions[" + i + "].function = function(){" + KlattmoseUtilities.config.onLoadFunctions[i].script + "}");
+	}
+}
+
+
+//***********************************
+//    On-Load Function Functions
+//***********************************
+KlattmoseUtilities.EditOnLoadFunction = function(i){
+	if(i < KlattmoseUtilities.config.onLoadFunctions.length){
+		KlattmoseUtilities.tempOnLoadFunction = JSON.parse(JSON.stringify(KlattmoseUtilities.config.onLoadFunctions[i]));
+	} else {
+		KlattmoseUtilities.tempOnLoadFunction = {nickname:'New On-Load Function', script:''};
+	}
+	
+	var onLoadFunction = KlattmoseUtilities.tempOnLoadFunction;
+	
+	var str = '<h3>Edit On-Load Function</h3><div class="block" style="overflow: auto;">';
+	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + onLoadFunction.nickname + '" style="width: 125px;"></div></div><br/>';
+	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
+	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
+	str += onLoadFunction.script;
+	str += '</textarea></div></div>';
+	
+	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewOnLoadFunction(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
+					  ['Nevermind', 'Game.ClosePrompt();']]);
+}
+
+KlattmoseUtilities.saveNewOnLoadFunction = function(i){
+	KlattmoseUtilities.tempOnLoadFunction.nickname = l('nicknameEditor').value;
+	KlattmoseUtilities.tempOnLoadFunction.script = l('textareaPrompt').value;
+	KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction;
+	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+
+
+//***********************************
+//    Hotkey Functions
+//***********************************
+KlattmoseUtilities.EditHotkey = function(i){
+	if(i < KlattmoseUtilities.config.hotkeys.length){
+		KlattmoseUtilities.tempHotkey = JSON.parse(JSON.stringify(KlattmoseUtilities.config.hotkeys[i]));
+	} else {
+		KlattmoseUtilities.tempHotkey = {keyCode:0, nickname:'New hotkey', ctrl:false, shift:false, alt:false, script:''};
+	}
+	
+	var hotkey = KlattmoseUtilities.tempHotkey;
+	
+	var str = '<h3>Edit Hotkey</h3><div class="block" style="overflow: auto;">';
+	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 125px;"></div><br/>';
+	str += '<div class="listing" style="float: left;">Key Binding: <a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></div></div>';
+	str += '<div class="listing" style="float: left;">Period (ms): <input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 125px;"></div><br/>';
+	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
+	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
+	str += hotkey.script;
+	str += '</textarea></div></div>';
+	
+	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewKeybinding(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
+					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']]);
+}
+
+KlattmoseUtilities.getNewKeybinding = function(i){
+	var hotkey = KlattmoseUtilities.config.hotkeys[i];
+	l('keybindEditor').innerHTML = '...';
+	KlattmoseUtilities.waitingForInput = 1;
+}
+
+KlattmoseUtilities.saveNewKeybinding = function(i){
+	KlattmoseUtilities.waitingForInput = 0;
+	if(KlattmoseUtilities.validateInput(KlattmoseUtilities.tempHotkey.keyCode).length == 0) return;
+	
+	KlattmoseUtilities.tempHotkey.nickname = l('nicknameEditor').value;
+	KlattmoseUtilities.tempHotkey.period = l('periodEditor').value;
+	if(isNaN(KlattmoseUtilities.tempHotkey.period) || KlattmoseUtilities.tempHotkey.period.length == 0) delete KlattmoseUtilities.tempHotkey.period;
+	KlattmoseUtilities.tempHotkey.script = l('textareaPrompt').value;
+	KlattmoseUtilities.config.hotkeys[i] = KlattmoseUtilities.tempHotkey;
+	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+
+KlattmoseUtilities.getKeybindString = function(hotkey){
+	var res = '';
+	res += hotkey.ctrl?'Ctrl+':'';
+	res += hotkey.shift?'Shift+':'';
+	res += hotkey.alt?'Alt+':'';
+	
+	return res + KlattmoseUtilities.validateInput(hotkey.keyCode);
+}
+
+KlattmoseUtilities.validateInput = function(keyCode){
+	if((keyCode > 47 && keyCode < 58) || (keyCode > 64 && keyCode < 91)) return String.fromCharCode(keyCode);
+	if(keyCode > 95 && keyCode < 106) return 'Num ' + (keyCode - 96);
+	if(keyCode > 111 && keyCode < 124) return 'F' + (keyCode - 111);
+	return '';
+}
+
+
+//***********************************
+//    Optional Patches
+//***********************************
+KlattmoseUtilities.patches.Toggle = function(patchName, button, on, off, invert){
+	if (KlattmoseUtilities.config.patches[patchName]){
+		l(button).innerHTML = off;
+		KlattmoseUtilities.config.patches[patchName] = 0;
+	}else{
+		l(button).innerHTML = on;
+		KlattmoseUtilities.config.patches[patchName] = 1;
+	}
+	
+	l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
+	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+}
+
+
+KlattmoseUtilities.ReplaceNativeGarden = function() {
+	KlattmoseUtilities.HasReplaceAgronomicon = false;
+	if (!KlattmoseUtilities.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {
+		var M = Game.Objects["Farm"].minigame;
+		
+		KlattmoseUtilities.patches.gardenOrderofOperations = {};
+		KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction = M.logic;
+		
+		
+		KlattmoseUtilities.patches.gardenOrderofOperations.newFunction = function(){
+			//run each frame
+			var now=Date.now();
+			
+			if (!M.freeze)
+			{
+				M.nextStep=Math.min(M.nextStep,now+(M.stepT)*1000);
+				if (now>=M.nextStep)
+				{
+					M.computeStepT();
+					M.nextStep=now+M.stepT*1000;
+					
+					M.computeBoostPlot();
+					M.computeMatures();
+					
+					var weedMult=M.soilsById[M.soil].weedMult;
+					
+					var loops=1;
+					if (M.soilsById[M.soil].key=='woodchips') loops=3;
+					loops*=M.loopsMult;
+					M.loopsMult=1;
+					
+					for (var y=0;y<6;y++)
+					{
+						for (var x=0;x<6;x++)
+						{
+							if (M.isTileUnlocked(x,y))
+							{
+								var tile=M.plot[y][x];
+								var me=M.plantsById[tile[0]-1];
+								if (tile[0]>0)
+								{
+									//age
+									tile[1]+=randomFloor((me.ageTick+me.ageTickR*Math.random())*M.plotBoost[y][x][0]);
+									tile[1]=Math.max(tile[1],0);
+									if (me.immortal) tile[1]=Math.min(me.mature+1,tile[1]);
+									else if (tile[1]>=100)
+									{
+										//die of old age
+										M.plot[y][x]=[0,0];
+										if (me.onDie) me.onDie(x,y);
+										if (M.soilsById[M.soil].key=='pebbles' && Math.random()<0.35)
+										{
+											if (M.unlockSeed(me)) Game.Popup('Unlocked '+me.name+' seed.',Game.mouseX,Game.mouseY);
+										}
+									}
+									else if (!me.noContam)
+									{
+										//other plant contamination
+										//only occurs in cardinal directions
+										//immortal plants and plants with noContam are immune
+										
+										var list=[];
+										for (var i in M.plantContam)
+										{
+											if (Math.random()<M.plantContam[i] && (!M.plants[i].weed || Math.random()<weedMult)) list.push(i);
+										}
+										var contam=choose(list);
+										
+										if (contam && me.key!=contam)
+										{
+											if ((!M.plants[contam].weed && !M.plants[contam].fungus) || Math.random()<M.plotBoost[y][x][2])
+											{
+												var any=0;
+												var neighs={};//all surrounding plants
+												var neighsM={};//all surrounding mature plants
+												for (var i in M.plants){neighs[i]=0;}
+												for (var i in M.plants){neighsM[i]=0;}
+												var neigh=M.getTile(x,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+												var neigh=M.getTile(x,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+												var neigh=M.getTile(x-1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+												var neigh=M.getTile(x+1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+												
+												if (neighsM[contam]>=1) M.plot[y][x]=[M.plants[contam].id+1,0];
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					for (var y=0;y<6;y++)
+					{
+						for (var x=0;x<6;x++)
+						{
+							if (M.isTileUnlocked(x,y))
+							{
+								var tile=M.plot[y][x];
+								var me=M.plantsById[tile[0]-1];
+								if (tile[0]>0){}
+								else
+								{
+									//plant spreading and mutation
+									//happens on all 8 tiles around this one
+									for (var loop=0;loop<loops;loop++)
+									{
+										var any=0;
+										var neighs={};//all surrounding plants
+										var neighsM={};//all surrounding mature plants
+										for (var i in M.plants){neighs[i]=0;}
+										for (var i in M.plants){neighsM[i]=0;}
+										var neigh=M.getTile(x,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										var neigh=M.getTile(x,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										var neigh=M.getTile(x-1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										var neigh=M.getTile(x+1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										var neigh=M.getTile(x-1,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										var neigh=M.getTile(x-1,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										var neigh=M.getTile(x+1,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										var neigh=M.getTile(x+1,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
+										if (any>0)
+										{
+											var muts=M.getMuts(neighs,neighsM);
+											
+											var list=[];
+											for (var ii=0;ii<muts.length;ii++)
+											{
+												if (Math.random()<muts[ii][1] && (!M.plants[muts[ii][0]].weed || Math.random()<weedMult) && ((!M.plants[muts[ii][0]].weed && !M.plants[muts[ii][0]].fungus) || Math.random()<M.plotBoost[y][x][2])) list.push(muts[ii][0]);
+											}
+											if (list.length>0) M.plot[y][x]=[M.plants[choose(list)].id+1,0];
+										}
+										else if (loop==0)
+										{
+											//weeds in empty tiles (no other plants must be nearby)
+											var chance=0.002*weedMult*M.plotBoost[y][x][2];
+											if (Math.random()<chance) M.plot[y][x]=[M.plants['meddleweed'].id+1,0];
+										}
+									}
+								}
+							}
+						}
+					}
+					M.toRebuild=true;
+					M.toCompute=true;
+				}
+			}
+			if (M.toRebuild) M.buildPlot();
+			if (M.toCompute) M.computeEffs();
+			
+			if (Game.keys[27])//esc
+			{
+				if (M.seedSelected>-1) M.plantsById[M.seedSelected].l.classList.remove('on');
+				M.seedSelected=-1;
+			}
+		}
+		
+		
+		M.logic = function(){
+			if(KlattmoseUtilities.config.patches.gardenOrderofOperations) KlattmoseUtilities.patches.gardenOrderofOperations.newFunction();
+			else KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction();
+		}
+		
+		
+		//***********************************
+		//    Insert into Agronomicon
+		//***********************************
+		KlattmoseUtilities.patches.AgronomiconInjection();
+		KlattmoseUtilities.HasReplaceNativeGardenLaunch = true;
+	}
+}
+
+KlattmoseUtilities.patches.AgronomiconInjection = function(){
 	if(typeof AcharvaksAgronomicon == "undefined"){
 		AcharvaksAgronomicon = {};
 		AcharvaksAgronomicon.postloadHooks = [];
@@ -452,453 +895,8 @@ KlattmoseUtilities.init = function(){
 	}
 	
 	if(AcharvaksAgronomicon.isLoaded) (AcharvaksAgronomicon.postloadHooks[AgroPosition])(AcharvaksAgronomicon);
-	
-	
-	
-	//***********************************
-	//    Post-Load Hooks 
-	//    To support other mods interfacing with this one
-	//***********************************
-	if(KlattmoseUtilities.postloadHooks) {
-		for(var i = 0; i < Agronomicon.postloadHooks.length; ++i) {
-			(Agronomicon.postloadHooks[i])(Agronomicon);
-		}
-	}
-	
-	
-	//***********************************
-	//    On-Load Functions run now
-	//***********************************
-	if(KlattmoseUtilities.config.onLoadFunctions === undefined) KlattmoseUtilities.config.onLoadFunctions = {};
-	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-		KlattmoseUtilities.config.onLoadFunctions[i].function();
-	}
-	
-	if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');
-	else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
 }
 
-
-//***********************************
-//    Menu Replacer
-//***********************************
-KlattmoseUtilities.ReplaceGameMenu = function(){
-	KlattmoseUtilities.oldUpdateMenu = Game.UpdateMenu;
-	
-	Game.UpdateMenu = function(){
-		KlattmoseUtilities.oldUpdateMenu();
-		
-		if(KlattmoseUtilities.config.hotkeys === undefined) KlattmoseUtilities.config.hotkeys = {};
-		if(KlattmoseUtilities.config.patches === undefined) KlattmoseUtilities.config.patches = {};
-		
-		var writeHeader = function(text) {
-			var div = document.createElement('div');
-			div.className = 'listing';
-			div.style.padding = '5px 16px';
-			div.style.opacity = '0.7';
-			div.style.fontSize = '17px';
-			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
-			div.textContent = text;
-			return div.outerHTML;
-		}
-		
-		var WriteButton = function(patchName, button, on, off, callback, invert){
-			var invert = invert ? 1 : 0;
-			if (!callback) callback = '';
-			callback += 'PlaySound(\'snd/tick.mp3\');';
-			return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
-		}
-		
-		if(Game.onMenu === 'prefs') {
-			var str =	'<div class="title">Klattmose Utilities</div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
-											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
-						writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
-						'<div class="listing"><p>Single fire</p></div>';
-			
-			var repStr = '<div class="listing"><p>Repeaters</p></div>';
-			
-			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				
-				if(hotkey.period === undefined){
-					str += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				} else {
-					repStr += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				}
-			}
-			str += repStr;
-			
-			
-			str += writeHeader("On-Load Functions") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + KlattmoseUtilities.config.onLoadFunctions.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>';
-			for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-				var onLoadFunction = KlattmoseUtilities.config.onLoadFunctions[i];
-				
-				str += '<div class="listing">' + 
-					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunction.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
-					'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
-					'</div>';
-			}
-			
-			
-			str += writeHeader("Optional Patches");
-			
-			str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
-			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
-			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
-			
-			
-			
-			var div = document.createElement('div');
-			div.innerHTML = str;
-			var menu = document.getElementById('menu');
-			if(menu) {
-				menu = menu.getElementsByClassName('subsection')[0];
-				if(menu) {
-					var padding = menu.getElementsByTagName('div');
-					padding = padding[padding.length - 1];
-					if(padding) {
-						menu.insertBefore(div, padding);
-					} else {
-						menu.appendChild(div);
-					}
-				}
-			}
-		}
-	}
-}
-
-
-//***********************************
-//    Configuration
-//***********************************
-KlattmoseUtilities.saveConfig = function(config){
-	localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
-	KlattmoseUtilities.functionalize();
-}
-
-KlattmoseUtilities.loadConfig = function(){
-	if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
-		KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
-		KlattmoseUtilities.functionalize();
-	}
-}
-
-KlattmoseUtilities.restoreDefaultConfig = function(mode){
-	KlattmoseUtilities.config = KlattmoseUtilities.defaultConfig();
-	if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-	
-	KlattmoseUtilities.functionalize();
-}
-
-KlattmoseUtilities.exportConfig = function(){
-	Game.prefs.showBackupWarning = 0;
-	Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-				JSON.stringify(KlattmoseUtilities.config, null, 2) + 
-				'</textarea></div>',['All done!']);
-	l('textareaPrompt').focus();
-	l('textareaPrompt').select();
-}
-
-KlattmoseUtilities.importConfig = function(){
-	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); KlattmoseUtilities.functionalize(); Game.UpdateMenu();}'], 'Nevermind']);
-	l('textareaPrompt').focus();
-}
-
-KlattmoseUtilities.functionalize = function(){
-	for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-		eval("KlattmoseUtilities.config.hotkeys[" + i + "].function = function(){" + KlattmoseUtilities.config.hotkeys[i].script + "}");
-	}
-	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-		eval("KlattmoseUtilities.config.onLoadFunctions[" + i + "].function = function(){" + KlattmoseUtilities.config.onLoadFunctions[i].script + "}");
-	}
-}
-
-
-//***********************************
-//    On-Load Function Functions
-//***********************************
-KlattmoseUtilities.EditOnLoadFunction = function(i){
-	if(i < KlattmoseUtilities.config.onLoadFunctions.length){
-		KlattmoseUtilities.tempOnLoadFunction = JSON.parse(JSON.stringify(KlattmoseUtilities.config.onLoadFunctions[i]));
-	} else {
-		KlattmoseUtilities.tempOnLoadFunction = {nickname:'New On-Load Function', script:''};
-	}
-	
-	var onLoadFunction = KlattmoseUtilities.tempOnLoadFunction;
-	
-	var str = '<h3>Edit On-Load Function</h3><div class="block" style="overflow: auto;">';
-	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + onLoadFunction.nickname + '" style="width: 125px;"></div></div><br/>';
-	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
-	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
-	str += onLoadFunction.script;
-	str += '</textarea></div></div>';
-	
-	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewOnLoadFunction(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-					  ['Nevermind', 'Game.ClosePrompt();']]);
-}
-
-KlattmoseUtilities.saveNewOnLoadFunction = function(i){
-	KlattmoseUtilities.tempOnLoadFunction.nickname = l('nicknameEditor').value;
-	KlattmoseUtilities.tempOnLoadFunction.script = l('textareaPrompt').value;
-	KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction;
-	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-}
-
-
-//***********************************
-//    Hotkey Functions
-//***********************************
-KlattmoseUtilities.EditHotkey = function(i){
-	if(i < KlattmoseUtilities.config.hotkeys.length){
-		KlattmoseUtilities.tempHotkey = JSON.parse(JSON.stringify(KlattmoseUtilities.config.hotkeys[i]));
-	} else {
-		KlattmoseUtilities.tempHotkey = {keyCode:0, nickname:'New hotkey', ctrl:false, shift:false, alt:false, script:''};
-	}
-	
-	var hotkey = KlattmoseUtilities.tempHotkey;
-	
-	var str = '<h3>Edit Hotkey</h3><div class="block" style="overflow: auto;">';
-	str += '<div class="listing" style="float: left;">Nickname: <input id="nicknameEditor" class="option" type="text" value="' + hotkey.nickname + '" style="width: 125px;"></div><br/>';
-	str += '<div class="listing" style="float: left;">Key Binding: <a id="keybindEditor" class="option" ' + Game.clickStr + '="KlattmoseUtilities.getNewKeybinding(' + i + ');" >' + (i==KlattmoseUtilities.config.hotkeys.length?'(Click)':KlattmoseUtilities.getKeybindString(hotkey)) + '</a></div></div>';
-	str += '<div class="listing" style="float: left;">Period (ms): <input id="periodEditor" class="option" type="text" value="' + (hotkey.period === undefined ? '' : hotkey.period) + '" style="width: 125px;"></div><br/>';
-	str += '<div class="block"><div class="listing" style="float: left;">Script:</div><br/>';
-	str += '<div><textarea id="textareaPrompt" style="width:100%;height:128px;">';
-	str += hotkey.script;
-	str += '</textarea></div></div>';
-	
-	Game.Prompt(str, [['Save', 'KlattmoseUtilities.saveNewKeybinding(' + i + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-					  ['Nevermind', 'KlattmoseUtilities.waitingForInput = 0; Game.ClosePrompt();']]);
-}
-
-KlattmoseUtilities.getNewKeybinding = function(i){
-	var hotkey = KlattmoseUtilities.config.hotkeys[i];
-	l('keybindEditor').innerHTML = '...';
-	KlattmoseUtilities.waitingForInput = 1;
-}
-
-KlattmoseUtilities.saveNewKeybinding = function(i){
-	KlattmoseUtilities.waitingForInput = 0;
-	if(KlattmoseUtilities.validateInput(KlattmoseUtilities.tempHotkey.keyCode).length == 0) return;
-	
-	KlattmoseUtilities.tempHotkey.nickname = l('nicknameEditor').value;
-	KlattmoseUtilities.tempHotkey.period = l('periodEditor').value;
-	if(isNaN(KlattmoseUtilities.tempHotkey.period) || KlattmoseUtilities.tempHotkey.period.length == 0) delete KlattmoseUtilities.tempHotkey.period;
-	KlattmoseUtilities.tempHotkey.script = l('textareaPrompt').value;
-	KlattmoseUtilities.config.hotkeys[i] = KlattmoseUtilities.tempHotkey;
-	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-}
-
-KlattmoseUtilities.getKeybindString = function(hotkey){
-	var res = '';
-	res += hotkey.ctrl?'Ctrl+':'';
-	res += hotkey.shift?'Shift+':'';
-	res += hotkey.alt?'Alt+':'';
-	
-	return res + KlattmoseUtilities.validateInput(hotkey.keyCode);
-}
-
-KlattmoseUtilities.validateInput = function(keyCode){
-	if((keyCode > 47 && keyCode < 58) || (keyCode > 64 && keyCode < 91)) return String.fromCharCode(keyCode);
-	if(keyCode > 95 && keyCode < 106) return 'Num ' + (keyCode - 96);
-	if(keyCode > 111 && keyCode < 124) return 'F' + (keyCode - 111);
-	return '';
-}
-
-
-//***********************************
-//    Optional Patches
-//***********************************
-KlattmoseUtilities.patches = {};
-
-KlattmoseUtilities.patches.Toggle = function(patchName, button, on, off, invert){
-	if (KlattmoseUtilities.config.patches[patchName]){
-		l(button).innerHTML = off;
-		KlattmoseUtilities.config.patches[patchName] = 0;
-	}else{
-		l(button).innerHTML = on;
-		KlattmoseUtilities.config.patches[patchName] = 1;
-	}
-	
-	l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
-	KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-}
-
-
-KlattmoseUtilities.ReplaceNativeGarden = function() {
-	KlattmoseUtilities.HasReplaceAgronomicon = false;
-	if (!KlattmoseUtilities.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {
-		var M = Game.Objects["Farm"].minigame;
-		
-		KlattmoseUtilities.patches.gardenOrderofOperations = {};
-		KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction = M.logic;
-		
-		
-		KlattmoseUtilities.patches.gardenOrderofOperations.newFunction = function(){
-			//run each frame
-			var now=Date.now();
-			
-			if (!M.freeze)
-			{
-				M.nextStep=Math.min(M.nextStep,now+(M.stepT)*1000);
-				if (now>=M.nextStep)
-				{
-					M.computeStepT();
-					M.nextStep=now+M.stepT*1000;
-					
-					M.computeBoostPlot();
-					M.computeMatures();
-					
-					var weedMult=M.soilsById[M.soil].weedMult;
-					
-					var loops=1;
-					if (M.soilsById[M.soil].key=='woodchips') loops=3;
-					loops*=M.loopsMult;
-					M.loopsMult=1;
-					
-					for (var y=0;y<6;y++)
-					{
-						for (var x=0;x<6;x++)
-						{
-							if (M.isTileUnlocked(x,y))
-							{
-								var tile=M.plot[y][x];
-								var me=M.plantsById[tile[0]-1];
-								if (tile[0]>0)
-								{
-									//age
-									tile[1]+=randomFloor((me.ageTick+me.ageTickR*Math.random())*M.plotBoost[y][x][0]);
-									tile[1]=Math.max(tile[1],0);
-									if (me.immortal) tile[1]=Math.min(me.mature+1,tile[1]);
-									else if (tile[1]>=100)
-									{
-										//die of old age
-										M.plot[y][x]=[0,0];
-										if (me.onDie) me.onDie(x,y);
-										if (M.soilsById[M.soil].key=='pebbles' && Math.random()<0.35)
-										{
-											if (M.unlockSeed(me)) Game.Popup('Unlocked '+me.name+' seed.',Game.mouseX,Game.mouseY);
-										}
-									}
-									else if (!me.noContam)
-									{
-										//other plant contamination
-										//only occurs in cardinal directions
-										//immortal plants and plants with noContam are immune
-										
-										var list=[];
-										for (var i in M.plantContam)
-										{
-											if (Math.random()<M.plantContam[i] && (!M.plants[i].weed || Math.random()<weedMult)) list.push(i);
-										}
-										var contam=choose(list);
-										
-										if (contam && me.key!=contam)
-										{
-											if ((!M.plants[contam].weed && !M.plants[contam].fungus) || Math.random()<M.plotBoost[y][x][2])
-											{
-												var any=0;
-												var neighs={};//all surrounding plants
-												var neighsM={};//all surrounding mature plants
-												for (var i in M.plants){neighs[i]=0;}
-												for (var i in M.plants){neighsM[i]=0;}
-												var neigh=M.getTile(x,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												var neigh=M.getTile(x,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												var neigh=M.getTile(x-1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												var neigh=M.getTile(x+1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-												
-												if (neighsM[contam]>=1) M.plot[y][x]=[M.plants[contam].id+1,0];
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					for (var y=0;y<6;y++)
-					{
-						for (var x=0;x<6;x++)
-						{
-							if (M.isTileUnlocked(x,y))
-							{
-								var tile=M.plot[y][x];
-								var me=M.plantsById[tile[0]-1];
-								if (tile[0]>0){}
-								else
-								{
-									//plant spreading and mutation
-									//happens on all 8 tiles around this one
-									for (var loop=0;loop<loops;loop++)
-									{
-										var any=0;
-										var neighs={};//all surrounding plants
-										var neighsM={};//all surrounding mature plants
-										for (var i in M.plants){neighs[i]=0;}
-										for (var i in M.plants){neighsM[i]=0;}
-										var neigh=M.getTile(x,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x-1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x+1,y);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x-1,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x-1,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x+1,y-1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										var neigh=M.getTile(x+1,y+1);if (neigh[0]>0){var age=neigh[1];neigh=M.plantsById[neigh[0]-1];any++;neighs[neigh.key]++;if (age>=neigh.mature){neighsM[neigh.key]++;}}
-										if (any>0)
-										{
-											var muts=M.getMuts(neighs,neighsM);
-											
-											var list=[];
-											for (var ii=0;ii<muts.length;ii++)
-											{
-												if (Math.random()<muts[ii][1] && (!M.plants[muts[ii][0]].weed || Math.random()<weedMult) && ((!M.plants[muts[ii][0]].weed && !M.plants[muts[ii][0]].fungus) || Math.random()<M.plotBoost[y][x][2])) list.push(muts[ii][0]);
-											}
-											if (list.length>0) M.plot[y][x]=[M.plants[choose(list)].id+1,0];
-										}
-										else if (loop==0)
-										{
-											//weeds in empty tiles (no other plants must be nearby)
-											var chance=0.002*weedMult*M.plotBoost[y][x][2];
-											if (Math.random()<chance) M.plot[y][x]=[M.plants['meddleweed'].id+1,0];
-										}
-									}
-								}
-							}
-						}
-					}
-					M.toRebuild=true;
-					M.toCompute=true;
-				}
-			}
-			if (M.toRebuild) M.buildPlot();
-			if (M.toCompute) M.computeEffs();
-			
-			if (Game.keys[27])//esc
-			{
-				if (M.seedSelected>-1) M.plantsById[M.seedSelected].l.classList.remove('on');
-				M.seedSelected=-1;
-			}
-		}
-		
-		
-		M.logic = function(){
-			if(KlattmoseUtilities.config.patches.gardenOrderofOperations) KlattmoseUtilities.patches.gardenOrderofOperations.newFunction();
-			else KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction();
-		}
-		
-		KlattmoseUtilities.HasReplaceNativeGardenLaunch = true;
-	}
-}
 
 KlattmoseUtilities.ReplaceNativePantheon = function() {
 	if (!KlattmoseUtilities.HasReplaceNativePantheonLaunch && Game.Objects["Temple"].minigameLoaded) {
@@ -930,6 +928,7 @@ KlattmoseUtilities.ReplaceNativePantheon = function() {
 		KlattmoseUtilities.HasReplaceNativePantheonLaunch = true;
 	}
 }
+
 
 KlattmoseUtilities.ReplaceNativeGrimoire = function() {
 	if (!KlattmoseUtilities.HasReplaceNativeGrimoireLaunch && Game.Objects["Wizard tower"].minigameLoaded) {
@@ -974,4 +973,4 @@ KlattmoseUtilities.ReplaceNativeGrimoire = function() {
 
 
 
-if(KlattmoseUtilities.toLoad) KlattmoseUtilities.init();
+if(!KlattmoseUtilities.isLoaded) KlattmoseUtilities.init();

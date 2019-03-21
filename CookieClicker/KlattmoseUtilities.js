@@ -228,13 +228,13 @@ KlattmoseUtilities.ReplaceGameMenu = function(){
 				if(hotkey.period === undefined){
 					str += '<div class="listing">' + 
 						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
 						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
 						'</div>';
 				} else {
 					repStr += '<div class="listing">' + 
 						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
 						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
 						'</div>';
 				}
@@ -248,7 +248,7 @@ KlattmoseUtilities.ReplaceGameMenu = function(){
 				
 				str += '<div class="listing">' + 
 					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunction.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' + 
+					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunctions.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
 					'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
 					'</div>';
 			}
@@ -326,10 +326,10 @@ KlattmoseUtilities.functionalize = function(){
 	if(KlattmoseUtilities.config.onLoadFunctions === undefined) KlattmoseUtilities.config.onLoadFunctions = {};
 	
 	for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-		eval("KlattmoseUtilities.config.hotkeys[" + i + "].function = function(){" + KlattmoseUtilities.config.hotkeys[i].script + "}");
+		eval("KlattmoseUtilities.config.hotkeys[" + i + "].function = function(){\n" + KlattmoseUtilities.config.hotkeys[i].script + "\n}");
 	}
 	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-		eval("KlattmoseUtilities.config.onLoadFunctions[" + i + "].function = function(){" + KlattmoseUtilities.config.onLoadFunctions[i].script + "}");
+		eval("KlattmoseUtilities.config.onLoadFunctions[" + i + "].function = function(){\n" + KlattmoseUtilities.config.onLoadFunctions[i].script + "\n}");
 	}
 }
 

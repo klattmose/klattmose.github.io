@@ -62,6 +62,14 @@ KlattmoseUtilities.defaultConfig = function(){
 		  "script": "var temp = Game.lumpCurrentType;\nvar str = 'normal';\nif (temp == 1) str = 'bifurcated';\nelse if (temp == 2) str = 'golden';\nelse if (temp == 3) str = 'meaty';\nelse if (temp == 4) str = 'caramelized';\nGame.Notify('A ' + str + ' sugar lump is growing!', '', [29,14+temp+(temp==4?9:0)]);"
 		},
 		{
+		  "keyCode": 53,
+		  "nickname": "Export Save",
+		  "ctrl": false,
+		  "shift": false,
+		  "alt": false,
+		  "script": "Game.ExportSave();\ndocument.execCommand('copy');\nGame.ClosePrompt();\nGame.Notify('Saved to clipboard', '', '', 1, 1);"
+		},
+		{
 		  "keyCode": 97,
 		  "nickname": "Autoclicker",
 		  "ctrl": false,

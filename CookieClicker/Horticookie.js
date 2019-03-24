@@ -49,6 +49,7 @@ Horticookie.initWithGarden = function(M){
 	Horticookie.M = M;
 	Horticookie.buildMutationMap();
 	Horticookie.buildUpgradesMap();
+	Horticookie.backupPlants();
 	Horticookie.recalcUnlockables();
 	
 	Game.customDraw.push(Horticookie.draw);
@@ -68,6 +69,8 @@ Horticookie.initWithGarden = function(M){
         Horticookie.nextTickProbabilities[y] = tmp;
     }
 	
+	for(var prefName in Horticookie.config) Horticookie.applyPref(prefName);
+	
 	Horticookie.recalcTileStatus();
 	Horticookie.recalcPlantStatus();
 }
@@ -78,7 +81,8 @@ Horticookie.initWithGarden = function(M){
 //***********************************
 Horticookie.defaultConfig = function(){
 	return {
-		autoHarvest:0
+		autoHarvest:0,
+		allImmortal:0
 	}
 }
 
@@ -91,8 +95,31 @@ Horticookie.togglePref = function(prefName, button, on, off, invert){
 		Horticookie.config[prefName] = 1;
 	}
 	
+	if(Horticookie.HasReplaceNativeGardenLaunch) Horticookie.applyPref(prefName);
+	
 	l(button).className = 'option' + ((Horticookie.config[prefName]^invert) ? '' : ' off');
 	Horticookie.saveConfig(Horticookie.config);
+}
+
+Horticookie.applyPref = function(prefName){
+	var M = Horticookie.M;
+	switch(prefName){
+		case 'allImmortal':
+			for(var key in M.plants){
+				if(Horticookie.Backup.plants[key].immortal){} // Do nothing
+				else{
+					if(Horticookie.config[prefName]){
+						M.plants[key].immortal = 1;
+						M.plants[key].detailsStr = (M.plants[key].detailsStr ? M.plants[key].detailsStr + ', i' : 'I') + 'mmortal';
+					}
+					else{
+						M.plants[key].detailsStr = Horticookie.Backup.plants[key].detailsStr;
+						delete M.plants[key].immortal;
+					}
+				}
+			}
+			break;
+	}
 }
 
 Horticookie.saveConfig = function(config){
@@ -138,6 +165,7 @@ Horticookie.dispPrefs = function(){
 		
 	str += writeHeader("Helpers");
 	str += '<div class="listing">' + WriteButton('autoHarvest', 'autoHarvestButton', 'Autoharvest ON', 'Autoharvest OFF', '') + '<label>Automatically harvests mature interesting plants.</label></div>';
+	str += '<div class="listing">' + WriteButton('allImmortal', 'allImmortalButton', 'Immortalize ON', 'Immortalize OFF', '') + '<label>All plants are immortal.</label></div>';
 	str += '<div class="listing"><small>A plant is considered Interesting if you lack its seed, if it\'s mature and you lack its upgrade, or if it\'s a Juicy Queenbeet. Danger is a chance of death or contamination.</small></div>';
 	
 	return str;
@@ -351,6 +379,18 @@ Horticookie.buildUpgradesMap = function(){
 	}
 }
 
+Horticookie.backupPlants = function(){
+	var M = Horticookie.M;
+	Horticookie.Backup.plants = {};
+	
+	for(var key in M.plants){
+		Horticookie.Backup.plants[key] = {};
+		for(var child in M.plants[key]){
+			Horticookie.Backup.plants[key][child] = M.plants[key][child];
+		}
+	}
+}
+
 Horticookie.getRecipes = function(plant){
 	var recipes = [];
 	
@@ -513,7 +553,7 @@ Horticookie.recalcPlantTile = function(x, y, weedMult, tile, plant){
 	ntp.mature[plant.key] = (1 - probDeath) * probMature;
 	ntp.immature[plant.key] = (1 - probDeath) * (1 - probMature);
 	
-	if(!plant.noContam && !plant.immortal){
+	if(!plant.noContam){
 		var list = [];
 		var list2 = {};
 		
@@ -1014,7 +1054,6 @@ Horticookie.ReplaceGameMenu = function(){
 }
 
 Horticookie.ReplaceNativeGarden = function() {
-	Horticookie.HasReplaceAgronomicon = false;
 	if (!Horticookie.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {
 		var M = Game.Objects["Farm"].minigame;
 		

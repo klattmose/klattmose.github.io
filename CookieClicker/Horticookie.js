@@ -138,6 +138,7 @@ Horticookie.dispPrefs = function(){
 		
 	str += writeHeader("Helpers");
 	str += '<div class="listing">' + WriteButton('autoHarvest', 'autoHarvestButton', 'Autoharvest ON', 'Autoharvest OFF', '') + '<label>Automatically harvests mature interesting plants.</label></div>';
+	str += '<div class="listing"><small>A plant is considered Interesting if you lack its seed, if it\'s mature and you lack its upgrade, or if it\'s a Juicy Queenbeet. Danger is a chance of death or contamination.</small></div>';
 	
 	return str;
 }
@@ -719,7 +720,7 @@ Horticookie.recalcPlantStatus = function(){
 					}
 					
 					if((tile[0] - 1) == plant.id){
-						if(tile[1] >= plant.mature && Horticookie.config.autoHarvest){
+						if(tile[1] >= plant.mature && Horticookie.config.autoHarvest && !plant.unlocked){
 							M.clickTile(x, y);
 							Horticookie.recalcTileStatus();
 						}else{
@@ -766,6 +767,13 @@ Horticookie.recalcUnlockables = function(){
 	} 
 }
 
+Horticookie.recalcAlerts = function(){
+	var M = Horticookie.M;
+	var ipid = false;
+	var nps = false;
+	var md = false;
+}
+
 Horticookie.draw = function(){
 	if(Game.drawT % 10 === 0) {
         // The original garden updates this just like here
@@ -789,8 +797,6 @@ Horticookie.UpdateMenu = function(){
 	if(Game.onMenu === 'prefs'){
 		var str = Horticookie.dispPrefs();
 		
-		
-		
 		var div = document.createElement('div');
 		div.innerHTML = str;
 		var menu = document.getElementById('menu');
@@ -813,6 +819,7 @@ Horticookie.computeEffs = function(){
 	Horticookie.Backup.computeEffs();
 	Horticookie.recalcTileStatus();
 	Horticookie.recalcPlantStatus();
+	if(!Horticookie.M.freeze) Horticookie.recalcAlerts();
 }
 
 Horticookie.seedTooltip = function(id){

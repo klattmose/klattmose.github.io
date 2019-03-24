@@ -723,6 +723,7 @@ Horticookie.recalcPlantStatus = function(){
 						if(tile[1] >= plant.mature && Horticookie.config.autoHarvest && !plant.unlocked){
 							M.clickTile(x, y);
 							Horticookie.recalcTileStatus();
+							ps.status = Horticookie.statusCodes.UNLOCKED;
 						}else{
 							ps.status = Math.max(ps.status, (tile[1] >= plant.mature) ? Horticookie.statusCodes.MATURE : Horticookie.statusCodes.PREMATURE);
 							if(ntp.immature[key] + ntp.mature[key] < 1) ps.status = Horticookie.statusCodes.DANGER;

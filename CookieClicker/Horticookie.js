@@ -499,79 +499,67 @@ Horticookie.recalcEmptyTile = function(x, y, weedMult, loops){
 		return !toggle; // return false if the loop ended because we ran out of combos, otherwise return true
 	}
 	
-	//for(var loop = 0; loop < loops; loop++){
-		var neighbors = [];
+	
+	var neighbors = [];
+	var neigh = Horticookie.getNTP(x, y - 1);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	var neigh = Horticookie.getNTP(x, y + 1);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	var neigh = Horticookie.getNTP(x - 1, y);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	var neigh = Horticookie.getNTP(x + 1, y);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	var neigh = Horticookie.getNTP(x - 1, y - 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	var neigh = Horticookie.getNTP(x - 1, y + 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	var neigh = Horticookie.getNTP(x + 1, y - 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	var neigh = Horticookie.getNTP(x + 1, y + 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+	
+	var combos = [];
+	for(var i = 0; i < neighbors.length; i++){
+		var outcomes = Horticookie.getOutcomes(neighbors[i]);
+		if(outcomes.length > 0) combos.push({length:outcomes.length, current:0, outcomes:outcomes});
+	}
+	
+	do{
+		var any = 0;
+		var comboChance = 1;
+		var neighs = [];
+		var neighsM = [];
+		for(var i in M.plants){neighs[i] = 0;}
+		for(var i in M.plants){neighsM[i] = 0;}
 		
-		var neigh = Horticookie.getNTP(x, y - 1);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x, y + 1);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x - 1, y);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x + 1, y);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x - 1, y - 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x - 1, y + 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x + 1, y - 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x + 1, y + 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		
-		var combos = [];
-		//combos.length = neighbors.length;
-		for(var i = 0; i < neighbors.length; i++){
-			var outcomes = Horticookie.getOutcomes(neighbors[i]);
-			if(outcomes.length > 0) combos.push({length:outcomes.length, current:0, outcomes:outcomes});
+		for(var i = 0; i < combos.length; i++){
+			var outcome = combos[i].outcomes[combos[i].current]
+			comboChance *= outcome.chance;
+			if(outcome.type == 1){any++; neighs[outcome.key]++;}
+			if(outcome.type == 2){any++; neighs[outcome.key]++; neighsM[outcome.key]++;}
 		}
 		
-		do{
-			var any = 0;
-			var comboChance = 1;
-			var neighs = [];
-			var neighsM = [];
-			for(var i in M.plants){neighs[i] = 0;}
-			for(var i in M.plants){neighsM[i] = 0;}
+		if(any > 0){
+			var muts = M.getMuts(neighs, neighsM);
+			var list = [];
+			var list2 = {};
 			
-			for(var i = 0; i < combos.length; i++){
-				var outcome = combos[i].outcomes[combos[i].current]
-				comboChance *= outcome.chance;
-				if(outcome.type == 1){any++; neighs[outcome.key]++;}
-				if(outcome.type == 2){any++; neighs[outcome.key]++; neighsM[outcome.key]++;}
+			for(var ii = 0; ii < muts.length; ii++){
+				var chance = muts[ii][1];
+				chance *= (M.plants[muts[ii][0]].weed ? Math.min(1, weedMult) : 1);
+				chance *= ((M.plants[muts[ii][0]].weed || M.plants[muts[ii][0]].fungus) ? Math.min(1, M.plotBoost[y][x][2]) : 1);
+				chance = 1 - Math.pow(1 - chance, loops);
+				list.push({key: muts[ii][0], chance: (chance*comboChance)});
 			}
 			
-			if(any > 0){
-				var muts = M.getMuts(neighs, neighsM);
-				var list = [];
-				var list2 = {};
-				
-				for(var ii = 0; ii < muts.length; ii++){
-					var chance = muts[ii][1];
-					chance *= (M.plants[muts[ii][0]].weed ? Math.min(1, weedMult) : 1);
-					chance *= ((M.plants[muts[ii][0]].weed || M.plants[muts[ii][0]].fungus) ? Math.min(1, M.plotBoost[y][x][2]) : 1);
-					list.push({key: muts[ii][0], chance: (chance*comboChance)});
-				}
-				
-				list = Horticookie.Feynman(list);
-				for(var i = 0; i < list.length; i++){ list2[list[i].key] = 0; }
-				for(var i = 0; i < list.length; i++){ list2[list[i].key] = 1 - (1 - list2[list[i].key]) * (1 - list[i].chance); }
-				for(var key in list2){
-					ntp.immature[key] += list2[key];
-					ntp.empty -= list2[key];
-				}
-				
-				var val = {};
-				for(var key in ntp.immature){
-					val[key] = ntp.immature[key];
-				}
-				
-				for(var loop = 1; loop < loops; loop++){
-					ntp.immature[key] = 1 - (1 - ntp.immature[key]) * (1 - val[key]);
-				}
-				
-			} else {
-				//weeds in empty tiles (no other plants must be nearby)
-				var chance = 0.002 * weedMult * M.plotBoost[y][x][2];
-				ntp.immature['meddleweed'] += chance * comboChance;
-				ntp.empty -= chance;
+			list = Horticookie.Feynman(list);
+			for(var i = 0; i < list.length; i++){ list2[list[i].key] = 0; }
+			for(var i = 0; i < list.length; i++){ list2[list[i].key] = 1 - (1 - list2[list[i].key]) * (1 - list[i].chance); }
+			for(var key in list2){
+				ntp.immature[key] += list2[key];
+				ntp.empty -= list2[key];
 			}
 			
-			
-		}while(nextCombo(combos));
-	//}
+		} else {
+			//weeds in empty tiles (no other plants must be nearby)
+			var chance = 0.002 * weedMult * M.plotBoost[y][x][2];
+			ntp.immature['meddleweed'] += chance * comboChance;
+			ntp.empty -= chance;
+		}
+		
+	}while(nextCombo(combos));
 	
 	//***********************************
 	//    Delete 0% possibilities

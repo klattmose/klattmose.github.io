@@ -118,8 +118,7 @@ KlattmoseUtilities.defaultConfig = function(){
 	  "patches": {
 		"gardenOrderofOperations": 0,
 		"slotGodFix": 0,
-		"gamblersFeverDreamFix": 0,
-		"acceleratedGarden": 0
+		"gamblersFeverDreamFix": 0
 	  },
 	  "onLoadFunctions": [
 		{
@@ -988,14 +987,6 @@ KlattmoseUtilities.ReplaceNativeGrimoire = function() {
 		
 		KlattmoseUtilities.HasReplaceNativeGrimoireLaunch = true;
 	}
-}
-
-
-KlattmoseUtilities.patches.acceleratedGarden = {};
-KlattmoseUtilities.patches.acceleratedGarden.oldFunction = randomFloor;
-randomFloor = function(x){
-	if(KlattmoseUtilities.config.patches.acceleratedGarden) return Math.ceil(x);
-	else return KlattmoseUtilities.patches.acceleratedGarden.oldFunction(x);
 }
 
 

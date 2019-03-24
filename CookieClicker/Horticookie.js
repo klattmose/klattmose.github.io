@@ -28,7 +28,7 @@ Horticookie.init = function(){
 	}
 	
 	Horticookie.ReplaceNativeGarden();
-	Horticookie.ReplaceGameMenu();
+	Horticookie.ReplaceMainGame();
 	
 	
 	//***********************************
@@ -82,7 +82,8 @@ Horticookie.initWithGarden = function(M){
 Horticookie.defaultConfig = function(){
 	return {
 		autoHarvest:0,
-		allImmortal:0
+		allImmortal:0,
+		accelGarden:0
 	}
 }
 
@@ -167,6 +168,7 @@ Horticookie.dispPrefs = function(){
 	str += writeHeader("Helpers");
 	str += '<div class="listing">' + WriteButton('autoHarvest', 'autoHarvestButton', 'Autoharvest ON', 'Autoharvest OFF', '') + '<label>Automatically harvests mature interesting plants.</label></div>';
 	str += '<div class="listing">' + WriteButton('allImmortal', 'allImmortalButton', 'Immortalize ON', 'Immortalize OFF', '') + '<label>All plants are immortal.</label></div>';
+	str += '<div class="listing">' + WriteButton('accelGarden', 'accelGardenButton', 'Accelerated Garden ON', 'Accelerated Garden OFF', '') + '<label>Long-lived plants age faster.</label></div>';
 	str += '<div class="listing"><small>A plant is considered Interesting if you lack its seed, if it\'s mature and you lack its upgrade, or if it\'s a Juicy Queenbeet. Danger is a chance of death or contamination.</small></div>';
 	
 	return str;
@@ -1049,9 +1051,17 @@ Horticookie.lockSeed = function(me) {
 //***********************************
 //    Inject into the main game
 //***********************************
-Horticookie.ReplaceGameMenu = function(){
+Horticookie.ReplaceMainGame = function(){
+	// Insert into the menu
 	Horticookie.Backup.UpdateMenu = Game.UpdateMenu;
 	Game.UpdateMenu = Horticookie.UpdateMenu;
+	
+	// Set up for Accelerated Garden
+	Horticookie.Backup.randomFloor = randomFloor;
+	randomFloor = function(x){
+		if(Horticookie.config.accelGarden) return Math.ceil(x);
+		else return Horticookie.Backup.randomFloor(x);
+	}
 }
 
 Horticookie.ReplaceNativeGarden = function() {
@@ -1081,6 +1091,8 @@ Horticookie.ReplaceNativeGarden = function() {
 		Horticookie.HasReplaceNativeGardenLaunch = true;
 	}
 }
+
+
 
 
 //***********************************

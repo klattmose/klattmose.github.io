@@ -4,7 +4,7 @@ if(Horticookie === undefined) var Horticookie = {};
 //***********************************
 //    For testing
 //***********************************
-Game.LoadMod('https://bitbucket.org/Acharvak/cookie-clicker-agronomicon/downloads/Agronomicon.js');
+//Game.LoadMod('https://bitbucket.org/Acharvak/cookie-clicker-agronomicon/downloads/Agronomicon.js');
 
 
 Horticookie.init = function(){

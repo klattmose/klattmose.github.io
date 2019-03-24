@@ -499,7 +499,7 @@ Horticookie.recalcEmptyTile = function(x, y, weedMult, loops){
 		return !toggle; // return false if the loop ended because we ran out of combos, otherwise return true
 	}
 	
-	for(var loop = 0; loop < loops; loop++){
+	//for(var loop = 0; loop < loops; loop++){
 		var neighbors = [];
 		
 		var neigh = Horticookie.getNTP(x, y - 1);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
@@ -553,7 +553,16 @@ Horticookie.recalcEmptyTile = function(x, y, weedMult, loops){
 					ntp.empty -= list2[key];
 				}
 				
-			} else if (loop == 0){
+				var val = {};
+				for(var key in ntp.immature){
+					val[key] = ntp.immature[key];
+				}
+				
+				for(var loop = 1; loop < loops; loop++){
+					ntp.immature[key] = 1 - (1 - ntp.immature[key]) * (1 - val[key]);
+				}
+				
+			} else {
 				//weeds in empty tiles (no other plants must be nearby)
 				var chance = 0.002 * weedMult * M.plotBoost[y][x][2];
 				ntp.immature['meddleweed'] += chance * comboChance;
@@ -562,7 +571,7 @@ Horticookie.recalcEmptyTile = function(x, y, weedMult, loops){
 			
 			
 		}while(nextCombo(combos));
-	}
+	//}
 	
 	//***********************************
 	//    Delete 0% possibilities
@@ -869,7 +878,7 @@ Horticookie.buildPanel = function(){
     }else{
 		if(Horticookie.unlockableCount) {
             for(var key in Horticookie.unlockables) {
-				var el = document.getElementById('gardenSeed-' + this.plants[key].id);
+				var el = document.getElementById('gardenSeed-' + M.plants[key].id);
 				if(el) {
 					var elc = el.cloneNode(true);
 					elc.style.opacity = 0.3;

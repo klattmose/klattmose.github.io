@@ -12,7 +12,7 @@ Horticookie.init = function(){
 	Horticookie.Backup = {};
 	Horticookie.initCodes();
 	Horticookie.setPercentagePrecision(4);
-    Horticookie.plantStatus = {};
+	Horticookie.plantStatus = {};
 	Horticookie.unlockables = {};
 	Horticookie.unlockableCount = 0;
 	Horticookie.ConfigPrefix = "Horticookie";

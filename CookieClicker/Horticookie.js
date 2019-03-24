@@ -15,6 +15,10 @@ Horticookie.init = function(){
     Horticookie.plantStatus = {};
 	Horticookie.unlockables = {};
 	Horticookie.unlockableCount = 0;
+	Horticookie.ConfigPrefix = "Horticookie";
+	
+	Horticookie.restoreDefaultConfig(1);
+	Horticookie.loadConfig();
 	
 	
 	Horticookie.Backup.scriptLoaded = Game.scriptLoaded;
@@ -24,6 +28,7 @@ Horticookie.init = function(){
 	}
 	
 	Horticookie.ReplaceNativeGarden();
+	Horticookie.ReplaceGameMenu();
 	
 	
 	//***********************************
@@ -64,12 +69,79 @@ Horticookie.initWithGarden = function(M){
     }
 	
 	Horticookie.recalcTileStatus();
+	Horticookie.recalcPlantStatus();
+}
+
+
+//***********************************
+//    Config functions
+//***********************************
+Horticookie.defaultConfig = function(){
+	return {
+		autoHarvest:0
+	}
+}
+
+Horticookie.togglePref = function(prefName, button, on, off, invert){
+	if (Horticookie.config[prefName]){
+		l(button).innerHTML = off;
+		Horticookie.config[prefName] = 0;
+	}else{
+		l(button).innerHTML = on;
+		Horticookie.config[prefName] = 1;
+	}
+	
+	l(button).className = 'option' + ((Horticookie.config[prefName]^invert) ? '' : ' off');
+	Horticookie.saveConfig(Horticookie.config);
+}
+
+Horticookie.saveConfig = function(config){
+	localStorage.setItem(Horticookie.ConfigPrefix, JSON.stringify(config));
+}
+
+Horticookie.loadConfig = function(){
+	if (localStorage.getItem(Horticookie.ConfigPrefix) != null) {
+		Horticookie.config = JSON.parse(localStorage.getItem(Horticookie.ConfigPrefix));
+	}
+}
+
+Horticookie.restoreDefaultConfig = function(mode){
+	Horticookie.config = Horticookie.defaultConfig();
+	if(mode == 2) Horticookie.saveConfig(Horticookie.config);
 }
 
 
 //***********************************
 //    Horticookie functions
 //***********************************
+Horticookie.dispPrefs = function(){
+	var writeHeader = function(text) {
+		var div = document.createElement('div');
+		div.className = 'listing';
+		div.style.padding = '5px 16px';
+		div.style.opacity = '0.7';
+		div.style.fontSize = '17px';
+		div.style.fontFamily = '\"Kavoon\", Georgia, serif';
+		div.textContent = text;
+		return div.outerHTML;
+	}
+	
+	var WriteButton = function(prefName, button, on, off, callback, invert){
+		var invert = invert ? 1 : 0;
+		if (!callback) callback = '';
+		callback += 'PlaySound(\'snd/tick.mp3\');';
+		return '<a class="option' + ((Horticookie.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="Horticookie.togglePref(\'' + prefName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (Horticookie.config[prefName] ? on : off) + '</a>';
+	}
+	
+	
+	var str = '<div class="title">Horticookie</div>';
+		
+	str += writeHeader("Helpers");
+	str += '<div class="listing">' + WriteButton('autoHarvest', 'autoHarvestButton', 'Autoharvest ON', 'Autoharvest OFF', '') + '<label>Automatically harvests mature interesting plants.</label></div>';
+	
+	return str;
+}
+
 Horticookie.initCodes = function(){
 	Horticookie.recipeCodes = {};
 	Horticookie.statusCodes = {};
@@ -621,9 +693,6 @@ Horticookie.recalcTileStatus = function(){
 			}
 		}
 	}
-	
-	
-	Horticookie.recalcPlantStatus();
 }
 
 Horticookie.recalcPlantStatus = function(){
@@ -638,20 +707,24 @@ Horticookie.recalcPlantStatus = function(){
 		if(plant.unlocked){
 			ps.status = Horticookie.statusCodes.UNLOCKED;
 		}else{
-			for(var y = 0; y < Horticookie.maxPlotHeight; y++){
-				for(var x = 0; x < Horticookie.maxPlotWidth; x++){
-					if(M.isTileUnlocked(x, y)){
-						var tile = M.plot[y][x];
-						var ntp = Horticookie.nextTickProbabilities[y][x];
-						
-						if(ntp.immature[key]){
-							ps.probGrowthNextTick = 1 - ((1 - ps.probGrowthNextTick) * (1 - ntp.immature[key]));	
-							ps.status = Math.max(ps.status, Horticookie.statusCodes.MAYGROW);
-						}
-						
-						if((tile[0] - 1) == plant.id){
+			for(var y = 0; y < Horticookie.maxPlotHeight; y++)
+			for(var x = 0; x < Horticookie.maxPlotWidth; x++){
+				if(M.isTileUnlocked(x, y)){
+					var tile = M.plot[y][x];
+					var ntp = Horticookie.nextTickProbabilities[y][x];
+					
+					if(ntp.immature[key]){
+						ps.probGrowthNextTick = 1 - ((1 - ps.probGrowthNextTick) * (1 - ntp.immature[key]));	
+						ps.status = Math.max(ps.status, Horticookie.statusCodes.MAYGROW);
+					}
+					
+					if((tile[0] - 1) == plant.id){
+						if(tile[1] >= plant.mature && Horticookie.config.autoHarvest){
+							M.clickTile(x, y);
+							Horticookie.recalcTileStatus();
+						}else{
 							ps.status = Math.max(ps.status, (tile[1] >= plant.mature) ? Horticookie.statusCodes.MATURE : Horticookie.statusCodes.PREMATURE);
-							for(var contam in M.plantContam) if(ntp.immature[contam] && key != contam) ps.status = Horticookie.statusCodes.DANGER;
+							if(ntp.immature[key] + ntp.mature[key] < 1) ps.status = Horticookie.statusCodes.DANGER;
 						}
 					}
 				}
@@ -708,11 +781,38 @@ Horticookie.draw = function(){
 
 
 //***********************************
-//    Functions that override the garden
+//    Functions that override the main game
 //***********************************
+Horticookie.UpdateMenu = function(){
+	Horticookie.Backup.UpdateMenu();
+	
+	if(Game.onMenu === 'prefs'){
+		var str = Horticookie.dispPrefs();
+		
+		
+		
+		var div = document.createElement('div');
+		div.innerHTML = str;
+		var menu = document.getElementById('menu');
+		if(menu) {
+			menu = menu.getElementsByClassName('subsection')[0];
+			if(menu) {
+				var padding = menu.getElementsByTagName('div');
+				padding = padding[padding.length - 1];
+				if(padding) {
+					menu.insertBefore(div, padding);
+				} else {
+					menu.appendChild(div);
+				}
+			}
+		}
+	}
+}
+
 Horticookie.computeEffs = function(){
 	Horticookie.Backup.computeEffs();
 	Horticookie.recalcTileStatus();
+	Horticookie.recalcPlantStatus();
 }
 
 Horticookie.seedTooltip = function(id){
@@ -754,7 +854,7 @@ Horticookie.seedTooltip = function(id){
 			if(rhtml) {
                 return tt.replace(/<\/div>$/, '<div class="line"></div>' + rhtml +
                                   '<div style="margin-top: 0.5em; text-align: center;">' +
-                                  '<small>(M) = mature, (AA) = any age, OO = other outcomes</small></div></div>');
+                                  '<small>(M) = mature, (AA) = any age</small></div></div>');
             } else {
                 return tt;
             }
@@ -898,8 +998,13 @@ Horticookie.lockSeed = function(me) {
 
 
 //***********************************
-//    Inject into the garden minigame
+//    Inject into the main game
 //***********************************
+Horticookie.ReplaceGameMenu = function(){
+	Horticookie.Backup.UpdateMenu = Game.UpdateMenu;
+	Game.UpdateMenu = Horticookie.UpdateMenu;
+}
+
 Horticookie.ReplaceNativeGarden = function() {
 	Horticookie.HasReplaceAgronomicon = false;
 	if (!Horticookie.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {

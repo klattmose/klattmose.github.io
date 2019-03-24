@@ -54,20 +54,20 @@ Horticookie.initWithGarden = function(M){
 	
 	Game.customDraw.push(Horticookie.draw);
 	
-    var gpl = M.plotLimits[M.plotLimits.length - 1];
-    Horticookie.maxPlotWidth = gpl[2] - gpl[0];
-    Horticookie.maxPlotHeight = gpl[3] - gpl[1];
+	var gpl = M.plotLimits[M.plotLimits.length - 1];
+	Horticookie.maxPlotWidth = gpl[2] - gpl[0];
+	Horticookie.maxPlotHeight = gpl[3] - gpl[1];
 	
 	Horticookie.nextTickProbabilities = [];
 	Horticookie.nextTickProbabilities.length = Horticookie.maxPlotHeight;
-    for(var y = 0; y < Horticookie.maxPlotHeight; ++y) {
-        var tmp = [];
-        tmp.length = Horticookie.maxPlotWidth;
-        for(var x = 0; x < tmp.length; ++x) {
-            tmp[x] = {empty: 1, immature: {}, mature: {}};
-        }
-        Horticookie.nextTickProbabilities[y] = tmp;
-    }
+	for(var y = 0; y < Horticookie.maxPlotHeight; ++y) {
+		var tmp = [];
+		tmp.length = Horticookie.maxPlotWidth;
+		for(var x = 0; x < tmp.length; ++x) {
+			tmp[x] = {empty: 1, immature: {}, mature: {}};
+		}
+		Horticookie.nextTickProbabilities[y] = tmp;
+	}
 	
 	for(var prefName in Horticookie.config) Horticookie.applyPref(prefName);
 	
@@ -118,6 +118,7 @@ Horticookie.applyPref = function(prefName){
 					}
 				}
 			}
+			Horticookie.computeEffs();
 			break;
 	}
 }
@@ -547,13 +548,13 @@ Horticookie.recalcPlantTile = function(x, y, weedMult, tile, plant){
 	var tile_boost = M.plotBoost[y][x];
 	var ntp = Horticookie.getNTP(x, y);
 	var probMature = Horticookie.calcProbAgingGT(Math.ceil(plant.mature - tile[1]), plant.ageTick, plant.ageTickR, tile_boost[0]);
-	var probDeath = plant.immortal ? 0 : Horticookie.calcProbAgingGT(100 - tile[1], plant.ageTick, plant.ageTickR, tile_boost[0]);
+	var probDeath = plant.immortal ? 0 : Horticookie.calcProbAgingGT(Math.ceil(100 - tile[1]), plant.ageTick, plant.ageTickR, tile_boost[0]);
 	
 	ntp.empty = probDeath;
 	ntp.mature[plant.key] = (1 - probDeath) * probMature;
 	ntp.immature[plant.key] = (1 - probDeath) * (1 - probMature);
 	
-	if(!plant.noContam){
+	if(!plant.noContam && !plant.immortal){
 		var list = [];
 		var list2 = {};
 		

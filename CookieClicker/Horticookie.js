@@ -4,7 +4,7 @@ if(Horticookie === undefined) var Horticookie = {};
 //***********************************
 //    For testing
 //***********************************
-//Game.LoadMod('https://bitbucket.org/Acharvak/cookie-clicker-agronomicon/downloads/Agronomicon.js');
+Game.LoadMod('https://bitbucket.org/Acharvak/cookie-clicker-agronomicon/downloads/Agronomicon.js');
 
 
 Horticookie.init = function(){
@@ -582,20 +582,49 @@ Horticookie.recalcTileStatus = function(){
 	var loops = 1;
 	if (M.soilsById[M.soil].key == 'woodchips') loops = 3;
 	
-	
-	for(var y = 0; y < Horticookie.maxPlotHeight; y++){
-		for(var x = 0; x < Horticookie.maxPlotWidth; x++){
-			if(M.isTileUnlocked(x, y)){
-				var tile = M.plot[y][x];
-				var plant = M.plantsById[tile[0] - 1];
-				if(tile[0] > 0){
-					Horticookie.recalcPlantTile(x, y, weedMult, tile, plant);
-				}else{
-					Horticookie.recalcEmptyTile(x, y, weedMult, loops);
+	if(Horticookie.detectKUGardenPatch()){
+		for(var y = 0; y < Horticookie.maxPlotHeight; y++){
+			for(var x = 0; x < Horticookie.maxPlotWidth; x++){
+				if(M.isTileUnlocked(x, y)){
+					var tile = M.plot[y][x];
+					var plant = M.plantsById[tile[0] - 1];
+					if(tile[0] > 0){
+						Horticookie.recalcPlantTile(x, y, weedMult, tile, plant);
+					}else{
+						//Horticookie.recalcEmptyTile(x, y, weedMult, loops);
+					}
+				}
+			}
+		}
+		for(var y = 0; y < Horticookie.maxPlotHeight; y++){
+			for(var x = 0; x < Horticookie.maxPlotWidth; x++){
+				if(M.isTileUnlocked(x, y)){
+					var tile = M.plot[y][x];
+					var plant = M.plantsById[tile[0] - 1];
+					if(tile[0] > 0){
+						//Horticookie.recalcPlantTile(x, y, weedMult, tile, plant);
+					}else{
+						Horticookie.recalcEmptyTile(x, y, weedMult, loops);
+					}
+				}
+			}
+		}
+	}else{
+		for(var y = 0; y < Horticookie.maxPlotHeight; y++){
+			for(var x = 0; x < Horticookie.maxPlotWidth; x++){
+				if(M.isTileUnlocked(x, y)){
+					var tile = M.plot[y][x];
+					var plant = M.plantsById[tile[0] - 1];
+					if(tile[0] > 0){
+						Horticookie.recalcPlantTile(x, y, weedMult, tile, plant);
+					}else{
+						Horticookie.recalcEmptyTile(x, y, weedMult, loops);
+					}
 				}
 			}
 		}
 	}
+	
 	
 	Horticookie.recalcPlantStatus();
 }
@@ -903,6 +932,17 @@ Horticookie.ReplaceNativeGarden = function() {
 	}
 }
 
+
+//***********************************
+//    Compatability with Klattmose Utilities Garden patch
+//***********************************
+Horticookie.detectKUGardenPatch = function(){
+	if(typeof KlattmoseUtilities == 'undefined') return false;
+	if(typeof KlattmoseUtilities.config == 'undefined') return false;
+	if(typeof KlattmoseUtilities.config.patches == 'undefined') return false;
+	
+	return KlattmoseUtilities.config.patches.gardenOrderofOperations == 1;
+}
 
 
 if(!Horticookie.isLoaded) Horticookie.init();

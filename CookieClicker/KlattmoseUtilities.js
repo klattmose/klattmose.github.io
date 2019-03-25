@@ -441,7 +441,7 @@ KlattmoseUtilities.keydown = function(e){
 			KlattmoseUtilities.waitingForInput = 0;
 		}
 		
-	} else if (!Game.OnAscend && Game.AscendTimer == 0) {
+	} else if (!Game.OnAscend && Game.AscendTimer == 0 && !Game.promptOn) {
 		for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
 			var hotkey = KlattmoseUtilities.config.hotkeys[i];
 			if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))

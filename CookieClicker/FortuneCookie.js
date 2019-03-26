@@ -63,6 +63,7 @@ FortuneCookie.ReplaceGameMenu = function(){
 	
 	Game.UpdateMenu = function(){
 		FortuneCookie.oldUpdateMenu();
+		
 		if(Game.onMenu === 'prefs') {
 			var str = '<div class="title">Fortune Cookie</div>' +
 					  '<div class="listing">'+

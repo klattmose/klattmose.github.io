@@ -193,73 +193,8 @@ KlattmoseUtilities.ReplaceGameMenu = function(){
 	Game.UpdateMenu = function(){
 		KlattmoseUtilities.Backup.UpdateMenu();
 		
-		var writeHeader = function(text) {
-			var div = document.createElement('div');
-			div.className = 'listing';
-			div.style.padding = '5px 16px';
-			div.style.opacity = '0.7';
-			div.style.fontSize = '17px';
-			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
-			div.textContent = text;
-			return div.outerHTML;
-		}
-		
-		var WriteButton = function(patchName, button, on, off, callback, invert){
-			var invert = invert ? 1 : 0;
-			if (!callback) callback = '';
-			callback += 'PlaySound(\'snd/tick.mp3\');';
-			return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
-		}
-		
 		if(Game.onMenu === 'prefs') {
-			var str =	'<div class="title">Klattmose Utilities</div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
-						'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
-											 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
-						writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
-						'<div class="listing"><p>Single fire</p></div>';
-			
-			var repStr = '<div class="listing"><p>Repeaters</p></div>';
-			
-			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-				var hotkey = KlattmoseUtilities.config.hotkeys[i];
-				
-				if(hotkey.period === undefined){
-					str += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				} else {
-					repStr += '<div class="listing">' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-						'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
-						'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
-						'</div>';
-				}
-			}
-			str += repStr;
-			
-			
-			str += writeHeader("On-Load Functions") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + KlattmoseUtilities.config.onLoadFunctions.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>';
-			for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-				var onLoadFunction = KlattmoseUtilities.config.onLoadFunctions[i];
-				
-				str += '<div class="listing">' + 
-					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
-					'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunctions.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
-					'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
-					'</div>';
-			}
-			
-			
-			str += writeHeader("Optional Patches");
-			
-			str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
-			str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
-			str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
-			
-			
+			var str = KlattmoseUtilities.getMenuString();
 			
 			var div = document.createElement('div');
 			div.innerHTML = str;
@@ -278,6 +213,77 @@ KlattmoseUtilities.ReplaceGameMenu = function(){
 			}
 		}
 	}
+}
+
+KlattmoseUtilities.getMenuString = function(){
+	var writeHeader = function(text) {
+		var div = document.createElement('div');
+		div.className = 'listing';
+		div.style.padding = '5px 16px';
+		div.style.opacity = '0.7';
+		div.style.fontSize = '17px';
+		div.style.fontFamily = '\"Kavoon\", Georgia, serif';
+		div.textContent = text;
+		return div.outerHTML;
+	}
+	
+	var WriteButton = function(patchName, button, on, off, callback, invert){
+		var invert = invert ? 1 : 0;
+		if (!callback) callback = '';
+		callback += 'PlaySound(\'snd/tick.mp3\');';
+		return '<a class="option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="KlattmoseUtilities.patches.Toggle(\'' + patchName + '\',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (KlattmoseUtilities.config.patches[patchName] ? on : off) + '</a>';
+	}
+	
+	
+	var str =	'<div class="title">Klattmose Utilities</div>' + 
+				'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+				'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
+									 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
+				writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 
+				'<div class="listing"><p>Single fire</p></div>';
+	
+	var repStr = '<div class="listing"><p>Repeaters</p></div>';
+	
+	for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
+		var hotkey = KlattmoseUtilities.config.hotkeys[i];
+		
+		if(hotkey.period === undefined){
+			str += '<div class="listing">' + 
+				'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+				'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
+				'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+				'</div>';
+		} else {
+			repStr += '<div class="listing">' + 
+				'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+				'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.hotkeys.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
+				'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
+				'</div>';
+		}
+	}
+	str += repStr;
+	
+	
+	str += writeHeader("On-Load Functions") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + KlattmoseUtilities.config.onLoadFunctions.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>';
+	for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
+		var onLoadFunction = KlattmoseUtilities.config.onLoadFunctions[i];
+		
+		str += '<div class="listing">' + 
+			'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditOnLoadFunction(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>' + 
+			'<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.config.onLoadFunctions.splice(' + i + ', 1); PlaySound(\'snd/tick.mp3\'); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();">Remove</a>' + 
+			'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
+			'</div>';
+	}
+	
+	
+	str += writeHeader("Optional Patches");
+	
+	str += '<div class="listing">' + WriteButton('gardenOrderofOperations', 'gardenOrderofOperationsButton', 'Garden Order of Operations ON', 'Garden Order of Operations OFF', '') + '<label>Makes it so the garden calculates the age of all the plants first, then the spread/mutation.</label></div>';
+	str += '<div class="listing">' + WriteButton('slotGodFix', 'slotGodFixButton', 'Pantheon Swap fix ON', 'Pantheon Swap fix OFF', '') + '<label>There\'s a small bug in the Pantheon minigame that sometimes assigns a god to slot -1. This only causes problems if you use a hotkey or the console to perform a soft-reload.</label></div>';
+	str += '<div class="listing">' + WriteButton('gamblersFeverDreamFix', 'gamblersFeverDreamFixButton', "Gambler\'s Fever Dream fix ON", "Gambler\'s Fever Dream fix OFF", '') + '<label>This makes the spell Gambler\'s Fever Dream act according to it\'s in-game description.</label></div>';
+	
+	
+	return str;
 }
 
 
@@ -314,7 +320,7 @@ KlattmoseUtilities.exportConfig = function(){
 
 KlattmoseUtilities.importConfig = function(){
 	Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); KlattmoseUtilities.functionalize(); Game.UpdateMenu();}'], 'Nevermind']);
+				[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();}'], 'Nevermind']);
 	l('textareaPrompt').focus();
 }
 

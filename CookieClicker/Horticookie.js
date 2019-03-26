@@ -143,7 +143,7 @@ Horticookie.restoreDefaultConfig = function(mode){
 //***********************************
 //    Horticookie functions
 //***********************************
-Horticookie.dispPrefs = function(){
+Horticookie.getMenuString = function(){
 	var writeHeader = function(text) {
 		var div = document.createElement('div');
 		div.className = 'listing';
@@ -743,37 +743,47 @@ Horticookie.recalcPlantStatus = function(){
 	var M = Horticookie.M;
 	Horticookie.plantStatus = {};
 	
-	for(var key in M.plants){
-		var plant = M.plants[key];
-		var ps = {status:0, probGrowthNextTick:0};
-		Horticookie.plantStatus[key] = ps;
-		
-		if(plant.unlocked){
-			ps.status = Horticookie.statusCodes.UNLOCKED;
-		}else{
-			for(var y = 0; y < Horticookie.maxPlotHeight; y++)
-			for(var x = 0; x < Horticookie.maxPlotWidth; x++){
-				if(M.isTileUnlocked(x, y)){
-					var tile = M.plot[y][x];
-					var ntp = Horticookie.nextTickProbabilities[y][x];
-					
-					if(ntp.immature[key]){
-						ps.probGrowthNextTick = 1 - ((1 - ps.probGrowthNextTick) * (1 - ntp.immature[key]));	
-						ps.status = Math.max(ps.status, Horticookie.statusCodes.MAYGROW);
-					}
-					
-					if((tile[0] - 1) == plant.id){
-						if(tile[1] >= plant.mature && Horticookie.config.autoHarvest && !plant.unlocked){
-							M.clickTile(x, y);
-							Horticookie.recalcTileStatus();
-							ps.status = Horticookie.statusCodes.UNLOCKED;
-						}else{
-							ps.status = Math.max(ps.status, (tile[1] >= plant.mature) ? Horticookie.statusCodes.MATURE : Horticookie.statusCodes.PREMATURE);
-							if(ntp.immature[key] + ntp.mature[key] < 1) ps.status = Horticookie.statusCodes.DANGER;
-						}
-					}
-				}
+	for(var key in M.plants) Horticookie.plantStatus[key] = {status:0, probGrowthNextTick:0};
+	
+	
+	for(var y = 0; y < Horticookie.maxPlotHeight; y++)
+	for(var x = 0; x < Horticookie.maxPlotWidth; x++){
+		if(M.isTileUnlocked(x, y)){
+			var tile = M.plot[y][x];
+			var ntp = Horticookie.nextTickProbabilities[y][x];
+			
+			// Calculate probability of sprouting
+			for(var key in ntp.immature){
+				var ps = Horticookie.plantStatus[key];
+				ps.probGrowthNextTick = 1 - ((1 - ps.probGrowthNextTick) * (1 - ntp.immature[key]));	
+				ps.status = Math.max(ps.status, Horticookie.statusCodes.MAYGROW);
 			}
+			
+			if(tile[0] != 0){
+				var plant = M.plantsById[tile[0] - 1];
+				var ps = Horticookie.plantStatus[plant.key];
+				
+				if(tile[1] >= plant.mature){
+					if(Horticookie.config.autoHarvest && (!plant.unlocked || plant.key == 'queenbeetLump')){
+						M.clickTile(x, y);
+						Horticookie.recalcTileStatus();
+					}else{
+						ps.status = Math.max(ps.status, Horticookie.statusCodes.MATURE);
+					}
+				}else{
+					ps.status = Math.max(ps.status, Horticookie.statusCodes.PREMATURE);
+					
+				}
+				
+				if(ntp.immature[plant.key] + ntp.mature[plant.key] < 1) ps.status = Math.max(ps.status, Horticookie.statusCodes.DANGER);
+			}
+		}
+	}
+	
+	
+	for(var key in M.plants){
+		if(M.plants[key].unlocked){
+			Horticookie.plantStatus[key].status = Horticookie.statusCodes.UNLOCKED;
 		}
 	}
 }
@@ -835,30 +845,6 @@ Horticookie.draw = function(){
 //***********************************
 //    Functions that override the main game
 //***********************************
-Horticookie.UpdateMenu = function(){
-	Horticookie.Backup.UpdateMenu();
-	
-	if(Game.onMenu === 'prefs'){
-		var str = Horticookie.dispPrefs();
-		
-		var div = document.createElement('div');
-		div.innerHTML = str;
-		var menu = document.getElementById('menu');
-		if(menu) {
-			menu = menu.getElementsByClassName('subsection')[0];
-			if(menu) {
-				var padding = menu.getElementsByTagName('div');
-				padding = padding[padding.length - 1];
-				if(padding) {
-					menu.insertBefore(div, padding);
-				} else {
-					menu.appendChild(div);
-				}
-			}
-		}
-	}
-}
-
 Horticookie.computeEffs = function(){
 	Horticookie.Backup.computeEffs();
 	Horticookie.recalcTileStatus();
@@ -1054,7 +1040,30 @@ Horticookie.lockSeed = function(me) {
 Horticookie.ReplaceMainGame = function(){
 	// Insert into the menu
 	Horticookie.Backup.UpdateMenu = Game.UpdateMenu;
-	Game.UpdateMenu = Horticookie.UpdateMenu;
+	
+	Game.UpdateMenu = function(){
+		Horticookie.Backup.UpdateMenu();
+		
+		if(Game.onMenu === 'prefs'){
+			var str = Horticookie.getMenuString();
+			
+			var div = document.createElement('div');
+			div.innerHTML = str;
+			var menu = document.getElementById('menu');
+			if(menu) {
+				menu = menu.getElementsByClassName('subsection')[0];
+				if(menu) {
+					var padding = menu.getElementsByTagName('div');
+					padding = padding[padding.length - 1];
+					if(padding) {
+						menu.insertBefore(div, padding);
+					} else {
+						menu.appendChild(div);
+					}
+				}
+			}
+		}
+	}
 	
 	// Set up for Accelerated Garden
 	Horticookie.Backup.randomFloor = randomFloor;

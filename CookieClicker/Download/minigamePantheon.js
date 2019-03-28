@@ -1,4 +1,4 @@
-var M={};
+﻿var M={};
 M.parent=Game.Objects['Temple'];
 M.parent.minigame=M;
 M.launch=function()

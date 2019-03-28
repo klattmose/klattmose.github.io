@@ -1,4 +1,4 @@
-var M={};
+﻿var M={};
 M.parent=Game.Objects['Wizard tower'];
 M.parent.minigame=M;
 M.launch=function()

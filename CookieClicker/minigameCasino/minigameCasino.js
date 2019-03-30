@@ -17,6 +17,10 @@ M.launch = function(){
 		M.cards.push({pip: 0, value:0, suit: 0});
 		for(var j = 0; j < 4; j++) for(var i = 1; i <= 13; i++) M.cards.push({pip: i, value: (i < 10 ? i : 10), suit: j});
 		
+		M.wins = 0;
+		M.winsT = 0;
+		M.ownLuckWins = 0;
+		
 		M.reshuffle = function(deckCount){
 			M.Deck = [];
 			for(var i = 0; i < M.deckCount; i++) for(var j = 1; j < M.cards.length; j++) M.Deck.push(M.cards[j]);
@@ -92,18 +96,40 @@ M.launch = function(){
 			return str;
 		}
 		
+		M.cardImage2 = function(card){
+			var left, top;
+			if(!card.pip){
+				left = 2 * 79;
+				top = 4 * 123;
+			} else {
+				left = (card.pip - 1) * 79;
+				top = (card.suit) * 123;
+			}
+			var str = '';
+			str += '-' + left + 'px ';
+			str += '-' + top + 'px ';
+			return str;
+		}
+		
 		M.hit = function(hand, player){
 			hand.cards.push(M.drawCard(M.Deck));
 			M.getHandValue(hand);
 			
 			if(hand.value > 21){
 				if(player){
-					Game.Popup('Bust!');
+					Game.Popup('Bust!', Game.mouseX, Game.mouseY);
 					M.stand();
 				}
 			}
 			
 			M.buildTable();
+		}
+		
+		M.doubledown = function(){
+			Game.Spend(M.betAmount);
+			M.betAmount *= 2;
+			M.hit(M.hands.player[0], true);
+			if(M.gameActive) M.stand();
 		}
 		
 		M.stand = function(){
@@ -154,25 +180,45 @@ M.launch = function(){
 			M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
 			M.currentPlayerHand = 0;
 			M.gameActive = 1;
+			M.firstTurn = 1;
+			Game.Spend(M.betAmount);
 			
 			M.hit(M.hands.player[0], true);
 			M.hit(M.hands.dealer, false);
 			M.hit(M.hands.player[0], true);
 			M.hit(M.hands.dealer, false);
 			
-			if(M.hands.player[0].value == 21){
+			var hiddenCard = M.hands.dealer.cards[1];
+			M.hands.dealer.cards[1] = M.cards[0];
+			
+			if(Math.random() < M.instantWinChance()){
+				M.Deck.push(M.hands.player[0].cards[0]);
+				M.Deck.push(M.hands.player[0].cards[1]);
+				M.Deck.push(hiddenCard);
+				
+				M.hands.player[0].cards[0] = {pip:choose([10,11,12,13]), value:10, suit:choose([0,1,2,3])}
+				M.hands.player[0].cards[1] = {pip:1, value:1, suit:choose([0,1,2,3])}
+				M.getHandValue(M.hands.player[0]);
+				M.buildTable();
+				
+				M.endGame('instantWin');
+				
+			} else if(M.hands.player[0].value == 21){
 				M.endGame('playerblackjack');
-				M.Deck.push(M.hands.dealer.cards[1]);
-				M.hands.dealer.cards[1] = M.cards[0];
+				M.Deck.push(hiddenCard);
 			} else if(M.hands.dealer.value == 21){
+				M.hands.dealer.cards[1] = hiddenCard;
 				M.endGame('dealerblackjack');
 			} else{
-				M.Deck.push(M.hands.dealer.cards[1]);
-				M.hands.dealer.cards[1] = M.cards[0];
+				M.Deck.push(hiddenCard);
 			}
 			
 			M.buildSidebar();
 			M.buildTable();
+		}
+		
+		M.instantWinChance = function(){
+			return 1 - Math.pow(1 - 0.0005, M.parent.amount);
 		}
 		
 		M.evaluateHands = function(){
@@ -188,40 +234,49 @@ M.launch = function(){
 		
 		M.endGame = function(mode){
 			M.gameActive = 0;
+			M.firstTurn = 0;
 			var messg = '';
-			var winnings = M.bet;
+			var winnings = M.betAmount;
 			
 			switch(mode){
+				case 'instantWin':
+					winnings *= 2.5;
+					messg = 'You make your own luck!';
+					M.ownLuckWins++;
+					break;
+					
 				case 'playerblackjack':
-					winnings *= 1.5;
+					winnings *= 2.5;
 					messg = 'Blackjack!';
 					break;
 					
 				case 'dealerblackjack':
-					winnings *= -1;
+					winnings *= 0;
 					messg = 'Dealer blackjack';
 					break;
 				
 				case 'bust':
-					winnings *= -1;
+					winnings *= 0;
 					messg = 'Over 21!';
 					break;
 				
 				case 'dealerbust':
+					winnings *= 2;
 					messg = 'Dealer went over 21!';
 					break;
 				
 				case 'win':
+					winnings *= 2;
 					messg = 'Victory!';
 					break;
 				
 				case 'lose':
-					winnings *= -1;
+					winnings *= 0;
 					messg = 'You lose';
 					break;
 					
 				case 'push':
-					winnings *= -1;
+					winnings *= 0;
 					messg = 'Tie goes to dealer';
 					break;
 					
@@ -229,39 +284,70 @@ M.launch = function(){
 					break;
 			}
 			
-			messg += '<br/>' + (winnings < 0 ? 'Lose' : 'Gain') + ' $' + Math.abs(winnings) + '!';
-			M.bank += winnings;
+			if(winnings > 0){
+				Game.Earn(winnings);
+				M.wins++;
+				M.winsT++;
+				messg += '<br/>Gain ' + Beautify(Math.abs(winnings)) + ' cookies!';
+			}
+			
+			
 			Game.Notify(messg, '', '');
 			M.buildSidebar();
 		}
 		
-		
+		M.toggleBetMode = function(){
+			if(M.betMode == 1) M.betMode = 2;
+			else if(M.betMode == 2) M.betMode = 3;
+			else M.betMode = 1;
+			
+			M.buildSidebar();
+		}
 		
 		M.buildSidebar = function(){
-			var str = '';
-			str += '<div><input type=button id="casinoDeal" value="Deal" ' + (M.gameActive ? 'disabled="" ' : '') + '/></div>';
-			str += '<div><input type=button id="casinoHit" value="Hit" ' + ((M.gameActive && !M.isDealerTurn) ? '' : 'disabled="" ') + '/></div>';
-			str += '<div><input type=button id="casinoStand" value="Stand" ' + ((M.gameActive && !M.isDealerTurn) ? '' : 'disabled="" ') + '/></div>';
-			M.actionsL.innerHTML = str;
+			var mode = '';
 			
+			if(M.betMode == 1){
+				mode = 'second';
+			}else if(M.betMode == 2){
+				mode = 'minute';
+			}else if(M.betMode == 3){
+				mode = 'hour';
+			}
 			var str = '';
-			str += '<div>Bank: $' + M.bank + '</div>';
-			str += '<div>Bet: $' + M.bet + '</div>';
+			str += '<div>Bet: ' + Beautify(M.betChoice) + ' <input type=button id="casinoBetModeToggle" value="' + mode + (M.betChoice == 1 ? '' : 's') + '" /> of CPS</div>';
+			str += '<div id="casinoCurrentBet">(' + Beautify(M.betAmount) + ' cookies)</div>';
 			M.moneyL.innerHTML = str;
 			
-			AddEvent(l('casinoHit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.hit(M.hands.player[M.currentPlayerHand], true);}}()); 
-			AddEvent(l('casinoStand'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.stand();}}()); 
+			AddEvent(l('casinoBetModeToggle'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.toggleBetMode();}}()); 
+			
+			
+			var str = '';
+			str += '<div><input type=button id="casinoDeal" value="Deal" /></div>';
+			str += '<div><input type=button id="casinoHit" value="Hit" /></div>';
+			str += '<div><input type=button id="casinoDoubledown" value="Double Down" /></div>';
+			str += '<div><input type=button id="casinoStand" value="Stand" /></div>';
+			M.actionsL.innerHTML = str;
+			
+			l('casinoDeal').disabled = M.gameActive;
+			l('casinoHit').disabled = (!M.gameActive || M.isDealerTurn);
+			l('casinoStand').disabled = (!M.gameActive || M.isDealerTurn);
+			AddEvent(l('casinoHit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.hit(M.hands.player[M.currentPlayerHand], true);}}()); 
+			AddEvent(l('casinoStand'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.stand();}}()); 
+			AddEvent(l('casinoDoubledown'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.doubledown();}}()); 
 			AddEvent(l('casinoDeal'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.newGame();}}()); 
 		}
 		
 		M.buildTable = function(){
 			var str = '<table id="casinoBJTable">';
 			str += '<tr><td>Dealer\'s hand:</td>';
-			for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage"><img src="' + M.cardsImage + '" style="' + M.cardImage(M.hands.dealer.cards[i]) + '"/></div></td>';
+			//for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage"><img src="' + M.cardsImage + '" style="' + M.cardImage(M.hands.dealer.cards[i]) + '"/></div></td>';
+			for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage2(M.hands.dealer.cards[i]) + ';" /></td>';
 			str += '</tr>';
 			str += '<tr style="height:75px;"><td></td></tr>';
 			str += '<tr><td>Player\'s hand' + (M.hands.player.length > 1 ? (' (' + (M.currentPlayerHand + 1) + ' of ' + M.hands.player.length + ')') : '') + ':</td>'
-			for(var i = 0; i < M.hands.player[M.currentPlayerHand].cards.length; i++) str += '<td><div class="casinoBJCardImage"><img src="' + M.cardsImage + '" style="' + M.cardImage(M.hands.player[M.currentPlayerHand].cards[i]) + '"/></div></td>';
+			for(var i = 0; i < M.hands.player[M.currentPlayerHand].cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage2(M.hands.player[M.currentPlayerHand].cards[i]) + ';" /></td>';
+			//for(var i = 0; i < M.hands.player[M.currentPlayerHand].cards.length; i++) str += '<td><div class="casinoBJCardImage"><img src="' + M.cardsImage + '" style="' + M.cardImage(M.hands.player[M.currentPlayerHand].cards[i]) + '"/></div></td>';
 			str += '</tr>';
 			str += '</table>';
 			
@@ -314,7 +400,12 @@ M.launch = function(){
 	M.save = function(){
 		//output cannot use ",", ";" or "|"
 		var str = '';
-		str = M.getCardSave(M.Deck);
+		str += parseInt(M.wins);
+		str += ' ' + parseInt(M.winsT);
+		str += ' ' + parseInt(M.ownLuckWins);
+		str += ' ' + parseInt(M.betMode);
+		str += ' ' + parseInt(M.firstTurn);
+		str += ' ' + M.getCardSave(M.Deck);
 		str += ' ' + M.getCardSave(M.hands.dealer.cards);
 		str += ' ' + M.getPlayerHandsSave();
 		str += ' ' + parseInt(M.bank);
@@ -332,6 +423,11 @@ M.launch = function(){
 		
 		var i = 0;
 		var spl = str.split(' ');
+		M.wins = parseInt(spl[i++] || 0);
+		M.winsT = parseInt(spl[i++] || 0);
+		M.ownLuckWins = parseInt(spl[i++] || 0);
+		M.betMode = parseInt(spl[i++] || 0);
+		M.firstTurn = parseInt(spl[i++] || 0);
 		M.Deck = M.parseCardSave(spl[i++] || 0);
 		M.hands.dealer = {cards:M.parseCardSave(spl[i++] || 0)};
 		M.getHandValue(M.hands.dealer);
@@ -354,8 +450,12 @@ M.launch = function(){
 		M.currentPlayerHand = 0;
 		M.gameActive = 0;
 		M.minDecks = 2;
-		M.bank = 1000;
-		M.bet = 100;
+		M.betAmount = 0;
+		M.betChoice = 1;
+		M.betMode = 1;
+		M.wins = 0;
+		M.ownLuckWins = 0;
+		M.firstTurn = 0;
 		
 		M.reshuffle();
 		
@@ -367,7 +467,15 @@ M.launch = function(){
 	
 	M.logic = function(){
 		//run each frame
+		if(M.betMode == 1 && !M.gameActive){
+			M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice);
+		}else if(M.betMode == 2 && !M.gameActive){
+			M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice * 60);
+		}else if(M.betMode == 3 && !M.gameActive){
+			M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice * 60 * 60);
+		}
 		
+		l('casinoDoubledown').disabled = !(M.firstTurn && Game.cookies >= M.betAmount);
 	}
 	
 	M.onResize = function(){
@@ -380,7 +488,8 @@ M.launch = function(){
 	
 	M.draw = function(){
 		//run each draw frame
-		
+		M.infoL.innerHTML = 'Hands won : ' + Beautify(M.wins) + ' (total : ' + Beautify(M.winsT) + ')';
+		l('casinoCurrentBet').innerHTML = '(' + Beautify(M.betAmount) + ' cookies)';
 	}
 	
 	M.init(l('rowSpecial' + M.parent.id));

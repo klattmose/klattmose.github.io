@@ -6,7 +6,10 @@ M.launch = function(){
 	var M = this;
 	M.name = M.parent.minigameName;
 	M.savePrefix = 'minigameCasino';
-	M.sourceFolder = 'https://klattmose.github.io/CookieClicker/minigameCasino/';
+	//M.sourceFolder = '../minigameCasino/';
+	var script = l('minigameScript-' + M.parent.id);
+	var src = script.src;
+	M.sourceFolder = src.substring(0, src.lastIndexOf('/') + 1);
 	M.cardsImage = M.sourceFolder + 'img/cards.png'
 	
 	M.init = function(div){
@@ -87,25 +90,6 @@ M.launch = function(){
 				top = (card.suit) * 123;
 			}
 			var str = '';
-			str += 'position: absolute; ';
-			str += 'width: ' + (79 * 13) + 'px; ';
-			str += 'height: ' + (123 * 5) + 'px; ';
-			str += 'left: -' + left + 'px; ';
-			str += 'top: -' + top + 'px; ';
-			str += 'clip: rect(' + top + 'px ' + (left + 79) + 'px ' + (top + 123) + 'px ' + left + 'px);';
-			return str;
-		}
-		
-		M.cardImage2 = function(card){
-			var left, top;
-			if(!card.pip){
-				left = 2 * 79;
-				top = 4 * 123;
-			} else {
-				left = (card.pip - 1) * 79;
-				top = (card.suit) * 123;
-			}
-			var str = '';
 			str += '-' + left + 'px ';
 			str += '-' + top + 'px ';
 			return str;
@@ -130,6 +114,18 @@ M.launch = function(){
 			M.betAmount *= 2;
 			M.hit(M.hands.player[0], true);
 			if(M.gameActive) M.stand();
+		}
+		
+		M.split = function(){
+			Game.Spend(M.betAmount);
+			
+			M.hands.player.push({value:0, cards:[]});
+			M.hands.player[1].cards.push(M.hands.player[0].cards[1]);
+			M.hands.player[0].cards.splice(1, 1);
+			
+			M.hit(M.hands.player[0], true);
+			M.hit(M.hands.player[1], true);
+			M.buildTable();
 		}
 		
 		M.stand = function(){
@@ -326,6 +322,7 @@ M.launch = function(){
 			str += '<div><input type=button id="casinoDeal" value="Deal" /></div>';
 			str += '<div><input type=button id="casinoHit" value="Hit" /></div>';
 			str += '<div><input type=button id="casinoDoubledown" value="Double Down" /></div>';
+			str += '<div><input type=button id="casinoSplit" value="Split" /></div>';
 			str += '<div><input type=button id="casinoStand" value="Stand" /></div>';
 			M.actionsL.innerHTML = str;
 			
@@ -335,19 +332,18 @@ M.launch = function(){
 			AddEvent(l('casinoHit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.hit(M.hands.player[M.currentPlayerHand], true);}}()); 
 			AddEvent(l('casinoStand'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.stand();}}()); 
 			AddEvent(l('casinoDoubledown'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.doubledown();}}()); 
+			AddEvent(l('casinoSplit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.split();}}()); 
 			AddEvent(l('casinoDeal'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.newGame();}}()); 
 		}
 		
 		M.buildTable = function(){
 			var str = '<table id="casinoBJTable">';
 			str += '<tr><td>Dealer\'s hand:</td>';
-			//for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage"><img src="' + M.cardsImage + '" style="' + M.cardImage(M.hands.dealer.cards[i]) + '"/></div></td>';
-			for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage2(M.hands.dealer.cards[i]) + ';" /></td>';
+			for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage(M.hands.dealer.cards[i]) + ';" /></td>';
 			str += '</tr>';
 			str += '<tr style="height:75px;"><td></td></tr>';
-			str += '<tr><td>Player\'s hand' + (M.hands.player.length > 1 ? (' (' + (M.currentPlayerHand + 1) + ' of ' + M.hands.player.length + ')') : '') + ':</td>'
-			for(var i = 0; i < M.hands.player[M.currentPlayerHand].cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage2(M.hands.player[M.currentPlayerHand].cards[i]) + ';" /></td>';
-			//for(var i = 0; i < M.hands.player[M.currentPlayerHand].cards.length; i++) str += '<td><div class="casinoBJCardImage"><img src="' + M.cardsImage + '" style="' + M.cardImage(M.hands.player[M.currentPlayerHand].cards[i]) + '"/></div></td>';
+			str += '<tr><td>Player\'s hand' + (M.hands.player.length > 1 ? (' (' + (M.currentPlayerHand + 1) + ' of ' + M.hands.player.length + ')') : '') + ':<br/>Score: ' + M.hands.player[M.currentPlayerHand].value + '</td>'
+			for(var i = 0; i < M.hands.player[M.currentPlayerHand].cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage(M.hands.player[M.currentPlayerHand].cards[i]) + ';" /></td>';
 			str += '</tr>';
 			str += '</table>';
 			
@@ -476,6 +472,7 @@ M.launch = function(){
 		}
 		
 		l('casinoDoubledown').disabled = !(M.firstTurn && Game.cookies >= M.betAmount);
+		l('casinoSplit').disabled = !(M.firstTurn && Game.cookies >= M.betAmount) || (M.hands.player[0].cards[0].pip != M.hands.player[0].cards[1].pip);
 	}
 	
 	M.onResize = function(){
@@ -494,4 +491,5 @@ M.launch = function(){
 	
 	M.init(l('rowSpecial' + M.parent.id));
 }
+
 //var M = 0;

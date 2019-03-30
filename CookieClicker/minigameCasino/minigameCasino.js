@@ -6,7 +6,7 @@ M.launch = function(){
 	var M = this;
 	M.name = M.parent.minigameName;
 	M.savePrefix = 'minigameCasino';
-	M.sourceFolder = '../minigameCasino/';
+	M.sourceFolder = 'https://klattmose.github.io/CookieClicker/minigameCasino/';
 	M.cardsImage = M.sourceFolder + 'img/cards.png'
 	
 	M.init = function(div){

@@ -8,4 +8,4 @@ Game.LoadMinigameMod = function(objKey, miniName, miniSource){
 	Game.LoadMinigames();
 }
 
-Game.LoadMinigameMod('Chancemaker', 'Casino', '../minigameCasino/minigameCasino.js');
+Game.LoadMinigameMod('Chancemaker', 'Casino', 'https://klattmose.github.io/CookieClicker/minigameCasino/minigameCasino.js');

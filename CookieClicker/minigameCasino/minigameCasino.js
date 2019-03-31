@@ -11,6 +11,7 @@ M.launch = function(){
 	var src = script.src;
 	M.sourceFolder = src.substring(0, src.lastIndexOf('/') + 1);
 	M.cardsImage = M.sourceFolder + 'img/cards.png'
+	M.chancemakerChance = 0.0005;
 	
 	M.init = function(div){
 		// It's possible that the save data might get lost if entrusted to the game's save
@@ -22,47 +23,65 @@ M.launch = function(){
 		
 		M.wins = 0;
 		M.winsT = 0;
+		M.tiesLost = 0;
 		M.ownLuckWins = 0;
+		M.beatLength = 1000;
+		
+		M.phases = {
+			inactive:0,
+			deal:1,
+			firstTurn:2,
+			playerTurn:3,
+			dealerTurn:4,
+			evaluate:5
+		}
+		
+		
+		//***********************************
+		//    Achievements
+		//***********************************
+		M.Achievements = []; //x,y
+		M.Achievements.push(new Game.Achievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [24, 26]));
+		M.Achievements.push(new Game.Achievement('Card trout', 'Win <b>210</b> hands of blackjack.', [24, 26]));
+		M.Achievements.push(new Game.Achievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [24, 26]));
+		M.Achievements.push(new Game.Achievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>You're such a stud!</q>", [24, 26]));
+		M.Achievements.push(new Game.Achievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [24, 26]));
+			Game.last.pool = 'shadow';
+		M.Achievements.push(new Game.Achievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [24, 26]));
+		M.Achievements.push(new Game.Achievement('Paid off the dealer', "Win <b>" + (13 * 13) + "</b> hands of blackjack through chancemaker intervention in one ascension.<q>Takes money to make money.</q>", [24, 26]));
+		M.Achievements.push(new Game.Achievement('Losing is for losers', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>If you're not cheating, are you even trying?</q>", [24, 26]));
+		M.Achievements.push(new Game.Achievement('Blackjack!', "Have a score of <b>21</b> without hitting.", [24, 26]));
+		M.Achievements.push(new Game.Achievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>WHO DO YOU WORK FOR?</q>", [24, 26]));
+		M.Achievements.push(new Game.Achievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [24, 26]));
+			Game.last.pool = 'shadow';
+		
+		for(var i = 0; i < M.Achievements.length; i++) M.Achievements[i].order = 1000000 + i / 100;
+		
+		
+		//***********************************
+		//    Upgrades
+		//***********************************
+		M.Upgrades = [];
+		M.Upgrades.push(new Game.Upgrade('Math lessons', "Show the value of your current blackjack hand.<q>C'mon, it's not that hard.</q>", 1, [24, 26])); 
+			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+			Game.last.buyFunction = function(){M.buildTable();}
+		M.Upgrades.push(new Game.Upgrade('Raise the stakes', "Can bet a minute of CPS at a time.<q>Now we're getting somewhere!</q>", 10, [24, 26])); 
+			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+			Game.last.buyFunction = function(){M.buildSidebar();}
+		M.Upgrades.push(new Game.Upgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [24, 26])); 
+			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+			Game.last.buyFunction = function(){M.buildSidebar();}
+		M.Upgrades.push(new Game.Upgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the house now.</q>", 15, [24, 26])); 
+			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+		M.Upgrades.push(new Game.Upgrade('I make my own luck', "Each Chancemaker gives a <b>" + (M.chancemakerChance * 100) + "%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [24, 26])); 
+			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+		
+		for(var i = 0; i < M.Upgrades.length; i++) M.Upgrades[i].order = 1000000 + i / 100;
+		
 		
 		M.reshuffle = function(deckCount){
 			M.Deck = [];
 			for(var i = 0; i < M.deckCount; i++) for(var j = 1; j < M.cards.length; j++) M.Deck.push(M.cards[j]);
-		}
-		
-		M.getCardSave = function(deck){
-			var res = '';
-			for(var i = 0; i < deck.length; i++) res += (res.length ? '-' : '') + (deck[i].pip + 13 * deck[i].suit);
-			return res;
-		}
-		
-		M.parseCardSave = function(str){
-			var res = [];
-			if(str){
-				var arr = str.split('-');
-				for(var i = 0; i < arr.length; i++){
-					res.push(M.cards[arr[i]]);
-				}
-			} 
-			return res;
-		}
-		
-		M.getPlayerHandsSave = function(){
-			var res = '';
-			for(var i = 0; i < M.hands.player.length; i++) res += (res.length ? '_' : '') + M.getCardSave(M.hands.player[i].cards);
-			return res;
-		}
-		
-		M.parsePlayerHandsSave = function(str){
-			M.hands.player = [];
-			if(str){
-				var hands = str.split('_');
-				for(var i = 0; i < hands.length; i++){
-					M.hands.player.push({cards:M.parseCardSave(hands[i])});
-					M.getHandValue(M.hands.player[i]);
-				} 
-			}else{
-				M.hands.player = [{value:0, cards:[]}];
-			}
 		}
 		
 		M.getHandValue = function(hand){
@@ -96,14 +115,18 @@ M.launch = function(){
 		}
 		
 		M.hit = function(hand, player){
+			M.getHandValue(hand);
+			var oldValue = hand.value;
 			hand.cards.push(M.drawCard(M.Deck));
 			M.getHandValue(hand);
 			
 			if(hand.value > 21){
 				if(player){
-					Game.Popup('Bust!', Game.mouseX, Game.mouseY);
+					Game.Unlock('Math lessons');
 					M.stand();
 				}
+			}else if(player && oldValue >= 17){
+				Game.Win('I like to live dangerously');
 			}
 			
 			M.buildTable();
@@ -113,7 +136,7 @@ M.launch = function(){
 			Game.Spend(M.betAmount);
 			M.betAmount *= 2;
 			M.hit(M.hands.player[0], true);
-			if(M.gameActive) M.stand();
+			M.stand();
 		}
 		
 		M.split = function(){
@@ -125,6 +148,8 @@ M.launch = function(){
 			
 			M.hit(M.hands.player[0], true);
 			M.hit(M.hands.player[1], true);
+			
+			M.buildSidebar();
 			M.buildTable();
 		}
 		
@@ -134,29 +159,24 @@ M.launch = function(){
 				for(var i = 0; i < M.hands.player.length; i++) if(M.hands.player[i].value <= 21) allBust = false;
 				
 				if(allBust){
-					M.evaluateHands();
+					M.nextBeat = Date.now() + M.beatLength;
+					M.phase = M.phases.evaluate;
 				}else{
-					M.isDealerTurn = 1;
-					M.buildSidebar()
 					M.determineHiddenDealerCard();
-					M.buildTable();
-					setTimeout(M.dealerTurn, 1000);
+					M.phase = M.phases.dealerTurn;
+					if(M.hands.dealer.value >= 17){
+						M.currentPlayerHand = 0;
+						M.phase = M.phases.evaluate;
+					}
+					M.nextBeat = Date.now() + M.beatLength;
 				}
 				
 			}else{
 				M.currentPlayerHand++;
-				M.buildTable();
 			}
-		}
-		
-		M.dealerTurn = function(){
-			if(M.gameActive && M.hands.dealer.value < 17){
-				M.hit(M.hands.dealer, false);
-				M.buildTable();
-				setTimeout(M.dealerTurn, 1000);
-			}else{
-				M.evaluateHands();
-			}
+			
+			M.buildSidebar()
+			M.buildTable();
 		}
 		
 		M.determineHiddenDealerCard = function(){
@@ -175,8 +195,7 @@ M.launch = function(){
 			if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
 			M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
 			M.currentPlayerHand = 0;
-			M.gameActive = 1;
-			M.firstTurn = 1;
+			M.phase = M.phases.firstTurn;
 			Game.Spend(M.betAmount);
 			
 			M.hit(M.hands.player[0], true);
@@ -213,24 +232,10 @@ M.launch = function(){
 			M.buildTable();
 		}
 		
-		M.instantWinChance = function(){
-			return 1 - Math.pow(1 - 0.0005, M.parent.amount);
-		}
-		
-		M.evaluateHands = function(){
-			M.isDealerTurn = 0;
-			for(var i = 0; i < M.hands.player.length; i++){
-				if(M.hands.player[i].value > 21) M.endGame('bust');
-				else if(M.hands.dealer.value > 21) M.endGame('dealerbust');
-				else if(M.hands.dealer.value < M.hands.player[i].value) M.endGame('win');
-				else if(M.hands.dealer.value > M.hands.player[i].value) M.endGame('lose');
-				else if(M.hands.dealer.value == M.hands.player[i].value) M.endGame('push');
-			}
-		}
+		M.instantWinChance = function(){ return (Game.Has('I make my own luck') ? (1 - Math.pow(1 - M.chancemakerChance, M.parent.amount)) : 0); }
 		
 		M.endGame = function(mode){
-			M.gameActive = 0;
-			M.firstTurn = 0;
+			M.phase = M.phases.inactive;
 			var messg = '';
 			var winnings = M.betAmount;
 			
@@ -239,11 +244,17 @@ M.launch = function(){
 					winnings *= 2.5;
 					messg = 'You make your own luck!';
 					M.ownLuckWins++;
+					
+					if(M.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
+					if(M.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
+					if(M.ownLuckWins >= 666) Game.Win('Losing is for losers');
 					break;
 					
 				case 'playerblackjack':
 					winnings *= 2.5;
 					messg = 'Blackjack!';
+					Game.Unlock('I make my own luck');
+					Game.Win('Blackjack!');
 					break;
 					
 				case 'dealerblackjack':
@@ -263,7 +274,7 @@ M.launch = function(){
 				
 				case 'win':
 					winnings *= 2;
-					messg = 'Victory!';
+					messg = 'You win!';
 					break;
 				
 				case 'lose':
@@ -272,33 +283,52 @@ M.launch = function(){
 					break;
 					
 				case 'push':
-					winnings *= 0;
-					messg = 'Tie goes to dealer';
+					if(Game.Has('Tiebreaker')){
+						winnings *= 2;
+						messg = 'Tie goes to player!';
+					}else{
+						winnings *= 0;
+						messg = 'Tie goes to dealer';
+						M.tiesLost++;
+						if(M.tiesLost >= 7) Game.Unlock('Tiebreaker');
+					}
+					
 					break;
 					
 				default:
 					break;
 			}
 			
+			messg += '<div style="font-size:65%;">';
 			if(winnings > 0){
 				Game.Earn(winnings);
 				M.wins++;
 				M.winsT++;
-				messg += '<br/>Gain ' + Beautify(Math.abs(winnings)) + ' cookies!';
+				messg += 'Gain ' + Beautify(Math.abs(winnings - M.betAmount)) + ' cookies!';
+				
+				if(M.winsT >= 7) Game.Unlock('Raise the stakes');
+				if(M.winsT >= 49) Game.Unlock('High roller!');
+				if(M.winsT >= 21) Game.Win('Card minnow');
+				if(M.winsT >= 210) Game.Win('Card trout');
+				if(M.winsT >= 2100) Game.Win('Card shark');
+			}else{
+				messg += 'Lost ' + Beautify(Math.abs(M.betAmount)) + ' cookies';
 			}
+			messg += '</div>';
 			
 			
-			Game.Notify(messg, '', '');
+			Game.Popup(messg, Game.mouseX, Game.mouseY);
 			M.buildSidebar();
 		}
 		
 		M.toggleBetMode = function(){
-			if(M.betMode == 1) M.betMode = 2;
-			else if(M.betMode == 2) M.betMode = 3;
+			if(M.betMode == 1 && Game.Has('Raise the stakes')) M.betMode = 2;
+			else if(M.betMode < 3 && Game.Has('High roller!')) M.betMode = 3;
 			else M.betMode = 1;
 			
 			M.buildSidebar();
 		}
+		
 		
 		M.buildSidebar = function(){
 			var mode = '';
@@ -311,28 +341,34 @@ M.launch = function(){
 				mode = 'hour';
 			}
 			var str = '';
-			str += '<div>Bet: ' + Beautify(M.betChoice) + ' <input type=button id="casinoBetModeToggle" value="' + mode + (M.betChoice == 1 ? '' : 's') + '" /> of CPS</div>';
+			
+			if(Game.Has('Raise the stakes') || Game.Has('High roller!')) str += '<div>Bet: ' + Beautify(M.betChoice) + ' <input type=button id="casinoBetModeToggle" value="' + mode + (M.betChoice == 1 ? '' : 's') + '" /> of CPS</div>';
+			else str += '<div>Bet: ' + Beautify(M.betChoice) + ' ' + mode + (M.betChoice == 1 ? '' : 's') + ' of CPS</div>';
+			
 			str += '<div id="casinoCurrentBet">(' + Beautify(M.betAmount) + ' cookies)</div>';
 			M.moneyL.innerHTML = str;
 			
-			AddEvent(l('casinoBetModeToggle'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.toggleBetMode();}}()); 
+			if(Game.Has('Raise the stakes') || Game.Has('High roller!')) AddEvent(l('casinoBetModeToggle'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.toggleBetMode();}}()); 
 			
 			
 			var str = '';
-			str += '<div><input type=button id="casinoDeal" value="Deal" /></div>';
-			str += '<div><input type=button id="casinoHit" value="Hit" /></div>';
-			str += '<div><input type=button id="casinoDoubledown" value="Double Down" /></div>';
-			str += '<div><input type=button id="casinoSplit" value="Split" /></div>';
-			str += '<div><input type=button id="casinoStand" value="Stand" /></div>';
+			str += '<div class="listing"><input type=button id="casinoDeal" value="Deal" /></div>';
+			str += '<div class="listing"><input type=button id="casinoHit" value="Hit" /></div>';
+			str += '<div class="listing"><input type=button id="casinoDoubledown" value="Double Down" /></div>';
+			str += '<div class="listing"><input type=button id="casinoSplit" value="Split" /></div>';
+			str += '<div class="listing"><input type=button id="casinoStand" value="Stand" /></div>';
 			M.actionsL.innerHTML = str;
 			
-			l('casinoDeal').disabled = M.gameActive;
-			l('casinoHit').disabled = (!M.gameActive || M.isDealerTurn);
-			l('casinoStand').disabled = (!M.gameActive || M.isDealerTurn);
-			AddEvent(l('casinoHit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.hit(M.hands.player[M.currentPlayerHand], true);}}()); 
-			AddEvent(l('casinoStand'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.stand();}}()); 
-			AddEvent(l('casinoDoubledown'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.doubledown();}}()); 
-			AddEvent(l('casinoSplit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.firstTurn = 0;M.split();}}()); 
+			l('casinoDeal').disabled = M.phase != M.phases.inactive;
+			l('casinoHit').disabled = !(M.phase == M.phases.firstTurn || M.phase == M.phases.playerTurn);
+			l('casinoStand').disabled = !(M.phase == M.phases.firstTurn || M.phase == M.phases.playerTurn);
+			l('casinoDoubledown').disabled = !(M.phase == M.phases.firstTurn && Game.cookies >= M.betAmount);
+			l('casinoSplit').disabled = !(M.phase == M.phases.firstTurn && Game.cookies >= M.betAmount) || (M.hands.player[0].cards[0].pip != M.hands.player[0].cards[1].pip);
+			
+			AddEvent(l('casinoHit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.phase = M.phases.playerTurn;M.hit(M.hands.player[M.currentPlayerHand], true);M.buildSidebar();}}()); 
+			AddEvent(l('casinoStand'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.phase = M.phases.playerTurn;M.stand();}}()); 
+			AddEvent(l('casinoDoubledown'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.phase = M.phases.playerTurn;M.doubledown();}}()); 
+			AddEvent(l('casinoSplit'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.phase = M.phases.playerTurn;M.split();}}()); 
 			AddEvent(l('casinoDeal'), 'click', function(){return function(){PlaySound('snd/tick.mp3');M.newGame();}}()); 
 		}
 		
@@ -342,7 +378,7 @@ M.launch = function(){
 			for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage(M.hands.dealer.cards[i]) + ';" /></td>';
 			str += '</tr>';
 			str += '<tr style="height:75px;"><td></td></tr>';
-			str += '<tr><td>Player\'s hand' + (M.hands.player.length > 1 ? (' (' + (M.currentPlayerHand + 1) + ' of ' + M.hands.player.length + ')') : '') + ':<br/>Score: ' + M.hands.player[M.currentPlayerHand].value + '</td>'
+			str += '<tr><td>Player\'s hand' + (M.hands.player.length > 1 ? (' (' + (M.currentPlayerHand + 1) + ' of ' + M.hands.player.length + ')') : '') + ':' + (Game.Has('Math lessons') ? ('<br/>Score: ' + M.hands.player[M.currentPlayerHand].value) : '') + '</td>'
 			for(var i = 0; i < M.hands.player[M.currentPlayerHand].cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage(M.hands.player[M.currentPlayerHand].cards[i]) + ';" /></td>';
 			str += '</tr>';
 			str += '</table>';
@@ -355,6 +391,7 @@ M.launch = function(){
 		'#casinoBG{background:url(img/shadedBorders.png), url(' + M.sourceFolder + 'img/BGcasino.jpg); background-size:100% 100%, auto; position:absolute; left:0px; right:0px; top:0px; bottom:16px;}' + 
 		'#casinoContent{position:relative; box-sizing:border-box; padding:4px 24px; height:500px;}' +
 		'#casinoSidebar{text-align:center; margin:0px; padding:0px; position:absolute; left:4px; top:4px; bottom:4px; right:65%; overflow-y:auto; overflow-x:hidden; box-shadow:8px 0px 8px rgba(0,0,0,0.5);}' +
+		'#casinoSidebar .listing{text-align:left;}' +
 		'#casinoTable{text-align:center; position:absolute; right:0px; top:0px; bottom:0px; overflow-x:auto; overflow:hidden;}' + 
 		'.casinoBJCardImage{position: relative; width: 79px; height: 123px; left: 0px; top: 0px; overflow: visible;}' + 
 		'.casinoSpacer{position: relative; width: 79px; height: 123px; left: 0px; top: 0px; overflow: visible;}' + 
@@ -395,18 +432,66 @@ M.launch = function(){
 	
 	M.save = function(){
 		//output cannot use ",", ";" or "|"
-		var str = '';
-		str += parseInt(M.wins);
-		str += ' ' + parseInt(M.winsT);
-		str += ' ' + parseInt(M.ownLuckWins);
-		str += ' ' + parseInt(M.betMode);
-		str += ' ' + parseInt(M.firstTurn);
-		str += ' ' + M.getCardSave(M.Deck);
-		str += ' ' + M.getCardSave(M.hands.dealer.cards);
-		str += ' ' + M.getPlayerHandsSave();
-		str += ' ' + parseInt(M.bank);
-		str += ' ' + parseInt(M.gameActive);
-		str += ' ' + parseInt(M.parent.onMinigame ? '1' : '0');
+		
+		var getMinigameStateSave = function(){
+			var res = '';
+			res += parseInt(M.parent.onMinigame ? '1' : '0');
+			res += '_' + parseInt(M.wins);
+			res += '_' + parseInt(M.winsT);
+			res += '_' + parseInt(M.ownLuckWins);
+			res += '_' + parseInt(M.tiesLost);
+			res += '_' + parseInt(M.betMode);
+			res += '_' + parseInt(M.betChoice);
+			
+			return res;
+		}
+		
+		var getGameStateSave = function(){
+			var res = '';
+			res += parseInt(M.currentPlayerHand);
+			res += '_' + parseInt(M.nextBeat);
+			res += '_' + parseInt(M.phase);
+			res += '_' + parseInt(M.istep);
+			res += '_' + parseFloat(M.betAmount);
+			
+			return res;
+		}
+		
+		var getCardSave = function(deck){
+			var res = '';
+			for(var i = 0; i < deck.length; i++) res += (res.length ? '-' : '') + (deck[i].pip + 13 * deck[i].suit);
+			return res;
+		}
+		
+		var getPlayerHandsSave = function(){
+			var res = '';
+			for(var i = 0; i < M.hands.player.length; i++) res += (res.length ? '_' : '') + getCardSave(M.hands.player[i].cards);
+			return res;
+		}
+		
+		var getAchievementSave = function(){
+			var res = '';
+			for(var i = 0; i < M.Achievements.length; i++) res += Math.min(M.Achievements[i].won);
+			return res;
+		}
+		
+		var getUpgradeSave = function(){
+			var res = '';
+			for (var i in M.Upgrades){
+				var me = M.Upgrades[i];
+				res += Math.min(me.unlocked, 1) + '' + Math.min(me.bought, 1);
+			}
+			return res;
+		}
+		
+		
+		var str = getMinigameStateSave();
+		str += ' ' + getGameStateSave();
+		str += ' ' + getCardSave(M.hands.dealer.cards);
+		str += ' ' + getPlayerHandsSave();
+		str += ' ' + getCardSave(M.Deck);
+		str += ' ' + getAchievementSave();
+		str += ' ' + getUpgradeSave();
 		
 		localStorage.setItem(M.savePrefix, str);
 		return str;
@@ -417,23 +502,98 @@ M.launch = function(){
 		//note : not actually called in the Game's load; see "minigameSave" in main.js
 		if(!str) return false;
 		
+		var parseMinigameStateSave = function(str){
+			var i = 0;
+			var spl = str.split('_');
+			var on = parseInt(spl[i++] || 0);
+			M.wins = parseInt(spl[i++] || 0);
+			M.winsT = parseInt(spl[i++] || 0);
+			M.ownLuckWins = parseInt(spl[i++] || 0);
+			M.tiesLost = parseInt(spl[i++] || 0);
+			M.betMode = parseInt(spl[i++] || 0);
+			M.betChoice = parseInt(spl[i++] || 0);
+			
+			if(on && Game.ascensionMode != 1) M.parent.switchMinigame(1);
+		}
+		
+		var parseGameStateSave = function(str){
+			var i = 0;
+			var spl = str.split('_');
+			M.currentPlayerHand = parseInt(spl[i++] || 0);
+			M.nextBeat = parseInt(spl[i++] || 0);
+			M.phase = parseInt(spl[i++] || 0);
+			M.istep = parseInt(spl[i++] || 0);
+			M.betAmount = parseFloat(spl[i++] || 0);
+		}
+		
+		var parseCardSave = function(str){
+			var res = [];
+			if(str){
+				var arr = str.split('-');
+				for(var i = 0; i < arr.length; i++){
+					res.push(M.cards[arr[i]]);
+				}
+			} 
+			return res;
+		}
+		
+		var parsePlayerHandsSave = function(str){
+			M.hands.player = [];
+			if(str){
+				var hands = str.split('_');
+				for(var i = 0; i < hands.length; i++){
+					M.hands.player.push({cards:parseCardSave(hands[i])});
+					M.getHandValue(M.hands.player[i]);
+				} 
+			}else{
+				M.hands.player = [{value:0, cards:[]}];
+			}
+		}
+		
+		var parseAchievementSave = function(str){
+			var spl = str.split('');
+			for (var i in M.Achievements){
+				var me = M.Achievements[i];
+				if(spl[i]){
+					var mestr = [spl[i]];
+					me.won = parseInt(mestr[0]);
+				}else{
+					me.won = 0;
+				}
+				if(me.won && Game.CountsAsAchievementOwned(me.pool)) Game.AchievementsOwned++;
+			}
+		}
+		
+		var parseUpgradeSave = function(str){
+			var spl = str.split('');
+			for (var i in M.Upgrades){
+				var me = M.Upgrades[i];
+				if (spl[i * 2]){
+					var mestr = [spl[i * 2],spl[i * 2 + 1]];
+					me.unlocked = parseInt(mestr[0]);
+					me.bought = parseInt(mestr[1]);
+					if (me.bought && Game.CountsAsUpgradeOwned(me.pool)) Game.UpgradesOwned++;
+				}
+				else{
+					me.unlocked = 0;
+					me.bought = 0;
+				}
+			}
+		}
+		
+		
 		var i = 0;
 		var spl = str.split(' ');
-		M.wins = parseInt(spl[i++] || 0);
-		M.winsT = parseInt(spl[i++] || 0);
-		M.ownLuckWins = parseInt(spl[i++] || 0);
-		M.betMode = parseInt(spl[i++] || 0);
-		M.firstTurn = parseInt(spl[i++] || 0);
-		M.Deck = M.parseCardSave(spl[i++] || 0);
-		M.hands.dealer = {cards:M.parseCardSave(spl[i++] || 0)};
-		M.getHandValue(M.hands.dealer);
-		M.parsePlayerHandsSave(spl[i++] || 0);
-		M.bank = parseInt(spl[i++] || 1000);
-		M.gameActive = parseInt(spl[i++] || 0);
-		var on = parseInt(spl[i++] || 0);
+		parseMinigameStateSave(spl[i++] || '');
+		parseGameStateSave(spl[i++] || '');
+		M.hands.dealer = {cards:parseCardSave(spl[i++] || 0)};
+		parsePlayerHandsSave(spl[i++] || 0);
+		M.Deck = parseCardSave(spl[i++] || 0);
+		parseAchievementSave(spl[i++] || '');
+		parseUpgradeSave(spl[i++] || '');
 		
+		M.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
-		if(on && Game.ascensionMode != 1) M.parent.switchMinigame(1);
 		
 		M.buildSidebar();
 		M.buildTable();
@@ -444,14 +604,16 @@ M.launch = function(){
 		M.Deck = [];
 		M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
 		M.currentPlayerHand = 0;
-		M.gameActive = 0;
 		M.minDecks = 2;
 		M.betAmount = 0;
 		M.betChoice = 1;
 		M.betMode = 1;
 		M.wins = 0;
 		M.ownLuckWins = 0;
-		M.firstTurn = 0;
+		M.tiesLost = 0;
+		M.phase = 0;
+		M.istep = 0;
+		M.nextBeat = Date.now() + M.beatLength;
 		
 		M.reshuffle();
 		
@@ -463,16 +625,74 @@ M.launch = function(){
 	
 	M.logic = function(){
 		//run each frame
-		if(M.betMode == 1 && !M.gameActive){
+		if(M.betMode == 1 && M.phase == M.phases.inactive){
 			M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice);
-		}else if(M.betMode == 2 && !M.gameActive){
+		}else if(M.betMode == 2 && M.phase == M.phases.inactive){
 			M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice * 60);
-		}else if(M.betMode == 3 && !M.gameActive){
+		}else if(M.betMode == 3 && M.phase == M.phases.inactive){
 			M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice * 60 * 60);
 		}
 		
-		l('casinoDoubledown').disabled = !(M.firstTurn && Game.cookies >= M.betAmount);
-		l('casinoSplit').disabled = !(M.firstTurn && Game.cookies >= M.betAmount) || (M.hands.player[0].cards[0].pip != M.hands.player[0].cards[1].pip);
+		if(Date.now() > M.nextBeat){
+			M.nextBeat = Date.now() + M.beatLength;
+			
+			if(M.phase == M.phases.inactive){
+				
+			}
+			else if(M.phase == M.phases.deal){
+				
+			}
+			else if(M.phase == M.phases.playerTurn || M.phase == M.phases.firstTurn){
+				
+			}
+			else if(M.phase == M.phases.dealerTurn){
+				if(M.hands.dealer.value < 17){
+					M.hit(M.hands.dealer, false);
+					M.buildTable();
+				}
+				if(M.hands.dealer.value >= 17){
+					M.currentPlayerHand = 0;
+					M.phase = M.phases.evaluate;
+				}
+				
+			}
+			else if(M.phase == M.phases.evaluate){
+				var playerHand = M.currentPlayerHand;
+				var outcome = '';
+				M.buildTable();
+				
+				if(M.hands.player[playerHand].value > 21) outcome = 'bust';
+				else if(M.hands.dealer.value > 21){
+					outcome = 'dealerbust';
+					if(M.hands.player[playerHand].value <= 5) Game.Win('I also like to live dangerously');
+				} 
+				else if(M.hands.dealer.value < M.hands.player[playerHand].value){
+					if(M.hands.player[playerHand].cards.length >= 5) Game.Win('Five card stud');
+					if(M.hands.player[playerHand].cards.length >= 6) Game.Win("Why can't I hold all these cards?");
+					outcome = 'win';
+				}
+				else if(M.hands.dealer.value > M.hands.player[playerHand].value) outcome = 'lose';
+				else if(M.hands.dealer.value == M.hands.player[playerHand].value){
+					if(Game.Has('Tiebreaker')){
+						if(M.hands.player[playerHand].cards.length >= 5) Game.Win('Five card stud');
+						if(M.hands.player[playerHand].cards.length >= 6) Game.Win("Why can't I hold all these cards?");
+					}
+					outcome = 'push';
+				}
+				
+				M.endGame(outcome);
+				
+				playerHand++;
+				if(playerHand < M.hands.player.length){
+					M.currentPlayerHand = playerHand;
+					M.phase = M.phases.evaluate;
+				} 
+				else{
+					M.phase = M.phases.inactive;
+					M.buildSidebar();
+				}
+			}
+		}
 	}
 	
 	M.onResize = function(){

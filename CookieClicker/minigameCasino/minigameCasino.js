@@ -44,7 +44,7 @@ M.launch = function(){
 		M.Achievements.push(new Game.Achievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [24, 26]));
 		M.Achievements.push(new Game.Achievement('Card trout', 'Win <b>210</b> hands of blackjack.', [24, 26]));
 		M.Achievements.push(new Game.Achievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [24, 26]));
-		M.Achievements.push(new Game.Achievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>You're such a stud!</q>", [24, 26]));
+		M.Achievements.push(new Game.Achievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>Wait, what game are you playing again?</q>", [24, 26]));
 		M.Achievements.push(new Game.Achievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [24, 26]));
 			Game.last.pool = 'shadow';
 		M.Achievements.push(new Game.Achievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [24, 26]));
@@ -71,7 +71,7 @@ M.launch = function(){
 		M.Upgrades.push(new Game.Upgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [24, 26])); 
 			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
 			Game.last.buyFunction = function(){M.buildSidebar();}
-		M.Upgrades.push(new Game.Upgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the house now.</q>", 15, [24, 26])); 
+		M.Upgrades.push(new Game.Upgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the dealer now.</q>", 15, [24, 26])); 
 			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
 		M.Upgrades.push(new Game.Upgrade('I make my own luck', "Each Chancemaker gives a <b>" + (M.chancemakerChance * 100) + "%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [24, 26])); 
 			Game.last.priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
@@ -327,6 +327,24 @@ M.launch = function(){
 			else M.betMode = 1;
 			
 			M.buildSidebar();
+		}
+		
+		M.backupUpdateMenu = Game.UpdateMenu;
+		Game.UpdateMenu = function(){
+			M.backupUpdateMenu();
+			
+			if(Game.onMenu=='stats' && M.ownLuckWins){
+				var section;
+				var sections = document.getElementsByClassName('subsection');
+			
+				for(var i = 0; i < sections.length; i++){
+					if(sections[i].innerHTML.indexOf('Special') > 0) section = sections[i]
+				}
+				
+				if(typeof section != 'undefined'){
+					section.innerHTML += '<div class="listing"><b>Made your own luck :</b> ' + M.ownLuckWins + ' times</div>';
+				}
+			}
 		}
 		
 		

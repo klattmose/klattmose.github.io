@@ -7,7 +7,7 @@ Spoilers ahead.
 http://orteil.dashnet.org
 */
 
-var VERSION=2.018;
+var VERSION=2.019;
 var BETA=0;
 
 
@@ -615,6 +615,19 @@ Game.Launch=function()
 	
 	'</div><div class="subsection">'+
 	'<div class="title">Version history</div>'+
+	
+	'</div><div class="subsection update small">'+
+	'<div class="title">01/04/2019 - 2.019 (the "this year" update)</div>'+
+	'<div class="listing">&bull; game has been renamed to "Cookie Clicker" to avoid confusion</div>'+
+	'<div class="listing">&bull; can now click the big cookie to generate cookies for free</div>'+
+	'<div class="listing">&bull; removed fall damage</div>'+
+	'<div class="listing">&bull; fixed various typos : player\'s name is now correctly spelled as "[bakeryName]"</div>'+
+	'<div class="listing">&bull; removed all references to computer-animated movie <i style="font-style:italic;">Hoodwinked!</i> (2005)</div>'+
+	'<div class="listing">&bull; went back in time and invented cookies and computer mice, ensuring Cookie Clicker would one day come to exist</div>'+
+	'<div class="listing">&bull; game now fully compliant with Geneva Conventions</div>'+
+	'<div class="listing">&bull; dropped support for TI-84 version</div>'+
+	'<div class="listing">&bull; released a low-res retro version of the game, playable here : <a href="http://orteil.dashnet.org/experiments/cookie/" target="_blank">orteil.dashnet.org/experiments/cookie</a></div>'+
+	'<div class="listing">&bull; updated version number</div>'+
 	
 	'</div><div class="subsection update small">'+
 	'<div class="title">05/03/2019 - cookies for days</div>'+
@@ -5486,7 +5499,7 @@ Game.Launch=function()
 			}
 			else if (Game.onMenu=='log')
 			{
-				str+=Game.updateLog;
+				str+=replaceAll('[bakeryName]',Game.bakeryName,Game.updateLog);
 			}
 			else if (Game.onMenu=='stats')
 			{

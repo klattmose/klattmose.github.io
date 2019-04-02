@@ -70,7 +70,7 @@
       "ctrl": false,
       "shift": false,
       "alt": false,
-      "script": "Game.Objects[\"Farm\"].minigame.nextStep = Date.now();\nGame.Objects[\"Farm\"].minigame.nextSoil = Date.now()"
+      "script": "Game.Objects[\"Farm\"].minigame.nextStep = Date.now();\nGame.Objects[\"Farm\"].minigame.nextSoil = Date.now();"
     },
     {
       "keyCode": 97,
@@ -131,6 +131,10 @@
     {
       "nickname": "Load Horticookie",
       "script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/Horticookie.js');"
+    },
+    {
+      "nickname": "Load Casino",
+      "script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/CasinoLoader.js');"
     },
     {
       "nickname": "Load Cookie Monster",

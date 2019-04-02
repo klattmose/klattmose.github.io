@@ -600,10 +600,8 @@ M.launch = function(){
 					if(Math.random() < M.instantWinChance()){
 						M.hands.dealer.cards[1] = M.hiddenCard;
 						
-						M.hands.player[0].cards[0] = {pip:choose([10,11,12,13]), value:10, suit:choose([0,1,2,3])}
-						M.hands.player[0].cards[1] = {pip:1, value:1, suit:choose([0,1,2,3])}
-						M.getHandValue(M.hands.player[0]);
-						M.buildTable();
+						M.hands.player[0].cards[0] = {pip:choose([10,11,12,13]), value:10, suit:choose([0,1,2,3])};
+						M.hands.player[0].cards[1] = {pip:1, value:1, suit:choose([0,1,2,3])};
 						
 						outcome = 'instantWin';
 						M.phase = M.phases.inactive;
@@ -619,7 +617,6 @@ M.launch = function(){
 						M.phase = M.phases.inactive;
 						
 					} else{
-						M.getHandValue(M.hands.dealer);
 						
 					}
 				}
@@ -653,8 +650,6 @@ M.launch = function(){
 					outcome = 'push';
 				}
 				
-				//M.endGame(outcome);
-				
 				playerHand++;
 				if(playerHand < M.hands.player.length){
 					M.currentPlayerHand = playerHand;
@@ -664,6 +659,9 @@ M.launch = function(){
 					M.phase = M.phases.inactive;
 				}
 			}
+			
+			M.getHandValue(M.hands.dealer);
+			M.getHandValue(M.hands.player[M.currentPlayerHand]);
 			
 			
 			if(outcome){

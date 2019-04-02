@@ -11,12 +11,14 @@ M.launch = function(){
 	var src = script.src;
 	M.sourceFolder = src.substring(0, src.lastIndexOf('/') + 1);
 	M.cardsImage = M.sourceFolder + 'img/cards.png'
+	M.iconsImage = M.sourceFolder + 'img/casinoIcons.png'
 	M.chancemakerChance = 0.0003;
 	M.beatLength = 750;
 	
 	M.init = function(div){
 		// It's possible that the save data might get lost if entrusted to the game's save
-		if(!M.parent.minigameSave && localStorage.getItem(M.savePrefix) != null) M.parent.minigameSave = localStorage.getItem(M.savePrefix);
+		if(localStorage.getItem(M.savePrefix) != null) M.parent.minigameSave = localStorage.getItem(M.savePrefix);
+		M.saveString = M.parent.minigameSave;
 		
 		M.cards = [];
 		M.cards.push({pip: 0, value:0, suit: 0});
@@ -26,6 +28,7 @@ M.launch = function(){
 		M.winsT = 0;
 		M.tiesLost = 0;
 		M.ownLuckWins = 0;
+		M.netTotal = 0;
 		
 		M.phases = {
 			inactive:0,
@@ -40,19 +43,20 @@ M.launch = function(){
 		//***********************************
 		//    Achievements
 		//***********************************
-		M.Achievements = []; //x,y
-		M.Achievements.push(new Game.Achievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [24, 26]));
-		M.Achievements.push(new Game.Achievement('Card trout', 'Win <b>210</b> hands of blackjack.', [24, 26]));
-		M.Achievements.push(new Game.Achievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [24, 26]));
-		M.Achievements.push(new Game.Achievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>Wait, what game are you playing again?</q>", [24, 26]));
-		M.Achievements.push(new Game.Achievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [24, 26]));
+		M.Achievements = [];
+		M.Achievements.push(new Game.Achievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement('Card trout', 'Win <b>210</b> hands of blackjack.', [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>Wait, what game are you playing again?</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [0, 0, M.iconsImage]));
 			Game.last.pool = 'shadow';
-		M.Achievements.push(new Game.Achievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [24, 26]));
-		M.Achievements.push(new Game.Achievement('Paid off the dealer', "Win <b>" + (13 * 13) + "</b> hands of blackjack through chancemaker intervention in one ascension.<q>Takes money to make money.</q>", [24, 26]));
-		M.Achievements.push(new Game.Achievement('Deal with the Devil', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>Just sign right here.</q>", [24, 26]));
-		M.Achievements.push(new Game.Achievement('Blackjack!', "Have a score of <b>21</b> without hitting.", [24, 26]));
-		M.Achievements.push(new Game.Achievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>My name is Number 2. This is my Italian confidential secretary. Her name is Alotta. Alotta Fagina.</q>", [24, 26]));
-		M.Achievements.push(new Game.Achievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [24, 26]));
+		M.Achievements.push(new Game.Achievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement('Paid off the dealer', "Win <b>" + (13 * 13) + "</b> hands of blackjack through chancemaker intervention in one ascension.<q>Takes money to make money.</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement('Deal with the Devil', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>Just sign right here.</q>", [0, 0, M.iconsImage]));
+			Game.last.pool = 'shadow';
+		M.Achievements.push(new Game.Achievement('Blackjack!', "Be dealt a hand totaling 21 naturally.", [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>My name is Number 2. This is my Italian confidential secretary. Her name is Alotta. Alotta Fagina.</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(new Game.Achievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [0, 0, M.iconsImage]));
 			Game.last.pool = 'shadow';
 		
 		for(var i = 0; i < M.Achievements.length; i++) M.Achievements[i].order = 1000000 + i / 100;
@@ -62,15 +66,16 @@ M.launch = function(){
 		//    Upgrades
 		//***********************************
 		M.Upgrades = [];
-		M.Upgrades.push(new Game.Upgrade('Math lessons', "Show the value of your current blackjack hand.<q>C'mon, it's not that hard.</q>", 1, [24, 26])); 
+		M.Upgrades.push(new Game.Upgrade('Raise the stakes', "Can bet a minute of CPS at a time.<q>Now we're getting somewhere!</q>", 10, [0, 0, M.iconsImage])); 
+			Game.last.buyFunction = function(){M.buildSidebar();}
+		M.Upgrades.push(new Game.Upgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [0, 0, M.iconsImage])); 
+			Game.last.buyFunction = function(){M.buildSidebar();}
+		M.Upgrades.push(new Game.Upgrade('Math lessons', "Show the value of your current blackjack hand.<q>C'mon, it's not that hard.</q>", 1, [0, 0, M.iconsImage])); 
 			Game.last.buyFunction = function(){M.buildTable();}
-		M.Upgrades.push(new Game.Upgrade('Raise the stakes', "Can bet a minute of CPS at a time.<q>Now we're getting somewhere!</q>", 10, [24, 26])); 
-			Game.last.buyFunction = function(){M.buildSidebar();}
-		M.Upgrades.push(new Game.Upgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [24, 26])); 
-			Game.last.buyFunction = function(){M.buildSidebar();}
-		M.Upgrades.push(new Game.Upgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the dealer now.</q>", 15, [24, 26])); 
-		M.Upgrades.push(new Game.Upgrade('I make my own luck', "Each Chancemaker gives a <b>0.0<span></span>3%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [24, 26])); 
-		M.Upgrades.push(new Game.Upgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [24, 26]));
+		M.Upgrades.push(new Game.Upgrade('Counting cards', "Keeps track of which cards have been played. 2-6 increase the count by 1. 10-K and Aces decrease the count by 1. Higher counts give better odds.<q>Technically not cheating, but casinos frown on this sort of thing.</q>", 21, [0, 0, M.iconsImage])); 
+		M.Upgrades.push(new Game.Upgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the dealer now.</q>", 15, [0, 0, M.iconsImage])); 
+		M.Upgrades.push(new Game.Upgrade('I make my own luck', "Each Chancemaker gives a <b>0.0<span></span>3%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [0, 0, M.iconsImage])); 
+		M.Upgrades.push(new Game.Upgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 0, M.iconsImage]));
 		
 		for(var i = 0; i < M.Upgrades.length; i++){
 			M.Upgrades[i].order = 1000000 + i / 100;
@@ -81,6 +86,7 @@ M.launch = function(){
 		M.reshuffle = function(deckCount){
 			M.Deck = [];
 			for(var i = 0; i < M.deckCount; i++) for(var j = 1; j < M.cards.length; j++) M.Deck.push(M.cards[j]);
+			M.cardCount = 0;
 		}
 		
 		M.getHandValue = function(hand){
@@ -94,7 +100,14 @@ M.launch = function(){
 			var res = deck[i];
 			deck.splice(i, 1);
 			
-			if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
+			if(res.value >= 2 && res.value <= 6) M.cardCount++
+			else if(res.value == 1 || res.value >= 10) M.cardCount--;
+			
+			if(M.Deck.length < (M.minDecks * 52)){
+				Game.Unlock('Counting cards');
+				M.reshuffle();
+				Game.Popup('Decks reshuffled!', Game.mouseX, Game.mouseY);
+			}
 			return res;
 		}
 		
@@ -162,6 +175,7 @@ M.launch = function(){
 					M.phase = M.phases.evaluate;
 				}else{
 					M.hands.dealer.cards[1] = M.hiddenCard;
+					M.getHandValue(M.hands.dealer);
 					M.phase = M.phases.dealerTurn;
 					if(M.hands.dealer.value >= 17){
 						M.currentPlayerHand = 0;
@@ -193,16 +207,21 @@ M.launch = function(){
 		Game.UpdateMenu = function(){
 			M.backupUpdateMenu();
 			
-			if(Game.onMenu=='stats' && M.ownLuckWins){
-				var section;
+			if(Game.onMenu=='stats' && (M.ownLuckWins || M.netTotal)){
 				var sections = document.getElementsByClassName('subsection');
 			
 				for(var i = 0; i < sections.length; i++){
-					if(sections[i].innerHTML.indexOf('Special') > 0) section = sections[i]
-				}
-				
-				if(typeof section != 'undefined'){
-					section.innerHTML += '<div class="listing"><b>Made your own luck :</b> ' + M.ownLuckWins + ' times</div>';
+					if(sections[i].innerHTML.indexOf('General') > 0 && M.netTotal){
+						var spl = sections[i].innerHTML.split('</div><br><div class="listing">');
+						sections[i].innerHTML = spl[0] + '</div><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div>' + '</div><br><div class="listing">' + spl[1];
+						//sections[i].innerHTML += '<br/><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div></div>';
+					}
+					else if(sections[i].innerHTML.indexOf('Special') > 0 && M.ownLuckWins){
+						var spl = sections[i].innerHTML.split('</div><div class="listing">');
+						spl.splice(1, 0, '<b>Made your own luck :</b> ' + M.ownLuckWins + ' times');
+						sections[i].innerHTML = spl.join('</div><div class="listing">');
+						//sections[i].innerHTML += '<div class="listing"><b>Made your own luck :</b> ' + M.ownLuckWins + ' times</div>';
+					}
 				}
 			}
 		}
@@ -276,7 +295,7 @@ M.launch = function(){
 		
 		M.buildTable = function(){
 			var str = '<table id="casinoBJTable">';
-			str += '<tr><td>Dealer\'s hand:</td>';
+			str += '<tr><td>Dealer\'s hand:' + (Game.Has('Math lessons') ? ('<br/>Score: ' + M.hands.dealer.value) : '') + '</td>';
 			for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage(M.hands.dealer.cards[i]) + ';" /></td>';
 			str += '</tr>';
 			str += '<tr style="height:75px;"><td></td></tr>';
@@ -291,7 +310,7 @@ M.launch = function(){
 		var str = '';
 		str += '<style>' + 
 		'#casinoBG{background:url(img/shadedBorders.png), url(' + M.sourceFolder + 'img/BGcasino.jpg); background-size:100% 100%, auto; position:absolute; left:0px; right:0px; top:0px; bottom:16px;}' + 
-		'#casinoContent{position:relative; box-sizing:border-box; padding:4px 24px; height:400px;}' +
+		'#casinoContent{position:relative; box-sizing:border-box; padding:4px 24px; height:450px;}' +
 		'#casinoSidebar{text-align:center; margin:0px; padding:0px; position:absolute; left:4px; top:4px; bottom:4px; right:65%; overflow-y:auto; overflow-x:hidden; box-shadow:8px 0px 8px rgba(0,0,0,0.5);}' +
 		'#casinoSidebar .listing{text-align:left;}' +
 		'#casinoTable{text-align:center; position:absolute; right:0px; top:0px; bottom:0px; overflow-x:auto; overflow:hidden;}' + 
@@ -344,6 +363,8 @@ M.launch = function(){
 			res += '_' + parseInt(M.tiesLost);
 			res += '_' + parseInt(M.betMode);
 			res += '_' + parseInt(M.betChoice);
+			res += '_' + parseFloat(M.netTotal);
+			res += '_' + parseInt(M.cardCount);
 			
 			return res;
 		}
@@ -397,6 +418,7 @@ M.launch = function(){
 		str += ' ' + getUpgradeSave();
 		
 		localStorage.setItem(M.savePrefix, str);
+		M.saveString = str;
 		return str;
 	}
 	
@@ -415,6 +437,8 @@ M.launch = function(){
 			M.tiesLost = parseInt(spl[i++] || 0);
 			M.betMode = parseInt(spl[i++] || 0);
 			M.betChoice = parseInt(spl[i++] || 0);
+			M.netTotal = parseFloat(spl[i++] || 0);
+			M.cardCount = parseInt(spl[i++] || 0);
 			
 			if(on && Game.ascensionMode != 1) M.parent.switchMinigame(1);
 		}
@@ -493,11 +517,12 @@ M.launch = function(){
 		M.hands.dealer = {cards:parseCardSave(spl[i++] || 0)};
 		parsePlayerHandsSave(spl[i++] || 0);
 		M.Deck = parseCardSave(spl[i++] || 0);
-		parseAchievementSave(spl[i++] || '');
-		parseUpgradeSave(spl[i++] || '');
+		M.AchievementTimeout = setTimeout(function(){ parseAchievementSave(spl[i++] || ''); }, 50);	// Need to add this delay or the achievements get wiped on a soft-load
+		M.UpgradeTimeout = setTimeout(function(){ parseUpgradeSave(spl[i++] || ''); }, 50);			// Need to add this delay or the achievements get wiped on a soft-load
 		
 		M.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
+		M.saveString = str;
 		
 		M.buildSidebar();
 		M.buildTable();
@@ -520,6 +545,8 @@ M.launch = function(){
 		M.istep = 0;
 		M.nextBeat = Date.now() + M.beatLength;
 		
+		if(M.AchievementTimeout) clearTimeout(M.AchievementTimeout);
+		if(M.UpgradeTimeout) clearTimeout(M.UpgradeTimeout);
 		M.reshuffle();
 		
 		M.buildSidebar();
@@ -571,8 +598,6 @@ M.launch = function(){
 					
 					M.phase = M.phases.firstTurn;
 					if(Math.random() < M.instantWinChance()){
-						M.Deck.push(M.hands.player[0].cards[0]);
-						M.Deck.push(M.hands.player[0].cards[1]);
 						M.hands.dealer.cards[1] = M.hiddenCard;
 						
 						M.hands.player[0].cards[0] = {pip:choose([10,11,12,13]), value:10, suit:choose([0,1,2,3])}
@@ -594,6 +619,7 @@ M.launch = function(){
 						M.phase = M.phases.inactive;
 						
 					} else{
+						M.getHandValue(M.hands.dealer);
 						
 					}
 				}
@@ -618,19 +644,12 @@ M.launch = function(){
 				if(M.hands.player[playerHand].value > 21) outcome = 'bust';
 				else if(M.hands.dealer.value > 21){
 					outcome = 'dealerbust';
-					if(M.hands.player[playerHand].value <= 5) Game.Win('I also like to live dangerously');
 				} 
 				else if(M.hands.dealer.value < M.hands.player[playerHand].value){
-					if(M.hands.player[playerHand].cards.length >= 5) Game.Win('Five card stud');
-					if(M.hands.player[playerHand].cards.length >= 6) Game.Win("Why can't I hold all these cards?");
 					outcome = 'win';
 				}
 				else if(M.hands.dealer.value > M.hands.player[playerHand].value) outcome = 'lose';
 				else if(M.hands.dealer.value == M.hands.player[playerHand].value){
-					if(Game.Has('Tiebreaker')){
-						if(M.hands.player[playerHand].cards.length >= 5) Game.Win('Five card stud');
-						if(M.hands.player[playerHand].cards.length >= 6) Game.Win("Why can't I hold all these cards?");
-					}
 					outcome = 'push';
 				}
 				
@@ -724,12 +743,16 @@ M.launch = function(){
 					if(M.winsT >= 21) Game.Win('Card minnow');
 					if(M.winsT >= 210) Game.Win('Card trout');
 					if(M.winsT >= 2100) Game.Win('Card shark');
+					
+					if(M.hands.player[M.currentPlayerHand].cards.length >= 5) Game.Win('Five card stud');
+					if(M.hands.player[M.currentPlayerHand].cards.length >= 6) Game.Win("Why can't I hold all these cards?");
+					if(M.hands.player[M.currentPlayerHand].value <= 5) Game.Win('I also like to live dangerously');
 				}else{
 					messg += 'Lost ' + Beautify(Math.abs(M.betAmount)) + ' cookies';
 				}
 				messg += '</div>';
 				
-				
+				M.netTotal += winnings - M.betAmount;
 				Game.Popup(messg, Game.mouseX, Game.mouseY);
 			}
 			
@@ -748,7 +771,13 @@ M.launch = function(){
 	
 	M.draw = function(){
 		//run each draw frame
-		M.infoL.innerHTML = 'Hands won : ' + Beautify(M.wins) + ' (total : ' + Beautify(M.winsT) + ')';
+		var countModify = 0;
+		if(M.hiddenCard && M.hands.dealer.cards[1] && M.hands.dealer.cards[1].value == 0){
+			if(M.hiddenCard.value >= 2 && M.hiddenCard.value <= 6) countModify--;
+			else if(M.hiddenCard.value == 1 || M.hiddenCard.value >= 10) countModify++;
+		}
+		M.infoL.innerHTML = 'Hands won : ' + Beautify(M.wins) + ' (total : ' + Beautify(M.winsT) + ')' + (Game.Has('Counting cards') ? ('<br/>Cards left in deck : ' + M.Deck.length + '<br/>Count : ' + (M.cardCount + countModify)) : '');
+		
 		l('casinoCurrentBet').innerHTML = '(' + Beautify(M.betAmount) + ' cookies)';
 	}
 	

@@ -17,7 +17,7 @@ M.launch = function(){
 	
 	M.init = function(div){
 		// It's possible that the save data might get lost if entrusted to the game's save
-		if(localStorage.getItem(M.savePrefix) != null) M.parent.minigameSave = localStorage.getItem(M.savePrefix);
+		if(!M.parent.minigameSave && localStorage.getItem(M.savePrefix) != null) M.parent.minigameSave = localStorage.getItem(M.savePrefix);
 		M.saveString = M.parent.minigameSave;
 		
 		M.cards = [];

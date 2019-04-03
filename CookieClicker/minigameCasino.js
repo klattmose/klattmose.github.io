@@ -374,6 +374,9 @@ M.launch = function(){
 		
 		M.buildSidebar();
 		M.buildTable();
+		
+		if (Game.prefs.popups) Game.Popup('Casino loaded!');
+		else Game.Notify('Casino loaded!', '', '', 1, 1);
 	}
 	
 	M.save = function(){

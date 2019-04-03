@@ -207,7 +207,32 @@ M.launch = function(){
 		Game.UpdateMenu = function(){
 			M.backupUpdateMenu();
 			
-			if(Game.onMenu=='stats' && (M.ownLuckWins || M.netTotal)){
+			if(Game.onMenu == 'prefs'){
+				var callback = "M.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = M.beatLength;"
+				var str = '<div class="title">Casino</div>' +
+					'<div class="listing">' +
+					'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>'
+					'</div>';
+			
+				var div = document.createElement('div');
+				div.innerHTML = str;
+				var menu = document.getElementById('menu');
+				if(menu) {
+					menu = menu.getElementsByClassName('subsection')[0];
+					if(menu) {
+						var padding = menu.getElementsByTagName('div');
+						padding = padding[padding.length - 1];
+						if(padding) {
+							menu.insertBefore(div, padding);
+						} else {
+							menu.appendChild(div);
+						}
+						
+						//l('beatLengthSlider').max = 1000;
+					}
+				}
+			}
+			else if(Game.onMenu == 'stats' && (M.ownLuckWins || M.netTotal)){
 				var sections = document.getElementsByClassName('subsection');
 			
 				for(var i = 0; i < sections.length; i++){
@@ -365,6 +390,7 @@ M.launch = function(){
 			res += '_' + parseInt(M.betChoice);
 			res += '_' + parseFloat(M.netTotal);
 			res += '_' + parseInt(M.cardCount);
+			res += '_' + parseInt(M.beatLength);
 			
 			return res;
 		}
@@ -439,6 +465,7 @@ M.launch = function(){
 			M.betChoice = parseInt(spl[i++] || 0);
 			M.netTotal = parseFloat(spl[i++] || 0);
 			M.cardCount = parseInt(spl[i++] || 0);
+			M.beatLength = parseInt(spl[i++] || 750);
 			
 			if(on && Game.ascensionMode != 1) M.parent.switchMinigame(1);
 		}

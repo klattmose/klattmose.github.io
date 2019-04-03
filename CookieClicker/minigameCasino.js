@@ -2,6 +2,7 @@ Game.Win('Third-party');
 var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
+M.loadedCount = 0;
 
 M.launch = function(){
 	var M = this;
@@ -203,52 +204,63 @@ M.launch = function(){
 		}
 		
 		
-		M.backupUpdateMenu = Game.UpdateMenu;
-		Game.UpdateMenu = function(){
-			M.backupUpdateMenu();
-			
-			if(Game.onMenu == 'prefs'){
-				var callback = "M.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = M.beatLength;"
-				var str = '<div class="title">Casino</div>' +
-					'<div class="listing">' +
-					'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>'
-					'</div>';
-			
-				var div = document.createElement('div');
-				div.innerHTML = str;
-				var menu = document.getElementById('menu');
-				if(menu) {
-					menu = menu.getElementsByClassName('subsection')[0];
+		// Only run this part once, regardless of hard resets
+		if(!M.loadedCount){
+			M.backupUpdateMenu = Game.UpdateMenu;
+			Game.UpdateMenu = function(){
+				M.backupUpdateMenu();
+				
+				if(Game.onMenu == 'prefs'){
+					var callback = "M.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = M.beatLength;"
+					var str = '<div class="title">Casino</div>' +
+						'<div class="listing">' +
+						'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>'
+						'</div>';
+				
+					var div = document.createElement('div');
+					div.innerHTML = str;
+					var menu = document.getElementById('menu');
 					if(menu) {
-						var padding = menu.getElementsByTagName('div');
-						padding = padding[padding.length - 1];
-						if(padding) {
-							menu.insertBefore(div, padding);
-						} else {
-							menu.appendChild(div);
+						menu = menu.getElementsByClassName('subsection')[0];
+						if(menu) {
+							var padding = menu.getElementsByTagName('div');
+							padding = padding[padding.length - 1];
+							if(padding) {
+								menu.insertBefore(div, padding);
+							} else {
+								menu.appendChild(div);
+							}
 						}
-						
-						//l('beatLengthSlider').max = 1000;
+					}
+				}
+				else if(Game.onMenu == 'stats' && (M.ownLuckWins || M.netTotal)){
+					var sections = document.getElementsByClassName('subsection');
+				
+					for(var i = 0; i < sections.length; i++){
+						if(sections[i].innerHTML.indexOf('General') > 0 && M.netTotal){
+							var spl = sections[i].innerHTML.split('</div><br><div class="listing">');
+							sections[i].innerHTML = spl[0] + '</div><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div>' + '</div><br><div class="listing">' + spl[1];
+							//sections[i].innerHTML += '<br/><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div></div>';
+						}
+						else if(sections[i].innerHTML.indexOf('Special') > 0 && M.ownLuckWins){
+							var spl = sections[i].innerHTML.split('</div><div class="listing">');
+							spl.splice(1, 0, '<b>Made your own luck :</b> ' + M.ownLuckWins + ' times');
+							sections[i].innerHTML = spl.join('</div><div class="listing">');
+							//sections[i].innerHTML += '<div class="listing"><b>Made your own luck :</b> ' + M.ownLuckWins + ' times</div>';
+						}
 					}
 				}
 			}
-			else if(Game.onMenu == 'stats' && (M.ownLuckWins || M.netTotal)){
-				var sections = document.getElementsByClassName('subsection');
 			
-				for(var i = 0; i < sections.length; i++){
-					if(sections[i].innerHTML.indexOf('General') > 0 && M.netTotal){
-						var spl = sections[i].innerHTML.split('</div><br><div class="listing">');
-						sections[i].innerHTML = spl[0] + '</div><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div>' + '</div><br><div class="listing">' + spl[1];
-						//sections[i].innerHTML += '<br/><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div></div>';
-					}
-					else if(sections[i].innerHTML.indexOf('Special') > 0 && M.ownLuckWins){
-						var spl = sections[i].innerHTML.split('</div><div class="listing">');
-						spl.splice(1, 0, '<b>Made your own luck :</b> ' + M.ownLuckWins + ' times');
-						sections[i].innerHTML = spl.join('</div><div class="listing">');
-						//sections[i].innerHTML += '<div class="listing"><b>Made your own luck :</b> ' + M.ownLuckWins + ' times</div>';
-					}
+			if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
+				M.backupLoadSave = Game.LoadSave;
+				Game.LoadSave = function(data){
+					M.backupLoadSave(data);
+					for(var i in Game.customLoad){Game.customLoad[i]();} // This isn't in the original Game.LoadSave
 				}
 			}
+			
+			Game.customLoad.push(function(){M.load(M.saveString);});
 		}
 		
 		M.buildSidebar = function(){
@@ -375,6 +387,7 @@ M.launch = function(){
 		M.buildSidebar();
 		M.buildTable();
 		
+		M.loadedCount++;
 		if (Game.prefs.popups) Game.Popup('Casino loaded!');
 		else Game.Notify('Casino loaded!', '', '', 1, 1);
 	}
@@ -455,6 +468,7 @@ M.launch = function(){
 		//interpret str; called after .init
 		//note : not actually called in the Game's load; see "minigameSave" in main.js
 		if(!str) return false;
+		M.saveString = str;
 		
 		var parseMinigameStateSave = function(str){
 			var i = 0;
@@ -552,13 +566,12 @@ M.launch = function(){
 		
 		M.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
-		M.saveString = str;
 		
 		M.buildSidebar();
 		M.buildTable();
 	}
 	
-	M.reset = function(){
+	M.reset = function(hard){
 		M.deckCount = 4;
 		M.Deck = [];
 		M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
@@ -574,6 +587,10 @@ M.launch = function(){
 		M.phase = 0;
 		M.istep = 0;
 		M.nextBeat = Date.now() + M.beatLength;
+		
+		if(hard){
+			M.saveString = '';
+		}
 		
 		if(M.AchievementTimeout) clearTimeout(M.AchievementTimeout);
 		if(M.UpgradeTimeout) clearTimeout(M.UpgradeTimeout);

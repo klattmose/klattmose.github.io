@@ -561,8 +561,10 @@ M.launch = function(){
 		M.hands.dealer = {cards:parseCardSave(spl[i++] || 0)};
 		parsePlayerHandsSave(spl[i++] || 0);
 		M.Deck = parseCardSave(spl[i++] || 0);
-		M.AchievementTimeout = setTimeout(function(){ parseAchievementSave(spl[i++] || ''); }, 50);	// Need to add this delay or the achievements get wiped on a soft-load
-		M.UpgradeTimeout = setTimeout(function(){ parseUpgradeSave(spl[i++] || ''); }, 50);			// Need to add this delay or the achievements get wiped on a soft-load
+		parseAchievementSave(spl[i++] || '');
+		parseUpgradeSave(spl[i++] || '');
+		//M.AchievementTimeout = setTimeout(function(){ parseAchievementSave(spl[i++] || ''); }, 50);	// Need to add this delay or the achievements get wiped on a soft-load
+		//M.UpgradeTimeout = setTimeout(function(){ parseUpgradeSave(spl[i++] || ''); }, 50);			// Need to add this delay or the achievements get wiped on a soft-load
 		
 		M.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
@@ -592,8 +594,8 @@ M.launch = function(){
 			M.saveString = '';
 		}
 		
-		if(M.AchievementTimeout) clearTimeout(M.AchievementTimeout);
-		if(M.UpgradeTimeout) clearTimeout(M.UpgradeTimeout);
+		//if(M.AchievementTimeout) clearTimeout(M.AchievementTimeout);
+		//if(M.UpgradeTimeout) clearTimeout(M.UpgradeTimeout);
 		M.reshuffle();
 		
 		M.buildSidebar();

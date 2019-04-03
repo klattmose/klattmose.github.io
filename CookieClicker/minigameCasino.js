@@ -68,20 +68,21 @@ M.launch = function(){
 		//***********************************
 		M.Upgrades = [];
 		M.Upgrades.push(new Game.Upgrade('Raise the stakes', "Can bet a minute of CPS at a time.<q>Now we're getting somewhere!</q>", 10, [0, 0, M.iconsImage])); 
-			Game.last.buyFunction = function(){M.buildSidebar();}
 		M.Upgrades.push(new Game.Upgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [0, 0, M.iconsImage])); 
-			Game.last.buyFunction = function(){M.buildSidebar();}
 		M.Upgrades.push(new Game.Upgrade('Math lessons', "Show the value of your current blackjack hand.<q>C'mon, it's not that hard.</q>", 1, [0, 0, M.iconsImage])); 
-			Game.last.buyFunction = function(){M.buildTable();}
 		M.Upgrades.push(new Game.Upgrade('Counting cards', "Keeps track of which cards have been played. 2-6 increase the count by 1. 10-K and Aces decrease the count by 1. Higher counts give better odds.<q>Technically not cheating, but casinos frown on this sort of thing.</q>", 21, [0, 0, M.iconsImage])); 
 		M.Upgrades.push(new Game.Upgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the dealer now.</q>", 15, [0, 0, M.iconsImage])); 
 		M.Upgrades.push(new Game.Upgrade('I make my own luck', "Each Chancemaker gives a <b>0.0<span></span>3%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [0, 0, M.iconsImage])); 
 		M.Upgrades.push(new Game.Upgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 0, M.iconsImage]));
+		M.Upgrades.push(new Game.Upgrade('Double or nothing', "Multiply your bet by <b>2</b>.<q>The Martingale System sounds good on paper, but one losing streak long enough will bankrupt anyone.</q>", 120, [0, 0, M.iconsImage])); 
+		M.Upgrades.push(new Game.Upgrade('Stoned cows', "Multiply your bet by <b>5</b>.<q>The steaks have never been higher!</q>", 300, [0, 0, M.iconsImage])); 
 		
 		for(var i = 0; i < M.Upgrades.length; i++){
 			M.Upgrades[i].order = 1000000 + i / 100;
 			M.Upgrades[i].priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
 		}
+		Game.Upgrades['Double or nothing'].order = Game.Upgrades['High roller!'].order + 0.001;
+		Game.Upgrades['Stoned cows'].order = Game.Upgrades['Double or nothing'].order + 0.001;
 		
 		
 		M.reshuffle = function(deckCount){
@@ -203,6 +204,14 @@ M.launch = function(){
 			M.buildSidebar();
 		}
 		
+		M.toggleBetChoice = function(){
+			if(M.betChoice == 1 && Game.Has('Double or nothing')) M.betChoice = 2;
+			else if(M.betChoice < 5 && Game.Has('Stoned cows')) M.betChoice = 5;
+			else M.betChoice = 1;
+			
+			M.buildSidebar();
+		}
+		
 		
 		// Only run this part once, regardless of hard resets
 		if(!M.loadedCount){
@@ -261,6 +270,10 @@ M.launch = function(){
 			}
 			
 			Game.customLoad.push(function(){M.load(M.saveString);});
+			Game.customChecks.push(function(){
+				if(Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
+				if(Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
+			});
 		}
 		
 		M.buildSidebar = function(){
@@ -275,8 +288,11 @@ M.launch = function(){
 			}
 			var str = '';
 			
-			if(Game.Has('Raise the stakes') || Game.Has('High roller!')) str += '<div>Bet: ' + Beautify(M.betChoice) + ' <a class="option" id="casinoBetModeToggle" >' + mode + (M.betChoice == 1 ? '' : 's') + '</a> of CPS</div>';
-			else str += '<div>Bet: ' + Beautify(M.betChoice) + ' ' + mode + (M.betChoice == 1 ? '' : 's') + ' of CPS</div>';
+			if(Game.Has('Double or nothing') || Game.Has('Stoned cows')) str += '<div>Bet: <a class="option" id="casinoBetChoiceToggle" >' + Beautify(M.betChoice) + '</a> ';
+			else str += '<div>Bet: ' + Beautify(M.betChoice) + ' ';
+			
+			if(Game.Has('Raise the stakes') || Game.Has('High roller!')) str += '<a class="option" id="casinoBetModeToggle" >' + mode + (M.betChoice == 1 ? '' : 's') + '</a> of CPS</div>';
+			else str += mode + (M.betChoice == 1 ? '' : 's') + ' of CPS</div>';
 			
 			str += '<div id="casinoCurrentBet">(' + Beautify(M.betAmount) + ' cookies)</div>';
 			M.moneyL.innerHTML = str;
@@ -297,6 +313,10 @@ M.launch = function(){
 			
 			
 			
+			if(l('casinoBetChoiceToggle')) AddEvent(l('casinoBetChoiceToggle'), 'click', function(){return function(){
+				PlaySound('snd/tick.mp3');
+				M.toggleBetChoice();
+			}}()); 
 			if(l('casinoBetModeToggle')) AddEvent(l('casinoBetModeToggle'), 'click', function(){return function(){
 				PlaySound('snd/tick.mp3');
 				M.toggleBetMode();

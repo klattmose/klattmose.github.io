@@ -138,7 +138,7 @@ M.launch = function(){
 					Game.Unlock('Math lessons');
 					M.stand();
 				}
-			}else if(player && oldValue >= 17){
+			}else if(player && oldValue >= 17 && hand.value > oldValue){
 				Game.Win('I like to live dangerously');
 			}
 			

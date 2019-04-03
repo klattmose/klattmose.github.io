@@ -1,3 +1,4 @@
+Game.Win('Third-party');
 var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
@@ -9,7 +10,7 @@ M.launch = function(){
 	//M.sourceFolder = '../minigameCasino/';
 	var script = l('minigameScript-' + M.parent.id);
 	var src = script.src;
-	M.sourceFolder = src.substring(0, src.lastIndexOf('/') + 1);
+	M.sourceFolder = 'https://klattmose.github.io/CookieClicker/minigameCasino/'; //src.substring(0, src.lastIndexOf('/') + 1);
 	M.cardsImage = M.sourceFolder + 'img/cards.png'
 	M.iconsImage = M.sourceFolder + 'img/casinoIcons.png'
 	M.chancemakerChance = 0.0003;
@@ -809,4 +810,7 @@ M.launch = function(){
 	M.init(l('rowSpecial' + M.parent.id));
 }
 
-//var M = 0;
+var M = 0;
+Game.Objects['Chancemaker'].minigameUrl = 'https://klattmose.github.io/CookieClicker/CasinoLoader.js';
+Game.Objects['Chancemaker'].minigameName = 'Casino';
+Game.LoadMinigames();

@@ -286,7 +286,7 @@ M.launch = function(){
 				if(M.ownLuckWins >= 666) Game.Win('Deal with the Devil');
 			});
 			
-			if(CM.Sim.InitData) CM.Sim.InitData(); // Cookie Monster compatibility
+			if(typeof CM != 'undefined') CM.Sim.InitData(); // Cookie Monster compatibility
 		}
 		
 		M.buildSidebar = function(){

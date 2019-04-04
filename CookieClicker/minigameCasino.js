@@ -270,10 +270,10 @@ M.launch = function(){
 			Game.customLoad.push(function(){M.load(M.saveString);});
 			Game.customChecks.push(function(){
 				if(M.winsT >= 7) Game.Unlock('Raise the stakes');
-				if(M.winsT >= 49) Game.Unlock('High roller!');
-				if(Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
-				if(Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
-				if(M.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
+				if(Game.Has('Raise the stakes') && M.winsT >= 49) Game.Unlock('High roller!');
+				if(Game.Has('High roller!') && Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
+				if(Game.Has('Double or nothing') && Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
+				if(Game.Has('I make my own luck') && M.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
 				if(M.tiesLost >= 7) Game.Unlock('Tiebreaker');
 				
 				if(M.winsT >= 21) Game.Win('Card minnow');
@@ -749,7 +749,7 @@ M.launch = function(){
 						M.ownLuckWins++;
 						
 						if(M.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
-						if(M.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
+						if(Game.Has('I make my own luck') && M.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
 						if(M.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
 						if(M.ownLuckWins >= 666) Game.Win('Deal with the Devil');
 						break;
@@ -811,7 +811,7 @@ M.launch = function(){
 					messg += 'Gain ' + Beautify(Math.abs(winnings - M.betAmount)) + ' cookies!';
 					
 					if(M.winsT >= 7) Game.Unlock('Raise the stakes');
-					if(M.winsT >= 49) Game.Unlock('High roller!');
+					if(Game.Has('Raise the stakes') && M.winsT >= 49) Game.Unlock('High roller!');
 					if(M.winsT >= 21) Game.Win('Card minnow');
 					if(M.winsT >= 210) Game.Win('Card trout');
 					if(M.winsT >= 2100) Game.Win('Card shark');

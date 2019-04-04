@@ -249,13 +249,11 @@ M.launch = function(){
 						if(sections[i].innerHTML.indexOf('General') > 0 && M.netTotal){
 							var spl = sections[i].innerHTML.split('</div><br><div class="listing">');
 							sections[i].innerHTML = spl[0] + '</div><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div>' + '</div><br><div class="listing">' + spl[1];
-							//sections[i].innerHTML += '<br/><div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.netTotal) + '</div></div>';
 						}
 						else if(sections[i].innerHTML.indexOf('Special') > 0 && M.ownLuckWins){
 							var spl = sections[i].innerHTML.split('</div><div class="listing">');
 							spl.splice(1, 0, '<b>Made your own luck :</b> ' + M.ownLuckWins + ' times');
 							sections[i].innerHTML = spl.join('</div><div class="listing">');
-							//sections[i].innerHTML += '<div class="listing"><b>Made your own luck :</b> ' + M.ownLuckWins + ' times</div>';
 						}
 					}
 				}
@@ -271,8 +269,19 @@ M.launch = function(){
 			
 			Game.customLoad.push(function(){M.load(M.saveString);});
 			Game.customChecks.push(function(){
+				if(M.winsT >= 7) Game.Unlock('Raise the stakes');
+				if(M.winsT >= 49) Game.Unlock('High roller!');
 				if(Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
 				if(Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
+				if(M.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
+				if(M.tiesLost >= 7) Game.Unlock('Tiebreaker');
+				
+				if(M.winsT >= 21) Game.Win('Card minnow');
+				if(M.winsT >= 210) Game.Win('Card trout');
+				if(M.winsT >= 2100) Game.Win('Card shark');
+				if(M.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
+				if(M.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
+				if(M.ownLuckWins >= 666) Game.Win('Deal with the Devil');
 			});
 		}
 		
@@ -583,8 +592,6 @@ M.launch = function(){
 		M.Deck = parseCardSave(spl[i++] || 0);
 		parseAchievementSave(spl[i++] || '');
 		parseUpgradeSave(spl[i++] || '');
-		//M.AchievementTimeout = setTimeout(function(){ parseAchievementSave(spl[i++] || ''); }, 50);	// Need to add this delay or the achievements get wiped on a soft-load
-		//M.UpgradeTimeout = setTimeout(function(){ parseUpgradeSave(spl[i++] || ''); }, 50);			// Need to add this delay or the achievements get wiped on a soft-load
 		
 		M.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
@@ -614,8 +621,6 @@ M.launch = function(){
 			M.saveString = '';
 		}
 		
-		//if(M.AchievementTimeout) clearTimeout(M.AchievementTimeout);
-		//if(M.UpgradeTimeout) clearTimeout(M.UpgradeTimeout);
 		M.reshuffle();
 		
 		M.buildSidebar();

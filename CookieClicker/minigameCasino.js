@@ -285,6 +285,8 @@ M.launch = function(){
 				if(M.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
 				if(M.ownLuckWins >= 666) Game.Win('Deal with the Devil');
 			});
+			
+			if(CM.Sim.InitData) CM.Sim.InitData(); // Cookie Monster compatibility
 		}
 		
 		M.buildSidebar = function(){

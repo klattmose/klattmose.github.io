@@ -220,11 +220,11 @@ M.launch = function(){
 				M.backupUpdateMenu();
 				
 				if(Game.onMenu == 'prefs'){
-					var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;"
+					var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
 					var str = '<div class="title">Casino</div>' +
 						'<div class="listing">' +
-						'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>'
-						'</div>';
+						'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>' + 
+						'This is the time in milliseconds between each card deal.</div>';
 				
 					var div = document.createElement('div');
 					div.innerHTML = str;
@@ -309,17 +309,18 @@ M.launch = function(){
 			M.moneyL.innerHTML = str;
 			
 			
-			var str = '';
-			if(M.phase == M.phases.inactive) str += '<div class="listing"><a class="option" id="casinoDeal" >Deal</a></div>';
-			else str += '<div class="listing">Deal</div>';
-			if(M.phase == M.phases.firstTurn || M.phase == M.phases.playerTurn) str += '<div class="listing"><a class="option" id="casinoHit" >Hit</a></div>';
-			else str += '<div class="listing">Hit</div>';
-			if(M.phase == M.phases.firstTurn && Game.cookies >= M.betAmount) str += '<div class="listing"><a class="option" id="casinoDoubledown" >Double Down</a></div>';
-			else str += '<div class="listing">Double Down</div>';
-			if(M.phase == M.phases.firstTurn && Game.cookies >= M.betAmount && M.hands.player[0].cards[0].pip == M.hands.player[0].cards[1].pip) str += '<div class="listing"><a class="option" id="casinoSplit" >Split</a></div>';
-			else str += '<div class="listing">Split</div>';
-			if(M.phase == M.phases.firstTurn || M.phase == M.phases.playerTurn) str += '<div class="listing"><a class="option" id="casinoStand" >Stand</a></div>';
-			else str += '<div class="listing">Stand</div>';
+			var str = '<table class="casinoActionsTable">';
+			if(M.phase == M.phases.inactive) str += '<tr><td><div class="listing"><a class="option" id="casinoDeal" >Deal</a></div></td></tr>';
+			else str += '<tr><td><div class="listing">Deal</div></td></tr>';
+			if(M.phase == M.phases.firstTurn || M.phase == M.phases.playerTurn) str += '<tr><td><div class="listing"><a class="option" id="casinoHit" >Hit</a></div></td></tr>';
+			else str += '<tr><td><div class="listing">Hit</div></td></tr>';
+			if(M.phase == M.phases.firstTurn && Game.cookies >= M.betAmount) str += '<tr><td><div class="listing"><a class="option" id="casinoDoubledown" >Double Down</a></div></td></tr>';
+			else str += '<tr><td><div class="listing">Double Down</div></td></tr>';
+			if(M.phase == M.phases.firstTurn && Game.cookies >= M.betAmount && M.hands.player[0].cards[0].pip == M.hands.player[0].cards[1].pip) str += '<tr><td><div class="listing"><a class="option" id="casinoSplit" >Split</a></div></td></tr>';
+			else str += '<tr><td><div class="listing">Split</div></td></tr>';
+			if(M.phase == M.phases.firstTurn || M.phase == M.phases.playerTurn) str += '<tr><td><div class="listing"><a class="option" id="casinoStand" >Stand</a></div></td></tr>';
+			else str += '<tr><td><div class="listing">Stand</div></td></tr>';
+			str += '</table>';
 			M.actionsL.innerHTML = str;
 			
 			
@@ -388,6 +389,7 @@ M.launch = function(){
 		'#casinoBJTable tr{height:150px}' + 
 		'#casinoBJTable{margin-left:auto; margin-right:auto;}' + 
 		'.casinoSidebarLabel{font-size:12px;width:100%;padding:2px;margin-top:4px;margin-bottom:-4px;}' + 
+		'.casinoActionsTable tr{height: 40px;}' + 
 		'#casinoGame{position: relative;}' + 
 		'#casinoInfo{position: relative;text-align:center; font-size:11px; margin-top:12px; color:rgba(255,255,255,0.75); text-shadow:-1px 1px 0px #000;}' + 
 		'</style>';
@@ -582,7 +584,6 @@ M.launch = function(){
 					me.bought = 0;
 				}
 			}
-			Game.RebuildUpgrades();
 		}
 		
 		

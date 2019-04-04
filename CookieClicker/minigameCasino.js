@@ -267,7 +267,10 @@ M.launch = function(){
 				}
 			}
 			
-			Game.customLoad.push(function(){M.load(M.saveString);Game.RefreshStore();Game.RebuildUpgrades();});
+			Game.customLoad.push(function(){
+				M.load(M.saveString);
+				//setTimeout(function(){Game.RebuildUpgrades();}, 5000);
+			});
 			Game.customChecks.push(function(){
 				if(M.winsT >= 7) Game.Unlock('Raise the stakes');
 				if(Game.Has('Raise the stakes') && M.winsT >= 49) Game.Unlock('High roller!');
@@ -580,6 +583,7 @@ M.launch = function(){
 					me.bought = 0;
 				}
 			}
+			Game.RebuildUpgrades();
 		}
 		
 		

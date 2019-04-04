@@ -269,7 +269,6 @@ M.launch = function(){
 			
 			Game.customLoad.push(function(){
 				M.load(M.saveString);
-				//setTimeout(function(){Game.RebuildUpgrades();}, 5000);
 			});
 			Game.customChecks.push(function(){
 				if(M.winsT >= 7) Game.Unlock('Raise the stakes');

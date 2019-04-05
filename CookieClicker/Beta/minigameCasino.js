@@ -308,6 +308,9 @@ M.launch = function(){
 		}
 		
 		M.games.Blackjack.buildTable = function(){
+			M.games.Blackjack.getHandValue(M.hands.dealer);
+			M.games.Blackjack.getHandValue(M.hands.player[M.currentPlayerHand]);
+			
 			var str = '<table id="casinoBJTable">';
 			str += '<tr><td>Dealer\'s hand:' + (Game.Has('Math lessons') ? ('<br/>Score: ' + M.hands.dealer.value) : '') + '</td>';
 			for(var i = 0; i < M.hands.dealer.cards.length; i++) str += '<td><div class="casinoBJCardImage" style="background-image:url(' + M.cardsImage + '); background-position:' + M.cardImage(M.hands.dealer.cards[i]) + ';" /></td>';
@@ -434,9 +437,6 @@ M.launch = function(){
 					M.games.Blackjack.buildTable();
 					M.games.Blackjack.buildSidebar();
 				}
-				
-				M.games.Blackjack.getHandValue(M.hands.dealer);
-				M.games.Blackjack.getHandValue(M.hands.player[M.currentPlayerHand]);
 				
 				
 				if(outcome){

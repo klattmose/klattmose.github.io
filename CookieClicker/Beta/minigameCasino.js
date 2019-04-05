@@ -438,6 +438,8 @@ M.launch = function(){
 					M.games.Blackjack.buildSidebar();
 				}
 				
+				M.games.Blackjack.getHandValue(M.hands.dealer);
+				M.games.Blackjack.getHandValue(M.hands.player[M.currentPlayerHand]);
 				
 				if(outcome){
 					var messg = '';

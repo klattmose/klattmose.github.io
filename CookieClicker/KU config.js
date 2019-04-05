@@ -38,7 +38,7 @@
       "ctrl": false,
       "shift": false,
       "alt": false,
-      "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
+      "script": "Game.Objects[\"Mine\"].sell(600); Game.Objects[\"Mine\"].buy(600);"
     },
     {
       "keyCode": 51,
@@ -134,11 +134,15 @@
     },
     {
       "nickname": "Load Casino",
-      "script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/CasinoLoader.js');"
+      "script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/minigameCasino.js');"
     },
     {
       "nickname": "Load Cookie Monster",
       "script": "Game.LoadMod('https://aktanusa.github.io/CookieMonster/CookieMonster.js');"
+    },
+    {
+      "nickname": "Use normal cards",
+      "script": "setTimeout(function(){\n\tvar M = Game.Objects[\"Chancemaker\"].minigame;\n\tM.cardsImage = M.sourceFolder + 'img/cards.png';\n}, 1000);"
     }
   ]
 }

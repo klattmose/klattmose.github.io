@@ -547,6 +547,9 @@ M.launch = function(){
 		}
 		
 		
+		//***********************************
+		//    End games, back to generic
+		//***********************************
 		// Only run this part once, regardless of hard resets
 		if(!M.loadedCount){
 			M.backupUpdateMenu = Game.UpdateMenu;

@@ -11,8 +11,8 @@ M.launch = function(){
 	var script = l('minigameScript-' + M.parent.id);
 	var src = script.src;
 	M.sourceFolder = src.substring(0, src.lastIndexOf('/') + 1);
-	M.cardsImage = M.sourceFolder + 'img/cards.png'
-	M.iconsImage = M.sourceFolder + 'img/casinoIcons.png'
+	M.cardsImage = M.sourceFolder + 'img/phantasypantsCards.png';
+	M.iconsImage = M.sourceFolder + 'img/casinoIcons.png';
 	M.chancemakerChance = 0.0003;
 	M.beatLength = 750;
 	
@@ -601,6 +601,7 @@ M.launch = function(){
 		
 		M.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
+		if(M.phase == M.phases.inactive) M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
 		
 		M.buildSidebar();
 		M.buildTable();

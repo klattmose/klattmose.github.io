@@ -601,7 +601,10 @@ M.launch = function(){
 		
 		M.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
-		if(M.phase == M.phases.inactive) M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
+		if(M.phase == M.phases.inactive){
+			M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
+			M.currentPlayerHand = 0;
+		}
 		
 		M.buildSidebar();
 		M.buildTable();

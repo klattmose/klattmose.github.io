@@ -884,7 +884,7 @@ M.launch = function(){
 		M.games.Blackjack.tiesLost = 0;
 		M.games.Blackjack.phase = 0;
 		M.games.Blackjack.istep = 0;
-		M.nextBeat = Date.now() + M.beatLength;
+		M.nextBeat = Date.now();
 		
 		if(hard){
 			M.saveString = '';

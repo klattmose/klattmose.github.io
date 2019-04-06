@@ -84,7 +84,6 @@ M.launch = function(){
 		M.reshuffle = function(){
 			M.Deck = [];
 			for(var i = 0; i < M.deckCount; i++) for(var j = 1; j < M.cards.length; j++) M.Deck.push(M.cards[j]);
-			M.games.Blackjack.cardCount = 0;
 		}
 		
 		M.cardImage = function(card){
@@ -140,9 +139,6 @@ M.launch = function(){
 				var i = Math.floor(Math.random() * deck.length);
 				var res = deck[i];
 				deck.splice(i, 1);
-				
-				if(res.value >= 2 && res.value <= 6) this.cardCount++
-				else if(res.value == 1 || res.value >= 10) this.cardCount--;
 				
 				if(M.Deck.length < (M.minDecks * 52)){
 					Game.Unlock('Counting cards');
@@ -326,6 +322,19 @@ M.launch = function(){
 				str += '</table>';
 				
 				M.gameL.innerHTML = str;
+				
+				
+				var cardCount = 0;
+				for(var i = 0; i < M.Deck.length; i++){
+					if(M.Deck[i].value >= 2 && M.Deck[i].value <= 6) cardCount--;
+					else if(M.Deck[i].value == 1 || M.Deck[i].value >= 10) cardCount++;
+				}
+				if(this.hiddenCard && M.hands.dealer.cards[1] && M.hands.dealer.cards[1].value == 0){
+					if(this.hiddenCard.value >= 2 && this.hiddenCard.value <= 6) cardCount--;
+					else if(this.hiddenCard.value == 1 || this.hiddenCard.value >= 10) cardCount++;
+				}
+				M.infoL.innerHTML = 'Hands won : ' + Beautify(this.wins) + ' (total : ' + Beautify(this.winsT) + ')' + (Game.Has('Counting cards') ? ('<br/>Cards left in deck : ' + M.Deck.length + '<br/>Count : ' + cardCount) : '');
+				
 			},
 			
 			logic : function(){
@@ -542,13 +551,6 @@ M.launch = function(){
 			
 			draw : function(){
 				//run each draw frame
-				var countModify = 0;
-				if(this.hiddenCard && M.hands.dealer.cards[1] && M.hands.dealer.cards[1].value == 0){
-					if(this.hiddenCard.value >= 2 && this.hiddenCard.value <= 6) countModify--;
-					else if(this.hiddenCard.value == 1 || this.hiddenCard.value >= 10) countModify++;
-				}
-				M.infoL.innerHTML = 'Hands won : ' + Beautify(this.wins) + ' (total : ' + Beautify(this.winsT) + ')' + (Game.Has('Counting cards') ? ('<br/>Cards left in deck : ' + M.Deck.length + '<br/>Count : ' + (this.cardCount + countModify)) : '');
-				
 				l('casinoCurrentBet').innerHTML = '(' + Beautify(M.betAmount) + ' cookies)';
 			}
 		
@@ -634,6 +636,7 @@ M.launch = function(){
 			if(typeof CM != 'undefined') CM.Sim.InitData(); // Cookie Monster compatibility
 		}
 		
+		
 		var str = '';
 		str += '<style>' + 
 		'#casinoBG{background:url(img/shadedBorders.png), url(' + M.sourceFolder + 'img/BGcasino.jpg); background-size:100% 100%, auto; position:absolute; left:0px; right:0px; top:0px; bottom:16px;}' + 
@@ -696,7 +699,7 @@ M.launch = function(){
 			res += '_' + parseInt(M.betMode);
 			res += '_' + parseInt(M.betChoice);
 			res += '_' + parseFloat(M.games.Blackjack.netTotal);
-			res += '_' + parseInt(M.games.Blackjack.cardCount);
+			res += '_' + parseInt(0);
 			res += '_' + parseInt(M.beatLength);
 			
 			return res;
@@ -772,7 +775,7 @@ M.launch = function(){
 			M.betMode = parseInt(spl[i++] || 0);
 			M.betChoice = parseInt(spl[i++] || 0);
 			M.games.Blackjack.netTotal = parseFloat(spl[i++] || 0);
-			M.games.Blackjack.cardCount = parseInt(spl[i++] || 0);
+			var dummy = parseInt(spl[i++] || 0);
 			M.beatLength = parseInt(spl[i++] || 750);
 			
 			if(on && Game.ascensionMode != 1) M.parent.switchMinigame(1);

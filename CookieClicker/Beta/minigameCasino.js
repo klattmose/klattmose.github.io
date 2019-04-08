@@ -35,9 +35,7 @@ M.launch = function(){
 		M.Upgrades.push(new Game.Upgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 0, M.iconsImage]));
 		M.Upgrades.push(new Game.Upgrade('Double or nothing', "Multiply your bet by <b>2</b>.<q>The Martingale System sounds good on paper, but one losing streak long enough will bankrupt anyone.</q>", 120, [0, 0, M.iconsImage])); 
 		M.Upgrades.push(new Game.Upgrade('Stoned cows', "Multiply your bet by <b>5</b>.<q>The steaks have never been higher!</q>", 300, [0, 0, M.iconsImage])); 
-		// Eidetic memory
-		// Quick maffs
-		// 208 card pickup
+		M.Upgrades.push(new Game.Upgrade('Actually, do tell me the odds', "Action buttons give tooltips displaying various probabilities.<q>2 plus 2 is 4 minus 1 that's 3, quick maffs.</q>", 300, [0, 0, M.iconsImage])); 
 		
 		for(var i = 0; i < M.Upgrades.length; i++){
 			M.Upgrades[i].order = 1000000 + i / 100;
@@ -107,6 +105,59 @@ M.launch = function(){
 		
 		M.buildTable = function(){
 			if(M.games.choice == 0) M.games.Blackjack.buildTable();
+		}
+		
+		M.formatPercentage = function(value) {
+			if(!M.percentagePrecision) {
+				return value * 100 + '%';
+			} else {
+				var sign = (value < 0 ? '-' : '');
+				value = Math.abs(value);
+				if(value < M.minPercentage) {
+					if(sign) {
+						return '-' + M.minPercentageStr + 'to 0%';
+					} else {
+						return '<' + M.minPercentageStr;
+					}
+				} else {
+					// Decided on floor instead of round, it is more similar to the expectations
+					value = Math.round(value * 100 * M.percentagePow10);
+					var low = value % M.percentagePow10;
+					var low_digits = M.percentagePrecision;
+					while(low > 0 && low % 10 === 0) {
+						low /= 10;
+						low_digits -= 1;
+					}
+					if(low) {
+						low = '' + low;
+						while(low.length < low_digits) {
+							low = '0' + low;
+						}
+						low = '.' + low;
+					} else {
+						low = '';
+					}
+					var high = Math.floor(value / M.percentagePow10);
+					return sign + high + low + '%';
+				}
+			}
+		}
+		
+		M.setPercentagePrecision = function(precision) {
+			if(precision < 0) {
+				throw "In setPercentagePrecision: precision must be >= 0, got " + precision;
+			} else {
+				M.percentagePrecision = precision;
+				if(!precision) {
+					M.minPercentage = null;
+					M.minPercentageStr = null;
+					M.percentagePow10 = null;
+			   } else {
+					M.minPercentage = Math.pow(10, -precision - 2);
+					M.minPercentageStr = '' + Math.pow(10, -precision) + '%';
+					M.percentagePow10 = Math.pow(10, precision);
+			   }       
+			}
 		}
 		
 		
@@ -232,6 +283,76 @@ M.launch = function(){
 				this.buildSidebar();
 			},
 			
+			dealProbabilities : function(){
+				var res = '<div style="padding:8px 4px; min-width:150px;">';
+				var iwc = M.games.Blackjack.instantWinChance();
+				var chances = [];
+				var cards = [];
+				var possibles = M.Deck.length * (M.Deck.length - 1) / 2;
+				
+				for(var i = 4; i <= 21; i++) chances[i] = 0;
+				for(var i = 1; i <= 10; i++) cards[i] = 0;
+				
+				for(var i = 0; i < M.Deck.length; i++){
+					var card = M.Deck[i];
+					cards[card.value]++;
+				}
+				
+				for(var i = 1; i <= 10; i++)
+				for(var j = 1; j <= 10; j++){
+					var val = j + i;
+					if(i == 1 || j == 1) val += 10;
+					chances[val] += cards[i] * (cards[j] + (i == j ? -1 : 0)) / possibles / 2;
+				}
+				
+				chances[21] = 1 - (1 - chances[21]) * (1 - iwc);
+				for(var i = 4; i <= 20; i++) chances[i] *= 1 - iwc;
+				
+				if(chances[21] != 0) res += '<b>Blackjack : </b>' + M.formatPercentage(chances[21]) + '<br/>';
+				for(var i = 20; i >= 4; i--) if(chances[i] != 0) res += '<b>' + i + ' : </b>' + M.formatPercentage(chances[i]) + '<br/>';
+				
+				return res + '</div>';
+			},
+			
+			drawProbabilities : function(){
+				var res = '<div style="padding:8px 4px; min-width:150px;">';
+				var cards = [];
+				var outcomes = [];
+				outcomes[22] = 0;
+				
+				for(var i = 1; i <= 10; i++) cards[i] = 0;
+				for(var i = 0; i < M.Deck.length; i++){
+					var card = M.Deck[i];
+					cards[card.value]++;
+				}
+				cards[M.games.Blackjack.hiddenCard.value]++;
+				
+				for(var i = 1; i <= 10; i++){
+					var prob = cards[i] / (M.Deck.length + 1);
+					var value = 0;
+					var hand = M.hands.player[M.currentPlayerHand];
+					
+					for(var j = 0; j < hand.cards.length; j++) value += hand.cards[j].value;
+					value += i;
+					if(value <= 11 && i == 1) value += 10;
+					for(var j = 0; j < hand.cards.length; j++) if(value <= 11 && hand.cards[j].value == 1) value += 10;
+					
+					if(value > 21) outcomes[22] += prob;
+					else outcomes[value] = prob;
+				}
+				
+				if(outcomes[22]) res += '<b>Bust : </b>' + M.formatPercentage(outcomes[22]) + '<br/>';
+				for(var i = 21; i > 5; i--) if(outcomes[i]) res += '<b>' + i + ' : </b>' + M.formatPercentage(outcomes[i]) + '<br/>';
+				
+				return res + '</div>';
+			},
+			
+			standProbabilities : function(){
+				var res = '<div style="padding:8px 4px; min-width:150px;">';
+				
+				return res + '</div>';
+			},
+			
 			buildSidebar : function(){
 				var mode = '';
 				
@@ -280,31 +401,45 @@ M.launch = function(){
 				}}()); 
 				if(l('casinoDeal')) AddEvent(l('casinoDeal'), 'click', function(){return function(){
 					PlaySound('snd/tick.mp3');
+					Game.tooltip.shouldHide = 1;
 					M.games.Blackjack.istep = 0;
 					M.games.Blackjack.phase = M.games.Blackjack.phases.deal;
 					M.nextBeat = Date.now();
 				}}()); 
 				if(l('casinoHit')) AddEvent(l('casinoHit'), 'click', function(){return function(){
 					PlaySound('snd/tick.mp3');
+					Game.tooltip.shouldHide = 1;
 					M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
 					M.games.Blackjack.hit(M.hands.player[M.currentPlayerHand], true);
 					M.games.Blackjack.buildSidebar();
 				}}()); 
 				if(l('casinoDoubledown')) AddEvent(l('casinoDoubledown'), 'click', function(){return function(){
 					PlaySound('snd/tick.mp3');
+					Game.tooltip.shouldHide = 1;
 					M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
 					M.games.Blackjack.doubledown();
 				}}()); 
 				if(l('casinoSplit')) AddEvent(l('casinoSplit'), 'click', function(){return function(){
 					PlaySound('snd/tick.mp3');
+					Game.tooltip.shouldHide = 1;
 					M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
 					M.games.Blackjack.split();
 				}}()); 
 				if(l('casinoStand')) AddEvent(l('casinoStand'), 'click', function(){return function(){
 					PlaySound('snd/tick.mp3');
+					Game.tooltip.shouldHide = 1;
 					M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
 					M.games.Blackjack.stand();
 				}}()); 
+				
+				//if(Game.Has('Actually, do tell me the odds')){
+				if(1){
+					if(l('casinoDeal')) Game.attachTooltip(l('casinoDeal'), this.dealProbabilities, 'this');
+					if(l('casinoHit')) Game.attachTooltip(l('casinoHit'), this.drawProbabilities, 'this');
+					if(l('casinoDoubledown')) Game.attachTooltip(l('casinoDoubledown'), this.drawProbabilities, 'this');
+					//if(l('casinoSplit')) Game.attachTooltip(l('casinoSplit'), this.drawProbabilities, 'this');
+					if(l('casinoStand')) Game.attachTooltip(l('casinoStand'), this.standProbabilities, 'this');
+				}
 			},
 			
 			buildTable : function(){
@@ -626,8 +761,8 @@ M.launch = function(){
 				if(M.games.Blackjack.tiesLost >= 7) Game.Unlock('Tiebreaker');
 				
 				if(M.games.Blackjack.winsT >= 21) Game.Win('Card minnow');
-				if(M.games.Blackjack.winsT >= 210) Game.Win('Card trout');
-				if(M.games.Blackjack.winsT >= 2100) Game.Win('Card shark');
+				if(M.games.Blackjack.winsT >= 210) Game.Win('Card trout');'Actually, do tell me the odds'
+				if(M.games.Blackjack.winsT >= 2100){ Game.Win('Card shark'); Game.Unlock('Actually, do tell me the odds'); }
 				if(M.games.Blackjack.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
 				if(M.games.Blackjack.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
 				if(M.games.Blackjack.ownLuckWins >= 666) Game.Win('Deal with the Devil');
@@ -885,6 +1020,8 @@ M.launch = function(){
 		M.games.Blackjack.phase = 0;
 		M.games.Blackjack.istep = 0;
 		M.nextBeat = Date.now();
+		
+		M.setPercentagePrecision(4);
 		
 		if(hard){
 			M.saveString = '';

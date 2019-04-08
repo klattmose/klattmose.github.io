@@ -348,9 +348,52 @@ M.launch = function(){
 			},
 			
 			standProbabilities : function(){
-				var res = '<div style="padding:8px 4px; min-width:150px;">';
+				var res = '<div style="padding:8px 4px; min-width:150px;"><b>Dealer chances</b><br/>';
+				var cards = [];
+				var outcomes = [];
+				var simHand = [];
+				
+				for(var i = 0; i < M.hands.dealer.cards.length; i++) if(M.hands.dealer.cards[i].value) simHand.push(M.hands.dealer.cards[i].value);
+				for(var i = 17; i <= 22; i++) outcomes[i] = 0;
+				
+				for(var i = 1; i <= 10; i++) cards[i] = 0;
+				for(var i = 0; i < M.Deck.length; i++){
+					var card = M.Deck[i];
+					cards[card.value]++;
+				}
+				cards[M.games.Blackjack.hiddenCard.value]++;
+				
+				M.games.Blackjack.recursiveDealerSim(cards, outcomes, simHand, M.Deck.length + 1, 1);
+				
+				if(outcomes[22]) res += '<b>Bust : </b>' + M.formatPercentage(outcomes[22]) + '<br/>';
+				for(var i = 21; i >= 17; i--) if(outcomes[i]) res += '<b>' + i + ' : </b>' + M.formatPercentage(outcomes[i]) + '<br/>';
 				
 				return res + '</div>';
+			},
+			
+			recursiveDealerSim : function(cards, outcomes, simHand, deckLength, stateChance){
+				for(var i = 1; i <= 10; i++){
+					if(cards[i]){
+						simHand.push(i);
+						
+						var value = 0;
+						var chance = stateChance * cards[i] / deckLength;
+						for(var j = 0; j < simHand.length; j++) value += simHand[j];
+						for(var j = 0; j < simHand.length; j++) if(value <= 11 && simHand[j] == 1) value += 10;
+						
+						if(value > 21) value = 22;
+						if(value >= 17){
+							outcomes[value] += chance;
+						}
+						else{
+							cards[i]--;
+							M.games.Blackjack.recursiveDealerSim(cards, outcomes, simHand, deckLength - 1, chance);
+							cards[i]++;
+						}
+						
+						simHand.splice(simHand.length - 1);
+					}
+				}
 			},
 			
 			buildSidebar : function(){
@@ -766,6 +809,8 @@ M.launch = function(){
 				if(M.games.Blackjack.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
 				if(M.games.Blackjack.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
 				if(M.games.Blackjack.ownLuckWins >= 666) Game.Win('Deal with the Devil');
+				
+				if(M.games.choice == 0) M.games.Blackjack.buildSidebar();
 			});
 			
 			if(typeof CM != 'undefined') CM.Sim.InitData(); // Cookie Monster compatibility

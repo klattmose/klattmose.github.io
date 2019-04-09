@@ -35,7 +35,6 @@ M.launch = function(){
 		M.Upgrades.push(new Game.Upgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 0, M.iconsImage]));
 		M.Upgrades.push(new Game.Upgrade('Double or nothing', "Multiply your bet by <b>2</b>.<q>The Martingale System sounds good on paper, but one losing streak long enough will bankrupt anyone.</q>", 120, [0, 0, M.iconsImage])); 
 		M.Upgrades.push(new Game.Upgrade('Stoned cows', "Multiply your bet by <b>5</b>.<q>The steaks have never been higher!</q>", 300, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(new Game.Upgrade('Actually, do tell me the odds', "Action buttons give tooltips displaying various probabilities.<q>2 plus 2 is 4 minus 1 that's 3, quick maffs.</q>", 300, [0, 0, M.iconsImage])); 
 		
 		for(var i = 0; i < M.Upgrades.length; i++){
 			M.Upgrades[i].order = 1000000 + i / 100;
@@ -475,7 +474,7 @@ M.launch = function(){
 					M.games.Blackjack.stand();
 				}}()); 
 				
-				if(Game.Has('Actually, do tell me the odds')){
+				if(Game.HasAchiev('Card shark')){
 					if(l('casinoDeal')) Game.attachTooltip(l('casinoDeal'), this.dealProbabilities, 'this');
 					if(l('casinoHit')) Game.attachTooltip(l('casinoHit'), this.drawProbabilities, 'this');
 					if(l('casinoDoubledown')) Game.attachTooltip(l('casinoDoubledown'), this.drawProbabilities, 'this');
@@ -803,8 +802,8 @@ M.launch = function(){
 				if(M.games.Blackjack.tiesLost >= 7) Game.Unlock('Tiebreaker');
 				
 				if(M.games.Blackjack.winsT >= 21) Game.Win('Card minnow');
-				if(M.games.Blackjack.winsT >= 210) Game.Win('Card trout');'Actually, do tell me the odds'
-				if(M.games.Blackjack.winsT >= 2100){ Game.Win('Card shark'); Game.Unlock('Actually, do tell me the odds'); }
+				if(M.games.Blackjack.winsT >= 210) Game.Win('Card trout');
+				if(M.games.Blackjack.winsT >= 2100) Game.Win('Card shark');
 				if(M.games.Blackjack.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
 				if(M.games.Blackjack.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
 				if(M.games.Blackjack.ownLuckWins >= 666) Game.Win('Deal with the Devil');

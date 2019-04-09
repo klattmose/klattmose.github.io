@@ -6,9 +6,8 @@ CCSE.launch = function(){
 	CCSE.Backup = {};
 	
 	CCSE.init = function(){
-		if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
-		
 		CCSE.ReplaceNativeMenu();
+		
 		
 		if (Game.prefs.popups) Game.Popup('CCSE loaded!');
 		else Game.Notify('CCSE loaded!', '', '', 1, 1);
@@ -19,6 +18,8 @@ CCSE.launch = function(){
 	Menu functions
 	=======================================================================================*/
 	CCSE.ReplaceNativeMenu = function(){
+		if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+		
 		CCSE.Backup.UpdateMenu = Game.UpdateMenu;
 		Game.UpdateMenu = function(){
 			CCSE.Backup.UpdateMenu();
@@ -26,13 +27,13 @@ CCSE.launch = function(){
 		}
 	}
 	
-	CCSE.AppendMenuString = function(str){
+	CCSE.AppendOptionsMenuString = function(str){
 		var div = document.createElement('div');
 		div.innerHTML = str;
-		CCSE.AppendMenuDiv(div);
+		CCSE.AppendOptionsMenuDiv(div);
 	}
 	
-	CCSE.AppendMenuDiv = function(div){
+	CCSE.AppendOptionsMenuDiv = function(div){
 		var menu = l('menu');
 		if(menu){
 			menu = menu.getElementsByClassName('subsection')[0];
@@ -40,14 +41,71 @@ CCSE.launch = function(){
 				var padding = menu.getElementsByTagName('div');
 				padding = padding[padding.length - 1];
 				if(padding){
-					console.log('padding');
 					menu.insertBefore(div, padding);
 				} else {
-					console.log('append');
 					menu.appendChild(div);
 				}
 			}
 		}
+	}
+	
+	CCSE.AppendStatsGeneralString = function(str){
+		var div = document.createElement('div');
+		div.innerHTML = str;
+		CCSE.AppendStatsGeneralDiv(div);
+	}
+	
+	CCSE.AppendStatsGeneralDiv = function(div){
+		var general;
+		var subsections = l('menu').getElementsByClassName('subsection');
+		
+		for(var i in subsections){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+				general = subsections[i];
+				break;
+			}
+		}
+		
+		if(general) general.insertBefore(div, general.childNodes[Math.max(general.childNodes.length - 2, 1)]);
+	}
+	
+	CCSE.AppendStatsSpecialString = function(str){
+		var div = document.createElement('div');
+		div.innerHTML = str;
+		CCSE.AppendStatsSpecialDiv(div);
+	}
+	
+	CCSE.AppendStatsSpecialDiv = function(div){
+		var special;
+		var subsections = l('menu').getElementsByClassName('subsection');
+		
+		for(var i in subsections){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'Special'){
+				special = subsections[i];
+				break;
+			}
+		}
+		
+		if(!special){
+			var general;
+			subsections = l('menu').getElementsByClassName('subsection');
+			
+			for(var i in subsections){
+				if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+					general = subsections[i];
+					break;
+				}
+			}
+			
+			if(general){
+				special = document.createElement('div');
+				special.className = 'subsection';
+				special.innerHTML = '<div class="title">Special</div>';
+				l('menu').insertBefore(special, subsections[1]);
+			}
+		}
+		
+		special.appendChild(div);
 	}
 	
 	

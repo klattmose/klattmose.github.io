@@ -347,10 +347,12 @@ M.launch = function(){
 			},
 			
 			standProbabilities : function(){
-				var res = '<div style="padding:8px 4px; min-width:150px;"><b>Dealer chances</b><br/>';
+				var res = '<div style="padding:8px 4px; min-width:150px;">';
 				var cards = [];
 				var outcomes = [];
 				var simHand = [];
+				var winChance = 0;
+				var lossChance = 0;
 				
 				for(var i = 0; i < M.hands.dealer.cards.length; i++) if(M.hands.dealer.cards[i].value) simHand.push(M.hands.dealer.cards[i].value);
 				for(var i = 17; i <= 22; i++) outcomes[i] = 0;
@@ -364,7 +366,12 @@ M.launch = function(){
 				
 				M.games.Blackjack.recursiveDealerSim(cards, outcomes, simHand, M.Deck.length + 1, 1);
 				
-				if(outcomes[22]) res += '<b>Bust : </b>' + M.formatPercentage(outcomes[22]) + '<br/>';
+				winChance += outcomes[22];
+				for(var i = 21; i >= 17; i--) if(i >= M.hands.player[M.currentPlayerHand].value + (Game.Has('Tiebreaker') ? 1 : 0)) lossChance += outcomes[i]; else winChance += outcomes[i];
+				if(winChance) res += '<b>Win : </b><span class="green">' + M.formatPercentage(winChance) + '</span><br/>'
+				if(lossChance) res += '<b>Lose : </b><span class="red">' + M.formatPercentage(lossChance) + '</span><br/>'
+				
+				if(outcomes[22]) res += '<br/><b>Dealer chances</b><br/><br/><b>Bust : </b>' + M.formatPercentage(outcomes[22]) + '<br/>';
 				for(var i = 21; i >= 17; i--) if(outcomes[i]) res += '<b>' + i + ' : </b>' + M.formatPercentage(outcomes[i]) + '<br/>';
 				
 				return res + '</div>';

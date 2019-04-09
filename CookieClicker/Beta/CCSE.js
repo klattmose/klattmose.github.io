@@ -15,6 +15,9 @@ CCSE.launch = function(){
 	}
 	
 	
+	/*=====================================================================================
+	Menu functions
+	=======================================================================================*/
 	CCSE.ReplaceNativeMenu = function(){
 		CCSE.Backup.UpdateMenu = Game.UpdateMenu;
 		Game.UpdateMenu = function(){
@@ -26,15 +29,21 @@ CCSE.launch = function(){
 	CCSE.AppendMenuString = function(str){
 		var div = document.createElement('div');
 		div.innerHTML = str;
-		var menu = document.getElementById('menu');
-		if(menu) {
+		CCSE.AppendMenuDiv(div);
+	}
+	
+	CCSE.AppendMenuDiv = function(div){
+		var menu = l('menu');
+		if(menu){
 			menu = menu.getElementsByClassName('subsection')[0];
-			if(menu) {
+			if(menu){
 				var padding = menu.getElementsByTagName('div');
 				padding = padding[padding.length - 1];
-				if(padding) {
+				if(padding){
+					console.log('padding');
 					menu.insertBefore(div, padding);
 				} else {
+					console.log('append');
 					menu.appendChild(div);
 				}
 			}

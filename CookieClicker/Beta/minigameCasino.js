@@ -475,8 +475,7 @@ M.launch = function(){
 					M.games.Blackjack.stand();
 				}}()); 
 				
-				//if(Game.Has('Actually, do tell me the odds')){
-				if(1){
+				if(Game.Has('Actually, do tell me the odds')){
 					if(l('casinoDeal')) Game.attachTooltip(l('casinoDeal'), this.dealProbabilities, 'this');
 					if(l('casinoHit')) Game.attachTooltip(l('casinoHit'), this.drawProbabilities, 'this');
 					if(l('casinoDoubledown')) Game.attachTooltip(l('casinoDoubledown'), this.drawProbabilities, 'this');

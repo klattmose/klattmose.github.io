@@ -1,5 +1,5 @@
 Game.Win('Third-party');
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;

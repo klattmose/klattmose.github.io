@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.0';
+KlattmoseUtilities.version = '2.1';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -196,7 +196,7 @@ KlattmoseUtilities.launch = function(){
 		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
 		
 		Game.customOptionsMenu.push(function(){
-			CCSE.AppendOptionsMenuString(KlattmoseUtilities.getMenuString());
+			CCSE.AppendCollapsibleOptionsMenuString(KlattmoseUtilities.name, KlattmoseUtilities.getMenuString());
 		});
 		
 		Game.customStatsMenu.push(function(){
@@ -224,8 +224,7 @@ KlattmoseUtilities.launch = function(){
 		}
 		
 		
-		var str =	'<div class="title">Klattmose Utilities</div>' + 
-					'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+		var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
 					'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.exportConfig(); PlaySound(\'snd/tick.mp3\');">Export configuration</a>' +
 										 '<a class="option" ' + Game.clickStr + '="KlattmoseUtilities.importConfig(); PlaySound(\'snd/tick.mp3\');">Import configuration</a></div>' + 
 					writeHeader("Hotkeys") + '<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.EditHotkey(' + KlattmoseUtilities.config.hotkeys.length + '); PlaySound(\'snd/tick.mp3\');">Add</a></div>' + 

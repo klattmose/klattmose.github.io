@@ -14,6 +14,7 @@ CCSE.launch = function(){
 		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
 		if(typeof Game.customInfoMenu == 'undefined') Game.customInfoMenu = [];
 		if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
+		CCSE.collapseMenu = {};
 		
 		
 		// Inject the hooks into the main game
@@ -63,6 +64,50 @@ CCSE.launch = function(){
 		var div = document.createElement('div');
 		div.innerHTML = str;
 		CCSE.AppendOptionsMenuDiv(div);
+	}
+	
+	CCSE.AppendCollapsibleOptionsMenuString = function(title, str){
+		var titleDiv = document.createElement('div');
+		titleDiv.className = 'title';
+		titleDiv.textContent = title + ' ';
+		
+		if(CCSE.collapseMenu[title] === undefined) CCSE.collapseMenu[title] = 0;
+		
+		// Stolen wholesale from Cookie Monster
+		var span = document.createElement('span');
+		span.style.cursor = 'pointer';
+		span.style.display = 'inline-block';
+		span.style.height = '14px';
+		span.style.width = '14px';
+		span.style.borderRadius = '7px';
+		span.style.textAlign = 'center';
+		span.style.backgroundColor = '#C0C0C0';
+		span.style.color = 'black';
+		span.style.fontSize = '13px';
+		span.style.verticalAlign = 'middle';
+		span.textContent = (CCSE.collapseMenu[title] ? '+' : '-');
+		span.onclick = function(){CCSE.ToggleCollabsibleMenu(title); Game.UpdateMenu();};
+		titleDiv.appendChild(span);
+		
+		var div = document.createElement('div');
+		if(!CCSE.collapseMenu[title]){
+			div.innerHTML = str;
+			div.insertBefore(titleDiv, div.childNodes[0]);
+		}
+		else{
+			div.appendChild(titleDiv);
+		}		
+		
+		CCSE.AppendOptionsMenuDiv(div);
+	}
+	
+	CCSE.ToggleCollabsibleMenu = function(title) {
+		if(CCSE.collapseMenu[title] == 0){
+			CCSE.collapseMenu[title]++;
+		}
+		else{
+			CCSE.collapseMenu[title]--;
+		}
 	}
 	
 	CCSE.AppendOptionsMenuDiv = function(div){

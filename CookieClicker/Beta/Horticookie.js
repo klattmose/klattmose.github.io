@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '2.0';
+Horticookie.version = '2.1';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -169,7 +169,7 @@ Horticookie.launch = function(){
 		}
 		
 		
-		var str = '<div class="title">Horticookie</div>';
+		var str = '';
 			
 		str += writeHeader("Helpers");
 		str += '<div class="listing">' + WriteButton('autoHarvest', 'autoHarvestButton', 'Autoharvest ON', 'Autoharvest OFF', '') + '<label>Automatically harvests mature interesting plants.</label></div>';
@@ -1048,7 +1048,7 @@ Horticookie.launch = function(){
 		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
 		
 		Game.customOptionsMenu.push(function(){
-			CCSE.AppendOptionsMenuString(Horticookie.getMenuString());
+			CCSE.AppendCollapsibleOptionsMenuString(Horticookie.name, Horticookie.getMenuString());
 		});
 		
 		Game.customStatsMenu.push(function(){

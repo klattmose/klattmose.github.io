@@ -4,7 +4,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '2.0';
+M.version = '2.1';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -753,12 +753,11 @@ M.launch = function(){
 			
 			Game.customOptionsMenu.push(function(){
 				var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
-				var str = '<div class="title">Casino</div>' +
-					'<div class="listing">' +
+				var str = '<div class="listing">' +
 					'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>' + 
 					'This is the time in milliseconds between each card deal.</div>';
 				
-				CCSE.AppendOptionsMenuString(str);
+				CCSE.AppendCollapsibleOptionsMenuString(M.name, str);
 			});
 			
 			Game.customStatsMenu.push(function(){

@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.0';
+FortuneCookie.version = '2.1';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -64,9 +64,9 @@ FortuneCookie.launch = function(){
 		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
 		
 		Game.customOptionsMenu.push(function(){
-			CCSE.AppendOptionsMenuString('<div class="title">' + FortuneCookie.name + '</div>' +
-				'<div class="listing">'+
-				Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
+			CCSE.AppendCollapsibleOptionsMenuString(FortuneCookie.name,
+				'<div class="listing">' +
+				Game.WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;") + '<br>' +
 				'</div>');
 		});
 		

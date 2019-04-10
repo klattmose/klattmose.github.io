@@ -1,11 +1,3 @@
-//***********************************
-//    Not even remotely ready
-//***********************************
-
-Game.LoadMinigameMod = function(objKey, miniName, miniSource){
-	Game.Objects[objKey].minigameUrl = miniSource;
-	Game.Objects[objKey].minigameName = miniName;
-	Game.LoadMinigames();
+if(Date.now() >= new Date(new Date().getFullYear(), 7 - 1, 1) && Date.now() <= new Date(new Date().getFullYear(), 7 - 1, 7)){
+	Game.baseSeason = 'american';
 }
-
-Game.LoadMinigameMod('Chancemaker', 'Casino', '../minigameCasino/minigameCasino.js');

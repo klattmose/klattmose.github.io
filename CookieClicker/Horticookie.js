@@ -1,5 +1,6 @@
 Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 
 //***********************************
 //    For testing
@@ -21,11 +22,13 @@ Horticookie.init = function(){
 	Horticookie.loadConfig();
 	
 	
-	Horticookie.Backup.scriptLoaded = Game.scriptLoaded;
+	if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
+	Game.customScriptLoaded.push(Horticookie.ReplaceNativeGarden);
+	/*Horticookie.Backup.scriptLoaded = Game.scriptLoaded;
 	Game.scriptLoaded = function(who, script) {
 		Horticookie.Backup.scriptLoaded(who, script);
 		Horticookie.ReplaceNativeGarden();
-	}
+	}*/
 	
 	Horticookie.ReplaceNativeGarden();
 	Horticookie.ReplaceMainGame();
@@ -1039,7 +1042,15 @@ Horticookie.lockSeed = function(me) {
 //***********************************
 Horticookie.ReplaceMainGame = function(){
 	// Insert into the menu
-	Horticookie.Backup.UpdateMenu = Game.UpdateMenu;
+	if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+	
+	Game.customMenu.push(function(){
+		if(Game.onMenu === 'prefs') {
+			CCSE.AppendOptionsMenuString(Horticookie.getMenuString());
+		}
+	});
+	
+	/*Horticookie.Backup.UpdateMenu = Game.UpdateMenu;
 	
 	Game.UpdateMenu = function(){
 		Horticookie.Backup.UpdateMenu();
@@ -1063,7 +1074,7 @@ Horticookie.ReplaceMainGame = function(){
 				}
 			}
 		}
-	}
+	}*/
 	
 	// Set up for Accelerated Garden
 	Horticookie.Backup.randomFloor = randomFloor;

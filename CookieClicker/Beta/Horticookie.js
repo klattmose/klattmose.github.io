@@ -1,6 +1,6 @@
 Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 
 //***********************************
 //    For testing

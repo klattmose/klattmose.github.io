@@ -1,6 +1,7 @@
 Game.Win('Third-party');
 if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 
 KlattmoseUtilities.defaultConfig = function(){
 	return {
@@ -140,13 +141,19 @@ KlattmoseUtilities.init = function(){
 	KlattmoseUtilities.restoreDefaultConfig(1);
 	KlattmoseUtilities.loadConfig();
 	
-	KlattmoseUtilities.Backup.scriptLoaded = Game.scriptLoaded;
+	if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
+	Game.customScriptLoaded.push(function(){
+		KlattmoseUtilities.ReplaceNativeGarden();
+		KlattmoseUtilities.ReplaceNativePantheon();
+		KlattmoseUtilities.ReplaceNativeGrimoire();
+	});
+	/*KlattmoseUtilities.Backup.scriptLoaded = Game.scriptLoaded;
 	Game.scriptLoaded = function(who, script) {
 		KlattmoseUtilities.Backup.scriptLoaded(who, script);
 		KlattmoseUtilities.ReplaceNativeGarden();
 		KlattmoseUtilities.ReplaceNativePantheon();
 		KlattmoseUtilities.ReplaceNativeGrimoire();
-	}
+	}*/
 	
 	KlattmoseUtilities.ReplaceNativeGarden();
 	KlattmoseUtilities.ReplaceNativePantheon();
@@ -188,7 +195,15 @@ KlattmoseUtilities.init = function(){
 //    Menu Replacer
 //***********************************
 KlattmoseUtilities.ReplaceGameMenu = function(){
-	KlattmoseUtilities.Backup.UpdateMenu = Game.UpdateMenu;
+	if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+	
+	Game.customMenu.push(function(){
+		if(Game.onMenu === 'prefs') {
+			CCSE.AppendOptionsMenuString(KlattmoseUtilities.getMenuString());
+		}
+	});
+	
+	/*KlattmoseUtilities.Backup.UpdateMenu = Game.UpdateMenu;
 	
 	Game.UpdateMenu = function(){
 		KlattmoseUtilities.Backup.UpdateMenu();
@@ -212,7 +227,7 @@ KlattmoseUtilities.ReplaceGameMenu = function(){
 				}
 			}
 		}
-	}
+	}*/
 }
 
 KlattmoseUtilities.getMenuString = function(){

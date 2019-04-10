@@ -1,22 +1,38 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
+CCSE.name = 'CCSE';
+CCSE.version = '0.1';
+CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
-	CCSE.isLoaded = 1;
 	CCSE.Backup = {};
 	
 	CCSE.init = function(){
+		// Declare a whole mess of new mod hooks
 		if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+		if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
+		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
+		if(typeof Game.customInfoMenu == 'undefined') Game.customInfoMenu = [];
 		if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
 		
 		
+		// Inject the hooks into the main game
 		CCSE.ReplaceNativeMenu();
 		CCSE.ReplaceLoadSave();
 		CCSE.ReplaceScriptLoaded();
 		
 		
+		// Show the version number in Stats
+		Game.customStatsMenu.push(function(){
+			CCSE.AppendStatsVersionNumber(CCSE.name, CCSE.version);
+		});
+		
+		
+		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		if (Game.prefs.popups) Game.Popup('CCSE loaded!');
 		else Game.Notify('CCSE loaded!', '', '', 1, 1);
+		CCSE.isLoaded = 1;
+		if(CCSE.postLoadHooks) for(var i in CCSE.postLoadHooks) CCSE.postLoadHooks[i]();
 	}
 	
 	
@@ -27,6 +43,18 @@ CCSE.launch = function(){
 		CCSE.Backup.UpdateMenu = Game.UpdateMenu;
 		Game.UpdateMenu = function(){
 			CCSE.Backup.UpdateMenu();
+			
+			if(Game.onMenu == 'prefs'){
+				for(var i in Game.customOptionsMenu) Game.customOptionsMenu[i]();
+			}
+			else if(Game.onMenu == 'stats'){
+				for(var i in Game.customStatsMenu) Game.customStatsMenu[i]();
+			}
+			else if(Game.onMenu == 'log'){
+				for(var i in Game.customInfoMenu) Game.customInfoMenu[i]();
+			}
+			
+			// Any that don't want to fit into a label
 			for(var i in Game.customMenu) Game.customMenu[i]();
 		}
 	}
@@ -110,6 +138,24 @@ CCSE.launch = function(){
 		}
 		
 		special.appendChild(div);
+	}
+	
+	CCSE.AppendStatsVersionNumber = function(modName, versionString){
+		var general;
+		var str = '<b>' + modName + ' version :</b> ' + versionString;
+		var div = document.createElement('div');
+		div.className = 'listing';
+		div.innerHTML = str;
+		
+		var subsections = l('menu').getElementsByClassName('subsection');
+		for(var i in subsections){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+				general = subsections[i];
+				break;
+			}
+		}
+		
+		if(general) general.appendChild(div);
 	}
 	
 	

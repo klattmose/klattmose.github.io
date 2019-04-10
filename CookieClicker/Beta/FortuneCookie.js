@@ -1,7 +1,9 @@
 Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
-
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
+FortuneCookie.name = 'Fortune Cookie';
+FortuneCookie.version = '2.0';
+FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.init = function(){
 	FortuneCookie.isLoaded = 1;
@@ -93,17 +95,18 @@ FortuneCookie.setForecastLength = function(length){
 }*/
 
 FortuneCookie.ReplaceGameMenu = function(){
-	if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+	if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
+	if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
 	
-	Game.customMenu.push(function(){
-		if(Game.onMenu === 'prefs') {
-			var str = '<div class="title">Fortune Cookie</div>' +
-					  '<div class="listing">'+
-					  Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
-					  '</div>';
-			
-			CCSE.AppendOptionsMenuString(str);
-		}
+	Game.customOptionsMenu.push(function(){
+		CCSE.AppendOptionsMenuString('<div class="title">' + FortuneCookie.name + '</div>' +
+			'<div class="listing">'+
+			Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
+			'</div>');
+	});
+	
+	Game.customStatsMenu.push(function(){
+		CCSE.AppendStatsVersionNumber(FortuneCookie.name, FortuneCookie.version);
 	});
 }
 
@@ -453,4 +456,13 @@ FortuneCookie.detectKUGamblerPatch = function(){
 }
 
 
-if(!FortuneCookie.isLoaded) FortuneCookie.init();
+if(!FortuneCookie.isLoaded){
+	if(CCSE && CCSE.isLoaded){
+		FortuneCookie.init();
+	}
+	else{
+		if(!CCSE) CCSE = {};
+		if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
+		CCSE.postLoadHooks.push(FortuneCookie.init);
+	}
+}

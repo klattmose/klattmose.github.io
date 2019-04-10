@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.3';
+CCSE.version = '0.5';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -9,11 +9,15 @@ CCSE.launch = function(){
 	
 	CCSE.init = function(){
 		// Declare a whole mess of new mod hooks
-		if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
-		if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
-		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
-		if(typeof Game.customInfoMenu == 'undefined') Game.customInfoMenu = [];
-		if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
+		if(!Game.customMenu) Game.customMenu = [];
+		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
+		if(!Game.customStatsMenu) Game.customStatsMenu = [];
+		if(!Game.customInfoMenu) Game.customInfoMenu = [];
+		if(!Game.customScriptLoaded) Game.customScriptLoaded = [];
+		
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		for(key in Game.Objects) if(!Game.customMinigameOnLoad[key]) Game.customMinigameOnLoad[key] = [];
+		
 		CCSE.collapseMenu = {};
 		
 		
@@ -229,8 +233,16 @@ CCSE.launch = function(){
 		Game.scriptLoaded = function(who, script) {
 			CCSE.Backup.scriptLoaded(who, script);
 			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
+			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);
 		}
 	}
+	
+	CCSE.MinigameReplacer = function(func, objKey){
+		var me = Game.Objects[objKey];
+		if(me.minigameLoaded) func(me, 'minigameScript-' + me.id);
+		else Game.customMinigameOnLoad[objKey].push(func);
+	}
+	
 	
 	CCSE.init();
 }

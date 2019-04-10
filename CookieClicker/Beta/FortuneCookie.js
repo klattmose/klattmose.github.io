@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.1';
+FortuneCookie.version = '2.2';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -14,8 +14,8 @@ FortuneCookie.launch = function(){
 		FortuneCookie.ConfigPrefix = "FortuneCookie";
 		FortuneCookie.loadConfig();
 		
-		if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
-		Game.customScriptLoaded.push(FortuneCookie.ReplaceNativeGrimoire);
+		//if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
+		//Game.customScriptLoaded.push(FortuneCookie.ReplaceNativeGrimoire);
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.ReplaceGameMenu();
@@ -60,8 +60,8 @@ FortuneCookie.launch = function(){
 	//    Replacement
 	//***********************************
 	FortuneCookie.ReplaceGameMenu = function(){
-		if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
-		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
+		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
+		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		
 		Game.customOptionsMenu.push(function(){
 			CCSE.AppendCollapsibleOptionsMenuString(FortuneCookie.name,
@@ -76,7 +76,21 @@ FortuneCookie.launch = function(){
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {
-		if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		if(!Game.customMinigameOnLoad['Wizard tower']) Game.customMinigameOnLoad['Wizard tower'] = [];
+		
+		CCSE.MinigameReplacer(function(){
+			var M = Game.Objects['Wizard tower'].minigame;
+			
+			eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
+				.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
+						FortuneCookie.spellForecast(me) + 
+						$1`
+				)
+			);
+		}, 'Wizard tower');
+		
+		/*if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
 			var M = Game.Objects['Wizard tower'].minigame;
 			
 			eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
@@ -87,7 +101,7 @@ FortuneCookie.launch = function(){
 			);
 			
 			FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
-		}
+		}*/
 	}
 
 

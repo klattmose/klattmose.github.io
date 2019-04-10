@@ -1,5 +1,6 @@
 Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 
 
 FortuneCookie.init = function(){
@@ -10,11 +11,13 @@ FortuneCookie.init = function(){
 	FortuneCookie.ConfigPrefix = "FortuneCookie";
 	FortuneCookie.loadConfig();
 	
-	FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
+	if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
+	Game.customScriptLoaded.push(FortuneCookie.ReplaceNativeGrimoire);
+	/*FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
 	Game.scriptLoaded = function(who, script) {
 		FortuneCookie.Backup.scriptLoaded(who, script);
 		FortuneCookie.ReplaceNativeGrimoire();
-	}
+	}*/
 	
 	FortuneCookie.ReplaceNativeGrimoire();
 	FortuneCookie.ReplaceGameMenu();
@@ -58,7 +61,7 @@ FortuneCookie.setForecastLength = function(length){
 //***********************************
 //    Replacement
 //***********************************
-FortuneCookie.ReplaceGameMenu = function(){
+/*FortuneCookie.ReplaceGameMenu = function(){
 	FortuneCookie.oldUpdateMenu = Game.UpdateMenu;
 	
 	Game.UpdateMenu = function(){
@@ -87,6 +90,21 @@ FortuneCookie.ReplaceGameMenu = function(){
 			}
 		}
 	}
+}*/
+
+FortuneCookie.ReplaceGameMenu = function(){
+	if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+	
+	Game.customMenu.push(function(){
+		if(Game.onMenu === 'prefs') {
+			var str = '<div class="title">Fortune Cookie</div>' +
+					  '<div class="listing">'+
+					  Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
+					  '</div>';
+			
+			CCSE.AppendOptionsMenuString(str);
+		}
+	});
 }
 
 FortuneCookie.ReplaceNativeGrimoire = function() {

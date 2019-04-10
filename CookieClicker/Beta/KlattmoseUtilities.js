@@ -145,12 +145,6 @@ KlattmoseUtilities.launch = function(){
 		KlattmoseUtilities.restoreDefaultConfig(1);
 		KlattmoseUtilities.loadConfig();
 		
-		if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
-		Game.customScriptLoaded.push(function(){
-			KlattmoseUtilities.ReplaceNativeGarden();
-			KlattmoseUtilities.ReplaceNativePantheon();
-			KlattmoseUtilities.ReplaceNativeGrimoire();
-		});
 		
 		KlattmoseUtilities.ReplaceNativeGarden();
 		KlattmoseUtilities.ReplaceNativePantheon();
@@ -492,8 +486,10 @@ KlattmoseUtilities.launch = function(){
 
 
 	KlattmoseUtilities.ReplaceNativeGarden = function() {
-		KlattmoseUtilities.HasReplaceAgronomicon = false;
-		if (!KlattmoseUtilities.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		if(!Game.customMinigameOnLoad['Farm']) Game.customMinigameOnLoad['Farm'] = [];
+		
+		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Farm"].minigame;
 			
 			KlattmoseUtilities.patches.gardenOrderofOperations = {};
@@ -656,8 +652,8 @@ KlattmoseUtilities.launch = function(){
 			//    Insert into Agronomicon
 			//***********************************
 			KlattmoseUtilities.patches.AgronomiconInjection();
-			KlattmoseUtilities.HasReplaceNativeGardenLaunch = true;
-		}
+		}, 'Farm');
+		
 	}
 
 	KlattmoseUtilities.patches.AgronomiconInjection = function(){
@@ -912,7 +908,10 @@ KlattmoseUtilities.launch = function(){
 
 
 	KlattmoseUtilities.ReplaceNativePantheon = function() {
-		if (!KlattmoseUtilities.HasReplaceNativePantheonLaunch && Game.Objects["Temple"].minigameLoaded) {
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		if(!Game.customMinigameOnLoad['Temple']) Game.customMinigameOnLoad['Temple'] = [];
+		
+		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Temple"].minigame;
 			
 			KlattmoseUtilities.patches.slotGodFix = {};
@@ -937,14 +936,16 @@ KlattmoseUtilities.launch = function(){
 				if(KlattmoseUtilities.config.patches.slotGodFix) KlattmoseUtilities.patches.slotGodFix.newFunction(god, slot);
 				else KlattmoseUtilities.patches.slotGodFix.oldFunction(god, slot);
 			}
-			
-			KlattmoseUtilities.HasReplaceNativePantheonLaunch = true;
-		}
+		}, 'Temple');
+		
 	}
 
 
 	KlattmoseUtilities.ReplaceNativeGrimoire = function() {
-		if (!KlattmoseUtilities.HasReplaceNativeGrimoireLaunch && Game.Objects["Wizard tower"].minigameLoaded) {
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		if(!Game.customMinigameOnLoad['Wizard tower']) Game.customMinigameOnLoad['Wizard tower'] = [];
+		
+		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Wizard tower"].minigame;
 			
 			KlattmoseUtilities.patches.gamblersFeverDreamFix = {};
@@ -978,9 +979,8 @@ KlattmoseUtilities.launch = function(){
 				if(KlattmoseUtilities.config.patches.gamblersFeverDreamFix) KlattmoseUtilities.patches.gamblersFeverDreamFix.newFunction();
 				else KlattmoseUtilities.patches.gamblersFeverDreamFix.oldFunction();
 			}
-			
-			KlattmoseUtilities.HasReplaceNativeGrimoireLaunch = true;
-		}
+		}, 'Wizard tower');
+		
 	}
 	
 	KlattmoseUtilities.init();

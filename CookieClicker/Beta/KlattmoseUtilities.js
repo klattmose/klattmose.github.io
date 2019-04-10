@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 
 KlattmoseUtilities.defaultConfig = function(){
 	return {

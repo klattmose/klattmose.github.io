@@ -63,37 +63,6 @@ FortuneCookie.setForecastLength = function(length){
 //***********************************
 //    Replacement
 //***********************************
-/*FortuneCookie.ReplaceGameMenu = function(){
-	FortuneCookie.oldUpdateMenu = Game.UpdateMenu;
-	
-	Game.UpdateMenu = function(){
-		FortuneCookie.oldUpdateMenu();
-		
-		if(Game.onMenu === 'prefs') {
-			var str = '<div class="title">Fortune Cookie</div>' +
-					  '<div class="listing">'+
-					  Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
-					  '</div>';
-			
-			var div = document.createElement('div');
-			div.innerHTML = str;
-			var menu = document.getElementById('menu');
-			if(menu) {
-				menu = menu.getElementsByClassName('subsection')[0];
-				if(menu) {
-					var padding = menu.getElementsByTagName('div');
-					padding = padding[padding.length - 1];
-					if(padding) {
-						menu.insertBefore(div, padding);
-					} else {
-						menu.appendChild(div);
-					}
-				}
-			}
-		}
-	}
-}*/
-
 FortuneCookie.ReplaceGameMenu = function(){
 	if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
 	if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
@@ -461,7 +430,7 @@ if(!FortuneCookie.isLoaded){
 		FortuneCookie.init();
 	}
 	else{
-		if(!CCSE) CCSE = {};
+		if(!CCSE) var CCSE = {};
 		if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 		CCSE.postLoadHooks.push(FortuneCookie.init);
 	}

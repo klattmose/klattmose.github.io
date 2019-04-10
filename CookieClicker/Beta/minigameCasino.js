@@ -284,7 +284,7 @@ M.launch = function(){
 			},
 			
 			dealProbabilities : function(){
-				var res = '<div style="padding:8px 4px; min-width:150px;">';
+				var res = '<div style="padding:8px 4px; min-width:125px;">';
 				var iwc = M.games.Blackjack.instantWinChance();
 				var chances = [];
 				var cards = [];
@@ -315,7 +315,7 @@ M.launch = function(){
 			},
 			
 			drawProbabilities : function(){
-				var res = '<div style="padding:8px 4px; min-width:150px;">';
+				var res = '<div style="padding:8px 4px; min-width:125px;">';
 				var cards = [];
 				var outcomes = [];
 				outcomes[22] = 0;
@@ -348,7 +348,7 @@ M.launch = function(){
 			},
 			
 			standProbabilities : function(){
-				var res = '<div style="padding:8px 4px; min-width:150px;">';
+				var res = '<div style="padding:8px 4px; min-width:125px;">';
 				var cards = [];
 				var outcomes = [];
 				var simHand = [];
@@ -1091,7 +1091,7 @@ M.launch = function(){
 		M.games.Blackjack.istep = 0;
 		M.nextBeat = Date.now();
 		
-		M.setPercentagePrecision(4);
+		M.setPercentagePrecision(1);
 		
 		if(hard){
 			M.saveString = '';

@@ -1,4 +1,5 @@
 Game.Win('Third-party');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
@@ -745,7 +746,7 @@ M.launch = function(){
 		//***********************************
 		// Only run this part once, regardless of hard resets
 		if(!M.loadedCount){
-			M.backupUpdateMenu = Game.UpdateMenu;
+			/*M.backupUpdateMenu = Game.UpdateMenu;
 			Game.UpdateMenu = function(){
 				M.backupUpdateMenu();
 				
@@ -787,15 +788,34 @@ M.launch = function(){
 						}
 					}
 				}
-			}
+			}*/
 			
+			if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+			Game.customMenu.push(function(){
+				if(Game.onMenu === 'prefs') {
+					var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
+					var str = '<div class="title">Casino</div>' +
+						'<div class="listing">' +
+						'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>' + 
+						'This is the time in milliseconds between each card deal.</div>';
+					
+					
+					CCSE.AppendOptionsMenuString(str);
+				}
+				else if(Game.onMenu == 'stats' && (M.games.Blackjack.ownLuckWins || M.games.Blackjack.netTotal)){
+					if(M.games.Blackjack.netTotal) CCSE.AppendStatsGeneralString('<div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.games.Blackjack.netTotal) + '</div></div>');
+					if(M.games.Blackjack.ownLuckWins) CCSE.AppendStatsSpecialString('<div class="listing"><b>Made your own luck :</b> ' + M.games.Blackjack.ownLuckWins + ' times</div>');
+				}
+			});
+			
+			/*
 			if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
 				M.backupLoadSave = Game.LoadSave;
 				Game.LoadSave = function(data){
 					M.backupLoadSave(data);
 					for(var i in Game.customLoad){Game.customLoad[i]();} // This isn't in the original Game.LoadSave
 				}
-			}
+			}*/
 			
 			Game.customLoad.push(function(){
 				M.load(M.saveString);

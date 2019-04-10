@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.2';
+CCSE.version = '0.3';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -98,7 +98,10 @@ CCSE.launch = function(){
 			}
 		}
 		
-		if(general) general.insertBefore(div, general.childNodes[Math.max(general.childNodes.length - 2, 1)]);
+		if(general){
+			var br = general.getElementsByTagName('br')[0];
+			if(br) general.insertBefore(div, br);
+		}
 	}
 	
 	CCSE.AppendStatsSpecialString = function(str){

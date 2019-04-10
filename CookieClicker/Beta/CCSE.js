@@ -6,7 +6,13 @@ CCSE.launch = function(){
 	CCSE.Backup = {};
 	
 	CCSE.init = function(){
+		if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
+		if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
+		
+		
 		CCSE.ReplaceNativeMenu();
+		CCSE.ReplaceLoadSave();
+		CCSE.ReplaceScriptLoaded();
 		
 		
 		if (Game.prefs.popups) Game.Popup('CCSE loaded!');
@@ -18,8 +24,6 @@ CCSE.launch = function(){
 	Menu functions
 	=======================================================================================*/
 	CCSE.ReplaceNativeMenu = function(){
-		if(typeof Game.customMenu == 'undefined') Game.customMenu = [];
-		
 		CCSE.Backup.UpdateMenu = Game.UpdateMenu;
 		Game.UpdateMenu = function(){
 			CCSE.Backup.UpdateMenu();
@@ -108,6 +112,31 @@ CCSE.launch = function(){
 		special.appendChild(div);
 	}
 	
+	
+	/*=====================================================================================
+	Load Save
+	=======================================================================================*/
+	CCSE.ReplaceLoadSave = function(){
+		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
+			CCSE.Backup.backupLoadSave = Game.LoadSave;
+			Game.LoadSave = function(data){
+				CCSE.Backup.backupLoadSave(data);
+				for(var i in Game.customLoad) Game.customLoad[i](); // This isn't in the original Game.LoadSave
+			}
+		}
+	}
+	
+	
+	/*=====================================================================================
+	Minigames
+	=======================================================================================*/
+	CCSE.ReplaceScriptLoaded = function(){
+		CCSE.Backup.scriptLoaded = Game.scriptLoaded;
+		Game.scriptLoaded = function(who, script) {
+			CCSE.Backup.scriptLoaded(who, script);
+			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
+		}
+	}
 	
 	CCSE.init();
 }

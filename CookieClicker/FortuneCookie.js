@@ -8,16 +8,12 @@ FortuneCookie.init = function(){
 	FortuneCookie.Backup = {};
 	FortuneCookie.config = {};
 	FortuneCookie.config.spellForecastLength = 10;
+	FortuneCookie.config.simGCs = 0;
 	FortuneCookie.ConfigPrefix = "FortuneCookie";
 	FortuneCookie.loadConfig();
 	
 	if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
 	Game.customScriptLoaded.push(FortuneCookie.ReplaceNativeGrimoire);
-	/*FortuneCookie.Backup.scriptLoaded = Game.scriptLoaded;
-	Game.scriptLoaded = function(who, script) {
-		FortuneCookie.Backup.scriptLoaded(who, script);
-		FortuneCookie.ReplaceNativeGrimoire();
-	}*/
 	
 	FortuneCookie.ReplaceNativeGrimoire();
 	FortuneCookie.ReplaceGameMenu();
@@ -97,9 +93,21 @@ FortuneCookie.ReplaceGameMenu = function(){
 	
 	Game.customMenu.push(function(){
 		if(Game.onMenu === 'prefs') {
+			WriteSlider=function(slider,leftText,rightText,startValueFunction,callback,min,max,step){
+				if (!callback) callback = '';
+				if (!min) min = 0;
+				if (!max) max = 100;
+				if (!step) step = 1;
+				return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
+			}
+			
+			var callback = "FortuneCookie.config.simGCs = Math.round(l('simGCsSlider').value); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;";
 			var str = '<div class="title">Fortune Cookie</div>' +
-					  '<div class="listing">'+
-					  Game.WriteSlider('spellForecastSlider','Forecast Length','[$]',function(){return FortuneCookie.config.spellForecastLength;},"FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value)));l('spellForecastSliderRightText').innerHTML=FortuneCookie.config.spellForecastLength;")+'<br>'+
+					  '<div class="listing">' +
+						WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
+					  '</div>' +
+					  '<div class="listing">' +
+						WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', function(){return FortuneCookie.config.simGCs;}, "FortuneCookie.config.simGCs = Math.round(l('simGCsSlider').value); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
 					  '</div>';
 			
 			CCSE.AppendOptionsMenuString(str);
@@ -323,6 +331,7 @@ FortuneCookie.spellForecast=function(spell){
 	
 	switch(spell.name){
 		case "Force the Hand of Fate":
+			backfire += 0.15 * FortuneCookie.config.simGCs;
 			
 			spellOutcome += '<table width="100%"><tr>';
 			for(var i = 0; i < 3; i++)

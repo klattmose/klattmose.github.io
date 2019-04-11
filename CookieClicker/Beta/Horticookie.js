@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '2.1';
+Horticookie.version = '2.2';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -24,14 +24,6 @@ Horticookie.launch = function(){
 		Horticookie.restoreDefaultConfig(1);
 		Horticookie.loadConfig();
 		
-		
-		if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
-		Game.customScriptLoaded.push(Horticookie.ReplaceNativeGarden);
-		/*Horticookie.Backup.scriptLoaded = Game.scriptLoaded;
-		Game.scriptLoaded = function(who, script) {
-			Horticookie.Backup.scriptLoaded(who, script);
-			Horticookie.ReplaceNativeGarden();
-		}*/
 		
 		Horticookie.ReplaceNativeGarden();
 		Horticookie.ReplaceMainGame();
@@ -102,7 +94,7 @@ Horticookie.launch = function(){
 			Horticookie.config[prefName] = 1;
 		}
 		
-		if(Horticookie.HasReplaceNativeGardenLaunch) Horticookie.applyPref(prefName);
+		if(Game.Objects['Farm'].minigameLoaded) Horticookie.applyPref(prefName);
 		
 		l(button).className = 'option' + ((Horticookie.config[prefName]^invert) ? '' : ' off');
 		Horticookie.saveConfig(Horticookie.config);
@@ -1064,7 +1056,10 @@ Horticookie.launch = function(){
 	}
 
 	Horticookie.ReplaceNativeGarden = function() {
-		if (!Horticookie.HasReplaceNativeGardenLaunch && Game.Objects["Farm"].minigameLoaded) {
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		if(!Game.customMinigameOnLoad['Farm']) Game.customMinigameOnLoad['Farm'] = [];
+		
+		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Farm"].minigame;
 			
 			Horticookie.Backup.computeEffs = M.computeEffs;
@@ -1087,8 +1082,8 @@ Horticookie.launch = function(){
 			
 			M.toRebuild = true;
 			M.buildPanel();
-			Horticookie.HasReplaceNativeGardenLaunch = true;
-		}
+		}, 'Farm');
+		
 	}
 
 

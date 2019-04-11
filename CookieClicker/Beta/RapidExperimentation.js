@@ -28,10 +28,8 @@ CCSE.NewSpell('test', spell)
 
 
 CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
-	var me = new Game.Upgrade(name, desc, price, icon);
+	var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
 	Game.PrestigeUpgrades.push(me);
-	
-	if(buyFunction !== undefined) me.buyFunction = buyFunction;
 	
 	me.pool = 'prestige';
 	me.posX = posX;
@@ -43,4 +41,6 @@ CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents,
 	for(var ii in me.parents){
 		if(me.parents[ii] != -1) me.parents[ii] = Game.Upgrades[me.parents[ii]];
 	}
+	
+	return me;
 }

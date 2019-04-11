@@ -14,8 +14,6 @@ FortuneCookie.launch = function(){
 		FortuneCookie.ConfigPrefix = "FortuneCookie";
 		FortuneCookie.loadConfig();
 		
-		//if(typeof Game.customScriptLoaded == 'undefined') Game.customScriptLoaded = [];
-		//Game.customScriptLoaded.push(FortuneCookie.ReplaceNativeGrimoire);
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.ReplaceGameMenu();
@@ -89,19 +87,6 @@ FortuneCookie.launch = function(){
 				)
 			);
 		}, 'Wizard tower');
-		
-		/*if (!FortuneCookie.HasReplaceNativeGrimoireLaunch && Game.Objects['Wizard tower'].minigameLoaded) {
-			var M = Game.Objects['Wizard tower'].minigame;
-			
-			eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
-				.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
-						FortuneCookie.spellForecast(me) + 
-						$1`
-				)
-			);
-			
-			FortuneCookie.HasReplaceNativeGrimoireLaunch = true;
-		}*/
 	}
 
 
@@ -402,12 +387,7 @@ FortuneCookie.launch = function(){
 				}
 				break;
 				
-			case "Conjure Baked Goods":
-			case "Stretch Time":
-			case "Haggler's Charm":
-			case "Summon Crafty Pixies":
-			case "Resurrect Abomination":
-			case "Diminish Ineptitude":
+			default:
 				while(spellsCast < target){
 					Math.seedrandom(Game.seed + '/' + spellsCast);
 					if(Math.random() < (1 - backfire))
@@ -418,10 +398,6 @@ FortuneCookie.launch = function(){
 					spellsCast += 1;
 					Math.seedrandom();
 				}
-				break;
-				
-			default:
-				spellOutcome = "";
 		}
 		return spellOutcome;
 	}

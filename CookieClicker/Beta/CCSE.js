@@ -244,6 +244,58 @@ CCSE.launch = function(){
 	}
 	
 	
+	/*=====================================================================================
+	Grimoire
+	=======================================================================================*/
+	CCSE.RedrawSpells = function(){
+		var str = '';
+		var M = Game.Objects['Wizard tower'].minigame;
+		
+		for (var i in M.spells){
+			var me = M.spells[i];
+			var icon = me.icon || [28,12];
+			str += '<div class="grimoireSpell titleFont" id="grimoireSpell' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.spellTooltip(' + me.id + ')','this') + '><div class="usesIcon shadowFilter grimoireIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="grimoirePrice" id="grimoirePrice' + me.id + '">-</div></div>';
+		}
+		
+		l('grimoireSpells').innerHTML = str;
+		
+		for (var i in M.spells){
+			var me = M.spells[i];
+			AddEvent(l('grimoireSpell' + me.id), 'click', function(spell){return function(){PlaySound('snd/tick.mp3'); M.castSpell(spell);}}(me));
+		}
+		
+		if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();
+	}
+	
+	CCSE.NewSpell = function(key, name, desc, failDesc, icon, costMin, costPercent, failFunc, win, fail){
+		var M = Game.Objects['Wizard tower'].minigame;
+		var spell = {name: name};
+		
+		if(desc !== undefined) spell.desc = desc;
+		if(failDesc !== undefined) spell.failDesc = failDesc;
+		if(icon !== undefined) spell.icon = icon;
+		if(costMin !== undefined) spell.costMin = costMin;
+		if(costPercent !== undefined) spell.costPercent = costPercent;
+		if(failFunc !== undefined) spell.failFunc = failFunc;
+		if(win !== undefined) spell.win = win;
+		if(fail !== undefined) spell.fail = fail;
+		
+		M.spells[key] = spell;
+		
+		M.spellsById = [];
+		var n = 0;
+		for(var i in M.spells){
+			M.spells[i].id = n;
+			M.spellsById[n] = M.spells[i];
+			n++;
+		}
+		
+		CCSE.RedrawSpells();
+	}
+	
+	/*=====================================================================================
+	Start your engines
+	=======================================================================================*/
 	CCSE.init();
 }
 

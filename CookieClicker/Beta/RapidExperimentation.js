@@ -1,6 +1,12 @@
+/*=====================================================================================
+Just some snippets of code I might use later
+=======================================================================================*/
+
+
 if(Date.now() >= new Date(new Date().getFullYear(), 7 - 1, 1) && Date.now() <= new Date(new Date().getFullYear(), 7 - 1, 7)){
 	Game.baseSeason = 'american';
 }
+
 
 
 var spell = {
@@ -18,3 +24,23 @@ var spell = {
 	}
 }
 CCSE.NewSpell('test', spell)
+
+
+
+CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
+	var me = new Game.Upgrade(name, desc, price, icon);
+	Game.PrestigeUpgrades.push(me);
+	
+	if(buyFunction !== undefined) me.buyFunction = buyFunction;
+	
+	me.pool = 'prestige';
+	me.posX = posX;
+	me.posY = posY;
+	
+	me.parents = parents;
+	if(me.parents.length == 0) me.parents = ['Legacy'];
+	me.parents = me.parents || [-1];
+	for(var ii in me.parents){
+		if(me.parents[ii] != -1) me.parents[ii] = Game.Upgrades[me.parents[ii]];
+	}
+}

@@ -4,7 +4,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '2.1';
+M.version = '2.3';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -38,10 +38,12 @@ M.launch = function(){
 		M.Upgrades.push(new Game.Upgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 0, M.iconsImage]));
 		M.Upgrades.push(new Game.Upgrade('Double or nothing', "Multiply your bet by <b>2</b>.<q>The Martingale System sounds good on paper, but one losing streak long enough will bankrupt anyone.</q>", 120, [0, 0, M.iconsImage])); 
 		M.Upgrades.push(new Game.Upgrade('Stoned cows', "Multiply your bet by <b>5</b>.<q>The steaks have never been higher!</q>", 300, [0, 0, M.iconsImage])); 
+		M.Upgrades.push(CCSE.NewHeavenlyUpgrade('Actually, do tell me the odds', "Display the probabilities of various outcomes of taking an action in the Casino.<q>2 + 2 is 4 minus 1 that's three quick maffs.</q>", 21000000, [0, 0, M.iconsImage], 3, -200, []));
+			Game.last.showIf = function(){return Game.HasAchiev('Card shark');}
 		
 		for(var i = 0; i < M.Upgrades.length; i++){
 			M.Upgrades[i].order = 1000000 + i / 100;
-			M.Upgrades[i].priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+			if(M.Upgrades[i].pool != 'prestige') M.Upgrades[i].priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
 		}
 		Game.Upgrades['Double or nothing'].order = Game.Upgrades['High roller!'].order + 0.001;
 		Game.Upgrades['Stoned cows'].order = Game.Upgrades['Double or nothing'].order + 0.001;
@@ -484,7 +486,7 @@ M.launch = function(){
 					M.games.Blackjack.stand();
 				}}()); 
 				
-				if(Game.HasAchiev('Card shark')){
+				if(Game.Has('Actually, do tell me the odds')){
 					if(l('casinoDeal')) Game.attachTooltip(l('casinoDeal'), this.dealProbabilities, 'this');
 					if(l('casinoHit')) Game.attachTooltip(l('casinoHit'), this.drawProbabilities, 'this');
 					if(l('casinoDoubledown')) Game.attachTooltip(l('casinoDoubledown'), this.drawProbabilities, 'this');
@@ -1081,4 +1083,13 @@ M.launch = function(){
 var M = 0;
 Game.Objects['Chancemaker'].minigameUrl = 'https://klattmose.github.io/CookieClicker/dummyFile.js';
 Game.Objects['Chancemaker'].minigameName = 'Casino';
-Game.LoadMinigames();
+
+
+if(CCSE && CCSE.isLoaded){
+	Game.LoadMinigames();
+}
+else{
+	if(!CCSE) var CCSE = {};
+	if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
+	CCSE.postLoadHooks.push(Game.LoadMinigames);
+}

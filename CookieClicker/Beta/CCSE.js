@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.6';
+CCSE.version = '0.7';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -282,6 +282,29 @@ CCSE.launch = function(){
 		
 		CCSE.RedrawSpells();
 	}
+	
+	
+	/*=====================================================================================
+	Upgrades
+	=======================================================================================*/
+	CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
+		var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
+		Game.PrestigeUpgrades.push(me);
+		
+		me.pool = 'prestige';
+		me.posX = posX;
+		me.posY = posY;
+		
+		me.parents = parents;
+		if(me.parents.length == 0) me.parents = ['Legacy'];
+		me.parents = me.parents || [-1];
+		for(var ii in me.parents){
+			if(me.parents[ii] != -1) me.parents[ii] = Game.Upgrades[me.parents[ii]];
+		}
+		
+		return me;
+	}
+	
 	
 	/*=====================================================================================
 	Start your engines

@@ -267,18 +267,8 @@ CCSE.launch = function(){
 		if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();
 	}
 	
-	CCSE.NewSpell = function(key, name, desc, failDesc, icon, costMin, costPercent, failFunc, win, fail){
+	CCSE.NewSpell = function(key, spell){
 		var M = Game.Objects['Wizard tower'].minigame;
-		var spell = {name: name};
-		
-		if(desc !== undefined) spell.desc = desc;
-		if(failDesc !== undefined) spell.failDesc = failDesc;
-		if(icon !== undefined) spell.icon = icon;
-		if(costMin !== undefined) spell.costMin = costMin;
-		if(costPercent !== undefined) spell.costPercent = costPercent;
-		if(failFunc !== undefined) spell.failFunc = failFunc;
-		if(win !== undefined) spell.win = win;
-		if(fail !== undefined) spell.fail = fail;
 		
 		M.spells[key] = spell;
 		

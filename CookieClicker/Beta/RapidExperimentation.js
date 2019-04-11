@@ -2,4 +2,19 @@ if(Date.now() >= new Date(new Date().getFullYear(), 7 - 1, 1) && Date.now() <= n
 	Game.baseSeason = 'american';
 }
 
-CCSE.NewSpell('test', 'Test', 'test description', 'test fail description', [0,0], 10, 0.1, '', new function(){return function(){console.log('win');}}, new function(){return function(){console.log('fail');}})
+
+var spell = {
+	name: 'Test',
+	desc: 'test description.',
+	failDesc: 'test fail description.',
+	icon: [0, 0],
+	costMin: 10,
+	costPercent: 0.1,
+	win: function(){
+		Game.Popup('<div style="font-size:80%;">win</div>',Game.mouseX,Game.mouseY);
+	},
+	fail: function(){
+		Game.Popup('<div style="font-size:80%;">fail</div>',Game.mouseX,Game.mouseY);
+	}
+}
+CCSE.NewSpell('test', spell)

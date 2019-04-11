@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.3';
+FortuneCookie.version = '2.4';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -10,9 +10,10 @@ FortuneCookie.launch = function(){
 		FortuneCookie.isLoaded = 1;
 		FortuneCookie.Backup = {};
 		FortuneCookie.config = {};
-		FortuneCookie.config.spellForecastLength = 10;
 		FortuneCookie.ConfigPrefix = "FortuneCookie";
 		FortuneCookie.loadConfig();
+		if(FortuneCookie.config.spellForecastLength === undefined) FortuneCookie.config.spellForecastLength = 10;
+		if(FortuneCookie.config.simGCs === undefined) FortuneCookie.config.simGCs = 0;
 		
 		
 		FortuneCookie.ReplaceNativeGrimoire();
@@ -52,7 +53,16 @@ FortuneCookie.launch = function(){
 		FortuneCookie.config.spellForecastLength = length;
 		FortuneCookie.saveConfig(FortuneCookie.config);
 	}
+	
+	FortuneCookie.setSimGCs = function(sim){
+		FortuneCookie.config.simGCs = sim;
+		FortuneCookie.saveConfig(FortuneCookie.config);
+	}
 
+	FortuneCookie.getSimGCs = function(){
+		return (FortuneCookie.config.simGCs ? FortuneCookie.config.simGCs : 0);
+	}
+	
 
 	//***********************************
 	//    Replacement
@@ -62,10 +72,22 @@ FortuneCookie.launch = function(){
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		
 		Game.customOptionsMenu.push(function(){
+			WriteSlider = function(slider, leftText, rightText, startValueFunction, callback, min, max, step){
+				if (!callback) callback = '';
+				if (!min) min = 0;
+				if (!max) max = 100;
+				if (!step) step = 1;
+				return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
+			}
+			
 			CCSE.AppendCollapsibleOptionsMenuString(FortuneCookie.name,
 				'<div class="listing">' +
-				Game.WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;") + '<br>' +
-				'</div>');
+					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
+				'</div>' +
+				'<div class="listing">' +
+					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.setSimGCs(Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
+				'</div>'
+			);
 		});
 		
 		Game.customStatsMenu.push(function(){
@@ -290,7 +312,8 @@ FortuneCookie.launch = function(){
 		
 		switch(spell.name){
 			case "Force the Hand of Fate":
-				
+				backfire += 0.15 * FortuneCookie.getSimGCs();
+			
 				spellOutcome += '<table width="100%"><tr>';
 				for(var i = 0; i < 3; i++)
 					spellOutcome += '<td width="33%">' + ((i == idx) ? 'Active' : '') + '</td>';

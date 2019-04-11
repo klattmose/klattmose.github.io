@@ -53,6 +53,15 @@ FortuneCookie.setForecastLength = function(length){
 	FortuneCookie.saveConfig(FortuneCookie.config);
 }
 
+FortuneCookie.setSimGCs = function(sim){
+	FortuneCookie.config.simGCs = sim;
+	FortuneCookie.saveConfig(FortuneCookie.config);
+}
+
+FortuneCookie.getSimGCs = function(){
+	return (FortuneCookie.config.simGCs ? FortuneCookie.config.simGCs : 0);
+}
+
 
 //***********************************
 //    Replacement
@@ -107,7 +116,7 @@ FortuneCookie.ReplaceGameMenu = function(){
 						WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
 					  '</div>' +
 					  '<div class="listing">' +
-						WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', function(){return FortuneCookie.config.simGCs;}, "FortuneCookie.config.simGCs = Math.round(l('simGCsSlider').value); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
+						WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.setSimGCs(Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
 					  '</div>';
 			
 			CCSE.AppendOptionsMenuString(str);
@@ -331,7 +340,7 @@ FortuneCookie.spellForecast=function(spell){
 	
 	switch(spell.name){
 		case "Force the Hand of Fate":
-			backfire += 0.15 * FortuneCookie.config.simGCs;
+			backfire += 0.15 * FortuneCookie.getSimGCs();
 			
 			spellOutcome += '<table width="100%"><tr>';
 			for(var i = 0; i < 3; i++)

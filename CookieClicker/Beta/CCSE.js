@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.5';
+CCSE.version = '0.6';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){

@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.7';
+CCSE.version = '0.8';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -64,13 +64,33 @@ CCSE.launch = function(){
 		}
 	}
 	
-	CCSE.AppendOptionsMenuString = function(str){
-		var div = document.createElement('div');
-		div.innerHTML = str;
-		CCSE.AppendOptionsMenuDiv(div);
+	CCSE.AppendOptionsMenu = function(inp){
+		// Accepts inputs of either string or div
+		var div;
+		if(typeof inp == 'string'){
+			div = document.createElement('div');
+			div.innerHTML = inp;
+		}
+		else{
+			div = inp;
+		}
+		
+		var menu = l('menu');
+		if(menu){
+			menu = menu.getElementsByClassName('subsection')[0];
+			if(menu){
+				var padding = menu.getElementsByTagName('div');
+				padding = padding[padding.length - 1];
+				if(padding){
+					menu.insertBefore(div, padding);
+				} else {
+					menu.appendChild(div);
+				}
+			}
+		}
 	}
 	
-	CCSE.AppendCollapsibleOptionsMenuString = function(title, str){
+	CCSE.AppendCollapsibleOptionsMenu = function(title, body){
 		var titleDiv = document.createElement('div');
 		titleDiv.className = 'title';
 		titleDiv.textContent = title + ' ';
@@ -93,16 +113,20 @@ CCSE.launch = function(){
 		span.onclick = function(){CCSE.ToggleCollabsibleMenu(title); Game.UpdateMenu();};
 		titleDiv.appendChild(span);
 		
-		var div = document.createElement('div');
-		if(!CCSE.collapseMenu[title]){
-			div.innerHTML = str;
-			div.insertBefore(titleDiv, div.childNodes[0]);
+		var bodyDiv;
+		if(typeof body == 'string'){
+			bodyDiv = document.createElement('div');
+			bodyDiv.innerHTML = body;
 		}
 		else{
-			div.appendChild(titleDiv);
-		}		
+			bodyDiv = body;
+		}
 		
-		CCSE.AppendOptionsMenuDiv(div);
+		var div = document.createElement('div');
+		div.appendChild(titleDiv);
+		if(!CCSE.collapseMenu[title]) div.appendChild(bodyDiv);
+		
+		CCSE.AppendOptionsMenu(div);
 	}
 	
 	CCSE.ToggleCollabsibleMenu = function(title) {
@@ -114,29 +138,17 @@ CCSE.launch = function(){
 		}
 	}
 	
-	CCSE.AppendOptionsMenuDiv = function(div){
-		var menu = l('menu');
-		if(menu){
-			menu = menu.getElementsByClassName('subsection')[0];
-			if(menu){
-				var padding = menu.getElementsByTagName('div');
-				padding = padding[padding.length - 1];
-				if(padding){
-					menu.insertBefore(div, padding);
-				} else {
-					menu.appendChild(div);
-				}
-			}
+	CCSE.AppendStatsGeneral = function(inp){
+		// Accepts inputs of either string or div
+		var div;
+		if(typeof inp == 'string'){
+			div = document.createElement('div');
+			div.innerHTML = inp;
 		}
-	}
-	
-	CCSE.AppendStatsGeneralString = function(str){
-		var div = document.createElement('div');
-		div.innerHTML = str;
-		CCSE.AppendStatsGeneralDiv(div);
-	}
-	
-	CCSE.AppendStatsGeneralDiv = function(div){
+		else{
+			div = inp;
+		}
+		
 		var general;
 		var subsections = l('menu').getElementsByClassName('subsection');
 		
@@ -153,13 +165,17 @@ CCSE.launch = function(){
 		}
 	}
 	
-	CCSE.AppendStatsSpecialString = function(str){
-		var div = document.createElement('div');
-		div.innerHTML = str;
-		CCSE.AppendStatsSpecialDiv(div);
-	}
-	
-	CCSE.AppendStatsSpecialDiv = function(div){
+	CCSE.AppendStatsSpecial = function(inp){
+		// Accepts inputs of either string or div
+		var div;
+		if(typeof inp == 'string'){
+			div = document.createElement('div');
+			div.innerHTML = inp;
+		}
+		else{
+			div = inp;
+		}
+		
 		var special;
 		var subsections = l('menu').getElementsByClassName('subsection');
 		

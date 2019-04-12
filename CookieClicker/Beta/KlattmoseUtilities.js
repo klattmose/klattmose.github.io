@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.2';
+KlattmoseUtilities.version = '2.3';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -190,7 +190,7 @@ KlattmoseUtilities.launch = function(){
 		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
 		
 		Game.customOptionsMenu.push(function(){
-			CCSE.AppendCollapsibleOptionsMenuString(KlattmoseUtilities.name, KlattmoseUtilities.getMenuString());
+			CCSE.AppendCollapsibleOptionsMenu(KlattmoseUtilities.name, KlattmoseUtilities.getMenuString());
 		});
 		
 		Game.customStatsMenu.push(function(){

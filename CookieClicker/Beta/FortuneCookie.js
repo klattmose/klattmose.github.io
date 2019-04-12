@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.4';
+FortuneCookie.version = '2.5';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -80,7 +80,7 @@ FortuneCookie.launch = function(){
 				return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
 			}
 			
-			CCSE.AppendCollapsibleOptionsMenuString(FortuneCookie.name,
+			CCSE.AppendCollapsibleOptionsMenu(FortuneCookie.name,
 				'<div class="listing">' +
 					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
 				'</div>' +

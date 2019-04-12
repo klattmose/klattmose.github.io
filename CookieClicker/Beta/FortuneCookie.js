@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.5';
+FortuneCookie.version = '2.6';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -96,9 +96,6 @@ FortuneCookie.launch = function(){
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		if(!Game.customMinigameOnLoad['Wizard tower']) Game.customMinigameOnLoad['Wizard tower'] = [];
-		
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects['Wizard tower'].minigame;
 			

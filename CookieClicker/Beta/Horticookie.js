@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '2.3';
+Horticookie.version = '2.4';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -1056,9 +1056,6 @@ Horticookie.launch = function(){
 	}
 
 	Horticookie.ReplaceNativeGarden = function() {
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		if(!Game.customMinigameOnLoad['Farm']) Game.customMinigameOnLoad['Farm'] = [];
-		
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Farm"].minigame;
 			

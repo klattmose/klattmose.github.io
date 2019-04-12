@@ -91,6 +91,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.AppendCollapsibleOptionsMenu = function(title, body){
+		// Title must be a string. Body may be either string or div
 		var titleDiv = document.createElement('div');
 		titleDiv.className = 'title';
 		titleDiv.textContent = title + ' ';

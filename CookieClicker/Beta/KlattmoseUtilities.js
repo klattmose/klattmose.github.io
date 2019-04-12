@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.3';
+KlattmoseUtilities.version = '2.4';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -486,9 +486,6 @@ KlattmoseUtilities.launch = function(){
 
 
 	KlattmoseUtilities.ReplaceNativeGarden = function() {
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		if(!Game.customMinigameOnLoad['Farm']) Game.customMinigameOnLoad['Farm'] = [];
-		
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Farm"].minigame;
 			
@@ -908,9 +905,6 @@ KlattmoseUtilities.launch = function(){
 
 
 	KlattmoseUtilities.ReplaceNativePantheon = function() {
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		if(!Game.customMinigameOnLoad['Temple']) Game.customMinigameOnLoad['Temple'] = [];
-		
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Temple"].minigame;
 			
@@ -942,9 +936,6 @@ KlattmoseUtilities.launch = function(){
 
 
 	KlattmoseUtilities.ReplaceNativeGrimoire = function() {
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		if(!Game.customMinigameOnLoad['Wizard tower']) Game.customMinigameOnLoad['Wizard tower'] = [];
-		
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Wizard tower"].minigame;
 			

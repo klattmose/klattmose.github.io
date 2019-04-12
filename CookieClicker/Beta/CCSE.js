@@ -1,30 +1,19 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.8';
+CCSE.version = '0.9';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
-	CCSE.Backup = {};
 	
 	CCSE.init = function(){
-		// Declare a whole mess of new mod hooks
-		if(!Game.customMenu) Game.customMenu = [];
-		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
-		if(!Game.customStatsMenu) Game.customStatsMenu = [];
-		if(!Game.customInfoMenu) Game.customInfoMenu = [];
-		if(!Game.customScriptLoaded) Game.customScriptLoaded = [];
-		
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		for(key in Game.Objects) if(!Game.customMinigameOnLoad[key]) Game.customMinigameOnLoad[key] = [];
-		
+		// Define more parts of CCSE
+		CCSE.Backup = {};
 		CCSE.collapseMenu = {};
-		
+	
 		
 		// Inject the hooks into the main game
-		CCSE.ReplaceNativeMenu();
-		CCSE.ReplaceLoadSave();
-		CCSE.ReplaceScriptLoaded();
+		CCSE.ReplaceMainGame();
 		
 		
 		// Show the version number in Stats
@@ -42,9 +31,16 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
-	Menu functions
+	Do all replacing in one function
+	Also declare hook arrays in the close vicinity of the fucntions they get used in
 	=======================================================================================*/
-	CCSE.ReplaceNativeMenu = function(){
+	CCSE.ReplaceMainGame = function(){
+		// Game.UpdateMenu
+		if(!Game.customMenu) Game.customMenu = [];
+		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
+		if(!Game.customStatsMenu) Game.customStatsMenu = [];
+		if(!Game.customInfoMenu) Game.customInfoMenu = [];
+		
 		CCSE.Backup.UpdateMenu = Game.UpdateMenu;
 		Game.UpdateMenu = function(){
 			CCSE.Backup.UpdateMenu();
@@ -62,8 +58,37 @@ CCSE.launch = function(){
 			// Any that don't want to fit into a label
 			for(var i in Game.customMenu) Game.customMenu[i]();
 		}
+		
+		
+		// Game.LoadSave
+		// I do a check before replacing this one. Game.customLoad is already in the game, just unused
+		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
+			CCSE.Backup.backupLoadSave = Game.LoadSave;
+			Game.LoadSave = function(data){
+				CCSE.Backup.backupLoadSave(data);
+				for(var i in Game.customLoad) Game.customLoad[i]();
+			}
+		}
+		
+		
+		// Game.scriptLoaded
+		if(!Game.customScriptLoaded) Game.customScriptLoaded = [];
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		for(key in Game.Objects) if(!Game.customMinigameOnLoad[key]) Game.customMinigameOnLoad[key] = [];
+		
+		CCSE.Backup.scriptLoaded = Game.scriptLoaded;
+		Game.scriptLoaded = function(who, script) {
+			CCSE.Backup.scriptLoaded(who, script);
+			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
+			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);
+		}
 	}
 	
+	
+	
+	/*=====================================================================================
+	Menu functions
+	=======================================================================================*/
 	CCSE.AppendOptionsMenu = function(inp){
 		// Accepts inputs of either string or div
 		var div;
@@ -229,31 +254,8 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
-	Load Save
-	=======================================================================================*/
-	CCSE.ReplaceLoadSave = function(){
-		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
-			CCSE.Backup.backupLoadSave = Game.LoadSave;
-			Game.LoadSave = function(data){
-				CCSE.Backup.backupLoadSave(data);
-				for(var i in Game.customLoad) Game.customLoad[i](); // This isn't in the original Game.LoadSave
-			}
-		}
-	}
-	
-	
-	/*=====================================================================================
 	Minigames
 	=======================================================================================*/
-	CCSE.ReplaceScriptLoaded = function(){
-		CCSE.Backup.scriptLoaded = Game.scriptLoaded;
-		Game.scriptLoaded = function(who, script) {
-			CCSE.Backup.scriptLoaded(who, script);
-			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
-			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);
-		}
-	}
-	
 	CCSE.MinigameReplacer = function(func, objKey){
 		var me = Game.Objects[objKey];
 		if(me.minigameLoaded) func(me, 'minigameScript-' + me.id);

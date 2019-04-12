@@ -26,21 +26,13 @@ var spell = {
 CCSE.NewSpell('test', spell)
 
 
-
-CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
-	var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
-	Game.PrestigeUpgrades.push(me);
-	
-	me.pool = 'prestige';
-	me.posX = posX;
-	me.posY = posY;
-	
-	me.parents = parents;
-	if(me.parents.length == 0) me.parents = ['Legacy'];
-	me.parents = me.parents || [-1];
-	for(var ii in me.parents){
-		if(me.parents[ii] != -1) me.parents[ii] = Game.Upgrades[me.parents[ii]];
+var output = '';
+var recursiveNaming = function(obj, path){
+	for(var key in obj){
+		var child = obj[key];
+		if(typeof child == 'function') console.log(path + '.' + key);
+		//else if(typeof child == 'object') recursiveNaming(child, path + '.' + key);
 	}
-	
-	return me;
 }
+
+recursiveNaming(Game, 'Game');

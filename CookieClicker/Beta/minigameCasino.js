@@ -750,9 +750,6 @@ M.launch = function(){
 		//***********************************
 		// Only run this part once, regardless of hard resets
 		if(!M.loadedCount){
-			if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
-			if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
-			
 			Game.customOptionsMenu.push(function(){
 				var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
 				var str = '<div class="listing">' +

@@ -186,9 +186,6 @@ KlattmoseUtilities.launch = function(){
 	//    Menu Replacer
 	//***********************************
 	KlattmoseUtilities.ReplaceGameMenu = function(){
-		if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
-		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
-		
 		Game.customOptionsMenu.push(function(){
 			CCSE.AppendCollapsibleOptionsMenu(KlattmoseUtilities.name, KlattmoseUtilities.getMenuString());
 		});

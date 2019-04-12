@@ -1036,9 +1036,6 @@ Horticookie.launch = function(){
 	//    Inject into the main game
 	//***********************************
 	Horticookie.ReplaceMainGame = function(){
-		if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
-		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
-		
 		Game.customOptionsMenu.push(function(){
 			CCSE.AppendCollapsibleOptionsMenu(Horticookie.name, Horticookie.getMenuString());
 		});

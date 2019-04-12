@@ -68,9 +68,6 @@ FortuneCookie.launch = function(){
 	//    Replacement
 	//***********************************
 	FortuneCookie.ReplaceGameMenu = function(){
-		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
-		if(!Game.customStatsMenu) Game.customStatsMenu = [];
-		
 		Game.customOptionsMenu.push(function(){
 			WriteSlider = function(slider, leftText, rightText, startValueFunction, callback, min, max, step){
 				if (!callback) callback = '';

@@ -40,6 +40,7 @@ CCSE.launch = function(){
 		// Doubt it really matters
 		var temp = '';
 		
+		
 		// Game.UpdateMenu
 		if(!Game.customMenu) Game.customMenu = [];
 		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];

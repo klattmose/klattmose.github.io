@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.6';
+FortuneCookie.version = '2.7';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -171,7 +171,7 @@ FortuneCookie.launch = function(){
 	//***********************************
 	//    Grimoire forecast
 	//***********************************
-	FortuneCookie.FateChecker = function(spellCount, idx, backfire){
+	FortuneCookie.FateChecker = function(spellCount, idx, backfire, active){
 		var res = '';
 		var FTHOFcookie = '';
 		Math.seedrandom(Game.seed + '/' + spellCount);
@@ -214,9 +214,9 @@ FortuneCookie.launch = function(){
 		}
 		
 		if(FTHOFcookie == 'Free Sugar Lump') res = '<span style="color:#DAA520;">' + FTHOFcookie + '</span><br/>';
-		return '<td>' + res + '</td>';
+		return '<td' + (active ? ' style="border-left: 2px solid grey;"' : '') + '>' + res + '</td>';
 	}
-
+	
 	FortuneCookie.gamblerFateChecker = function(spellCount, idx, forceTrue){
 		var res = '';
 		Math.seedrandom(Game.seed + '/' + spellCount);
@@ -316,7 +316,7 @@ FortuneCookie.launch = function(){
 				while(spellsCast < target){
 					spellOutcome += '<tr>';
 					for(var i = 0; i < 3; i++)
-						spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire);
+						spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire, false); // Change false to idx == i for an identifier
 					spellOutcome += '</tr>';
 					
 					spellsCast += 1;

@@ -36,3 +36,10 @@ var recursiveNaming = function(obj, path){
 }
 
 recursiveNaming(Game, 'Game');
+
+
+var doubledHC = function(){
+	return 2;
+}
+
+Game.customHeavenlyMultiplier.push(doubledHC);

@@ -4,7 +4,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '2.4';
+M.version = '2.5';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -766,8 +766,9 @@ M.launch = function(){
 			});
 			
 			
-			Game.customLoad.push(function(){
+			Game.customLoad.push(function(ret){
 				M.load(M.saveString);
+				return ret;
 			});
 			Game.customChecks.push(function(){
 				if(M.games.Blackjack.winsT >= 7) Game.Unlock('Raise the stakes');

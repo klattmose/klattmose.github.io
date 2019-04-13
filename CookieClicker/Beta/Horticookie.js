@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '2.4';
+Horticookie.version = '2.5';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -1045,11 +1045,11 @@ Horticookie.launch = function(){
 		});
 		
 		// Set up for Accelerated Garden
-		Horticookie.Backup.randomFloor = randomFloor;
-		randomFloor = function(x){
+		Game.customRandomFloor.push(function(x, ret){
 			if(Horticookie.config.accelGarden) return Math.ceil(x);
-			else return Horticookie.Backup.randomFloor(x);
-		}
+			else return ret;
+		});
+			
 	}
 
 	Horticookie.ReplaceNativeGarden = function() {

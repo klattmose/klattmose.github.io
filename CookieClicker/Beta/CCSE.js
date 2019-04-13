@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.9';
+CCSE.version = '0.11';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -35,16 +35,19 @@ CCSE.launch = function(){
 	Also declare hook arrays in the close vicinity of the fucntions they get used in
 	=======================================================================================*/
 	CCSE.ReplaceMainGame = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		
 		// Game.UpdateMenu
 		if(!Game.customMenu) Game.customMenu = [];
 		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		if(!Game.customInfoMenu) Game.customInfoMenu = [];
 		
-		CCSE.Backup.UpdateMenu = Game.UpdateMenu;
-		Game.UpdateMenu = function(){
-			CCSE.Backup.UpdateMenu();
-			
+		temp = Game.UpdateMenu.toString();
+		eval('Game.UpdateMenu = ' + temp.slice(0, -1) + `
 			if(Game.onMenu == 'prefs'){
 				for(var i in Game.customOptionsMenu) Game.customOptionsMenu[i]();
 			}
@@ -57,16 +60,18 @@ CCSE.launch = function(){
 			
 			// Any that don't want to fit into a label
 			for(var i in Game.customMenu) Game.customMenu[i]();
-		}
+		` + temp.slice(-1));
 		
 		
 		// Game.LoadSave
 		// I do a check before replacing this one. Game.customLoad is already in the game, just unused
+		// Need to do a nesting replace because Game.LoadSave returns a value
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
 			CCSE.Backup.backupLoadSave = Game.LoadSave;
 			Game.LoadSave = function(data){
-				CCSE.Backup.backupLoadSave(data);
-				for(var i in Game.customLoad) Game.customLoad[i]();
+				var ret = CCSE.Backup.backupLoadSave(data);
+				for(var i in Game.customLoad) ret = Game.customLoad[i](ret);
+				return ret;
 			}
 		}
 		
@@ -76,12 +81,46 @@ CCSE.launch = function(){
 		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
 		for(key in Game.Objects) if(!Game.customMinigameOnLoad[key]) Game.customMinigameOnLoad[key] = [];
 		
-		CCSE.Backup.scriptLoaded = Game.scriptLoaded;
-		Game.scriptLoaded = function(who, script) {
-			CCSE.Backup.scriptLoaded(who, script);
+		temp = Game.scriptLoaded.toString();
+		eval('Game.scriptLoaded = ' + temp.slice(0, -1) + `
 			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
 			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);
+		` + temp.slice(-1));
+		
+		
+		// randomFloor
+		if(!Game.customRandomFloor) Game.customRandomFloor = [];
+		CCSE.Backup.randomFloor = randomFloor;
+		randomFloor = function(x){
+			var ret = CCSE.Backup.randomFloor(x);
+			for(var i in Game.customRandomFloor) ret = Game.customRandomFloor[i](x, ret);
+			return ret;
 		}
+		
+		
+		// Beautify
+		if(!Game.customBeautify) Game.customBeautify = [];
+		CCSE.Backup.Beautify = Beautify;
+		Beautify = function(value, floats){
+			var ret = CCSE.Backup.Beautify(value, floats);
+			for(var i in Game.customBeautify) ret = Game.customBeautify[i](value, floats, ret);
+			return ret;
+		}
+		
+		
+		// Tooltips
+		if(!Game.customTooltipDraw) Game.customTooltipDraw = [];
+		temp = Game.tooltip.draw.toString();
+		eval('Game.tooltip.draw = ' + temp.slice(0, -1) + 
+			'\nfor(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin);\n' 
+			+ temp.slice(-1));
+		
+		if(!Game.customTooltipUpdate) Game.customTooltipUpdate = [];
+		temp = Game.tooltip.update.toString();
+		eval('Game.tooltip.update = ' + temp.slice(0, -1) + 
+			'\nfor(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();\n' + 
+			temp.slice(-1));
+		
 	}
 	
 	

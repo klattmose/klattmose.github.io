@@ -43,3 +43,14 @@ var doubledHC = function(){
 }
 
 Game.customHeavenlyMultiplier.push(doubledHC);
+
+Game.customComputeLumpTimes.push(function(){
+	Game.lumpMatureAge /= 2000;
+	Game.lumpRipeAge /= 2000;
+	Game.lumpOverripeAge /= 2000;
+})
+
+
+Game.customCanLumps.push(function(ret){
+	return true;
+})

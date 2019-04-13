@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.12';
+CCSE.version = '0.13';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -32,7 +32,7 @@ CCSE.launch = function(){
 	
 	/*=====================================================================================
 	Do all replacing in one function
-	Also declare hook arrays in the close vicinity of the fucntions they get used in
+	Also declare hook arrays in the close vicinity of the functions they get used in
 	=======================================================================================*/
 	CCSE.ReplaceMainGame = function(){
 		// Temporary variable for storing function strings
@@ -113,19 +113,25 @@ CCSE.launch = function(){
 		}
 		
 		
-		// Tooltips
+		// -----     Tooltips block     ----- //
+		
+		// Game.tooltip.draw
 		if(!Game.customTooltipDraw) Game.customTooltipDraw = [];
 		temp = Game.tooltip.draw.toString();
 		eval('Game.tooltip.draw = ' + temp.slice(0, -1) + 
 			'\nfor(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin);\n' 
 			+ temp.slice(-1));
 		
+		
+		// Game.tooltip.update
 		if(!Game.customTooltipUpdate) Game.customTooltipUpdate = [];
 		temp = Game.tooltip.update.toString();
 		eval('Game.tooltip.update = ' + temp.slice(0, -1) + 
 			'\nfor(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();\n' + 
 			temp.slice(-1));
 		
+		
+		// -----     Ascension block     ----- //
 		
 		// Game.GetHeavenlyMultiplier
 		// Functions should return a value to multiply the heavenlyMult by
@@ -164,6 +170,64 @@ CCSE.launch = function(){
 			for(var i in Game.customUpdateAscend) Game.customUpdateAscend[i](); 
 		` + temp.slice(-1));
 		
+		
+		// -----     Sugar Lumps block     ----- //
+		
+		// Game.computeLumpTimes
+		if(!Game.customComputeLumpTimes) Game.customComputeLumpTimes = [];
+		temp = Game.computeLumpTimes.toString();
+		eval('Game.computeLumpTimes = ' + temp.slice(0, -1) + `
+			for(var i in Game.customComputeLumpTimes) Game.customComputeLumpTimes[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.gainLumps
+		if(!Game.customGainLumps) Game.customGainLumps = [];
+		temp = Game.gainLumps.toString();
+		eval('Game.gainLumps = ' + temp.slice(0, -1) + `
+			for(var i in Game.customGainLumps) Game.customGainLumps[i](total); 
+		` + temp.slice(-1));
+		
+		
+		// Game.clickLump
+		if(!Game.customClickLump) Game.customClickLump = [];
+		temp = Game.clickLump.toString();
+		eval('Game.clickLump = ' + temp.slice(0, -1) + `
+			for(var i in Game.customClickLump) Game.customClickLump[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.harvestLumps
+		// I doubt this is useful. The functions get called after the interesting stuff happens
+		// TODO make a function that eases adding a lump type
+		// Same for Game.computeLumpType. Pointless to make a generic hook
+		if(!Game.customHarvestLumps) Game.customHarvestLumps = [];
+		temp = Game.harvestLumps.toString();
+		eval('Game.harvestLumps = ' + temp.slice(0, -1) + `
+			for(var i in Game.customHarvestLumps) Game.customHarvestLumps[i](amount, silent); 
+		` + temp.slice(-1));
+		
+		
+		// Game.canLumps
+		// Return ret to have no effect
+		if(!Game.customCanLumps) Game.customCanLumps = []; 
+		CCSE.Backup.canLumps = Game.canLumps;
+		Game.canLumps = function(x){
+			var ret = CCSE.Backup.canLumps();
+			for(var i in Game.customCanLumps) ret = Game.customCanLumps[i](ret);
+			return ret;
+		}
+		
+		
+		// Game.getLumpRefillMax
+		// Return ret to have no effect
+		if(!Game.customLumpRefillMax) Game.customLumpRefillMax = []; 
+		CCSE.Backup.getLumpRefillMax = Game.getLumpRefillMax;
+		Game.getLumpRefillMax = function(x){
+			var ret = CCSE.Backup.getLumpRefillMax();
+			for(var i in Game.customLumpRefillMax) ret = Game.customLumpRefillMax[i](ret);
+			return ret;
+		}
 		
 	}
 	

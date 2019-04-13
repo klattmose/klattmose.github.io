@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.11';
+CCSE.version = '0.12';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -39,6 +39,7 @@ CCSE.launch = function(){
 		// Slightly more efficient than nesting functions
 		// Doubt it really matters
 		var temp = '';
+		var pos = 0;
 		
 		
 		// Game.UpdateMenu
@@ -67,10 +68,11 @@ CCSE.launch = function(){
 		// Game.LoadSave
 		// I do a check before replacing this one. Game.customLoad is already in the game, just unused
 		// Need to do a nesting replace because Game.LoadSave returns a value
+		// This value is passed to the custom functions as ret
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
-			CCSE.Backup.backupLoadSave = Game.LoadSave;
+			CCSE.Backup.LoadSave = Game.LoadSave;
 			Game.LoadSave = function(data){
-				var ret = CCSE.Backup.backupLoadSave(data);
+				var ret = CCSE.Backup.LoadSave(data);
 				for(var i in Game.customLoad) ret = Game.customLoad[i](ret);
 				return ret;
 			}
@@ -90,7 +92,8 @@ CCSE.launch = function(){
 		
 		
 		// randomFloor
-		if(!Game.customRandomFloor) Game.customRandomFloor = [];
+		// Return ret to have no effect
+		if(!Game.customRandomFloor) Game.customRandomFloor = []; 
 		CCSE.Backup.randomFloor = randomFloor;
 		randomFloor = function(x){
 			var ret = CCSE.Backup.randomFloor(x);
@@ -100,7 +103,8 @@ CCSE.launch = function(){
 		
 		
 		// Beautify
-		if(!Game.customBeautify) Game.customBeautify = [];
+		// Return ret to have no effect
+		if(!Game.customBeautify) Game.customBeautify = []; 
 		CCSE.Backup.Beautify = Beautify;
 		Beautify = function(value, floats){
 			var ret = CCSE.Backup.Beautify(value, floats);
@@ -121,6 +125,45 @@ CCSE.launch = function(){
 		eval('Game.tooltip.update = ' + temp.slice(0, -1) + 
 			'\nfor(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();\n' + 
 			temp.slice(-1));
+		
+		
+		// Game.GetHeavenlyMultiplier
+		// Functions should return a value to multiply the heavenlyMult by
+		if(!Game.customHeavenlyMultiplier) Game.customHeavenlyMultiplier = []; 
+		temp = Game.GetHeavenlyMultiplier.toString();
+		eval('Game.GetHeavenlyMultiplier = ' + temp.replace('return heavenlyMult;', `
+			for(var i in Game.customHeavenlyMultiplier) heavenlyMult *= Game.customHeavenlyMultiplier[i]();
+			return heavenlyMult;`));
+		
+		
+		// Game.Reincarnate
+		// Only runs when bypass == 1 (i.e. passed the confirmation prompt)
+		if(!Game.customReincarnate) Game.customReincarnate = [];
+		temp = Game.Reincarnate.toString();
+		pos = temp.lastIndexOf('}', temp.length - 2)
+		eval('Game.Reincarnate = ' + temp.slice(0, pos) + `
+				for(var i in Game.customReincarnate) Game.customReincarnate[i]();
+			` + temp.slice(pos));
+		
+		
+		// Game.Ascend
+		// Only runs when bypass == 1 (i.e. passed the confirmation prompt)
+		if(!Game.customAscend) Game.customAscend = [];
+		temp = Game.Ascend.toString();
+		pos = temp.lastIndexOf('}', temp.length - 2)
+		eval('Game.Ascend = ' + temp.slice(0, pos) + `
+				for(var i in Game.customAscend) Game.customAscend[i]();
+			` + temp.slice(pos));
+		
+		
+		// Game.UpdateAscend
+		// Runs every frame while on the Ascension tree
+		if(!Game.customUpdateAscend) Game.customUpdateAscend = [];
+		temp = Game.UpdateAscend.toString();
+		eval('Game.UpdateAscend = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpdateAscend) Game.customUpdateAscend[i](); 
+		` + temp.slice(-1));
+		
 		
 	}
 	

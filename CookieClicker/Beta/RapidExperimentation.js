@@ -54,3 +54,6 @@ Game.customComputeLumpTimes.push(function(){
 Game.customCanLumps.push(function(ret){
 	return true;
 })
+
+
+https://redd.it/bcw40e

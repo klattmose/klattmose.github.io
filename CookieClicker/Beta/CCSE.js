@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.14';
+CCSE.version = '0.15';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -265,6 +265,7 @@ CCSE.launch = function(){
 		
 		// Game.shimmer
 		// Runs when a shimmer (Golden cookie or reindeer) gets created
+		// You can push a function that pops it immediately, but it will mess up any FtHoF predictor you use
 		if(!Game.customShimmer) Game.customShimmer = [];
 		temp = Game.shimmer.toString();
 		proto = Game.shimmer.prototype;
@@ -272,6 +273,98 @@ CCSE.launch = function(){
 			for(var i in Game.customShimmer) Game.customShimmer[i](this); 
 		` + temp.slice(-1));
 		Game.shimmer.prototype = proto;
+		
+		
+		// Game.updateShimmers
+		// Runs every logic frame when shimmers matter
+		if(!Game.customUpdateShimmers) Game.customUpdateShimmers = [];
+		temp = Game.updateShimmers.toString();
+		eval('Game.updateShimmers = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpdateShimmers) Game.customUpdateShimmers[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.killShimmers
+		// Runs when we want to remove all shimmers
+		if(!Game.customKillShimmers) Game.customKillShimmers = [];
+		temp = Game.killShimmers.toString();
+		eval('Game.killShimmers = ' + temp.slice(0, -1) + `
+			for(var i in Game.customKillShimmers) Game.customKillShimmers[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.shimmerTypes
+		// in these, "me" refers to the shimmer itself, and "this" to the shimmer's type object
+		if(!Game.customShimmerTypes) Game.customShimmerTypes = {};
+		CCSE.Backup.customShimmerTypes = {};
+		for(var key in Game.shimmerTypes){
+			if(!Game.customShimmerTypes[key]) Game.customShimmerTypes[key] = {};
+			CCSE.Backup.customShimmerTypes[key] = {};
+			
+			
+			// Game.shimmerTypes[key].initFunc
+			// durationMult functions should return a value to multiply the duration by
+			if(!Game.customShimmerTypes[key].initFunc) Game.customShimmerTypes[key].initFunc = [];
+			if(!Game.customShimmerTypes[key].durationMult) Game.customShimmerTypes[key].durationMult = [];
+			temp = Game.shimmerTypes[key].initFunc.toString();
+			eval('Game.shimmerTypes[key].initFunc = ' + temp.slice(0, -1).replace(
+				'me.dur=dur;', `for(var i in Game.customShimmerTypes['` + key + `'].durationMult) dur *= Game.customShimmerTypes['` + key + `'].durationMult[i](); 
+					me.dur=dur;`) + `
+					for(var i in Game.customShimmerTypes['` + key + `'].initFunc) Game.customShimmerTypes['` + key + `'].initFunc[i]();
+				` + temp.slice(-1));
+			
+			
+			// Game.shimmerTypes[key].updateFunc
+			if(!Game.customShimmerTypes[key].updateFunc) Game.customShimmerTypes[key].updateFunc = [];
+			temp = Game.shimmerTypes[key].updateFunc.toString();
+			eval('Game.shimmerTypes[key].updateFunc = ' + temp.slice(0, -1) + `
+					for(var i in Game.customShimmerTypes['` + key + `'].updateFunc) Game.customShimmerTypes['` + key + `'].updateFunc[i](); 
+				` + temp.slice(-1));
+			
+			
+			// Game.shimmerTypes[key].popFunc
+			if(!Game.customShimmerTypes[key].popFunc) Game.customShimmerTypes[key].popFunc = [];
+			temp = Game.shimmerTypes[key].popFunc.toString();
+			eval('Game.shimmerTypes[key].popFunc = ' + temp.slice(0, -1) + `
+					for(var i in Game.customShimmerTypes['` + key + `'].popFunc) Game.customShimmerTypes['` + key + `'].popFunc[i](); 
+				` + temp.slice(-1));
+			
+			
+			// Game.shimmerTypes[key].spawnConditions
+			// Return ret to have no effect 
+			if(!Game.customShimmerTypes[key].spawnConditions) Game.customShimmerTypes[key].spawnConditions = [];
+			CCSE.Backup.customShimmerTypes[key].spawnConditions = Game.shimmerTypes[key].spawnConditions;
+			eval(`Game.shimmerTypes['` + key + `'].spawnConditions = function(){
+				var ret = CCSE.Backup.customShimmerTypes['` + key + `'].spawnConditions();
+				for(var i in Game.customShimmerTypes['` + key + `'].spawnConditions) ret = Game.customShimmerTypes['` + key + `'].spawnConditions[i](ret);
+				return ret;
+			}`);
+			
+			
+			// Game.shimmerTypes[key].getTimeMod
+			// Functions should return a multiplier to the shimmer's spawn time (higher takes longer to spawn)
+			// Return 1 to have no effect 
+			// These run at the top of the function, before the vanilla code
+			if(!Game.customShimmerTypes[key].getTimeMod) Game.customShimmerTypes[key].getTimeMod = [];
+			temp = Game.shimmerTypes[key].getTimeMod.toString();
+			eval('Game.shimmerTypes[key].getTimeMod = ' + temp.replace('{', `{
+					for(var i in Game.customShimmerTypes['` + key + `'].getTimeMod) m *= Game.customShimmerTypes['` + key + `'].getTimeMod[i](me);`));
+		}
+		
+		
+		// Game.shimmerTypes['golden'].popFunc
+		// customListPush functions should push strings to list
+		// customEffectDurMod functions should return a multiplier to the effect's duration
+		// customMult functions should return a multiplier to the effect's magnitude (for Lucky, Chain Cookie, and Cookie Storm drops)
+		if(!Game.customShimmerTypes['golden'].customListPush) Game.customShimmerTypes['golden'].customListPush = [];
+		if(!Game.customShimmerTypes['golden'].customEffectDurMod) Game.customShimmerTypes['golden'].customEffectDurMod = [];
+		if(!Game.customShimmerTypes['golden'].customMult) Game.customShimmerTypes['golden'].customMult = [];
+		temp = Game.shimmerTypes['golden'].popFunc.toString();
+		eval("Game.shimmerTypes['golden'].popFunc = " + temp.replace('var list=[];', `var list=[];
+					for(var i in Game.customShimmerTypes['golden'].customListPush) Game.customShimmerTypes['golden'].customListPush[i](me, list);`
+			).replace('var buff=0;', `var buff=0;
+					for(var i in Game.customShimmerTypes['golden'].customEffectDurMod) effectDurMod *= Game.customShimmerTypes['golden'].customEffectDurMod[i](me);
+					for(var i in Game.customShimmerTypes['golden'].customMult) mult *= Game.customShimmerTypes['golden'].customMult[i](me);`));
 		
 		
 	}

@@ -43,8 +43,8 @@ recursiveNaming(Game, 'Game');
 var doubledHC = function(){
 	return 2;
 }
-
 Game.customHeavenlyMultiplier.push(doubledHC);
+
 
 Game.customComputeLumpTimes.push(function(){
 	Game.lumpMatureAge /= 2000;
@@ -61,3 +61,21 @@ Game.customCanLumps.push(function(ret){
 Game.customShimmer.push(function(shimmer){
 	setTimeout(shimmer.pop, 10);
 });
+
+
+var tentimes = function(ret){
+	return 10;
+}
+Game.customShimmerTypes['golden'].customEffectDurMod.push(tentimes)
+
+
+var outInit = function(){
+	console.log('shimmer init');
+}
+Game.customShimmerTypes['reindeer'].initFunc.push(outInit)
+
+
+var forceTrue = function(ret){
+	return true;
+}
+Game.customShimmerTypes['reindeer'].spawnConditions.push(forceTrue)

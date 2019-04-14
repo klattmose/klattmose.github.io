@@ -69,8 +69,8 @@ var tentimes = function(ret){
 Game.customShimmerTypes['golden'].customEffectDurMod.push(tentimes)
 
 
-var outInit = function(){
-	console.log('shimmer init');
+var outMsg = function(msg){
+	console.log(msg);
 }
 Game.customShimmerTypes['reindeer'].initFunc.push(outInit)
 
@@ -79,3 +79,12 @@ var forceTrue = function(ret){
 	return true;
 }
 Game.customShimmerTypes['reindeer'].spawnConditions.push(forceTrue)
+
+
+Game.customBuildings['Prism'].buyFree.push(outMsg);
+
+
+var tooltipreplace = function(obj, ret){
+	return '<div style="min-width:350px;padding:8px;">Replaced!</div>';
+}
+Game.customBuildings['Prism'].tooltip.push(tooltipreplace);

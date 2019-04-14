@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.15';
+CCSE.version = '0.16';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -294,61 +294,12 @@ CCSE.launch = function(){
 		
 		
 		// Game.shimmerTypes
-		// in these, "me" refers to the shimmer itself, and "this" to the shimmer's type object
+		// In these, "me" refers to the shimmer itself, and "this" to the shimmer's type object
+		// I put this in a separate function to call them when a new type is defined
 		if(!Game.customShimmerTypes) Game.customShimmerTypes = {};
 		CCSE.Backup.customShimmerTypes = {};
 		for(var key in Game.shimmerTypes){
-			if(!Game.customShimmerTypes[key]) Game.customShimmerTypes[key] = {};
-			CCSE.Backup.customShimmerTypes[key] = {};
-			
-			
-			// Game.shimmerTypes[key].initFunc
-			// durationMult functions should return a value to multiply the duration by
-			if(!Game.customShimmerTypes[key].initFunc) Game.customShimmerTypes[key].initFunc = [];
-			if(!Game.customShimmerTypes[key].durationMult) Game.customShimmerTypes[key].durationMult = [];
-			temp = Game.shimmerTypes[key].initFunc.toString();
-			eval('Game.shimmerTypes[key].initFunc = ' + temp.slice(0, -1).replace(
-				'me.dur=dur;', `for(var i in Game.customShimmerTypes['` + key + `'].durationMult) dur *= Game.customShimmerTypes['` + key + `'].durationMult[i](); 
-					me.dur=dur;`) + `
-					for(var i in Game.customShimmerTypes['` + key + `'].initFunc) Game.customShimmerTypes['` + key + `'].initFunc[i]();
-				` + temp.slice(-1));
-			
-			
-			// Game.shimmerTypes[key].updateFunc
-			if(!Game.customShimmerTypes[key].updateFunc) Game.customShimmerTypes[key].updateFunc = [];
-			temp = Game.shimmerTypes[key].updateFunc.toString();
-			eval('Game.shimmerTypes[key].updateFunc = ' + temp.slice(0, -1) + `
-					for(var i in Game.customShimmerTypes['` + key + `'].updateFunc) Game.customShimmerTypes['` + key + `'].updateFunc[i](); 
-				` + temp.slice(-1));
-			
-			
-			// Game.shimmerTypes[key].popFunc
-			if(!Game.customShimmerTypes[key].popFunc) Game.customShimmerTypes[key].popFunc = [];
-			temp = Game.shimmerTypes[key].popFunc.toString();
-			eval('Game.shimmerTypes[key].popFunc = ' + temp.slice(0, -1) + `
-					for(var i in Game.customShimmerTypes['` + key + `'].popFunc) Game.customShimmerTypes['` + key + `'].popFunc[i](); 
-				` + temp.slice(-1));
-			
-			
-			// Game.shimmerTypes[key].spawnConditions
-			// Return ret to have no effect 
-			if(!Game.customShimmerTypes[key].spawnConditions) Game.customShimmerTypes[key].spawnConditions = [];
-			CCSE.Backup.customShimmerTypes[key].spawnConditions = Game.shimmerTypes[key].spawnConditions;
-			eval(`Game.shimmerTypes['` + key + `'].spawnConditions = function(){
-				var ret = CCSE.Backup.customShimmerTypes['` + key + `'].spawnConditions();
-				for(var i in Game.customShimmerTypes['` + key + `'].spawnConditions) ret = Game.customShimmerTypes['` + key + `'].spawnConditions[i](ret);
-				return ret;
-			}`);
-			
-			
-			// Game.shimmerTypes[key].getTimeMod
-			// Functions should return a multiplier to the shimmer's spawn time (higher takes longer to spawn)
-			// Return 1 to have no effect 
-			// These run at the top of the function, before the vanilla code
-			if(!Game.customShimmerTypes[key].getTimeMod) Game.customShimmerTypes[key].getTimeMod = [];
-			temp = Game.shimmerTypes[key].getTimeMod.toString();
-			eval('Game.shimmerTypes[key].getTimeMod = ' + temp.replace('{', `{
-					for(var i in Game.customShimmerTypes['` + key + `'].getTimeMod) m *= Game.customShimmerTypes['` + key + `'].getTimeMod[i](me);`));
+			CCSE.ReplaceShimmerType(key);
 		}
 		
 		
@@ -367,8 +318,229 @@ CCSE.launch = function(){
 					for(var i in Game.customShimmerTypes['golden'].customMult) mult *= Game.customShimmerTypes['golden'].customMult[i](me);`));
 		
 		
+		// Game.shimmerTypes['reindeer'].popFunc
+		// customDropRateMult should return a multiplier to the fail rate for reindeer drops
+		// Game.customDropRateMult is already taken into account. This is for reindeer specific fucntions
+		// Return 1 to have no effect. Return 0 for a guarantee*
+		if(!Game.customShimmerTypes['reindeer'].customDropRateMult) Game.customShimmerTypes['reindeer'].customDropRateMult = [];
+		temp = Game.shimmerTypes['reindeer'].popFunc.toString();
+		eval("Game.shimmerTypes['reindeer'].popFunc = " + temp.replace('if (Math.random()>failRate)', 
+					`for(var i in Game.customShimmerTypes['reindeer'].customDropRateMult) failRate *= Game.customShimmerTypes['reindeer'].customDropRateMult[i](me);
+					if (Math.random()>failRate)`
+			));
+		
+		
+		// -----     Particles block       ----- //
+		// -----     Notifications block   ----- //
+		// -----     Prompts block         ----- //
+		// -----     Menu block            ----- //
+		// These start to get into the basic appearance of the game, and stray away from the gameplay itself
+		// If someone has an idea they want to try that requires hooks into these functions, I can add them then
+		
+		
+		// -----     Buildings block     ----- //
+		if(!Game.customBuildings) Game.customBuildings = {};
+		CCSE.Backup.customBuildings = {};
+		for(var key in Game.Objects){
+			CCSE.ReplaceBuilding(key);
+		}
+		
 	}
 	
+	CCSE.ReplaceShimmerType = function(key){
+		var temp = '';
+		var pos = 0;
+		var proto;
+		
+		if(!Game.customShimmerTypes[key]) Game.customShimmerTypes[key] = {};
+		CCSE.Backup.customShimmerTypes[key] = {};
+		
+		
+		// Game.shimmerTypes[key].initFunc
+		// durationMult functions should return a value to multiply the duration by
+		if(!Game.customShimmerTypes[key].initFunc) Game.customShimmerTypes[key].initFunc = [];
+		if(!Game.customShimmerTypes[key].durationMult) Game.customShimmerTypes[key].durationMult = [];
+		temp = Game.shimmerTypes[key].initFunc.toString();
+		eval('Game.shimmerTypes[key].initFunc = ' + temp.slice(0, -1).replace(
+			'me.dur=dur;', `for(var i in Game.customShimmerTypes['` + key + `'].durationMult) dur *= Game.customShimmerTypes['` + key + `'].durationMult[i](); 
+					me.dur=dur;`) + `
+					for(var i in Game.customShimmerTypes['` + key + `'].initFunc) Game.customShimmerTypes['` + key + `'].initFunc[i]();
+				` + temp.slice(-1));
+		
+		
+		// Game.shimmerTypes[key].updateFunc
+		if(!Game.customShimmerTypes[key].updateFunc) Game.customShimmerTypes[key].updateFunc = [];
+		temp = Game.shimmerTypes[key].updateFunc.toString();
+		eval('Game.shimmerTypes[key].updateFunc = ' + temp.slice(0, -1) + `
+					for(var i in Game.customShimmerTypes['` + key + `'].updateFunc) Game.customShimmerTypes['` + key + `'].updateFunc[i](); 
+				` + temp.slice(-1));
+		
+		
+		// Game.shimmerTypes[key].popFunc
+		if(!Game.customShimmerTypes[key].popFunc) Game.customShimmerTypes[key].popFunc = [];
+		temp = Game.shimmerTypes[key].popFunc.toString();
+		eval('Game.shimmerTypes[key].popFunc = ' + temp.slice(0, -1) + `
+					for(var i in Game.customShimmerTypes['` + key + `'].popFunc) Game.customShimmerTypes['` + key + `'].popFunc[i](); 
+				` + temp.slice(-1));
+		
+		
+		// Game.shimmerTypes[key].spawnConditions
+		// Return ret to have no effect 
+		if(!Game.customShimmerTypes[key].spawnConditions) Game.customShimmerTypes[key].spawnConditions = [];
+		CCSE.Backup.customShimmerTypes[key].spawnConditions = Game.shimmerTypes[key].spawnConditions;
+		eval(`Game.shimmerTypes['` + key + `'].spawnConditions = function(){
+				var ret = CCSE.Backup.customShimmerTypes['` + key + `'].spawnConditions();
+				for(var i in Game.customShimmerTypes['` + key + `'].spawnConditions) ret = Game.customShimmerTypes['` + key + `'].spawnConditions[i](ret);
+				return ret;
+			}`);
+		
+		
+		// Game.shimmerTypes[key].getTimeMod
+		// Functions should return a multiplier to the shimmer's spawn time (higher takes longer to spawn)
+		// Return 1 to have no effect 
+		// These run at the top of the function, before the vanilla code
+		if(!Game.customShimmerTypes[key].getTimeMod) Game.customShimmerTypes[key].getTimeMod = [];
+		temp = Game.shimmerTypes[key].getTimeMod.toString();
+		eval('Game.shimmerTypes[key].getTimeMod = ' + temp.replace('{', `{
+					for(var i in Game.customShimmerTypes['` + key + `'].getTimeMod) m *= Game.customShimmerTypes['` + key + `'].getTimeMod[i](me);`));
+	}
+	
+	CCSE.ReplaceBuilding = function(key){
+		// A lot of Copy/Paste happened, hence why I did so many functions.
+		// Also, I may not have fully tested each one.
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj = Game.Objects[key];
+		
+		if(!Game.customBuildings[key]) Game.customBuildings[key] = {};
+		CCSE.Backup.customBuildings[key] = {};
+		
+		
+		// this.switchMinigame
+		if(!Game.customBuildings[key].switchMinigame) Game.customBuildings[key].switchMinigame = [];
+		temp = obj.switchMinigame.toString();
+		eval('obj.switchMinigame = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].switchMinigame) Game.customBuildings['` + key + `'].switchMinigame[i](this, on); 
+			` + temp.slice(-1));
+		
+		
+		// this.getSellMultiplier
+		// Return ret to have no effect
+		if(!Game.customBuildings[key].getSellMultiplier) Game.customBuildings[key].getSellMultiplier = [];
+		temp = obj.getSellMultiplier.toString();
+		eval('obj.getSellMultiplier = ' + temp.replace('return', `
+				for(var i in Game.customBuildings['` + key + `'].getSellMultiplier) giveBack = Game.customBuildings['` + key + `'].getSellMultiplier[i](this, giveBack); 
+				return`));
+		
+		
+		// this.buy
+		if(!Game.customBuildings[key].buy) Game.customBuildings[key].buy = [];
+		temp = obj.buy.toString();
+		eval('obj.buy = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].buy) Game.customBuildings['` + key + `'].buy[i](this, amount); 
+			` + temp.slice(-1));
+		
+		
+		// this.sell
+		if(!Game.customBuildings[key].sell) Game.customBuildings[key].sell = [];
+		temp = obj.sell.toString();
+		eval('obj.sell = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].sell) Game.customBuildings['` + key + `'].sell[i](this, amount, bypass); 
+			` + temp.slice(-1));
+		
+		
+		// this.sacrifice
+		if(!Game.customBuildings[key].sacrifice) Game.customBuildings[key].sacrifice = [];
+		temp = obj.sacrifice.toString();
+		eval('obj.sacrifice = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].sacrifice) Game.customBuildings['` + key + `'].sacrifice[i](this, amount); 
+			` + temp.slice(-1));
+		
+		
+		// this.buyFree
+		if(!Game.customBuildings[key].buyFree) Game.customBuildings[key].buyFree = [];
+		temp = obj.buyFree.toString();
+		eval('obj.buyFree = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].buyFree) Game.customBuildings['` + key + `'].buyFree[i](this, amount); 
+			` + temp.slice(-1));
+		
+		
+		// this.getFree
+		if(!Game.customBuildings[key].getFree) Game.customBuildings[key].getFree = [];
+		temp = obj.getFree.toString();
+		eval('obj.getFree = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].getFree) Game.customBuildings['` + key + `'].getFree[i](this, amount); 
+			` + temp.slice(-1));
+		
+		
+		// this.getFreeRanks
+		if(!Game.customBuildings[key].getFreeRanks) Game.customBuildings[key].getFreeRanks = [];
+		temp = obj.getFreeRanks.toString();
+		eval('obj.getFreeRanks = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].getFreeRanks) Game.customBuildings['` + key + `'].getFreeRanks[i](this, amount); 
+			` + temp.slice(-1));
+		
+		
+		// this.tooltip
+		// Return ret to have no effect
+		if(!Game.customBuildings[key].tooltip) Game.customBuildings[key].tooltip = []; 
+		eval('CCSE.Backup.customBuildings[key].tooltip = ' + obj.tooltip.toString().split('this').join("Game.Objects['" + key + "']"));
+		obj.tooltip = function(){
+			var ret = CCSE.Backup.customBuildings[this.name].tooltip();
+			for(var i in Game.customBuildings[this.name].tooltip) ret = Game.customBuildings[this.name].tooltip[i](this, ret);
+			return ret;
+		}
+		
+		
+		// this.levelTooltip
+		// Return ret to have no effect
+		if(!Game.customBuildings[key].levelTooltip) Game.customBuildings[key].levelTooltip = []; 
+		eval('CCSE.Backup.customBuildings[key].levelTooltip = ' + obj.levelTooltip.toString().replace('this', "Game.Objects['" + key + "']"));
+		obj.levelTooltip = function(){
+			var ret = CCSE.Backup.customBuildings[this.name].levelTooltip();
+			for(var i in Game.customBuildings[this.name].levelTooltip) ret = Game.customBuildings[this.name].levelTooltip[i](this, ret);
+			return ret;
+		}
+		
+		
+		// this.levelUp
+		// Haha no. This is like four functions that return each other
+		// I'm not dealing with it unless I have to.
+		
+		
+		// this.refresh
+		if(!Game.customBuildings[key].refresh) Game.customBuildings[key].refresh = [];
+		temp = obj.refresh.toString();
+		eval('obj.refresh = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].refresh) Game.customBuildings['` + key + `'].refresh[i](this); 
+			` + temp.slice(-1));
+		
+		
+		// this.rebuild
+		if(!Game.customBuildings[key].rebuild) Game.customBuildings[key].rebuild = [];
+		temp = obj.rebuild.toString();
+		eval('obj.rebuild = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].rebuild) Game.customBuildings['` + key + `'].rebuild[i](this); 
+			` + temp.slice(-1));
+		
+		
+		// this.mute
+		if(!Game.customBuildings[key].mute) Game.customBuildings[key].mute = [];
+		temp = obj.mute.toString();
+		eval('obj.mute = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].mute) Game.customBuildings['` + key + `'].mute[i](this, val); 
+			` + temp.slice(-1));
+		
+		
+		// this.draw
+		if(!Game.customBuildings[key].draw) Game.customBuildings[key].draw = [];
+		temp = obj.draw.toString();
+		eval('obj.draw = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].draw) Game.customBuildings['` + key + `'].draw[i](this); 
+			` + temp.slice(-1));
+		
+	}
 	
 	
 	/*=====================================================================================

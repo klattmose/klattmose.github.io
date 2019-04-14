@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.13';
+CCSE.version = '0.14';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -40,6 +40,7 @@ CCSE.launch = function(){
 		// Doubt it really matters
 		var temp = '';
 		var pos = 0;
+		var proto;
 		
 		
 		// Game.UpdateMenu
@@ -212,7 +213,7 @@ CCSE.launch = function(){
 		// Return ret to have no effect
 		if(!Game.customCanLumps) Game.customCanLumps = []; 
 		CCSE.Backup.canLumps = Game.canLumps;
-		Game.canLumps = function(x){
+		Game.canLumps = function(){
 			var ret = CCSE.Backup.canLumps();
 			for(var i in Game.customCanLumps) ret = Game.customCanLumps[i](ret);
 			return ret;
@@ -223,11 +224,55 @@ CCSE.launch = function(){
 		// Return ret to have no effect
 		if(!Game.customLumpRefillMax) Game.customLumpRefillMax = []; 
 		CCSE.Backup.getLumpRefillMax = Game.getLumpRefillMax;
-		Game.getLumpRefillMax = function(x){
+		Game.getLumpRefillMax = function(){
 			var ret = CCSE.Backup.getLumpRefillMax();
 			for(var i in Game.customLumpRefillMax) ret = Game.customLumpRefillMax[i](ret);
 			return ret;
 		}
+		
+		
+		// Game.doLumps
+		// Runs every logic frame when lumps matter
+		if(!Game.customDoLumps) Game.customDoLumps = [];
+		temp = Game.doLumps.toString();
+		eval('Game.doLumps = ' + temp.slice(0, -1) + `
+			for(var i in Game.customDoLumps) Game.customDoLumps[i](); 
+		` + temp.slice(-1));
+		
+		
+		// -----     Economics block     ----- //
+		
+		// Game.CalculateGains
+		// I really think this is what he meant it to be
+		// The original just has Game.customCps doing the same thing as Game.customCpsMult
+		//eval('Game.CalculateGains = ' + Game.CalculateGains.toString().replace(
+		//	'for (var i in Game.customCps) {mult*=Game.customCps[i]();}', 
+		//	'for (var i in Game.customCps) {Game.cookiesPs += Game.customCps[i]();}'));
+		
+		
+		// Game.dropRateMult
+		// Return 1 to have no effect
+		if(!Game.customDropRateMult) Game.customDropRateMult = []; 
+		CCSE.Backup.dropRateMult = Game.dropRateMult;
+		Game.dropRateMult = function(){
+			var ret = CCSE.Backup.dropRateMult();
+			for(var i in Game.customDropRateMult) ret *= Game.customDropRateMult[i]();
+			return ret;
+		}
+		
+		
+		// -----     Shimmers block     ----- //
+		
+		// Game.shimmer
+		// Runs when a shimmer (Golden cookie or reindeer) gets created
+		if(!Game.customShimmer) Game.customShimmer = [];
+		temp = Game.shimmer.toString();
+		proto = Game.shimmer.prototype;
+		eval('Game.shimmer = ' + temp.slice(0, -1) + `
+			for(var i in Game.customShimmer) Game.customShimmer[i](this); 
+		` + temp.slice(-1));
+		Game.shimmer.prototype = proto;
+		
 		
 	}
 	

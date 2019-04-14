@@ -7,6 +7,8 @@ if(Date.now() >= new Date(new Date().getFullYear(), 7 - 1, 1) && Date.now() <= n
 	Game.baseSeason = 'american';
 }
 
+https://redd.it/bcw40e
+
 
 
 var spell = {
@@ -55,5 +57,7 @@ Game.customCanLumps.push(function(ret){
 	return true;
 })
 
-
-https://redd.it/bcw40e
+// pops too fast
+Game.customShimmer.push(function(shimmer){
+	setTimeout(shimmer.pop, 10);
+});

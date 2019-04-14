@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.16';
+CCSE.version = '0.17';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -41,6 +41,7 @@ CCSE.launch = function(){
 		var temp = '';
 		var pos = 0;
 		var proto;
+		var obj;
 		
 		
 		// Game.UpdateMenu
@@ -78,18 +79,6 @@ CCSE.launch = function(){
 				return ret;
 			}
 		}
-		
-		
-		// Game.scriptLoaded
-		if(!Game.customScriptLoaded) Game.customScriptLoaded = [];
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		for(key in Game.Objects) if(!Game.customMinigameOnLoad[key]) Game.customMinigameOnLoad[key] = [];
-		
-		temp = Game.scriptLoaded.toString();
-		eval('Game.scriptLoaded = ' + temp.slice(0, -1) + `
-			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
-			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);
-		` + temp.slice(-1));
 		
 		
 		// randomFloor
@@ -345,6 +334,87 @@ CCSE.launch = function(){
 			CCSE.ReplaceBuilding(key);
 		}
 		
+		
+		// Game.DrawBuildings
+		// Runs every draw frame if we're not ascending
+		if(!Game.customDrawBuildings) Game.customDrawBuildings = [];
+		temp = Game.DrawBuildings.toString();
+		eval('Game.DrawBuildings = ' + temp.slice(0, -1) + `
+			for(var i in Game.customDrawBuildings) Game.customDrawBuildings[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.modifyBuildingPrice
+		// Functions should return a value to multiply the price by
+		// Return 1 to have no effect
+		if(!Game.customModifyBuildingPrice) Game.customModifyBuildingPrice = [];
+		temp = Game.modifyBuildingPrice.toString();
+		eval('Game.modifyBuildingPrice = ' + temp.replace('return', `
+			for(var i in Game.customModifyBuildingPrice) price *= Game.customModifyBuildingPrice[i](building, price); 
+			return`));
+		
+		
+		// Game.storeBulkButton
+		if(!Game.customStoreBulkButton) Game.customStoreBulkButton = [];
+		temp = Game.storeBulkButton.toString();
+		eval('Game.storeBulkButton = ' + temp.slice(0, -1) + `
+			for(var i in Game.customStoreBulkButton) Game.customStoreBulkButton[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.RefreshStore
+		if(!Game.customRefreshStore) Game.customRefreshStore = [];
+		temp = Game.RefreshStore.toString();
+		eval('Game.RefreshStore = ' + temp.slice(0, -1) + `
+			for(var i in Game.customRefreshStore) Game.customRefreshStore[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.scriptLoaded
+		if(!Game.customScriptLoaded) Game.customScriptLoaded = [];
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		for(key in Game.Objects) if(!Game.customMinigameOnLoad[key]) Game.customMinigameOnLoad[key] = [];
+		
+		temp = Game.scriptLoaded.toString();
+		eval('Game.scriptLoaded = ' + temp.slice(0, -1) + `
+			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
+			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);
+		` + temp.slice(-1));
+		
+		
+		// -----     Individual Buildings block     ----- //
+		
+		obj = Game.Objects['Cursor'];
+		// Cursor.cps
+		// cpsAdd Functions should return a value to add per non cursor building (Return 0 to have no effect)
+		if(!Game.customBuildings[obj.name].cpsAdd) Game.customBuildings[obj.name].cpsAdd = [];
+		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
+		temp = obj.cps.toString();
+		eval('obj.cps = ' + temp.replace('var mult=1;', `
+			for(var i in Game.customBuildings['` + obj.name + `'].cpsAdd) add += Game.customBuildings['` + obj.name + `'].cpsAdd[i](me);
+			var mult=1;`
+		));
+		
+		
+		obj = Game.Objects['Grandma'];
+		// Grandma.art.pic
+		// Functions should push an image name (sans the .png part) into list
+		if(!Game.customGrandmaPicture) Game.customGrandmaPicture = [];
+		temp = obj.art.pic.toString();
+		eval('obj.art.pic = ' + temp.replace('return', `
+			for(var j in Game.customGrandmaPicture) Game.customGrandmaPicture[j](i, list);
+			return`));
+		
+		
+		// Grandma.cps
+		// cpsAdd Functions should return a value to add before multiplying (Return 0 to have no effect)
+		if(!Game.customBuildings[obj.name].cpsAdd) Game.customBuildings[obj.name].cpsAdd = [];
+		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
+		temp = obj.cps.toString();
+		eval('obj.cps = ' + temp.replace('return', `
+			for(var i in Game.customBuildings['` + obj.name + `'].cpsAdd) add += Game.customBuildings['` + obj.name + `'].cpsAdd[i](me);
+			return`));
+		
 	}
 	
 	CCSE.ReplaceShimmerType = function(key){
@@ -539,6 +609,23 @@ CCSE.launch = function(){
 		eval('obj.draw = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings['` + key + `'].draw) Game.customBuildings['` + key + `'].draw[i](this); 
 			` + temp.slice(-1));
+		
+		
+		// this.buyFunction
+		if(!Game.customBuildings[key].buyFunction) Game.customBuildings[key].buyFunction = [];
+		temp = obj.buyFunction.toString();
+		eval('obj.buyFunction = ' + temp.slice(0, -1) + `
+				for(var i in Game.customBuildings['` + key + `'].buyFunction) Game.customBuildings['` + key + `'].buyFunction[i](this); 
+			` + temp.slice(-1));
+		
+		
+		// this.cps
+		// cpsMult Functions should return a value to multiply the price by (Return 1 to have no effect)
+		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
+		temp = obj.cps.toString();
+		eval('obj.cps = ' + temp.replace('return', `
+			for(var i in Game.customBuildings['` + key + `'].cpsMult) mult *= Game.customBuildings['` + key + `'].cpsMult[i](me);
+			return`));
 		
 	}
 	

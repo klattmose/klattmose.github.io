@@ -63,28 +63,28 @@ Game.customShimmer.push(function(shimmer){
 });
 
 
-var tentimes = function(ret){
+Game.customShimmerTypes['golden'].customEffectDurMod.push(function(ret){
 	return 10;
-}
-Game.customShimmerTypes['golden'].customEffectDurMod.push(tentimes)
+})
+
+
+Game.customShimmerTypes['reindeer'].initFunc.push(outInit)
+
+
+Game.customShimmerTypes['reindeer'].spawnConditions.push(function(ret){
+	return true;
+})
 
 
 var outMsg = function(msg){
 	console.log(msg);
 }
-Game.customShimmerTypes['reindeer'].initFunc.push(outInit)
-
-
-var forceTrue = function(ret){
-	return true;
-}
-Game.customShimmerTypes['reindeer'].spawnConditions.push(forceTrue)
-
-
 Game.customBuildings['Prism'].buyFree.push(outMsg);
 
 
-var tooltipreplace = function(obj, ret){
+Game.customBuildings['Prism'].tooltip.push(function(obj, ret){
 	return '<div style="min-width:350px;padding:8px;">Replaced!</div>';
-}
-Game.customBuildings['Prism'].tooltip.push(tooltipreplace);
+});
+
+
+Game.customBuildings['Cursor'].cpsAdd.push(function(){return 500000000});

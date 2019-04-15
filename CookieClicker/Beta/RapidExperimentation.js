@@ -88,3 +88,10 @@ Game.customBuildings['Prism'].tooltip.push(function(obj, ret){
 
 
 Game.customBuildings['Cursor'].cpsAdd.push(function(){return 500000000});
+
+
+for(var i in Game.Upgrades){
+	var up = Game.Upgrades[i]
+	if(up.buyFunction) console.log(i)
+	if(up.buyFunction) console.log(up.buyFunction.toString())
+}

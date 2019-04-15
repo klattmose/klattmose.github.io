@@ -426,11 +426,25 @@ CCSE.launch = function(){
 		if(!Game.customUpgradesAll.unlock) 		Game.customUpgradesAll.unlock = [];
 		if(!Game.customUpgradesAll.lose) 		Game.customUpgradesAll.lose = [];
 		if(!Game.customUpgradesAll.toggle) 		Game.customUpgradesAll.toggle = [];
+		if(!Game.customUpgradesAll.buyFunction)	Game.customUpgradesAll.buyFunction = [];
+		if(!Game.customUpgradesAll.descFunc)	Game.customUpgradesAll.descFunc = [];
 		
 		if(!Game.customUpgrades) Game.customUpgrades = {};
 		CCSE.Backup.customUpgrades = {};
 		for(var key in Game.Upgrades){
 			CCSE.ReplaceUpgrade(key);
+		}
+		
+		
+		// Correct these descFuncs
+		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
+		for (var i=0;i<slots.length;i++)
+		{
+			CCSE.Backup.customUpgrades[slots[i]].descFunc=function(i){return function(){
+				if (Game.permanentUpgrades[i]==-1) return Game.Upgrades[slots[i]].desc;
+				var upgrade=Game.UpgradesById[Game.permanentUpgrades[i]];
+				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
+			};}(i);
 		}
 		
 		
@@ -538,6 +552,7 @@ CCSE.launch = function(){
 			return`));
 		
 		
+		// -----     Seasons block     ----- //
 	}
 	
 	CCSE.ReplaceShimmerType = function(key){
@@ -838,6 +853,39 @@ CCSE.launch = function(){
 			` + temp.slice(-1));
 		
 		
+		// this.buyFunction
+		if(!Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction = [];
+		Game.customUpgrades[key].buyFunction.push(CCSE.customUpgradesAllbuyFunction);
+		if(upgrade.buyFunction){
+			temp = upgrade.buyFunction.toString();
+			eval('upgrade.buyFunction = ' + temp.slice(0, -1) + `
+				for(var i in Game.customUpgrades['` + escKey + `'].buyFunction) Game.customUpgrades['` + escKey + `'].buyFunction[i](this); 
+			` + temp.slice(-1));
+		}else{
+			upgrade.buyFunction = function(){
+				for(var i in Game.customUpgrades['` + escKey + `'].buyFunction) Game.customUpgrades['` + escKey + `'].buyFunction[i](this);
+			}
+		}
+		
+		
+		// this.descFunc
+		if(!Game.customUpgrades[key].descFunc) Game.customUpgrades[key].descFunc = [];
+		Game.customUpgrades[key].descFunc.push(CCSE.customUpgradesAlldescFunc);
+		if(upgrade.descFunc){
+			eval('CCSE.Backup.customUpgrades[key].descFunc = ' + upgrade.descFunc.toString().split('this.').join("Game.Upgrades['" + escKey + "']."));
+			upgrade.descFunc = function(){
+				var desc = CCSE.Backup.customUpgrades[key].descFunc();
+				for(var i in Game.customUpgrades[key].descFunc) desc = Game.customUpgrades[key].descFunc[i](this, desc);
+				return desc;
+			}
+		}else{
+			upgrade.descFunc = function(){
+				var desc = this.desc;
+				for(var i in Game.customUpgrades[key].descFunc) desc = Game.customUpgrades[key].descFunc[i](this, desc);
+				return desc;
+			}
+		}
+		
 		
 	}
 	
@@ -1094,6 +1142,15 @@ CCSE.launch = function(){
 	
 	CCSE.customUpgradesAlltoggle = function(me){
 		for(var i in Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle[i](me);
+	}
+	
+	CCSE.customUpgradesAllbuyFunction = function(me){
+		for(var i in Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction[i](me);
+	}
+	
+	CCSE.customUpgradesAlldescFunc = function(me, desc){
+		for(var i in Game.customUpgradesAll.descFunc) desc = Game.customUpgradesAll.descFunc[i](me, desc);
+		return desc;
 	}
 	
 	

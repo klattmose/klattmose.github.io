@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.18';
+CCSE.version = '0.19';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -863,7 +863,7 @@ CCSE.launch = function(){
 			` + temp.slice(-1));
 		}else{
 			upgrade.buyFunction = function(){
-				for(var i in Game.customUpgrades['` + escKey + `'].buyFunction) Game.customUpgrades['` + escKey + `'].buyFunction[i](this);
+				for(var i in Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction[i](this);
 			}
 		}
 		

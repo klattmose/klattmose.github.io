@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.8';
+FortuneCookie.version = '2.9';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -77,10 +77,27 @@ FortuneCookie.launch = function(){
 				return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
 			}
 			
+			var writeHeader = function(text) {
+				var div = document.createElement('div');
+				div.className = 'listing';
+				div.style.padding = '5px 16px';
+				div.style.opacity = '0.7';
+				div.style.fontSize = '17px';
+				div.style.fontFamily = '\"Kavoon\", Georgia, serif';
+				div.textContent = text;
+				return div.outerHTML;
+			}
+			
 			CCSE.AppendCollapsibleOptionsMenu(FortuneCookie.name,
 				'<div class="listing">' +
 					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
-				'</div>' +
+				'</div>' + 
+				writeHeader('Force the Hand of Fate') + 
+				'<div class="listing">This spell\'s outcome changes based on the season, if the Golden Chime is on, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
+				'<div class="listing">Column 1 : Golden Chime is Off <b>AND</b> the season is neither Easter nor Valentine\'s.</div>' + 
+				'<div class="listing">Column 2 : Golden Chime is On <b>OR</b> the season is either Easter or Valentine\'s.</div>' + 
+				'<div class="listing">Column 3 : Golden Chime is On <b>AND</b> the season is either Easter or Valentine\'s.</div>' +
+				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
 				'<div class="listing">' +
 					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.setSimGCs(Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
 				'</div>'
@@ -301,7 +318,8 @@ FortuneCookie.launch = function(){
 			case "Force the Hand of Fate":
 				backfire += 0.15 * FortuneCookie.getSimGCs();
 			
-				spellOutcome += '<table width="100%"><tr>';
+				spellOutcome = spellOutcome.replace('<br/>', '<span style="color:yellow;">This spell is a bit complicated. See the Options menu for an explanation.</span><br/>') + 
+					'<table width="100%"><tr>';
 				for(var i = 0; i < 3; i++)
 					spellOutcome += '<td width="33%">' + ((i == idx) ? 'Active' : '') + '</td>';
 				spellOutcome += '</tr><br/>';

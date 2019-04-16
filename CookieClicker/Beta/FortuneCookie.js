@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.7';
+FortuneCookie.version = '2.8';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -110,40 +110,33 @@ FortuneCookie.launch = function(){
 	//    Membrane Forecast
 	//***********************************
 	FortuneCookie.initMembraneForecast = function(){
-		for(var i = 0; i < 3; i++){
-			var me;
-			if(i == 0) me = Game.Upgrades["Shimmering veil"];
-			if(i == 1) me = Game.Upgrades["Shimmering veil [off]"];
-			if(i == 2) me = Game.Upgrades["Shimmering veil [on]"];
+		var descFunc = function(me, desc){
+			var str = desc;
 			
-			if(typeof me.descFunc != 'undefined') me.oldDescFunc = me.descFunc;
-			me.descFunc = function(){
-				var str;
-				if(this.oldDescFunc === undefined) str = this.desc;
-				else str = this.oldDescFunc();
+			if (Game.Has('Reinforced membrane') && FortuneCookie.config.spellForecastLength){
+				var durable = FortuneCookie.forecastMembrane('click', 0);
+				var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
 				
+				str += '<br/><br/>';
+				var durCount = FortuneCookie.countMembraneDurability('click');
+				var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
 				
-				if (Game.Has('Reinforced membrane') && FortuneCookie.config.spellForecastLength){
-					var durable = FortuneCookie.forecastMembrane('click', 0);
-					var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
-					
-					str += '<br/><br/>';
-					var durCount = FortuneCookie.countMembraneDurability('click');
-					var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
-					
-					if(durable)
-						str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-					else
-						str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-					
-					if(golddurable)
-						str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
-					else
-						str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
-				}
-				return str;
+				if(durable)
+					str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				
+				if(golddurable)
+					str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
 			}
+			return str;
 		}
+		
+		Game.customUpgrades['Shimmering veil [off]'].descFunc.push(descFunc);
+		Game.customUpgrades['Shimmering veil [on]'].descFunc.push(descFunc);
+		
 	}
 
 	FortuneCookie.forecastMembrane = function(context, offset){

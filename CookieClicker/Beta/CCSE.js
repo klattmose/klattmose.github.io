@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.19';
+CCSE.version = '0.20';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -553,13 +553,54 @@ CCSE.launch = function(){
 		
 		
 		// -----     Seasons block     ----- //
+		
+		// Game.computeSeasons
+		temp = Game.computeSeasons.toString();
+		eval('Game.computeSeasons = ' + temp.replace("else Game.Notify(str,'',this.icon,4);", `else Game.Notify(str,'',this.icon,4);
+				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);`));
+		
+		
+		// Game.getSeasonDuration
+		// Functions should return a multiplier to the season duration
+		// Return 1 to have no effect
+		if(!Game.customGetSeasonDuration) Game.customGetSeasonDuration = []; 
+		CCSE.Backup.getSeasonDuration =  Game.getSeasonDuration;
+		Game.getSeasonDuration = function(pool){
+			var ret = CCSE.Backup.getSeasonDuration();
+			for(var i in Game.customGetSeasonDuration) ret *= Game.customGetSeasonDuration[i]();
+			return ret;
+		}
+		
+		
+		// -----     Achievements block     ----- //
+		if(!Game.customAchievementsAll) 		Game.customAchievementsAll = {};
+		if(!Game.customAchievementsAll.click) 	Game.customAchievementsAll.click = [];
+		
+		if(!Game.customAchievements) Game.customAchievements = {};
+		CCSE.Backup.customAchievements = {};
+		for(var key in Game.Achievements){
+			CCSE.ReplaceAchievement(key);
+		}
+		
+		
+		// Game.Win
+		if(!Game.customWin) Game.customWin = [];
+		temp = Game.Win.toString();
+		eval('Game.Win = ' + temp.slice(0, -1) + `
+			for(var i in Game.customWin) Game.customWin[i](what); 
+		` + temp.slice(-1));
+		
+		
+		// -----     Buffs block     ----- //
+		
+		
 	}
 	
 	CCSE.ReplaceShimmerType = function(key){
 		var temp = '';
 		var pos = 0;
 		var proto;
-		var escKey = key.replace("'", "\\'");
+		var escKey = key.replace(/'/g, "\\'");
 		
 		if(!Game.customShimmerTypes[key]) Game.customShimmerTypes[key] = {};
 		CCSE.Backup.customShimmerTypes[key] = {};
@@ -620,7 +661,7 @@ CCSE.launch = function(){
 		var temp = '';
 		var pos = 0;
 		var proto;
-		var escKey = key.replace("'", "\\'");
+		var escKey = key.replace(/'/g, "\\'");
 		var obj = Game.Objects[key];
 		
 		if(!Game.customBuildings[key]) Game.customBuildings[key] = {};
@@ -773,7 +814,7 @@ CCSE.launch = function(){
 		var temp = '';
 		var pos = 0;
 		var proto;
-		var escKey = key.replace("'", "\\'");
+		var escKey = key.replace(/'/g, "\\'");
 		var upgrade = Game.Upgrades[key];
 		
 		if(!Game.customUpgrades[key]) Game.customUpgrades[key] = {};
@@ -886,6 +927,27 @@ CCSE.launch = function(){
 			}
 		}
 		
+		
+	}
+	
+	CCSE.ReplaceAchievement = function(key){
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var escKey = key.replace(/'/g, "\\'");
+		var achievement = Game.Achievements[key];
+		
+		if(!Game.customAchievements[key]) Game.customAchievements[key] = {};
+		CCSE.Backup.customAchievements[key] = {};
+		
+		
+		// this.click
+		if(!Game.customAchievements[key].click) Game.customAchievements[key].click = [];
+		Game.customAchievements[key].click.push(CCSE.customAchievementsAllclick);
+		temp = achievement.click.toString();
+		eval('achievement.click = ' + temp.slice(0, -1) + `
+				for(var i in Game.customAchievements['` + escKey + `'].click) Game.customAchievements['` + escKey + `'].click[i](this); 
+			` + temp.slice(-1));
 		
 	}
 	
@@ -1152,6 +1214,11 @@ CCSE.launch = function(){
 		for(var i in Game.customUpgradesAll.descFunc) desc = Game.customUpgradesAll.descFunc[i](me, desc);
 		return desc;
 	}
+	
+	CCSE.customAchievementsAllclick = function(me){
+		for(var i in Game.customAchievementsAll.click) Game.customAchievementsAll.click[i](me);
+	}
+	
 	
 	
 	CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){

@@ -93,10 +93,10 @@ FortuneCookie.launch = function(){
 					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
 				'</div>' + 
 				writeHeader('Force the Hand of Fate') + 
-				'<div class="listing">This spell\'s outcome changes based on the season, if the Golden Chime is on, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
-				'<div class="listing">Column 1 : Golden Chime is Off <b>AND</b> the season is neither Easter nor Valentine\'s.</div>' + 
-				'<div class="listing">Column 2 : Golden Chime is On <b>OR</b> the season is either Easter or Valentine\'s.</div>' + 
-				'<div class="listing">Column 3 : Golden Chime is On <b>AND</b> the season is either Easter or Valentine\'s.</div>' +
+				'<div class="listing">This spell\'s outcome changes based on the season, if the Golden cookie sound selector is on, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
+				'<div class="listing">Column 1 : Golden cookie sound selector is Off <b>AND</b> the season is neither Easter nor Valentine\'s.</div>' + 
+				'<div class="listing">Column 2 : Golden cookie sound selector is On <b>OR</b> the season is either Easter or Valentine\'s.</div>' + 
+				'<div class="listing">Column 3 : Golden cookie sound selector is On <b>AND</b> the season is either Easter or Valentine\'s.</div>' +
 				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
 				'<div class="listing">' +
 					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.setSimGCs(Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+

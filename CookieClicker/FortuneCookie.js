@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.5';
+FortuneCookie.version = '2.9';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -68,9 +68,6 @@ FortuneCookie.launch = function(){
 	//    Replacement
 	//***********************************
 	FortuneCookie.ReplaceGameMenu = function(){
-		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
-		if(!Game.customStatsMenu) Game.customStatsMenu = [];
-		
 		Game.customOptionsMenu.push(function(){
 			WriteSlider = function(slider, leftText, rightText, startValueFunction, callback, min, max, step){
 				if (!callback) callback = '';
@@ -91,7 +88,7 @@ FortuneCookie.launch = function(){
 				return div.outerHTML;
 			}
 			
-			CCSE.AppendCollapsibleOptionsMenuString(FortuneCookie.name,
+			CCSE.AppendCollapsibleOptionsMenu(FortuneCookie.name,
 				'<div class="listing">' +
 					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.setForecastLength((Math.round(l('spellForecastSlider').value))); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
 				'</div>' + 
@@ -113,9 +110,6 @@ FortuneCookie.launch = function(){
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		if(!Game.customMinigameOnLoad['Wizard tower']) Game.customMinigameOnLoad['Wizard tower'] = [];
-		
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects['Wizard tower'].minigame;
 			
@@ -133,40 +127,33 @@ FortuneCookie.launch = function(){
 	//    Membrane Forecast
 	//***********************************
 	FortuneCookie.initMembraneForecast = function(){
-		for(var i = 0; i < 3; i++){
-			var me;
-			if(i == 0) me = Game.Upgrades["Shimmering veil"];
-			if(i == 1) me = Game.Upgrades["Shimmering veil [off]"];
-			if(i == 2) me = Game.Upgrades["Shimmering veil [on]"];
+		var descFunc = function(me, desc){
+			var str = desc;
 			
-			if(typeof me.descFunc != 'undefined') me.oldDescFunc = me.descFunc;
-			me.descFunc = function(){
-				var str;
-				if(this.oldDescFunc === undefined) str = this.desc;
-				else str = this.oldDescFunc();
+			if (Game.Has('Reinforced membrane') && FortuneCookie.config.spellForecastLength){
+				var durable = FortuneCookie.forecastMembrane('click', 0);
+				var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
 				
+				str += '<br/><br/>';
+				var durCount = FortuneCookie.countMembraneDurability('click');
+				var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
 				
-				if (Game.Has('Reinforced membrane') && FortuneCookie.config.spellForecastLength){
-					var durable = FortuneCookie.forecastMembrane('click', 0);
-					var golddurable = FortuneCookie.forecastMembrane('shimmer', 0);
-					
-					str += '<br/><br/>';
-					var durCount = FortuneCookie.countMembraneDurability('click');
-					var golddurCount = FortuneCookie.countMembraneDurability('shimmer');
-					
-					if(durable)
-						str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-					else
-						str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
-					
-					if(golddurable)
-						str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
-					else
-						str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
-				}
-				return str;
+				if(durable)
+					str += '<span class="green">Reinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against cookie clicks (for ' + (durCount==-1?('>'+FortuneCookie.config.spellForecastLength):durCount) + ' click' + (durCount==1?'':'s') + ')</span><br/>';
+				
+				if(golddurable)
+					str += '<span class="green">Reinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
+				else
+					str += '<span class="red">Unreinforced against golden cookie clicks (for ' + (golddurCount==-1?('>'+FortuneCookie.config.spellForecastLength):golddurCount) + ' click' + (golddurCount==1?'':'s') + ')</span><br/>';
 			}
+			return str;
 		}
+		
+		Game.customUpgrades['Shimmering veil [off]'].descFunc.push(descFunc);
+		Game.customUpgrades['Shimmering veil [on]'].descFunc.push(descFunc);
+		
 	}
 
 	FortuneCookie.forecastMembrane = function(context, offset){
@@ -194,7 +181,7 @@ FortuneCookie.launch = function(){
 	//***********************************
 	//    Grimoire forecast
 	//***********************************
-	FortuneCookie.FateChecker = function(spellCount, idx, backfire){
+	FortuneCookie.FateChecker = function(spellCount, idx, backfire, active){
 		var res = '';
 		var FTHOFcookie = '';
 		Math.seedrandom(Game.seed + '/' + spellCount);
@@ -237,9 +224,9 @@ FortuneCookie.launch = function(){
 		}
 		
 		if(FTHOFcookie == 'Free Sugar Lump') res = '<span style="color:#DAA520;">' + FTHOFcookie + '</span><br/>';
-		return '<td>' + res + '</td>';
+		return '<td' + (active ? ' style="border-left: 2px solid grey;"' : '') + '>' + res + '</td>';
 	}
-
+	
 	FortuneCookie.gamblerFateChecker = function(spellCount, idx, forceTrue){
 		var res = '';
 		Math.seedrandom(Game.seed + '/' + spellCount);
@@ -340,7 +327,7 @@ FortuneCookie.launch = function(){
 				while(spellsCast < target){
 					spellOutcome += '<tr>';
 					for(var i = 0; i < 3; i++)
-						spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire);
+						spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire, false); // Change false to idx == i for an identifier
 					spellOutcome += '</tr>';
 					
 					spellsCast += 1;

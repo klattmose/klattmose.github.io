@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '2.2';
+Horticookie.version = '2.5';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -1036,11 +1036,8 @@ Horticookie.launch = function(){
 	//    Inject into the main game
 	//***********************************
 	Horticookie.ReplaceMainGame = function(){
-		if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
-		if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
-		
 		Game.customOptionsMenu.push(function(){
-			CCSE.AppendCollapsibleOptionsMenuString(Horticookie.name, Horticookie.getMenuString());
+			CCSE.AppendCollapsibleOptionsMenu(Horticookie.name, Horticookie.getMenuString());
 		});
 		
 		Game.customStatsMenu.push(function(){
@@ -1048,17 +1045,14 @@ Horticookie.launch = function(){
 		});
 		
 		// Set up for Accelerated Garden
-		Horticookie.Backup.randomFloor = randomFloor;
-		randomFloor = function(x){
+		Game.customRandomFloor.push(function(x, ret){
 			if(Horticookie.config.accelGarden) return Math.ceil(x);
-			else return Horticookie.Backup.randomFloor(x);
-		}
+			else return ret;
+		});
+			
 	}
 
 	Horticookie.ReplaceNativeGarden = function() {
-		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
-		if(!Game.customMinigameOnLoad['Farm']) Game.customMinigameOnLoad['Farm'] = [];
-		
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Farm"].minigame;
 			

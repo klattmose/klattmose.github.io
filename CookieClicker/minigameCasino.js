@@ -4,7 +4,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '2.3';
+M.version = '2.5';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -750,27 +750,25 @@ M.launch = function(){
 		//***********************************
 		// Only run this part once, regardless of hard resets
 		if(!M.loadedCount){
-			if(typeof Game.customOptionsMenu == 'undefined') Game.customOptionsMenu = [];
-			if(typeof Game.customStatsMenu == 'undefined') Game.customStatsMenu = [];
-			
 			Game.customOptionsMenu.push(function(){
 				var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
 				var str = '<div class="listing">' +
 					'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>' + 
 					'This is the time in milliseconds between each card deal.</div>';
 				
-				CCSE.AppendCollapsibleOptionsMenuString(M.name, str);
+				CCSE.AppendCollapsibleOptionsMenu(M.name, str);
 			});
 			
 			Game.customStatsMenu.push(function(){
 				CCSE.AppendStatsVersionNumber(M.name, M.version);
-				if(M.games.Blackjack.netTotal) CCSE.AppendStatsGeneralString('<div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.games.Blackjack.netTotal) + '</div></div>');
-				if(M.games.Blackjack.ownLuckWins) CCSE.AppendStatsSpecialString('<div class="listing"><b>Made your own luck :</b> ' + M.games.Blackjack.ownLuckWins + ' times</div>');
+				if(M.games.Blackjack.netTotal) CCSE.AppendStatsGeneral('<div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.games.Blackjack.netTotal) + '</div></div>');
+				if(M.games.Blackjack.ownLuckWins) CCSE.AppendStatsSpecial('<div class="listing"><b>Made your own luck :</b> ' + M.games.Blackjack.ownLuckWins + ' times</div>');
 			});
 			
 			
-			Game.customLoad.push(function(){
+			Game.customLoad.push(function(ret){
 				M.load(M.saveString);
+				return ret;
 			});
 			Game.customChecks.push(function(){
 				if(M.games.Blackjack.winsT >= 7) Game.Unlock('Raise the stakes');

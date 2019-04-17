@@ -593,6 +593,21 @@ CCSE.launch = function(){
 		
 		// -----     Buffs block     ----- //
 		
+		// Game.gainBuff
+		if(!Game.customGainBuff) Game.customGainBuff = [];
+		temp = Game.gainBuff.toString();
+		eval('Game.gainBuff = ' + temp.replace('return', `
+			for(var i in Game.customGainBuff) Game.customGainBuff[i](buff);
+			return`));
+		
+		
+		// Game.updateBuffs
+		// executed every logic frame
+		if(!Game.customUpdateBuffs) Game.customUpdateBuffs = [];
+		temp = Game.updateBuffs.toString();
+		eval('Game.updateBuffs = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpdateBuffs) Game.customUpdateBuffs[i](); 
+		` + temp.slice(-1));
 		
 	}
 	
@@ -672,7 +687,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].switchMinigame) Game.customBuildings[key].switchMinigame = [];
 		temp = obj.switchMinigame.toString();
 		eval('obj.switchMinigame = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].switchMinigame) Game.customBuildings['` + escKey + `'].switchMinigame[i](this, on); 
+				for(var i in Game.customBuildings[this.name].switchMinigame) Game.customBuildings[this.name].switchMinigame[i](this, on); 
 			` + temp.slice(-1));
 		
 		
@@ -681,7 +696,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].getSellMultiplier) Game.customBuildings[key].getSellMultiplier = [];
 		temp = obj.getSellMultiplier.toString();
 		eval('obj.getSellMultiplier = ' + temp.replace('return', `
-				for(var i in Game.customBuildings['` + escKey + `'].getSellMultiplier) giveBack = Game.customBuildings['` + escKey + `'].getSellMultiplier[i](this, giveBack); 
+				for(var i in Game.customBuildings[this.name].getSellMultiplier) giveBack = Game.customBuildings[this.name].getSellMultiplier[i](this, giveBack); 
 				return`));
 		
 		
@@ -689,7 +704,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].buy) Game.customBuildings[key].buy = [];
 		temp = obj.buy.toString();
 		eval('obj.buy = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].buy) Game.customBuildings['` + escKey + `'].buy[i](this, amount); 
+				for(var i in Game.customBuildings[this.name].buy) Game.customBuildings[this.name].buy[i](this, amount); 
 			` + temp.slice(-1));
 		
 		
@@ -697,7 +712,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].sell) Game.customBuildings[key].sell = [];
 		temp = obj.sell.toString();
 		eval('obj.sell = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].sell) Game.customBuildings['` + escKey + `'].sell[i](this, amount, bypass); 
+				for(var i in Game.customBuildings[this.name].sell) Game.customBuildings[this.name].sell[i](this, amount, bypass); 
 			` + temp.slice(-1));
 		
 		
@@ -705,7 +720,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].sacrifice) Game.customBuildings[key].sacrifice = [];
 		temp = obj.sacrifice.toString();
 		eval('obj.sacrifice = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].sacrifice) Game.customBuildings['` + escKey + `'].sacrifice[i](this, amount); 
+				for(var i in Game.customBuildings[this.name].sacrifice) Game.customBuildings[this.name].sacrifice[i](this, amount); 
 			` + temp.slice(-1));
 		
 		
@@ -713,7 +728,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].buyFree) Game.customBuildings[key].buyFree = [];
 		temp = obj.buyFree.toString();
 		eval('obj.buyFree = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].buyFree) Game.customBuildings['` + escKey + `'].buyFree[i](this, amount); 
+				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount); 
 			` + temp.slice(-1));
 		
 		
@@ -721,7 +736,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].getFree) Game.customBuildings[key].getFree = [];
 		temp = obj.getFree.toString();
 		eval('obj.getFree = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].getFree) Game.customBuildings['` + escKey + `'].getFree[i](this, amount); 
+				for(var i in Game.customBuildings[this.name].getFree) Game.customBuildings[this.name].getFree[i](this, amount); 
 			` + temp.slice(-1));
 		
 		
@@ -729,7 +744,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].getFreeRanks) Game.customBuildings[key].getFreeRanks = [];
 		temp = obj.getFreeRanks.toString();
 		eval('obj.getFreeRanks = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].getFreeRanks) Game.customBuildings['` + escKey + `'].getFreeRanks[i](this, amount); 
+				for(var i in Game.customBuildings[this.name].getFreeRanks) Game.customBuildings[this.name].getFreeRanks[i](this, amount); 
 			` + temp.slice(-1));
 		
 		
@@ -764,7 +779,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].refresh) Game.customBuildings[key].refresh = [];
 		temp = obj.refresh.toString();
 		eval('obj.refresh = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].refresh) Game.customBuildings['` + escKey + `'].refresh[i](this); 
+				for(var i in Game.customBuildings[this.name].refresh) Game.customBuildings[this.name].refresh[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -772,7 +787,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].rebuild) Game.customBuildings[key].rebuild = [];
 		temp = obj.rebuild.toString();
 		eval('obj.rebuild = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].rebuild) Game.customBuildings['` + escKey + `'].rebuild[i](this); 
+				for(var i in Game.customBuildings[this.name].rebuild) Game.customBuildings[this.name].rebuild[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -780,7 +795,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].mute) Game.customBuildings[key].mute = [];
 		temp = obj.mute.toString();
 		eval('obj.mute = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].mute) Game.customBuildings['` + escKey + `'].mute[i](this, val); 
+				for(var i in Game.customBuildings[this.name].mute) Game.customBuildings[this.name].mute[i](this, val); 
 			` + temp.slice(-1));
 		
 		
@@ -788,7 +803,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].draw) Game.customBuildings[key].draw = [];
 		temp = obj.draw.toString();
 		eval('obj.draw = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].draw) Game.customBuildings['` + escKey + `'].draw[i](this); 
+				for(var i in Game.customBuildings[this.name].draw) Game.customBuildings[this.name].draw[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -796,7 +811,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].buyFunction) Game.customBuildings[key].buyFunction = [];
 		temp = obj.buyFunction.toString();
 		eval('obj.buyFunction = ' + temp.slice(0, -1) + `
-				for(var i in Game.customBuildings['` + escKey + `'].buyFunction) Game.customBuildings['` + escKey + `'].buyFunction[i](this); 
+				for(var i in Game.customBuildings[this.name].buyFunction) Game.customBuildings[this.name].buyFunction[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -805,7 +820,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
 		temp = obj.cps.toString();
 		eval('obj.cps = ' + temp.replace('return', `
-			for(var i in Game.customBuildings['` + escKey + `'].cpsMult) mult *= Game.customBuildings['` + escKey + `'].cpsMult[i](me);
+			for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);
 			return`));
 		
 	}
@@ -827,7 +842,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].getPrice.push(CCSE.customUpgradesAllgetPrice);
 		temp = upgrade.getPrice.toString();
 		eval('upgrade.getPrice = ' + temp.replace('return Math', `
-			for(var i in Game.customUpgrades['` + escKey + `'].getPrice) price *= Game.customUpgrades['` + escKey + `'].getPrice[i](this);
+			for(var i in Game.customUpgrades[this.name].getPrice) price *= Game.customUpgrades[this.name].getPrice[i](this);
 			return Math`));
 		
 		
@@ -836,7 +851,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].click.push(CCSE.customUpgradesAllclick);
 		temp = upgrade.click.toString();
 		eval('upgrade.click = ' + temp.slice(0, -1) + `
-				for(var i in Game.customUpgrades['` + escKey + `'].click) Game.customUpgrades['` + escKey + `'].click[i](this, e); 
+				for(var i in Game.customUpgrades[this.name].click) Game.customUpgrades[this.name].click[i](this, e); 
 			` + temp.slice(-1));
 		
 		
@@ -845,7 +860,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].buy.push(CCSE.customUpgradesAllbuy);
 		temp = upgrade.buy.toString();
 		eval('upgrade.buy = ' + temp.replace('return', `
-			for(var i in Game.customUpgrades['` + escKey + `'].buy) Game.customUpgrades['` + escKey + `'].buy[i](this, bypass, success);
+			for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);
 			return`));
 		
 		
@@ -854,7 +869,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].earn.push(CCSE.customUpgradesAllearn);
 		temp = upgrade.earn.toString();
 		eval('upgrade.earn = ' + temp.slice(0, -1) + `
-				for(var i in Game.customUpgrades['` + escKey + `'].earn) Game.customUpgrades['` + escKey + `'].earn[i](this); 
+				for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -863,7 +878,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].unearn.push(CCSE.customUpgradesAllunearn);
 		temp = upgrade.unearn.toString();
 		eval('upgrade.unearn = ' + temp.slice(0, -1) + `
-				for(var i in Game.customUpgrades['` + escKey + `'].unearn) Game.customUpgrades['` + escKey + `'].unearn[i](this); 
+				for(var i in Game.customUpgrades[this.name].unearn) Game.customUpgrades[this.name].unearn[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -872,7 +887,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].unlock.push(CCSE.customUpgradesAllunlock);
 		temp = upgrade.unlock.toString();
 		eval('upgrade.unlock = ' + temp.slice(0, -1) + `
-				for(var i in Game.customUpgrades['` + escKey + `'].unlock) Game.customUpgrades['` + escKey + `'].unlock[i](this); 
+				for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -881,7 +896,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].lose.push(CCSE.customUpgradesAlllose);
 		temp = upgrade.lose.toString();
 		eval('upgrade.lose = ' + temp.slice(0, -1) + `
-				for(var i in Game.customUpgrades['` + escKey + `'].lose) Game.customUpgrades['` + escKey + `'].lose[i](this); 
+				for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -890,7 +905,7 @@ CCSE.launch = function(){
 		Game.customUpgrades[key].toggle.push(CCSE.customUpgradesAlltoggle);
 		temp = upgrade.toggle.toString();
 		eval('upgrade.toggle = ' + temp.slice(0, -1) + `
-				for(var i in Game.customUpgrades['` + escKey + `'].toggle) Game.customUpgrades['` + escKey + `'].toggle[i](this); 
+				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this); 
 			` + temp.slice(-1));
 		
 		
@@ -900,11 +915,11 @@ CCSE.launch = function(){
 		if(upgrade.buyFunction){
 			temp = upgrade.buyFunction.toString();
 			eval('upgrade.buyFunction = ' + temp.slice(0, -1) + `
-				for(var i in Game.customUpgrades['` + escKey + `'].buyFunction) Game.customUpgrades['` + escKey + `'].buyFunction[i](this); 
+				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this); 
 			` + temp.slice(-1));
 		}else{
 			upgrade.buyFunction = function(){
-				for(var i in Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction[i](this);
+				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
 			}
 		}
 		
@@ -915,14 +930,14 @@ CCSE.launch = function(){
 		if(upgrade.descFunc){
 			eval('CCSE.Backup.customUpgrades[key].descFunc = ' + upgrade.descFunc.toString().split('this.').join("Game.Upgrades['" + escKey + "']."));
 			upgrade.descFunc = function(){
-				var desc = CCSE.Backup.customUpgrades[key].descFunc();
-				for(var i in Game.customUpgrades[key].descFunc) desc = Game.customUpgrades[key].descFunc[i](this, desc);
+				var desc = CCSE.Backup.customUpgrades[this.name].descFunc();
+				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
 				return desc;
 			}
 		}else{
 			upgrade.descFunc = function(){
 				var desc = this.desc;
-				for(var i in Game.customUpgrades[key].descFunc) desc = Game.customUpgrades[key].descFunc[i](this, desc);
+				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
 				return desc;
 			}
 		}
@@ -946,7 +961,7 @@ CCSE.launch = function(){
 		Game.customAchievements[key].click.push(CCSE.customAchievementsAllclick);
 		temp = achievement.click.toString();
 		eval('achievement.click = ' + temp.slice(0, -1) + `
-				for(var i in Game.customAchievements['` + escKey + `'].click) Game.customAchievements['` + escKey + `'].click[i](this); 
+				for(var i in Game.customAchievements[this.name].click) Game.customAchievements[this.name].click[i](this); 
 			` + temp.slice(-1));
 		
 	}

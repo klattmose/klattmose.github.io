@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.4';
+KlattmoseUtilities.version = '2.5';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -35,7 +35,15 @@ KlattmoseUtilities.launch = function(){
 			  "script": "Game.ShowMenu('log');"
 			},
 			{
-			  "keyCode": 49,
+			  "keyCode": 116,
+			  "nickname": "Quicksave",
+			  "ctrl": false,
+			  "shift": false,
+			  "alt": false,
+			  "script": "Game.WriteSave();"
+			},
+			{
+			  "keyCode": 120,
 			  "nickname": "Quickload",
 			  "ctrl": false,
 			  "shift": false,
@@ -414,6 +422,8 @@ KlattmoseUtilities.launch = function(){
 
 	KlattmoseUtilities.keydown = function(e){
 		if(KlattmoseUtilities.waitingForInput){
+			e.preventDefault();
+			
 			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
 			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
 			KlattmoseUtilities.tempHotkey.alt = e.altKey;
@@ -431,6 +441,8 @@ KlattmoseUtilities.launch = function(){
 				var hotkey = KlattmoseUtilities.config.hotkeys[i];
 				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))
 				{
+					e.preventDefault();
+					
 					if(hotkey.period === undefined){
 						hotkey.function();
 					}else{
@@ -453,6 +465,8 @@ KlattmoseUtilities.launch = function(){
 
 	KlattmoseUtilities.keyup = function(e){
 		if(KlattmoseUtilities.waitingForInput){
+			e.preventDefault();
+			
 			KlattmoseUtilities.tempHotkey.ctrl = e.ctrlKey;
 			KlattmoseUtilities.tempHotkey.shift = e.shiftKey;
 			KlattmoseUtilities.tempHotkey.alt = e.altKey;

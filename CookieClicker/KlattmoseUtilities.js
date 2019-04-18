@@ -35,14 +35,6 @@ KlattmoseUtilities.launch = function(){
 			  "script": "Game.ShowMenu('log');"
 			},
 			{
-			  "keyCode": 116,
-			  "nickname": "Quicksave",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "Game.WriteSave();"
-			},
-			{
 			  "keyCode": 120,
 			  "nickname": "Quickload",
 			  "ctrl": false,

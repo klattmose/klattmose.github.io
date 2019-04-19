@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.22';
+CCSE.version = '0.23';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -101,6 +101,12 @@ CCSE.launch = function(){
 			for(var i in Game.customBeautify) ret = Game.customBeautify[i](value, floats, ret);
 			return ret;
 		}
+		
+		
+		// Game.Loader.Load
+		temp = Game.Loader.Load.toString();
+		eval('Game.Loader.Load = ' + temp.replace('img.src=this.domain', 
+			"img.src=(assets[i].indexOf('http')>=0?'':this.domain)"));
 		
 		
 		// -----     Tooltips block     ----- //

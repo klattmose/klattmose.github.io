@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.24';
+CCSE.version = '0.25';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -823,13 +823,13 @@ CCSE.launch = function(){
 		
 		
 		// Game.DrawSpecial
-		// customDrawSpecialPic functions should return an object with children pic and frame (Return picframe for no effect)
+		// customDrawSpecialPic functions should alter the picframe object
 		// Pics are 96px by 96px
 		if(!Game.customDrawSpecialPic) Game.customDrawSpecialPic = [];
 		temp = Game.DrawSpecial.toString();
 		eval('Game.DrawSpecial = ' + temp.replace("if (hovered || selected)", 
 				`var picframe = {pic:pic, frame:frame};
-				for(var j in Game.customDrawSpecialPic) picframe = Game.customDrawSpecialPic[j](picframe, Game.specialTabs[i]);
+				for(var j in Game.customDrawSpecialPic) Game.customDrawSpecialPic[j](picframe, Game.specialTabs[i]);
 				pic = picframe.pic; frame = picframe.frame;
 				if (hovered || selected)`));
 		

@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.21';
+CCSE.version = '0.22';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -742,6 +742,91 @@ CCSE.launch = function(){
 		eval('Game.LoadWrinklers = ' + temp.slice(0, -1) + `
 			for(var i in Game.customLoadWrinklers) Game.customLoadWrinklers[i](amount, number, shinies, amountShinies); 
 		` + temp.slice(-1));
+		
+		
+		// -----     Special things and stuff block     ----- //
+		
+		// Game.UpdateSpecial
+		// customSpecialTabs functions should push a string to Game.specialTabs (or not)
+		if(!Game.customSpecialTabs) Game.customSpecialTabs = [];
+		temp = Game.UpdateSpecial.toString();
+		eval('Game.UpdateSpecial = ' + temp.replace('if (Game.specialTabs.length==0)', 
+			`for(var i in Game.customSpecialTabs) Game.customSpecialTabs[i]();
+			if (Game.specialTabs.length==0)`));
+		
+		
+		// Game.UpgradeSanta
+		if(!Game.customUpgradeSanta) Game.customUpgradeSanta = [];
+		temp = Game.UpgradeSanta.toString();
+		eval('Game.UpgradeSanta = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpgradeSanta) Game.customUpgradeSanta[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.hasAura
+		// Return ret to have no effect
+		if(!Game.customHasAura) Game.customHasAura = [];
+		CCSE.Backup.hasAura = Game.hasAura;
+		Game.hasAura = function(what){
+			var ret = CCSE.Backup.hasAura(what);
+			for(var i in Game.customHasAura) ret = Game.customHasAura[i](what, ret);
+			return ret;
+		}
+		
+		
+		// Game.SelectDragonAura
+		// Actually no. This function is not conducive to customization. Seems like 2 auras is all we get.
+		// customCurrentDragonAura functions should return an array index for currentAura (Return currentAura to do nothing)
+		// customDragonAuraShow functions should return 1 to show that aura in the picker, 0 to not (Return show to do nothing)
+		/*if(!Game.customCurrentDragonAura) Game.customCurrentDragonAura = [];
+		if(!Game.customDragonAuraShow) Game.customDragonAuraShow = [];
+		temp = Game.SelectDragonAura.toString();
+		eval('Game.SelectDragonAura = ' + temp.replace('if (!update)', 
+			`for(var i in Game.customCurrentDragonAura) currentAura = Game.customCurrentDragonAura[i](slot, update, currentAura);
+			if (!update)`).replace('if (i==0 || i!=otherAura)', 
+					`var show = (i==0 || i!=otherAura);
+					for(var i in Game.customDragonAuraShow) show = Game.customDragonAuraShow[i](slot, update, i, show);
+					if (show)`));*/
+		
+		
+		// Game.DescribeDragonAura
+		if(!Game.customDescribeDragonAura) Game.customDescribeDragonAura = [];
+		temp = Game.DescribeDragonAura.toString();
+		eval('Game.DescribeDragonAura = ' + temp.slice(0, -1) + `
+			for(var i in Game.customDescribeDragonAura) Game.customDescribeDragonAura[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.UpgradeDragon
+		if(!Game.customUpgradeDragon) Game.customUpgradeDragon = [];
+		temp = Game.UpgradeDragon.toString();
+		eval('Game.UpgradeDragon = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpgradeDragon) Game.customUpgradeDragon[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.ToggleSpecialMenu
+		// customToggleSpecialMenu functions should return a string for l('specialPopup').innerHTML (Return str for no effect)
+		// str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', <your pic here>)
+		// Pics are 96px by 96px
+		if(!Game.customToggleSpecialMenu) Game.customToggleSpecialMenu = [];
+		temp = Game.ToggleSpecialMenu.toString();
+		eval('Game.ToggleSpecialMenu = ' + temp.replace("l('specialPopup').innerHTML=str;", 
+				`for(var i in Game.customToggleSpecialMenu) str = Game.customToggleSpecialMenu[i](str);
+				l('specialPopup').innerHTML=str;`));
+		
+		
+		// Game.DrawSpecial
+		// customDrawSpecialPic functions should return a url for pic (Return pic for no effect)
+		// customDrawSpecialFrame functions should return value for frame (Return frame for no effect)
+		// Pics are 96px by 96px
+		if(!Game.customDrawSpecialPic) Game.customDrawSpecialPic = [];
+		if(!Game.customDrawSpecialFrame) Game.customDrawSpecialFrame = [];
+		temp = Game.DrawSpecial.toString();
+		eval('Game.DrawSpecial = ' + temp.replace("if (hovered || selected)", 
+				`for(var i in Game.customDrawSpecialPic) pic = Game.customDrawSpecialPic[i](pic, Game.specialTabs[i]);
+				for(var i in Game.customDrawSpecialFrame) frame = Game.customDrawSpecialFrame[i](frame, Game.specialTabs[i]);
+				if (hovered || selected)`));
 		
 		
 	}

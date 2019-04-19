@@ -823,15 +823,14 @@ CCSE.launch = function(){
 		
 		
 		// Game.DrawSpecial
-		// customDrawSpecialPic functions should return a url for pic (Return pic for no effect)
-		// customDrawSpecialFrame functions should return value for frame (Return frame for no effect)
+		// customDrawSpecialPic functions should return an object with children pic and frame (Return picframe for no effect)
 		// Pics are 96px by 96px
 		if(!Game.customDrawSpecialPic) Game.customDrawSpecialPic = [];
-		if(!Game.customDrawSpecialFrame) Game.customDrawSpecialFrame = [];
 		temp = Game.DrawSpecial.toString();
 		eval('Game.DrawSpecial = ' + temp.replace("if (hovered || selected)", 
-				`for(var i in Game.customDrawSpecialPic) pic = Game.customDrawSpecialPic[i](pic, Game.specialTabs[i]);
-				for(var i in Game.customDrawSpecialFrame) frame = Game.customDrawSpecialFrame[i](frame, Game.specialTabs[i]);
+				`var picframe = {pic:pic, frame:frame};
+				for(var i in Game.customDrawSpecialPic) picframe = Game.customDrawSpecialPic[i](picframe, Game.specialTabs[i]);
+				pic = picframe.pic; frame = picframe.frame;
 				if (hovered || selected)`));
 		
 		

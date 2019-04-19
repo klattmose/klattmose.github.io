@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.23';
+CCSE.version = '0.24';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -829,7 +829,7 @@ CCSE.launch = function(){
 		temp = Game.DrawSpecial.toString();
 		eval('Game.DrawSpecial = ' + temp.replace("if (hovered || selected)", 
 				`var picframe = {pic:pic, frame:frame};
-				for(var i in Game.customDrawSpecialPic) picframe = Game.customDrawSpecialPic[i](picframe, Game.specialTabs[i]);
+				for(var j in Game.customDrawSpecialPic) picframe = Game.customDrawSpecialPic[j](picframe, Game.specialTabs[i]);
 				pic = picframe.pic; frame = picframe.frame;
 				if (hovered || selected)`));
 		

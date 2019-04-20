@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.26';
+CCSE.version = '0.27';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -289,6 +289,44 @@ CCSE.launch = function(){
 		
 		
 		// Game.shimmerTypes
+		if(!Game.customShimmerTypesAll) Game.customShimmerTypesAll = {};
+		
+		if(!Game.customShimmerTypesAll.initFunc) Game.customShimmerTypesAll.initFunc = [];
+		CCSE.customShimmerTypesAllinitFunc = function(){
+			for(var i in Game.customShimmerTypesAll.initFunc) Game.customShimmerTypesAll.initFunc[i]();
+		}
+		
+		if(!Game.customShimmerTypesAll.durationMult) Game.customShimmerTypesAll.durationMult = [];
+		CCSE.customShimmerTypesAlldurationMult = function(){
+			var dur = 1;
+			for(var i in Game.customShimmerTypesAll.durationMult) dur *= Game.customShimmerTypesAll.durationMult[i]();
+			return dur;
+		}
+		
+		if(!Game.customShimmerTypesAll.updateFunc) Game.customShimmerTypesAll.updateFunc = [];
+		CCSE.customShimmerTypesAllupdateFunc = function(){
+			for(var i in Game.customShimmerTypesAll.updateFunc) Game.customShimmerTypesAll.updateFunc[i]();
+		}
+		
+		if(!Game.customShimmerTypesAll.popFunc) Game.customShimmerTypesAll.popFunc = [];
+		CCSE.customShimmerTypesAllpopFunc = function(){
+			for(var i in Game.customShimmerTypesAll.popFunc) Game.customShimmerTypesAll.popFunc[i]();
+		}
+		
+		if(!Game.customShimmerTypesAll.spawnConditions) Game.customShimmerTypesAll.spawnConditions = [];
+		CCSE.customShimmerTypesAllspawnConditions = function(ret){
+			for(var i in Game.customShimmerTypesAll.spawnConditions) ret = Game.customShimmerTypesAll.spawnConditions[i](ret);
+			return ret;
+		}
+		
+		if(!Game.customShimmerTypesAll.getTimeMod) Game.customShimmerTypesAll.getTimeMod = [];
+		CCSE.customShimmerTypesAllgetTimeMod = function(me){
+			var m = 1;
+			for(var i in Game.customShimmerTypesAll.getTimeMod) m *= Game.customShimmerTypesAll.getTimeMod[i](me);
+			return m;
+		}
+		
+		
 		// In these, "me" refers to the shimmer itself, and "this" to the shimmer's type object
 		// I put this in a separate function to call them when a new type is defined
 		if(!Game.customShimmerTypes) Game.customShimmerTypes = {};
@@ -837,6 +875,29 @@ CCSE.launch = function(){
 		` + temp.slice(-1));
 		
 		
+		// -----     Visual Effects block     ----- //
+		
+		// Game.DrawBackground
+		// Game.customDrawBackground functions get called in the same block that creates the cookie rain and seasonal backgrounds 
+		// If you want a hook somewhere else, let me know
+		if(!Game.customDrawBackground) Game.customDrawBackground = [];
+		temp = Game.DrawBackground.toString();
+		eval('Game.DrawBackground = ' + temp.replace("Timer.track('left background');", 
+				`for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();
+				Timer.track('left background');`));
+		
+		
+		// -----     Debug block     ----- //
+		
+		// Game.OpenSesame
+		// Game.customOpenSesame functions should add HTML strings to the debug menu
+		if(!Game.customOpenSesame) Game.customOpenSesame = [];
+		temp = Game.OpenSesame.toString();
+		eval('Game.OpenSesame = ' + temp.replace("str+='</div>';", 
+				`for(var i in Game.customOpenSesame) str += Game.customOpenSesame[i]();
+				str+='</div>';`));
+		
+		
 	}
 	
 	CCSE.ReplaceShimmerType = function(key){
@@ -853,6 +914,8 @@ CCSE.launch = function(){
 		// durationMult functions should return a value to multiply the duration by
 		if(!Game.customShimmerTypes[key].initFunc) Game.customShimmerTypes[key].initFunc = [];
 		if(!Game.customShimmerTypes[key].durationMult) Game.customShimmerTypes[key].durationMult = [];
+		Game.customShimmerTypes[key].initFunc.push(CCSE.customShimmerTypesAllinitFunc);
+		Game.customShimmerTypes[key].durationMult.push(CCSE.customShimmerTypesAlldurationMult);
 		temp = Game.shimmerTypes[key].initFunc.toString();
 		eval('Game.shimmerTypes[key].initFunc = ' + temp.slice(0, -1).replace(
 			'me.dur=dur;', `for(var i in Game.customShimmerTypes['` + escKey + `'].durationMult) dur *= Game.customShimmerTypes['` + escKey + `'].durationMult[i](); 
@@ -863,6 +926,7 @@ CCSE.launch = function(){
 		
 		// Game.shimmerTypes[key].updateFunc
 		if(!Game.customShimmerTypes[key].updateFunc) Game.customShimmerTypes[key].updateFunc = [];
+		Game.customShimmerTypes[key].updateFunc.push(CCSE.customShimmerTypesAllupdateFunc);
 		temp = Game.shimmerTypes[key].updateFunc.toString();
 		eval('Game.shimmerTypes[key].updateFunc = ' + temp.slice(0, -1) + `
 					for(var i in Game.customShimmerTypes['` + escKey + `'].updateFunc) Game.customShimmerTypes['` + escKey + `'].updateFunc[i](); 
@@ -871,6 +935,7 @@ CCSE.launch = function(){
 		
 		// Game.shimmerTypes[key].popFunc
 		if(!Game.customShimmerTypes[key].popFunc) Game.customShimmerTypes[key].popFunc = [];
+		Game.customShimmerTypes[key].popFunc.push(CCSE.customShimmerTypesAllpopFunc);
 		temp = Game.shimmerTypes[key].popFunc.toString();
 		eval('Game.shimmerTypes[key].popFunc = ' + temp.slice(0, -1) + `
 					for(var i in Game.customShimmerTypes['` + escKey + `'].popFunc) Game.customShimmerTypes['` + escKey + `'].popFunc[i](); 
@@ -880,6 +945,7 @@ CCSE.launch = function(){
 		// Game.shimmerTypes[key].spawnConditions
 		// Return ret to have no effect 
 		if(!Game.customShimmerTypes[key].spawnConditions) Game.customShimmerTypes[key].spawnConditions = [];
+		Game.customShimmerTypes[key].spawnConditions.push(CCSE.customShimmerTypesAllspawnConditions);
 		CCSE.Backup.customShimmerTypes[key].spawnConditions = Game.shimmerTypes[key].spawnConditions;
 		eval(`Game.shimmerTypes['` + escKey + `'].spawnConditions = function(){
 				var ret = CCSE.Backup.customShimmerTypes['` + escKey + `'].spawnConditions();
@@ -893,6 +959,7 @@ CCSE.launch = function(){
 		// Return 1 to have no effect 
 		// These run at the top of the function, before the vanilla code
 		if(!Game.customShimmerTypes[key].getTimeMod) Game.customShimmerTypes[key].getTimeMod = [];
+		Game.customShimmerTypes[key].getTimeMod.push(CCSE.customShimmerTypesAllgetTimeMod);
 		temp = Game.shimmerTypes[key].getTimeMod.toString();
 		eval('Game.shimmerTypes[key].getTimeMod = ' + temp.replace('{', `{
 					for(var i in Game.customShimmerTypes['` + escKey + `'].getTimeMod) m *= Game.customShimmerTypes['` + escKey + `'].getTimeMod[i](me);`));

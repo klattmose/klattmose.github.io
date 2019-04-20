@@ -142,7 +142,7 @@ TimerWidget.launch = function(){
 				else {
 					classColor = 'Purple';
 				}
-				l(TimerBarBuff.id + 'Bar').className = CM.Disp.colorBackPre + classColor;
+				l(TimerBarBuff.id + 'Bar').style.backgroundColor = classColor;
 				l(TimerBarBuff.id + 'Bar').style.width = Math.round(Game.buffs[i].time * maxWidth / Game.buffs[i].maxTime) + 'px';
 				l(TimerBarBuff.id + 'Time').textContent = Math.ceil(Game.buffs[i].time / Game.fps);
 			}

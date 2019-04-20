@@ -825,13 +825,16 @@ CCSE.launch = function(){
 		// Game.DrawSpecial
 		// customDrawSpecialPic functions should alter the picframe object
 		// Pics are 96px by 96px
+		if(!Game.customDrawSpecial) Game.customDrawSpecial = [];
 		if(!Game.customDrawSpecialPic) Game.customDrawSpecialPic = [];
 		temp = Game.DrawSpecial.toString();
 		eval('Game.DrawSpecial = ' + temp.replace("if (hovered || selected)", 
 				`var picframe = {pic:pic, frame:frame};
 				for(var j in Game.customDrawSpecialPic) Game.customDrawSpecialPic[j](picframe, Game.specialTabs[i]);
 				pic = picframe.pic; frame = picframe.frame;
-				if (hovered || selected)`));
+				if (hovered || selected)`).slice(0, -1) + `
+			for(var i in Game.customDrawSpecial) Game.customDrawSpecial[i](); 
+		` + temp.slice(-1));
 		
 		
 	}

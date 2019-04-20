@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.25';
+CCSE.version = '0.26';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1442,6 +1442,36 @@ CCSE.launch = function(){
 		for (var i = j; i < j + n; i++){
 			Game.wrinklers.push({id:parseInt(i),close:0,sucked:0,phase:0,x:0,y:0,r:0,hurt:0,hp:Game.wrinklerHP,selected:0,type:0});
 		}
+	}
+	
+	
+	/*=====================================================================================
+	Special Objects
+	=======================================================================================*/
+	CCSE.CreateSpecialObject = function(name, conditionFunc, pictureFunc, drawFunc){
+		// name            the key to identify this particular special object. Must be unique
+		// conditionFunc   a function that returns true if the object should be shown, false if not
+		// pictureFunc     a function that recieves and alters an object picframe{pic:<url>, frame:<integer>}
+		// drawFunc        a function that recieves and returns an HTML string.
+		
+		Game.customSpecialTabs.push(function(){
+			if(conditionFunc()) Game.specialTabs.push('timer');
+		});
+		
+		Game.customDrawSpecialPic.push(function(picframe, tab){
+			if(tab == name) pictureFunc(picframe);
+		});
+		
+		
+		Game.customToggleSpecialMenu.push(function(str){
+			if(Game.specialTab == name) str = drawFunc(str);
+			return str;
+		});
+	}
+	
+	CCSE.SetSpecialMenuImage = function(str, pic, frame){
+		return str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
+						  'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	
 	

@@ -1,9 +1,9 @@
 Game.Win('Third-party');
 if(TimerWidget === undefined) var TimerWidget = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
-TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/Beta/img/timer.png';
+TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/img/timer.png';
 TimerWidget.name = 'Timer Widget';
-TimerWidget.version = '1.1';
+TimerWidget.version = '1.2';
 TimerWidget.GameVersion = '2.019';
 
 TimerWidget.launch = function(){
@@ -23,18 +23,15 @@ TimerWidget.launch = function(){
 			CCSE.AppendStatsVersionNumber(TimerWidget.name, TimerWidget.version);
 		});
 		
-		Game.customSpecialTabs.push(function(){
-			Game.specialTabs.push('timer');
-		});
-		
-		Game.customDrawSpecialPic.push(function(picframe, tab){
-			if(tab == 'timer'){
+		CCSE.CreateSpecialObject('timer', 
+			function(){return true;}, 
+			function(picframe){
 				picframe.pic = TimerWidget.pic;
 				picframe.frame = 0;
-			}
-		});
+			}, 
+			TimerWidget.ToggleSpecialMenu
+		);
 		
-		Game.customToggleSpecialMenu.push(TimerWidget.ToggleSpecialMenu);
 		Game.customDrawSpecial.push(TimerWidget.Update);
 		
 		Game.customLoad.push(function(){
@@ -45,14 +42,11 @@ TimerWidget.launch = function(){
 	}
 	
 	TimerWidget.ToggleSpecialMenu = function(str){
-		if(Game.specialTab == 'timer'){
-			str = str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
-							  'background:url('+TimerWidget.pic+');background-position:0px 0px;');
-			
-			str += '<h3>Timer</h3>' + 
-				   '<div class="line"></div>' + 
-				   '<div id="TimerBar" style="text-align:left;margin-bottom:4px;"></div>';
-		}
+		str = CCSE.SetSpecialMenuImage(str, TimerWidget.pic, 0);
+		
+		str += '<h3>Timer</h3>' + 
+			   '<div class="line"></div>' + 
+			   '<div id="TimerBar" style="text-align:left;margin-bottom:4px;"></div>';
 		
 		return str;
 	}

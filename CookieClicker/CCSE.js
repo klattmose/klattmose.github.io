@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.25';
+CCSE.version = '0.28';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -289,6 +289,44 @@ CCSE.launch = function(){
 		
 		
 		// Game.shimmerTypes
+		if(!Game.customShimmerTypesAll) Game.customShimmerTypesAll = {};
+		
+		if(!Game.customShimmerTypesAll.initFunc) Game.customShimmerTypesAll.initFunc = [];
+		CCSE.customShimmerTypesAllinitFunc = function(){
+			for(var i in Game.customShimmerTypesAll.initFunc) Game.customShimmerTypesAll.initFunc[i]();
+		}
+		
+		if(!Game.customShimmerTypesAll.durationMult) Game.customShimmerTypesAll.durationMult = [];
+		CCSE.customShimmerTypesAlldurationMult = function(){
+			var dur = 1;
+			for(var i in Game.customShimmerTypesAll.durationMult) dur *= Game.customShimmerTypesAll.durationMult[i]();
+			return dur;
+		}
+		
+		if(!Game.customShimmerTypesAll.updateFunc) Game.customShimmerTypesAll.updateFunc = [];
+		CCSE.customShimmerTypesAllupdateFunc = function(){
+			for(var i in Game.customShimmerTypesAll.updateFunc) Game.customShimmerTypesAll.updateFunc[i]();
+		}
+		
+		if(!Game.customShimmerTypesAll.popFunc) Game.customShimmerTypesAll.popFunc = [];
+		CCSE.customShimmerTypesAllpopFunc = function(){
+			for(var i in Game.customShimmerTypesAll.popFunc) Game.customShimmerTypesAll.popFunc[i]();
+		}
+		
+		if(!Game.customShimmerTypesAll.spawnConditions) Game.customShimmerTypesAll.spawnConditions = [];
+		CCSE.customShimmerTypesAllspawnConditions = function(ret){
+			for(var i in Game.customShimmerTypesAll.spawnConditions) ret = Game.customShimmerTypesAll.spawnConditions[i](ret);
+			return ret;
+		}
+		
+		if(!Game.customShimmerTypesAll.getTimeMod) Game.customShimmerTypesAll.getTimeMod = [];
+		CCSE.customShimmerTypesAllgetTimeMod = function(me){
+			var m = 1;
+			for(var i in Game.customShimmerTypesAll.getTimeMod) m *= Game.customShimmerTypesAll.getTimeMod[i](me);
+			return m;
+		}
+		
+		
 		// In these, "me" refers to the shimmer itself, and "this" to the shimmer's type object
 		// I put this in a separate function to call them when a new type is defined
 		if(!Game.customShimmerTypes) Game.customShimmerTypes = {};
@@ -334,6 +372,94 @@ CCSE.launch = function(){
 		
 		
 		// -----     Buildings block     ----- //
+		if(!Game.customBuildingsAll) Game.customBuildingsAll = {};
+		
+		if(!Game.customBuildingsAll.switchMinigame) Game.customBuildingsAll.switchMinigame = [];
+		CCSE.customBuildingsAllswitchMinigame = function(obj, on){
+			for(var i in Game.customBuildingsAll.switchMinigame) Game.customBuildingsAll.switchMinigame[i](obj, on);
+		}
+		
+		if(!Game.customBuildingsAll.getSellMultiplier) Game.customBuildingsAll.getSellMultiplier = [];
+		CCSE.customBuildingsAllgetSellMultiplier = function(obj, giveBack){
+			for(var i in Game.customBuildingsAll.getSellMultiplier) giveBack = Game.customBuildingsAll.getSellMultiplier[i](obj, giveBack);
+			return giveBack;
+		}
+		
+		if(!Game.customBuildingsAll.buy) Game.customBuildingsAll.buy = [];
+		CCSE.customBuildingsAllbuy = function(obj, amount){
+			for(var i in Game.customBuildingsAll.buy) Game.customBuildingsAll.buy[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.sell) Game.customBuildingsAll.sell = [];
+		CCSE.customBuildingsAllsell = function(obj, amount, bypass){
+			for(var i in Game.customBuildingsAll.sell) Game.customBuildingsAll.sell[i](obj, amount, bypass);
+		}
+		
+		if(!Game.customBuildingsAll.sacrifice) Game.customBuildingsAll.sacrifice = [];
+		CCSE.customBuildingsAllsacrifice = function(obj, amount){
+			for(var i in Game.customBuildingsAll.sacrifice) Game.customBuildingsAll.sacrifice[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.buyFree) Game.customBuildingsAll.buyFree = [];
+		CCSE.customBuildingsAllbuyFree = function(obj, amount){
+			for(var i in Game.customBuildingsAll.buyFree) Game.customBuildingsAll.buyFree[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.getFree) Game.customBuildingsAll.getFree = [];
+		CCSE.customBuildingsAllgetFree = function(obj, amount){
+			for(var i in Game.customBuildingsAll.getFree) Game.customBuildingsAll.getFree[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.getFreeRanks) Game.customBuildingsAll.getFreeRanks = [];
+		CCSE.customBuildingsAllgetFreeRanks = function(obj, amount){
+			for(var i in Game.customBuildingsAll.getFreeRanks) Game.customBuildingsAll.getFreeRanks[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.tooltip) Game.customBuildingsAll.tooltip = [];
+		CCSE.customBuildingsAlltooltip = function(obj, ret){
+			for(var i in Game.customBuildingsAll.tooltip) ret = Game.customBuildingsAll.tooltip[i](obj, ret);
+			return ret;
+		}
+		
+		if(!Game.customBuildingsAll.levelTooltip) Game.customBuildingsAll.levelTooltip = [];
+		CCSE.customBuildingsAlllevelTooltip = function(obj, ret){
+			for(var i in Game.customBuildingsAll.levelTooltip) ret = Game.customBuildingsAll.levelTooltip[i](obj, ret);
+			return ret;
+		}
+		
+		if(!Game.customBuildingsAll.refresh) Game.customBuildingsAll.refresh = [];
+		CCSE.customBuildingsAllrefresh = function(obj){
+			for(var i in Game.customBuildingsAll.refresh) Game.customBuildingsAll.refresh[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.rebuild) Game.customBuildingsAll.rebuild = [];
+		CCSE.customBuildingsAllrebuild = function(obj){
+			for(var i in Game.customBuildingsAll.rebuild) Game.customBuildingsAll.rebuild[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.mute) Game.customBuildingsAll.mute = [];
+		CCSE.customBuildingsAllmute = function(obj, val){
+			for(var i in Game.customBuildingsAll.mute) Game.customBuildingsAll.mute[i](obj, val);
+		}
+		
+		if(!Game.customBuildingsAll.draw) Game.customBuildingsAll.draw = [];
+		CCSE.customBuildingsAlldraw = function(obj){
+			for(var i in Game.customBuildingsAll.draw) Game.customBuildingsAll.draw[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.buyFunction) Game.customBuildingsAll.buyFunction = [];
+		CCSE.customBuildingsAllbuyFunction = function(obj){
+			for(var i in Game.customBuildingsAll.buyFunction) Game.customBuildingsAll.buyFunction[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.cpsMult) Game.customBuildingsAll.cpsMult = [];
+		CCSE.customBuildingsAllcpsMult = function(obj){
+			var mult = 1;
+			for(var i in Game.customBuildingsAll.cpsMult) mult *= Game.customBuildingsAll.cpsMult[i](obj);
+			return mult;
+		}
+		
+		
 		if(!Game.customBuildings) Game.customBuildings = {};
 		CCSE.Backup.customBuildings = {};
 		for(var key in Game.Objects){
@@ -837,6 +963,29 @@ CCSE.launch = function(){
 		` + temp.slice(-1));
 		
 		
+		// -----     Visual Effects block     ----- //
+		
+		// Game.DrawBackground
+		// Game.customDrawBackground functions get called in the same block that creates the cookie rain and seasonal backgrounds 
+		// If you want a hook somewhere else, let me know
+		if(!Game.customDrawBackground) Game.customDrawBackground = [];
+		temp = Game.DrawBackground.toString();
+		eval('Game.DrawBackground = ' + temp.replace("Timer.track('left background');", 
+				`for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();
+				Timer.track('left background');`));
+		
+		
+		// -----     Debug block     ----- //
+		
+		// Game.OpenSesame
+		// Game.customOpenSesame functions should add HTML strings to the debug menu
+		if(!Game.customOpenSesame) Game.customOpenSesame = [];
+		temp = Game.OpenSesame.toString();
+		eval('Game.OpenSesame = ' + temp.replace("str+='</div>';", 
+				`for(var i in Game.customOpenSesame) str += Game.customOpenSesame[i]();
+				str+='</div>';`));
+		
+		
 	}
 	
 	CCSE.ReplaceShimmerType = function(key){
@@ -853,6 +1002,8 @@ CCSE.launch = function(){
 		// durationMult functions should return a value to multiply the duration by
 		if(!Game.customShimmerTypes[key].initFunc) Game.customShimmerTypes[key].initFunc = [];
 		if(!Game.customShimmerTypes[key].durationMult) Game.customShimmerTypes[key].durationMult = [];
+		Game.customShimmerTypes[key].initFunc.push(CCSE.customShimmerTypesAllinitFunc);
+		Game.customShimmerTypes[key].durationMult.push(CCSE.customShimmerTypesAlldurationMult);
 		temp = Game.shimmerTypes[key].initFunc.toString();
 		eval('Game.shimmerTypes[key].initFunc = ' + temp.slice(0, -1).replace(
 			'me.dur=dur;', `for(var i in Game.customShimmerTypes['` + escKey + `'].durationMult) dur *= Game.customShimmerTypes['` + escKey + `'].durationMult[i](); 
@@ -863,6 +1014,7 @@ CCSE.launch = function(){
 		
 		// Game.shimmerTypes[key].updateFunc
 		if(!Game.customShimmerTypes[key].updateFunc) Game.customShimmerTypes[key].updateFunc = [];
+		Game.customShimmerTypes[key].updateFunc.push(CCSE.customShimmerTypesAllupdateFunc);
 		temp = Game.shimmerTypes[key].updateFunc.toString();
 		eval('Game.shimmerTypes[key].updateFunc = ' + temp.slice(0, -1) + `
 					for(var i in Game.customShimmerTypes['` + escKey + `'].updateFunc) Game.customShimmerTypes['` + escKey + `'].updateFunc[i](); 
@@ -871,6 +1023,7 @@ CCSE.launch = function(){
 		
 		// Game.shimmerTypes[key].popFunc
 		if(!Game.customShimmerTypes[key].popFunc) Game.customShimmerTypes[key].popFunc = [];
+		Game.customShimmerTypes[key].popFunc.push(CCSE.customShimmerTypesAllpopFunc);
 		temp = Game.shimmerTypes[key].popFunc.toString();
 		eval('Game.shimmerTypes[key].popFunc = ' + temp.slice(0, -1) + `
 					for(var i in Game.customShimmerTypes['` + escKey + `'].popFunc) Game.customShimmerTypes['` + escKey + `'].popFunc[i](); 
@@ -880,6 +1033,7 @@ CCSE.launch = function(){
 		// Game.shimmerTypes[key].spawnConditions
 		// Return ret to have no effect 
 		if(!Game.customShimmerTypes[key].spawnConditions) Game.customShimmerTypes[key].spawnConditions = [];
+		Game.customShimmerTypes[key].spawnConditions.push(CCSE.customShimmerTypesAllspawnConditions);
 		CCSE.Backup.customShimmerTypes[key].spawnConditions = Game.shimmerTypes[key].spawnConditions;
 		eval(`Game.shimmerTypes['` + escKey + `'].spawnConditions = function(){
 				var ret = CCSE.Backup.customShimmerTypes['` + escKey + `'].spawnConditions();
@@ -893,6 +1047,7 @@ CCSE.launch = function(){
 		// Return 1 to have no effect 
 		// These run at the top of the function, before the vanilla code
 		if(!Game.customShimmerTypes[key].getTimeMod) Game.customShimmerTypes[key].getTimeMod = [];
+		Game.customShimmerTypes[key].getTimeMod.push(CCSE.customShimmerTypesAllgetTimeMod);
 		temp = Game.shimmerTypes[key].getTimeMod.toString();
 		eval('Game.shimmerTypes[key].getTimeMod = ' + temp.replace('{', `{
 					for(var i in Game.customShimmerTypes['` + escKey + `'].getTimeMod) m *= Game.customShimmerTypes['` + escKey + `'].getTimeMod[i](me);`));
@@ -913,6 +1068,7 @@ CCSE.launch = function(){
 		
 		// this.switchMinigame
 		if(!Game.customBuildings[key].switchMinigame) Game.customBuildings[key].switchMinigame = [];
+		Game.customBuildings[key].switchMinigame.push(CCSE.customBuildingsAllswitchMinigame);
 		temp = obj.switchMinigame.toString();
 		eval('obj.switchMinigame = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].switchMinigame) Game.customBuildings[this.name].switchMinigame[i](this, on); 
@@ -922,6 +1078,7 @@ CCSE.launch = function(){
 		// this.getSellMultiplier
 		// Return ret to have no effect
 		if(!Game.customBuildings[key].getSellMultiplier) Game.customBuildings[key].getSellMultiplier = [];
+		Game.customBuildings[key].getSellMultiplier.push(CCSE.customBuildingsAllgetSellMultiplier);
 		temp = obj.getSellMultiplier.toString();
 		eval('obj.getSellMultiplier = ' + temp.replace('return', `
 				for(var i in Game.customBuildings[this.name].getSellMultiplier) giveBack = Game.customBuildings[this.name].getSellMultiplier[i](this, giveBack); 
@@ -930,6 +1087,7 @@ CCSE.launch = function(){
 		
 		// this.buy
 		if(!Game.customBuildings[key].buy) Game.customBuildings[key].buy = [];
+		Game.customBuildings[key].buy.push(CCSE.customBuildingsAllbuy);
 		temp = obj.buy.toString();
 		eval('obj.buy = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].buy) Game.customBuildings[this.name].buy[i](this, amount); 
@@ -938,6 +1096,7 @@ CCSE.launch = function(){
 		
 		// this.sell
 		if(!Game.customBuildings[key].sell) Game.customBuildings[key].sell = [];
+		Game.customBuildings[key].sell.push(CCSE.customBuildingsAllsell);
 		temp = obj.sell.toString();
 		eval('obj.sell = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].sell) Game.customBuildings[this.name].sell[i](this, amount, bypass); 
@@ -946,6 +1105,7 @@ CCSE.launch = function(){
 		
 		// this.sacrifice
 		if(!Game.customBuildings[key].sacrifice) Game.customBuildings[key].sacrifice = [];
+		Game.customBuildings[key].sacrifice.push(CCSE.customBuildingsAllsacrifice);
 		temp = obj.sacrifice.toString();
 		eval('obj.sacrifice = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].sacrifice) Game.customBuildings[this.name].sacrifice[i](this, amount); 
@@ -954,6 +1114,7 @@ CCSE.launch = function(){
 		
 		// this.buyFree
 		if(!Game.customBuildings[key].buyFree) Game.customBuildings[key].buyFree = [];
+		Game.customBuildings[key].buyFree.push(CCSE.customBuildingsAllbuyFree);
 		temp = obj.buyFree.toString();
 		eval('obj.buyFree = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount); 
@@ -962,6 +1123,7 @@ CCSE.launch = function(){
 		
 		// this.getFree
 		if(!Game.customBuildings[key].getFree) Game.customBuildings[key].getFree = [];
+		Game.customBuildings[key].getFree.push(CCSE.customBuildingsAllgetFree);
 		temp = obj.getFree.toString();
 		eval('obj.getFree = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].getFree) Game.customBuildings[this.name].getFree[i](this, amount); 
@@ -970,6 +1132,7 @@ CCSE.launch = function(){
 		
 		// this.getFreeRanks
 		if(!Game.customBuildings[key].getFreeRanks) Game.customBuildings[key].getFreeRanks = [];
+		Game.customBuildings[key].getFreeRanks.push(CCSE.customBuildingsAllgetFreeRanks);
 		temp = obj.getFreeRanks.toString();
 		eval('obj.getFreeRanks = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].getFreeRanks) Game.customBuildings[this.name].getFreeRanks[i](this, amount); 
@@ -979,6 +1142,7 @@ CCSE.launch = function(){
 		// this.tooltip
 		// Return ret to have no effect
 		if(!Game.customBuildings[key].tooltip) Game.customBuildings[key].tooltip = []; 
+		Game.customBuildings[key].tooltip.push(CCSE.customBuildingsAlltooltip);
 		eval('CCSE.Backup.customBuildings[key].tooltip = ' + obj.tooltip.toString().split('this').join("Game.Objects['" + escKey + "']"));
 		obj.tooltip = function(){
 			var ret = CCSE.Backup.customBuildings[this.name].tooltip();
@@ -990,6 +1154,7 @@ CCSE.launch = function(){
 		// this.levelTooltip
 		// Return ret to have no effect
 		if(!Game.customBuildings[key].levelTooltip) Game.customBuildings[key].levelTooltip = []; 
+		Game.customBuildings[key].levelTooltip.push(CCSE.customBuildingsAlllevelTooltip);
 		eval('CCSE.Backup.customBuildings[key].levelTooltip = ' + obj.levelTooltip.toString().replace('this', "Game.Objects['" + escKey + "']"));
 		obj.levelTooltip = function(){
 			var ret = CCSE.Backup.customBuildings[this.name].levelTooltip();
@@ -1005,6 +1170,7 @@ CCSE.launch = function(){
 		
 		// this.refresh
 		if(!Game.customBuildings[key].refresh) Game.customBuildings[key].refresh = [];
+		Game.customBuildings[key].refresh.push(CCSE.customBuildingsAllrefresh);
 		temp = obj.refresh.toString();
 		eval('obj.refresh = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].refresh) Game.customBuildings[this.name].refresh[i](this); 
@@ -1013,6 +1179,7 @@ CCSE.launch = function(){
 		
 		// this.rebuild
 		if(!Game.customBuildings[key].rebuild) Game.customBuildings[key].rebuild = [];
+		Game.customBuildings[key].rebuild.push(CCSE.customBuildingsAllrebuild);
 		temp = obj.rebuild.toString();
 		eval('obj.rebuild = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].rebuild) Game.customBuildings[this.name].rebuild[i](this); 
@@ -1021,6 +1188,7 @@ CCSE.launch = function(){
 		
 		// this.mute
 		if(!Game.customBuildings[key].mute) Game.customBuildings[key].mute = [];
+		Game.customBuildings[key].mute.push(CCSE.customBuildingsAllmute);
 		temp = obj.mute.toString();
 		eval('obj.mute = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].mute) Game.customBuildings[this.name].mute[i](this, val); 
@@ -1029,6 +1197,7 @@ CCSE.launch = function(){
 		
 		// this.draw
 		if(!Game.customBuildings[key].draw) Game.customBuildings[key].draw = [];
+		Game.customBuildings[key].draw.push(CCSE.customBuildingsAlldraw);
 		temp = obj.draw.toString();
 		eval('obj.draw = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].draw) Game.customBuildings[this.name].draw[i](this); 
@@ -1037,6 +1206,7 @@ CCSE.launch = function(){
 		
 		// this.buyFunction
 		if(!Game.customBuildings[key].buyFunction) Game.customBuildings[key].buyFunction = [];
+		Game.customBuildings[key].buyFunction.push(CCSE.customBuildingsAllbuyFunction);
 		temp = obj.buyFunction.toString();
 		eval('obj.buyFunction = ' + temp.slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].buyFunction) Game.customBuildings[this.name].buyFunction[i](this); 
@@ -1046,6 +1216,7 @@ CCSE.launch = function(){
 		// this.cps
 		// cpsMult Functions should return a value to multiply the price by (Return 1 to have no effect)
 		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
+		Game.customBuildings[key].cpsMult.push(CCSE.customBuildingsAllcpsMult);
 		temp = obj.cps.toString();
 		eval('obj.cps = ' + temp.replace('return', `
 			for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);
@@ -1442,6 +1613,36 @@ CCSE.launch = function(){
 		for (var i = j; i < j + n; i++){
 			Game.wrinklers.push({id:parseInt(i),close:0,sucked:0,phase:0,x:0,y:0,r:0,hurt:0,hp:Game.wrinklerHP,selected:0,type:0});
 		}
+	}
+	
+	
+	/*=====================================================================================
+	Special Objects
+	=======================================================================================*/
+	CCSE.CreateSpecialObject = function(name, conditionFunc, pictureFunc, drawFunc){
+		// name            the key to identify this particular special object. Must be unique
+		// conditionFunc   a function that returns true if the object should be shown, false if not
+		// pictureFunc     a function that recieves and alters an object picframe{pic:<url>, frame:<integer>}
+		// drawFunc        a function that recieves and returns an HTML string.
+		
+		Game.customSpecialTabs.push(function(){
+			if(conditionFunc()) Game.specialTabs.push('timer');
+		});
+		
+		Game.customDrawSpecialPic.push(function(picframe, tab){
+			if(tab == name) pictureFunc(picframe);
+		});
+		
+		
+		Game.customToggleSpecialMenu.push(function(str){
+			if(Game.specialTab == name) str = drawFunc(str);
+			return str;
+		});
+	}
+	
+	CCSE.SetSpecialMenuImage = function(str, pic, frame){
+		return str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
+						  'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	
 	

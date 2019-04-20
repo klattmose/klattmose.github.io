@@ -40,17 +40,6 @@ var spell = {
 CCSE.NewSpell('test', spell)
 
 
-var output = '';
-var recursiveNaming = function(obj, path){
-	for(var key in obj){
-		var child = obj[key];
-		if(typeof child == 'function') console.log(path + '.' + key);
-		//else if(typeof child == 'object') recursiveNaming(child, path + '.' + key);
-	}
-}
-
-recursiveNaming(Game, 'Game');
-
 
 var doubledHC = function(){
 	return 2;

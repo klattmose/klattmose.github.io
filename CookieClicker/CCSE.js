@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.20';
+CCSE.version = '0.25';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -101,6 +101,12 @@ CCSE.launch = function(){
 			for(var i in Game.customBeautify) ret = Game.customBeautify[i](value, floats, ret);
 			return ret;
 		}
+		
+		
+		// Game.Loader.Load
+		temp = Game.Loader.Load.toString();
+		eval('Game.Loader.Load = ' + temp.replace('img.src=this.domain', 
+			"img.src=(assets[i].indexOf('http')>=0?'':this.domain)"));
 		
 		
 		// -----     Tooltips block     ----- //
@@ -417,17 +423,61 @@ CCSE.launch = function(){
 		
 		
 		// -----     Upgrades block     ----- //
-		if(!Game.customUpgradesAll) 			Game.customUpgradesAll = {};
-		if(!Game.customUpgradesAll.getPrice) 	Game.customUpgradesAll.getPrice = []; 
-		if(!Game.customUpgradesAll.click) 		Game.customUpgradesAll.click = [];
-		if(!Game.customUpgradesAll.buy) 		Game.customUpgradesAll.buy = []; 
-		if(!Game.customUpgradesAll.earn) 		Game.customUpgradesAll.earn = [];
-		if(!Game.customUpgradesAll.unearn) 		Game.customUpgradesAll.unearn = [];
-		if(!Game.customUpgradesAll.unlock) 		Game.customUpgradesAll.unlock = [];
-		if(!Game.customUpgradesAll.lose) 		Game.customUpgradesAll.lose = [];
-		if(!Game.customUpgradesAll.toggle) 		Game.customUpgradesAll.toggle = [];
-		if(!Game.customUpgradesAll.buyFunction)	Game.customUpgradesAll.buyFunction = [];
+		if(!Game.customUpgradesAll) Game.customUpgradesAll = {}; 
+		
+		if(!Game.customUpgradesAll.getPrice) Game.customUpgradesAll.getPrice = [];
+		CCSE.customUpgradesAllgetPrice = function(me){
+			var ret = 1
+			for(var i in Game.customUpgradesAll.getPrice) ret *= Game.customUpgradesAll.getPrice[i](me);
+			return ret;
+		}
+		
+		if(!Game.customUpgradesAll.click) Game.customUpgradesAll.click = [];
+		CCSE.customUpgradesAllclick = function(me, e){
+			for(var i in Game.customUpgradesAll.click) Game.customUpgradesAll.click[i](me, e);
+		}
+		
+		if(!Game.customUpgradesAll.buy) Game.customUpgradesAll.buy = []; 
+		CCSE.customUpgradesAllbuy = function(me, bypass, success){
+			for(var i in Game.customUpgradesAll.buy) Game.customUpgradesAll.buy[i](me, bypass, success);
+		}
+		
+		if(!Game.customUpgradesAll.earn) Game.customUpgradesAll.earn = [];
+		CCSE.customUpgradesAllearn = function(me){
+			for(var i in Game.customUpgradesAll.earn) Game.customUpgradesAll.earn[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.unearn) Game.customUpgradesAll.unearn = [];
+		CCSE.customUpgradesAllunearn = function(me){
+			for(var i in Game.customUpgradesAll.unearn) Game.customUpgradesAll.unearn[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.unlock) Game.customUpgradesAll.unlock = [];
+		CCSE.customUpgradesAllunlock = function(me){
+			for(var i in Game.customUpgradesAll.unlock) Game.customUpgradesAll.unlock[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.lose) Game.customUpgradesAll.lose = [];
+		CCSE.customUpgradesAlllose = function(me){
+			for(var i in Game.customUpgradesAll.lose) Game.customUpgradesAll.lose[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle = [];
+		CCSE.customUpgradesAlltoggle = function(me){
+			for(var i in Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction = [];
+		CCSE.customUpgradesAllbuyFunction = function(me){
+			for(var i in Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction[i](me);
+		}
+		
 		if(!Game.customUpgradesAll.descFunc)	Game.customUpgradesAll.descFunc = [];
+		CCSE.customUpgradesAlldescFunc = function(me, desc){
+			for(var i in Game.customUpgradesAll.descFunc) desc = Game.customUpgradesAll.descFunc[i](me, desc);
+			return desc;
+		}
+		
 		
 		if(!Game.customUpgrades) Game.customUpgrades = {};
 		CCSE.Backup.customUpgrades = {};
@@ -564,7 +614,7 @@ CCSE.launch = function(){
 		// Functions should return a multiplier to the season duration
 		// Return 1 to have no effect
 		if(!Game.customGetSeasonDuration) Game.customGetSeasonDuration = []; 
-		CCSE.Backup.getSeasonDuration =  Game.getSeasonDuration;
+		CCSE.Backup.getSeasonDuration = Game.getSeasonDuration;
 		Game.getSeasonDuration = function(pool){
 			var ret = CCSE.Backup.getSeasonDuration();
 			for(var i in Game.customGetSeasonDuration) ret *= Game.customGetSeasonDuration[i]();
@@ -573,9 +623,14 @@ CCSE.launch = function(){
 		
 		
 		// -----     Achievements block     ----- //
-		if(!Game.customAchievementsAll) 		Game.customAchievementsAll = {};
-		if(!Game.customAchievementsAll.click) 	Game.customAchievementsAll.click = [];
+		if(!Game.customAchievementsAll) Game.customAchievementsAll = {};
 		
+		if(!Game.customAchievementsAll.click) Game.customAchievementsAll.click = [];
+		CCSE.customAchievementsAllclick = function(me){
+			for(var i in Game.customAchievementsAll.click) Game.customAchievementsAll.click[i](me);
+		}
+	
+	
 		if(!Game.customAchievements) Game.customAchievements = {};
 		CCSE.Backup.customAchievements = {};
 		for(var key in Game.Achievements){
@@ -608,6 +663,179 @@ CCSE.launch = function(){
 		eval('Game.updateBuffs = ' + temp.slice(0, -1) + `
 			for(var i in Game.customUpdateBuffs) Game.customUpdateBuffs[i](); 
 		` + temp.slice(-1));
+		
+		
+		// -----     GRANDMAPOCALYPSE block     ----- //
+		
+		// I need this because this gets used once and if I leave it out the game breaks
+		function inRect(x,y,rect)
+		{
+			//find out if the point x,y is in the rotated rectangle rect{w,h,r,o} (width,height,rotation in radians,y-origin) (needs to be normalized)
+			//I found this somewhere online I guess
+			var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.o)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.o));
+			var h1 = Math.sqrt(dx*dx + dy*dy);
+			var currA = Math.atan2(dy,dx);
+			var newA = currA - rect.r;
+			var x2 = Math.cos(newA) * h1;
+			var y2 = Math.sin(newA) * h1;
+			if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
+			return false;
+		}
+		
+		// Game.UpdateGrandmapocalypse
+		// executed every logic frame
+		if(!Game.customUpdateGrandmapocalypse) Game.customUpdateGrandmapocalypse = [];
+		temp = Game.UpdateGrandmapocalypse.toString();
+		eval('Game.UpdateGrandmapocalypse = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpdateGrandmapocalypse) Game.customUpdateGrandmapocalypse[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.getWrinklersMax
+		// Functions should return a value to add to n. Return 0 to have no effect
+		if(!Game.customGetWrinklersMax) Game.customGetWrinklersMax = [];
+		temp = Game.getWrinklersMax.toString();
+		eval('Game.getWrinklersMax = ' + temp.replace('return', `
+			for(var i in Game.customGetWrinklersMax) n += Game.customGetWrinklersMax[i](n);
+			return`));
+		
+		
+		// Game.SpawnWrinkler
+		if(!Game.customSpawnWrinkler) Game.customSpawnWrinkler = [];
+		temp = Game.SpawnWrinkler.toString();
+		eval('Game.SpawnWrinkler = ' + temp.replace('return me', `
+			for(var i in Game.customSpawnWrinkler) Game.customSpawnWrinkler[i](me);
+			return me`));
+		
+		
+		// Game.UpdateWrinklers
+		// customWrinklerSpawnChance functions should return a multiplier to chance. (Return 1 to have no effect)
+		if(!Game.customUpdateWrinklers) Game.customUpdateWrinklers = [];
+		if(!Game.customWrinklerSpawnChance) Game.customWrinklerSpawnChance = [];
+		if(!Game.customWrinklerPop) Game.customWrinklerPop = [];
+		temp = Game.UpdateWrinklers.toString();
+		eval('Game.UpdateWrinklers = ' + temp.replace('if (Math.random()<chance)', `
+					for(var i in Game.customWrinklerSpawnChance) chance *= Game.customWrinklerSpawnChance[i]();
+					if (Math.random()<chance)`).replace('Game.Earn(me.sucked);', `
+					for(var i in Game.customWrinklerPop) Game.customWrinklerPop[i](me);
+					Game.Earn(me.sucked);`).slice(0, -1) + `
+			for(var i in Game.customUpdateWrinklers) Game.customUpdateWrinklers[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.DrawWrinklers
+		if(!Game.customDrawWrinklers) Game.customDrawWrinklers = [];
+		temp = Game.DrawWrinklers.toString();
+		eval('Game.DrawWrinklers = ' + temp.slice(0, -1) + `
+			for(var i in Game.customDrawWrinklers) Game.customDrawWrinklers[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.SaveWrinklers
+		// Return ret to have no effect
+		if(!Game.customSaveWrinklers) Game.customSaveWrinklers = [];
+		CCSE.Backup.SaveWrinklers = Game.SaveWrinklers;
+		Game.SaveWrinklers = function(){
+			var ret = CCSE.Backup.SaveWrinklers();
+			for(var i in Game.customSaveWrinklers) ret = Game.customSaveWrinklers[i](ret);
+			return ret;
+		}
+		
+		
+		// Game.LoadWrinklers
+		if(!Game.customLoadWrinklers) Game.customLoadWrinklers = [];
+		temp = Game.LoadWrinklers.toString();
+		eval('Game.LoadWrinklers = ' + temp.slice(0, -1) + `
+			for(var i in Game.customLoadWrinklers) Game.customLoadWrinklers[i](amount, number, shinies, amountShinies); 
+		` + temp.slice(-1));
+		
+		
+		// -----     Special things and stuff block     ----- //
+		
+		// Game.UpdateSpecial
+		// customSpecialTabs functions should push a string to Game.specialTabs (or not)
+		if(!Game.customSpecialTabs) Game.customSpecialTabs = [];
+		temp = Game.UpdateSpecial.toString();
+		eval('Game.UpdateSpecial = ' + temp.replace('if (Game.specialTabs.length==0)', 
+			`for(var i in Game.customSpecialTabs) Game.customSpecialTabs[i]();
+			if (Game.specialTabs.length==0)`));
+		
+		
+		// Game.UpgradeSanta
+		if(!Game.customUpgradeSanta) Game.customUpgradeSanta = [];
+		temp = Game.UpgradeSanta.toString();
+		eval('Game.UpgradeSanta = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpgradeSanta) Game.customUpgradeSanta[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.hasAura
+		// Return ret to have no effect
+		if(!Game.customHasAura) Game.customHasAura = [];
+		CCSE.Backup.hasAura = Game.hasAura;
+		Game.hasAura = function(what){
+			var ret = CCSE.Backup.hasAura(what);
+			for(var i in Game.customHasAura) ret = Game.customHasAura[i](what, ret);
+			return ret;
+		}
+		
+		
+		// Game.SelectDragonAura
+		// Actually no. This function is not conducive to customization. Seems like 2 auras is all we get.
+		// customCurrentDragonAura functions should return an array index for currentAura (Return currentAura to do nothing)
+		// customDragonAuraShow functions should return 1 to show that aura in the picker, 0 to not (Return show to do nothing)
+		/*if(!Game.customCurrentDragonAura) Game.customCurrentDragonAura = [];
+		if(!Game.customDragonAuraShow) Game.customDragonAuraShow = [];
+		temp = Game.SelectDragonAura.toString();
+		eval('Game.SelectDragonAura = ' + temp.replace('if (!update)', 
+			`for(var i in Game.customCurrentDragonAura) currentAura = Game.customCurrentDragonAura[i](slot, update, currentAura);
+			if (!update)`).replace('if (i==0 || i!=otherAura)', 
+					`var show = (i==0 || i!=otherAura);
+					for(var i in Game.customDragonAuraShow) show = Game.customDragonAuraShow[i](slot, update, i, show);
+					if (show)`));*/
+		
+		
+		// Game.DescribeDragonAura
+		if(!Game.customDescribeDragonAura) Game.customDescribeDragonAura = [];
+		temp = Game.DescribeDragonAura.toString();
+		eval('Game.DescribeDragonAura = ' + temp.slice(0, -1) + `
+			for(var i in Game.customDescribeDragonAura) Game.customDescribeDragonAura[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.UpgradeDragon
+		if(!Game.customUpgradeDragon) Game.customUpgradeDragon = [];
+		temp = Game.UpgradeDragon.toString();
+		eval('Game.UpgradeDragon = ' + temp.slice(0, -1) + `
+			for(var i in Game.customUpgradeDragon) Game.customUpgradeDragon[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.ToggleSpecialMenu
+		// customToggleSpecialMenu functions should return a string for l('specialPopup').innerHTML (Return str for no effect)
+		// str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', <your pic here>)
+		// Pics are 96px by 96px
+		if(!Game.customToggleSpecialMenu) Game.customToggleSpecialMenu = [];
+		temp = Game.ToggleSpecialMenu.toString();
+		eval('Game.ToggleSpecialMenu = ' + temp.replace("l('specialPopup').innerHTML=str;", 
+				`for(var i in Game.customToggleSpecialMenu) str = Game.customToggleSpecialMenu[i](str);
+				l('specialPopup').innerHTML=str;`));
+		
+		
+		// Game.DrawSpecial
+		// customDrawSpecialPic functions should alter the picframe object
+		// Pics are 96px by 96px
+		if(!Game.customDrawSpecial) Game.customDrawSpecial = [];
+		if(!Game.customDrawSpecialPic) Game.customDrawSpecialPic = [];
+		temp = Game.DrawSpecial.toString();
+		eval('Game.DrawSpecial = ' + temp.replace("if (hovered || selected)", 
+				`var picframe = {pic:pic, frame:frame};
+				for(var j in Game.customDrawSpecialPic) Game.customDrawSpecialPic[j](picframe, Game.specialTabs[i]);
+				pic = picframe.pic; frame = picframe.frame;
+				if (hovered || selected)`).slice(0, -1) + `
+			for(var i in Game.customDrawSpecial) Game.customDrawSpecial[i](); 
+		` + temp.slice(-1));
+		
 		
 	}
 	
@@ -1187,55 +1415,6 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Upgrades
 	=======================================================================================*/
-	CCSE.customUpgradesAllgetPrice = function(me){
-		var ret = 1
-		for(var i in Game.customUpgradesAll.getPrice) ret *= Game.customUpgradesAll.getPrice[i](me);
-		return ret;
-	}
-	
-	CCSE.customUpgradesAllclick = function(me, e){
-		for(var i in Game.customUpgradesAll.click) Game.customUpgradesAll.click[i](me, e);
-	}
-	
-	CCSE.customUpgradesAllbuy = function(me, bypass, success){
-		for(var i in Game.customUpgradesAll.buy) Game.customUpgradesAll.buy[i](me, bypass, success);
-	}
-	
-	CCSE.customUpgradesAllearn = function(me){
-		for(var i in Game.customUpgradesAll.earn) Game.customUpgradesAll.earn[i](me);
-	}
-	
-	CCSE.customUpgradesAllunearn = function(me){
-		for(var i in Game.customUpgradesAll.unearn) Game.customUpgradesAll.unearn[i](me);
-	}
-	
-	CCSE.customUpgradesAllunlock = function(me){
-		for(var i in Game.customUpgradesAll.unlock) Game.customUpgradesAll.unlock[i](me);
-	}
-	
-	CCSE.customUpgradesAlllose = function(me){
-		for(var i in Game.customUpgradesAll.lose) Game.customUpgradesAll.lose[i](me);
-	}
-	
-	CCSE.customUpgradesAlltoggle = function(me){
-		for(var i in Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle[i](me);
-	}
-	
-	CCSE.customUpgradesAllbuyFunction = function(me){
-		for(var i in Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction[i](me);
-	}
-	
-	CCSE.customUpgradesAlldescFunc = function(me, desc){
-		for(var i in Game.customUpgradesAll.descFunc) desc = Game.customUpgradesAll.descFunc[i](me, desc);
-		return desc;
-	}
-	
-	CCSE.customAchievementsAllclick = function(me){
-		for(var i in Game.customAchievementsAll.click) Game.customAchievementsAll.click[i](me);
-	}
-	
-	
-	
 	CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
 		var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
 		Game.PrestigeUpgrades.push(me);
@@ -1252,6 +1431,17 @@ CCSE.launch = function(){
 		}
 		
 		return me;
+	}
+	
+	
+	/*=====================================================================================
+	GRANDMAPOCALYPSE
+	=======================================================================================*/
+	CCSE.AddMoreWrinklers = function(n){
+		var j = Game.wrinklers.length;
+		for (var i = j; i < j + n; i++){
+			Game.wrinklers.push({id:parseInt(i),close:0,sucked:0,phase:0,x:0,y:0,r:0,hurt:0,hp:Game.wrinklerHP,selected:0,type:0});
+		}
 	}
 	
 	

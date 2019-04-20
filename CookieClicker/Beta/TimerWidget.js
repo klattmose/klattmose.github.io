@@ -2,9 +2,25 @@ Game.Win('Third-party');
 if(TimerWidget === undefined) var TimerWidget = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/Beta/img/timer.png';
+TimerWidget.name = 'Horticookie';
+TimerWidget.version = '1.0';
+TimerWidget.GameVersion = '2.019';
 
 TimerWidget.launch = function(){
 	TimerWidget.init = function(){
+		TimerWidget.buffColors = {
+			'Frenzy': 'Yellow', 
+			'Dragon Harvest': 'Brown', 
+			'Elder frenzy': 'Green', 
+			'Clot': 'Red', 
+			'Click frenzy': 'Blue', 
+			'Dragonflight': 'Pink'
+		};
+		
+		Game.customStatsMenu.push(function(){
+			CCSE.AppendStatsVersionNumber(TimerWidget.name, TimerWidget.version);
+		});
+		
 		Game.customSpecialTabs.push(function(){
 			Game.specialTabs.push('timer');
 		});
@@ -38,7 +54,6 @@ TimerWidget.launch = function(){
 	TimerWidget.Update = function(){
 		if(Game.specialTab == 'timer'){
 			var maxWidth = l('TimerBar').getBoundingClientRect().width - 159;
-			var buffColors = {'Frenzy': 'Yellow', 'Dragon Harvest': 'Brown', 'Elder frenzy': 'Green', 'Clot': 'Red', 'Click frenzy': 'Blue', 'Dragonflight': 'Pink'};
 			var bar = function(name, bars, time) {
 				var div = document.createElement('div');
 				div.style.width = '100%';
@@ -136,8 +151,8 @@ TimerWidget.launch = function(){
 				TimerBarBuff.style.display = '';
 				l(TimerBarBuff.id + 'Type').textContent = buff.name;
 				var classColor = '';
-				if (typeof buffColors[Game.buffs[i].name] !== 'undefined') {
-					classColor = buffColors[Game.buffs[i].name];
+				if (typeof TimerWidget.buffColors[Game.buffs[i].name] !== 'undefined') {
+					classColor = TimerWidget.buffColors[Game.buffs[i].name];
 				}
 				else {
 					classColor = 'Purple';

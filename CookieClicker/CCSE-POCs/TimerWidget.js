@@ -9,14 +9,15 @@ TimerWidget.GameVersion = '2.019';
 TimerWidget.launch = function(){
 	TimerWidget.init = function(){
 		TimerWidget.colorLookup = {
-			'golden': 'Purple', 
-			'reindeer': 'Orange', 
-			'Frenzy': 'Yellow', 
-			'Dragon Harvest': 'Brown', 
-			'Elder frenzy': 'Green', 
-			'Clot': 'Red', 
-			'Click frenzy': 'Blue', 
-			'Dragonflight': 'Pink'
+			'golden': 			'#ff00ff', 
+			'reindeer': 		'#ff7f00', 
+			'Frenzy': 			'#ffff00', 
+			'Dragon Harvest': 	'#8b4513', 
+			'Elder frenzy': 	'#00ff00', 
+			'Clot': 			'#ff0000', 
+			'Click frenzy': 	'#4bb8f0', 
+			'Dragonflight': 	'#ff1493',
+			'default': 			'#ff00ff'
 		};
 		
 		Game.customStatsMenu.push(function(){
@@ -109,7 +110,7 @@ TimerWidget.launch = function(){
 					TimerBarShimmer.style.height = '12px';
 					TimerBarShimmer.style.margin = '0px 10px';
 					TimerBarShimmer.style.position = 'relative';
-					TimerBarShimmer.appendChild(TimerWidget.bar('Next ' + key, [{id: key + 'TBMinBar', color: 'Gray'}, {id: key + 'TBBar', color: TimerWidget.colorLookup[key]}], key + 'TBTime'));
+					TimerBarShimmer.appendChild(TimerWidget.bar('Next ' + key, [{id: key + 'TBMinBar', color: '#b3b3b3'}, {id: key + 'TBBar', color: TimerWidget.colorLookup[key]}], key + 'TBTime'));
 					l('TimerBar').appendChild(TimerBarShimmer);
 					
 					TimerBarShimmer.style.display = '';
@@ -145,7 +146,7 @@ TimerWidget.launch = function(){
 					classColor = TimerWidget.colorLookup[Game.buffs[i].name];
 				}
 				else {
-					classColor = 'Purple';
+					classColor = TimerWidget.colorLookup['default'];
 				}
 				l(TimerBarBuff.id + 'Bar').style.backgroundColor = classColor;
 				l(TimerBarBuff.id + 'Bar').style.width = Math.round(Game.buffs[i].time * maxWidth / Game.buffs[i].maxTime) + 'px';

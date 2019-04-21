@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.28';
+CCSE.version = '0.29';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -10,10 +10,12 @@ CCSE.launch = function(){
 		// Define more parts of CCSE
 		CCSE.Backup = {};
 		CCSE.collapseMenu = {};
+		if(!Game.customMinigame) Game.customMinigame = {};
 	
 		
 		// Inject the hooks into the main game
 		CCSE.ReplaceMainGame();
+		CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, "Wizard tower");
 		
 		
 		// Show the version number in Stats
@@ -1542,10 +1544,88 @@ CCSE.launch = function(){
 		else Game.customMinigameOnLoad[objKey].push(func);
 	}
 	
+	CCSE.ReplaceGrimoire = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj;
+		var objKey = "Wizard tower";
+		var M = Game.Objects[objKey].minigame;
+		
+		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
+		
+		
+		// M.computeMagicM
+		if(!Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM = [];
+		temp = M.computeMagicM.toString();
+		eval('M.computeMagicM = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.getFailChance
+		// functions should return a value to multiply failChance by (Return 1 for no effect)
+		if(!Game.customMinigame[objKey].getFailChance) Game.customMinigame[objKey].getFailChance = [];
+		temp = M.getFailChance.toString();
+		eval('M.getFailChance = ' + temp.replace('return', `
+			for(var i in Game.customMinigame[objKey].getFailChance) failChance *= Game.customMinigame[objKey].getFailChance[i](spell);
+			return`));
+		
+		
+		// M.castSpell
+		// I'm open to suggestions
+		
+		
+		// M.getSpellCost
+		// functions should return a value to multiply out by (Return 1 for no effect)
+		if(!Game.customMinigame[objKey].getSpellCost) Game.customMinigame[objKey].getSpellCost = [];
+		temp = M.getSpellCost.toString();
+		eval('M.getSpellCost = ' + temp.replace('return', `
+			for(var i in Game.customMinigame[objKey].getSpellCost) out *= Game.customMinigame[objKey].getSpellCost[i](spell);
+			return`));
+		
+		
+		// M.getSpellCostBreakdown
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].getSpellCostBreakdown) Game.customMinigame[objKey].getSpellCostBreakdown = [];
+		temp = M.getSpellCostBreakdown.toString();
+		eval('M.getSpellCostBreakdown = ' + temp.replace('return', `
+			for(var i in Game.customMinigame[objKey].getSpellCostBreakdown) str = Game.customMinigame[objKey].getSpellCostBreakdown[i](spell, str);
+			return`));
+		
+		
+		// M.spellTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].spellTooltip) Game.customMinigame[objKey].spellTooltip = [];
+		temp = M.spellTooltip.toString();
+		eval('M.spellTooltip = ' + temp.replace('return str', `
+				for(var i in Game.customMinigame[objKey].spellTooltip) str = Game.customMinigame[objKey].spellTooltip[i](id, str);
+				return str`));
+		
+		
+		// M.refillTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
+		temp = M.refillTooltip.toString();
+		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
+			return str;
+		` + temp.slice(-1));
+		
+	}
+	
+	CCSE.ReplaceSpell = function(key){
+		
+	}
+	
 	
 	/*=====================================================================================
 	Grimoire
 	=======================================================================================*/
+	if(!CCSE.customRedrawSpells) CCSE.customRedrawSpells = [];
 	CCSE.RedrawSpells = function(){
 		var str = '';
 		var M = Game.Objects['Wizard tower'].minigame;
@@ -1563,6 +1643,7 @@ CCSE.launch = function(){
 			AddEvent(l('grimoireSpell' + me.id), 'click', function(spell){return function(){PlaySound('snd/tick.mp3'); M.castSpell(spell);}}(me));
 		}
 		
+		for(var i in CCSE.customRedrawSpells) CCSE.customRedrawSpells[i]();
 		if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();
 	}
 	
@@ -1601,6 +1682,7 @@ CCSE.launch = function(){
 			if(me.parents[ii] != -1) me.parents[ii] = Game.Upgrades[me.parents[ii]];
 		}
 		
+		CCSE.ReplaceUpgrade(name);
 		return me;
 	}
 	

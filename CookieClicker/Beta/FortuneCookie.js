@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.9';
+FortuneCookie.version = '2.10';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -113,12 +113,13 @@ FortuneCookie.launch = function(){
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects['Wizard tower'].minigame;
 			
-			eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
-				.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
-						FortuneCookie.spellForecast(me) + 
-						$1`
-				)
-			);
+			Game.customMinigame['Wizard tower'].spellTooltip.push(function(id, str){
+				return str.replace( '</div></div>', 
+									'<div style="height:8px;"></div>' + 
+									FortuneCookie.spellForecast(M.spellsById[id]) + 
+									'</div></div>');
+			});
+			
 		}, 'Wizard tower');
 	}
 

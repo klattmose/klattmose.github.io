@@ -3,7 +3,7 @@ if(TimerWidget === undefined) var TimerWidget = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/img/timer.png';
 TimerWidget.name = 'Timer Widget';
-TimerWidget.version = '1.3';
+TimerWidget.version = '1.4';
 TimerWidget.GameVersion = '2.019';
 
 TimerWidget.launch = function(){
@@ -68,7 +68,7 @@ TimerWidget.launch = function(){
 		var type = document.createElement('span');
 		type.style.display = 'inline-block';
 		type.style.textAlign = 'right';
-		type.style.width = '108px';
+		type.style.width = '117px';
 		type.style.marginRight = '5px';
 		type.style.verticalAlign = 'text-top';
 		type.textContent = name;
@@ -99,7 +99,7 @@ TimerWidget.launch = function(){
 	
 	TimerWidget.Update = function(){
 		if(Game.specialTab == 'timer'){
-			var maxWidth = l('TimerBar').getBoundingClientRect().width - 159;
+			var maxWidth = l('TimerBar').getBoundingClientRect().width - 185;
 			
 			l('TimerBar').innerHTML = '';
 			

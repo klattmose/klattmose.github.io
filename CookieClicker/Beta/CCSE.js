@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.29';
+CCSE.version = '0.30';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -16,6 +16,7 @@ CCSE.launch = function(){
 		// Inject the hooks into the main game
 		CCSE.ReplaceMainGame();
 		CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, "Wizard tower");
+		CCSE.MinigameReplacer(CCSE.ReplacePantheon, "Temple");
 		
 		
 		// Show the version number in Stats
@@ -1617,7 +1618,90 @@ CCSE.launch = function(){
 		
 	}
 	
-	CCSE.ReplaceSpell = function(key){
+	CCSE.ReplacePantheon = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj;
+		var objKey = "Temple";
+		var M = Game.Objects[objKey].minigame;
+		
+		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
+		
+		
+		// M.godTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].godTooltip) Game.customMinigame[objKey].godTooltip = [];
+		temp = M.godTooltip.toString();
+		eval('M.godTooltip = ' + temp.replace('return str', `
+				for(var i in Game.customMinigame[objKey].godTooltip) str = Game.customMinigame[objKey].godTooltip[i](id, str);
+				return str`));
+		
+		
+		// M.slotTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].slotTooltip) Game.customMinigame[objKey].slotTooltip = [];
+		temp = M.slotTooltip.toString();
+		eval('M.slotTooltip = ' + temp.replace('return str', `
+				for(var i in Game.customMinigame[objKey].slotTooltip) str = Game.customMinigame[objKey].slotTooltip[i](id, str);
+				return str`));
+		
+		
+		// M.useSwap
+		if(!Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap = [];
+		temp = M.useSwap.toString();
+		eval('M.useSwap = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap[i](n); 
+		` + temp.slice(-1));
+		
+		
+		// M.slotGod
+		if(!Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod = [];
+		temp = M.slotGod.toString();
+		eval('M.slotGod = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod[i](god, slot); 
+		` + temp.slice(-1));
+		
+		
+		// M.dragGod
+		if(!Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod = [];
+		temp = M.dragGod.toString();
+		eval('M.dragGod = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod[i](what); 
+		` + temp.slice(-1));
+		
+		
+		// M.dropGod
+		if(!Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod = [];
+		temp = M.dropGod.toString();
+		eval('M.dropGod = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.hoverSlot
+		if(!Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot = [];
+		temp = M.hoverSlot.toString();
+		eval('M.hoverSlot = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot[i](what); 
+		` + temp.slice(-1));
+		
+		
+		// Game.hasGod
+		// Game.forceUnslotGod
+		
+		
+		// M.refillTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
+		temp = M.refillTooltip.toString();
+		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
+			return str;
+		` + temp.slice(-1));
 		
 	}
 	

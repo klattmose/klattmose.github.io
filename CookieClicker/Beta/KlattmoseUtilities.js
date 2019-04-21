@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.5';
+KlattmoseUtilities.version = '2.6';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -911,28 +911,10 @@ KlattmoseUtilities.launch = function(){
 		CCSE.MinigameReplacer(function(){
 			var M = Game.Objects["Temple"].minigame;
 			
-			KlattmoseUtilities.patches.slotGodFix = {};
-			KlattmoseUtilities.patches.slotGodFix.oldFunction = M.slotGod;
+			Game.customMinigame["Temple"].slotGod.push(function(){
+				if(KlattmoseUtilities.config.patches.slotGodFix) delete M.slot[-1];
+			});
 			
-			
-			KlattmoseUtilities.patches.slotGodFix.newFunction = function(god, slot){
-				if(slot == god.slot) return false;
-				
-				if(slot == -1) M.slot[god.slot] = -1;
-				else if(M.slot[slot] != -1) M.godsById[M.slot[slot]].slot = god.slot;
-				
-				if(god.slot != -1 && slot != -1) M.slot[god.slot] = M.slot[slot];
-				if(slot != -1) M.slot[slot] = god.id;
-				
-				god.slot = slot;
-				Game.recalculateGains = true;
-			}
-			
-			
-			M.slotGod = function(god, slot){
-				if(KlattmoseUtilities.config.patches.slotGodFix) KlattmoseUtilities.patches.slotGodFix.newFunction(god, slot);
-				else KlattmoseUtilities.patches.slotGodFix.oldFunction(god, slot);
-			}
 		}, 'Temple');
 		
 	}

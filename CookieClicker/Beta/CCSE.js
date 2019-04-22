@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.30';
+CCSE.version = '0.40';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -15,9 +15,11 @@ CCSE.launch = function(){
 		
 		// Inject the hooks into the main game
 		CCSE.ReplaceMainGame();
-		CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, "Wizard tower");
-		CCSE.MinigameReplacer(CCSE.ReplacePantheon, "Temple");
+		CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, 'Wizard tower');
+		CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
 		
+		// Load any custom save data
+		CCSE.LoadCustomThings();
 		
 		// Show the version number in Stats
 		Game.customStatsMenu.push(function(){
@@ -71,16 +73,11 @@ CCSE.launch = function(){
 		
 		
 		// Game.LoadSave
-		// I do a check before replacing this one. Game.customLoad is already in the game, just unused
-		// Need to do a nesting replace because Game.LoadSave returns a value
-		// This value is passed to the custom functions as ret
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
-			CCSE.Backup.LoadSave = Game.LoadSave;
-			Game.LoadSave = function(data){
-				var ret = CCSE.Backup.LoadSave(data);
-				for(var i in Game.customLoad) ret = Game.customLoad[i](ret);
-				return ret;
-			}
+			temp = Game.LoadSave.toString();
+			eval('Game.LoadSave = ' + temp.replace('if (Game.prefs.showBackupWarning==1)', 
+					`for(var i in Game.customLoad) Game.customLoad[i](); 
+					if (Game.prefs.showBackupWarning==1)`));
 		}
 		
 		
@@ -1553,7 +1550,7 @@ CCSE.launch = function(){
 		var pos = 0;
 		var proto;
 		var obj;
-		var objKey = "Wizard tower";
+		var objKey = 'Wizard tower';
 		var M = Game.Objects[objKey].minigame;
 		
 		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
@@ -1626,7 +1623,7 @@ CCSE.launch = function(){
 		var pos = 0;
 		var proto;
 		var obj;
-		var objKey = "Temple";
+		var objKey = 'Temple';
 		var M = Game.Objects[objKey].minigame;
 		
 		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
@@ -1749,10 +1746,106 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
+	Save custom things
+	If you use CCSE to create custom upgrades or achievements, 
+	it will also save their state to local storage whenever the game is saved.
+	Each custom upgrade or achievement needs a unique name, or they could get overwritten.
+	Yes, this means across mods as well. 
+	If two mods have things with the same name, the mods cannot be used at the same time.
+	This is because of how the game itself keeps track of these things
+	=======================================================================================*/
+	CCSE.SaveCustomThings = function(type){
+		for(var name in CCSE.state.Achievements){
+			if(Game.Achievements[name]){
+				CCSE.state.Achievements[name] = Game.Achievements[name].won;
+			}
+		}
+		
+		for(var name in CCSE.state.Upgrades){
+			if(Game.Upgrades[name]){
+				CCSE.state.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
+				CCSE.state.Upgrades[name].bought = Game.Upgrades[name].bought;
+			}
+		}
+		
+		var str = JSON.stringify(CCSE.state);
+		
+		if(type == 2){
+			return str;
+		}
+		else if (type==1){
+			str = escape(utf8_to_b64(str) + '!END!');
+			return str;
+		}
+		else{
+			str = utf8_to_b64(str) + '!END!';
+			str = escape(str);
+			Game.localStorageSet(CCSE.name, str);
+		}
+	}
+	
+	CCSE.LoadCustomThings = function(data){
+		CCSE.state = null;
+		var str = '';
+		
+		if(data){
+			str = unescape(data);
+		}else{
+			if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
+		}
+		
+		if(str != ''){
+			str = str.split('!END!')[0];
+			str = b64_to_utf8(str);
+			CCSE.state = JSON.parse(str);
+		}
+		
+		
+		if(!CCSE.state) CCSE.state = {};
+		if(!CCSE.state.Achievements) CCSE.state.Achievements = {};
+		if(!CCSE.state.Upgrades) CCSE.state.Upgrades = {};
+		if(!CCSE.state.Buildings) CCSE.state.Buildings = {};
+		
+		for(var name in CCSE.state.Achievements){
+			if(Game.Achievements[name]){
+				Game.Achievements[name].won = CCSE.state.Achievements[name].won;
+			}
+		}
+		
+		for(var name in CCSE.state.Upgrades){
+			if(Game.Upgrades[name]){
+				Game.Upgrades[name].unlocked = CCSE.state.Upgrades[name].unlocked;
+				Game.Upgrades[name].bought = CCSE.state.Upgrades[name].bought;
+			}
+		}
+	}
+	
+	Game.customSave.push(CCSE.SaveCustomThings);
+	Game.customLoad.push(CCSE.LoadCustomThings);
+	
+	
+	/*=====================================================================================
 	Upgrades
 	=======================================================================================*/
-	CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
+	CCSE.NewUpgrade = function(name, desc, price, icon, buyFunction){
 		var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
+		CCSE.ReplaceUpgrade(name);
+		
+		if(CCSE.state.Upgrades[name]){
+			me.unlocked = CCSE.state.Upgrades[name].unlocked;
+			me.bought = CCSE.state.Upgrades[name].bought;
+		}else{
+			CCSE.state.Upgrades[name] = {
+				unlocked: 0,
+				bought: 0
+			}
+		}
+		
+		return me;
+	}
+	
+	CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
+		var me = CCSE.NewUpgrade(name, desc, price, icon, buyFunction);
 		Game.PrestigeUpgrades.push(me);
 		
 		me.pool = 'prestige';
@@ -1766,7 +1859,6 @@ CCSE.launch = function(){
 			if(me.parents[ii] != -1) me.parents[ii] = Game.Upgrades[me.parents[ii]];
 		}
 		
-		CCSE.ReplaceUpgrade(name);
 		return me;
 	}
 	
@@ -1808,7 +1900,7 @@ CCSE.launch = function(){
 	
 	CCSE.SetSpecialMenuImage = function(str, pic, frame){
 		return str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
-						  'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
+						   'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	
 	

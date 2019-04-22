@@ -53,19 +53,19 @@ M.launch = function(){
 		//    Achievements
 		//***********************************
 		M.Achievements = [];
-		M.Achievements.push(new Game.Achievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement('Card trout', 'Win <b>210</b> hands of blackjack.', [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>Wait, what game are you playing again?</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Card trout', 'Win <b>210</b> hands of blackjack.', [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>Wait, what game are you playing again?</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [0, 0, M.iconsImage]));
 			Game.last.pool = 'shadow';
-		M.Achievements.push(new Game.Achievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement('Paid off the dealer', "Win <b>" + (13 * 13) + "</b> hands of blackjack through chancemaker intervention in one ascension.<q>Takes money to make money.</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement('Deal with the Devil', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>Just sign right here.</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Paid off the dealer', "Win <b>" + (13 * 13) + "</b> hands of blackjack through chancemaker intervention in one ascension.<q>Takes money to make money.</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Deal with the Devil', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>Just sign right here.</q>", [0, 0, M.iconsImage]));
 			Game.last.pool = 'shadow';
-		M.Achievements.push(new Game.Achievement('Blackjack!', "Be dealt a hand totaling 21 naturally.", [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>My name is Number 2. This is my Italian confidential secretary. Her name is Alotta. Alotta Fagina.</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(new Game.Achievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('Blackjack!', "Be dealt a hand totaling 21 naturally.", [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>My name is Number 2. This is my Italian confidential secretary. Her name is Alotta. Alotta Fagina.</q>", [0, 0, M.iconsImage]));
+		M.Achievements.push(CCSE.NewAchievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [0, 0, M.iconsImage]));
 			Game.last.pool = 'shadow';
 		
 		for(var i = 0; i < M.Achievements.length; i++) M.Achievements[i].order = 1000000 + i / 100;

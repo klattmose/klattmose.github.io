@@ -1864,6 +1864,25 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
+	Achievements
+	=======================================================================================*/
+	CCSE.NewAchievement = function(name, desc, icon){
+		var me = new Game.Achievement(name, desc, icon);
+		CCSE.ReplaceAchievement(name);
+		
+		if(CCSE.state.Achievements[name]){
+			me.won = CCSE.state.Achievements[name].won;
+		}else{
+			CCSE.state.Achievements[name] = {
+				won: 0
+			}
+		}
+		
+		return me;
+	}
+	
+	
+	/*=====================================================================================
 	GRANDMAPOCALYPSE
 	=======================================================================================*/
 	CCSE.AddMoreWrinklers = function(n){

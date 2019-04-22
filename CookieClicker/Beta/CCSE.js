@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.40';
+CCSE.version = '0.41';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -19,7 +19,7 @@ CCSE.launch = function(){
 		CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
 		
 		// Load any custom save data
-		CCSE.LoadCustomThings();
+		CCSE.LoadSave();
 		
 		// Show the version number in Stats
 		Game.customStatsMenu.push(function(){
@@ -1754,7 +1754,7 @@ CCSE.launch = function(){
 	If two mods have things with the same name, the mods cannot be used at the same time.
 	This is because of how the game itself keeps track of these things
 	=======================================================================================*/
-	CCSE.SaveCustomThings = function(type){
+	CCSE.WriteSave = function(type){
 		for(var name in CCSE.state.Achievements){
 			if(Game.Achievements[name]){
 				CCSE.state.Achievements[name].won = Game.Achievements[name].won;
@@ -1784,7 +1784,7 @@ CCSE.launch = function(){
 		}
 	}
 	
-	CCSE.LoadCustomThings = function(data){
+	CCSE.LoadSave = function(data){
 		CCSE.state = null;
 		var str = '';
 		
@@ -1820,8 +1820,8 @@ CCSE.launch = function(){
 		}
 	}
 	
-	Game.customSave.push(CCSE.SaveCustomThings);
-	Game.customLoad.push(CCSE.LoadCustomThings);
+	Game.customSave.push(CCSE.WriteSave);
+	Game.customLoad.push(CCSE.LoadSave);
 	
 	
 	/*=====================================================================================

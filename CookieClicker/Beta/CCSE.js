@@ -1757,7 +1757,7 @@ CCSE.launch = function(){
 	CCSE.SaveCustomThings = function(type){
 		for(var name in CCSE.state.Achievements){
 			if(Game.Achievements[name]){
-				CCSE.state.Achievements[name] = Game.Achievements[name].won;
+				CCSE.state.Achievements[name].won = Game.Achievements[name].won;
 			}
 		}
 		

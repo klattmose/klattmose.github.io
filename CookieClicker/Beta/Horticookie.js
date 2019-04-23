@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.2';
+Horticookie.version = '3.3';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -19,10 +19,11 @@ Horticookie.launch = function(){
 		Horticookie.plantStatus = {};
 		Horticookie.unlockables = {};
 		Horticookie.unlockableCount = 0;
-		Horticookie.ConfigPrefix = "Horticookie";
 		
-		Horticookie.restoreDefaultConfig(1);
+		Horticookie.restoreDefaultConfig();
 		Horticookie.loadConfig();
+		CCSE.customLoad.push(Horticookie.loadConfig);
+		CCSE.customSave.push(Horticookie.saveConfig);
 		
 		
 		Horticookie.ReplaceNativeGarden();
@@ -97,7 +98,6 @@ Horticookie.launch = function(){
 		if(Game.Objects['Farm'].minigameLoaded) Horticookie.applyPref(prefName);
 		
 		l(button).className = 'option' + ((Horticookie.config[prefName]^invert) ? '' : ' off');
-		Horticookie.saveConfig(Horticookie.config);
 	}
 
 	Horticookie.applyPref = function(prefName){
@@ -123,18 +123,19 @@ Horticookie.launch = function(){
 	}
 
 	Horticookie.saveConfig = function(config){
-		localStorage.setItem(Horticookie.ConfigPrefix, JSON.stringify(config));
+		CCSE.save.OtherMods.Horticookie = Horticookie.config;
 	}
 
 	Horticookie.loadConfig = function(){
-		if (localStorage.getItem(Horticookie.ConfigPrefix) != null) {
-			Horticookie.config = JSON.parse(localStorage.getItem(Horticookie.ConfigPrefix));
+		if(CCSE.save.OtherMods.Horticookie){
+			Horticookie.config.autoHarvest = CCSE.save.OtherMods.Horticookie.autoHarvest;
+			Horticookie.config.allImmortal = CCSE.save.OtherMods.Horticookie.allImmortal;
+			Horticookie.config.accelGarden = CCSE.save.OtherMods.Horticookie.accelGarden;
 		}
 	}
 
-	Horticookie.restoreDefaultConfig = function(mode){
+	Horticookie.restoreDefaultConfig = function(){
 		Horticookie.config = Horticookie.defaultConfig();
-		if(mode == 2) Horticookie.saveConfig(Horticookie.config);
 	}
 
 

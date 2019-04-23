@@ -1,9 +1,9 @@
 Game.Win('Third-party');
 if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.6';
+KlattmoseUtilities.version = '2.7';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -490,7 +490,7 @@ KlattmoseUtilities.launch = function(){
 
 	KlattmoseUtilities.ReplaceNativeGarden = function() {
 		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects["Farm"].minigame;
+			var M = Game.Objects['Farm'].minigame;
 			
 			KlattmoseUtilities.patches.gardenOrderofOperations = {};
 			KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction = M.logic;
@@ -909,9 +909,9 @@ KlattmoseUtilities.launch = function(){
 
 	KlattmoseUtilities.ReplaceNativePantheon = function() {
 		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects["Temple"].minigame;
+			var M = Game.Objects['Temple'].minigame;
 			
-			Game.customMinigame["Temple"].slotGod.push(function(){
+			Game.customMinigame['Temple'].slotGod.push(function(){
 				if(KlattmoseUtilities.config.patches.slotGodFix) delete M.slot[-1];
 			});
 			
@@ -922,7 +922,7 @@ KlattmoseUtilities.launch = function(){
 
 	KlattmoseUtilities.ReplaceNativeGrimoire = function() {
 		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects["Wizard tower"].minigame;
+			var M = Game.Objects['Wizard tower'].minigame;
 			
 			KlattmoseUtilities.patches.gamblersFeverDreamFix = {};
 			KlattmoseUtilities.patches.gamblersFeverDreamFix.oldFunction = M.spells['gambler\'s fever dream'].win;

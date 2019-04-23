@@ -6,8 +6,8 @@ Just some snippets of code I might use later
 /**
 
 TODO:
-Game.dragonLevels
-Game.dragonAuras
+
+Demo Game.customMinigame['Farm'].getMuts function
 
 
 
@@ -69,18 +69,14 @@ Game.customShimmerTypes['golden'].customEffectDurMod.push(function(ret){
 })
 
 
-Game.customShimmerTypes['reindeer'].initFunc.push(outInit)
-
-
 Game.customShimmerTypes['reindeer'].spawnConditions.push(function(ret){
 	return true;
 })
 
 
-var outMsg = function(msg){
+Game.customBuildings['Prism'].buyFree.push(function(msg){
 	console.log(msg);
-}
-Game.customBuildings['Prism'].buyFree.push(outMsg);
+});
 
 
 Game.customBuildings['Prism'].tooltip.push(function(obj, ret){
@@ -96,3 +92,14 @@ for(var i in Game.Upgrades){
 	if(up.buyFunction) console.log(i)
 	if(up.buyFunction) console.log(up.buyFunction.toString())
 }
+
+
+Game.customRebuildUpgrades.push(function(){
+	var cnt = 0;
+	for (var i in Game.UpgradesInStore){
+		var me = Game.UpgradesInStore[i];
+		if(me.pool != 'toggle' && me.pool != 'tech' && !(me.isVaulted && Game.Has('Inspired checklist'))) cnt++;
+	}
+	if(cnt) l('upgrades').style.display = 'block';
+	else l('upgrades').style.display = 'none';
+});

@@ -1,8 +1,8 @@
 Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.10';
+FortuneCookie.version = '2.11';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){

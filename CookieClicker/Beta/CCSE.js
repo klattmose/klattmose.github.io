@@ -1977,12 +1977,14 @@ CCSE.launch = function(){
 	Save custom things
 	If you use CCSE to create custom upgrades or achievements, 
 	it will also save their state to local storage whenever the game is saved.
-	Each custom upgrade or achievement needs a unique name, or they could get overwritten.
-	Yes, this means across mods as well. 
-	If two mods have things with the same name, the mods cannot be used at the same time.
-	This is because of how the game itself keeps track of these things
+		Each custom upgrade or achievement needs a unique name, or they could get overwritten.
+		Yes, this means across mods as well. 
+		If two mods have things with the same name, the mods cannot be used at the same time.
+		This is because of how the game itself keeps track of these things
 	
-	You can also use CCSE to save your mod data
+	You can also use CCSE to save your mod data. 
+		Add your save data as a child of CCSE.save.OtherMods. Make sure not to step on anyone else's toes!
+		Push your save function into CCSE.customSave, and push your load function into CCSE.customLoad
 	=======================================================================================*/
 	if(!CCSE.customSave) CCSE.customSave = [];
 	CCSE.WriteSave = function(type){

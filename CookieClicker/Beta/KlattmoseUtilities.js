@@ -289,7 +289,6 @@ KlattmoseUtilities.launch = function(){
 	}
 
 	KlattmoseUtilities.exportConfig = function(){
-		Game.prefs.showBackupWarning = 0;
 		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
 					JSON.stringify(KlattmoseUtilities.config, null, 2) + 
 					'</textarea></div>',['All done!']);

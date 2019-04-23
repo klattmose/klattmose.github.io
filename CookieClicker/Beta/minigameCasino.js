@@ -6,7 +6,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.4';
+M.version = '3.5';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -769,7 +769,15 @@ M.launch = function(){
 			});
 			
 			
-			Game.customLoad.push(function(ret){
+			/*Game.customLoad.push(function(ret){
+				M.load(M.saveString);
+				return ret;
+			});*/
+			CCSE.customLoad.push(function(ret){
+				if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix);
+				if(!M.parent.minigameSave && CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
+				M.saveString = M.parent.minigameSave;
+				
 				M.load(M.saveString);
 				return ret;
 			});

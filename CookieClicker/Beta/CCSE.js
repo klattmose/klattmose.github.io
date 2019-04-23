@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.45';
+CCSE.version = '0.51';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -19,10 +19,19 @@ CCSE.launch = function(){
 		CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
 		CCSE.MinigameReplacer(CCSE.ReplaceGarden, 'Farm');
 		
-		// Load any custom save data
-		CCSE.LoadSave();
 		
-		// Show the version number in Stats
+		// Load any custom save data and inject save functions
+		CCSE.LoadSave();
+		Game.customSave.push(CCSE.WriteSave);
+		Game.customLoad.push(CCSE.LoadSave);
+		
+		
+		
+		// Inject menu functions
+		Game.customOptionsMenu.push(function(){
+			CCSE.AppendCollapsibleOptionsMenu(CCSE.name, CCSE.GetMenuString());
+		});
+		
 		Game.customStatsMenu.push(function(){
 			CCSE.AppendStatsVersionNumber(CCSE.name, CCSE.version);
 		});
@@ -1533,6 +1542,14 @@ CCSE.launch = function(){
 		if(general) general.appendChild(div);
 	}
 	
+	CCSE.GetMenuString = function(){
+		//var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+		var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportSave(); PlaySound(\'snd/tick.mp3\');">Export custom save</a>' +
+										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a></div>';
+		
+		return str;
+	}
+	
 	
 	/*=====================================================================================
 	Minigames
@@ -2063,8 +2080,19 @@ CCSE.launch = function(){
 		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
 	}
 	
-	Game.customSave.push(CCSE.WriteSave);
-	Game.customLoad.push(CCSE.LoadSave);
+	CCSE.ExportSave = function(){
+		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>It contains data that other mods authors decided to allow CCSE to manage, as well as data for custom things added through CCSE (i.e. achivements, upgrades, etc)</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+					CCSE.WriteSave(1) + 
+					'</textarea></div>',['All done!']);
+		l('textareaPrompt').focus();
+		l('textareaPrompt').select();
+	}
+	
+	CCSE.ImportSave = function(){
+		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+		l('textareaPrompt').focus();
+	}
 	
 	
 	/*=====================================================================================

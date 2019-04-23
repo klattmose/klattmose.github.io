@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.12';
+FortuneCookie.version = '2.13';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -52,12 +52,10 @@ FortuneCookie.launch = function(){
 
 	FortuneCookie.setForecastLength = function(length){
 		FortuneCookie.config.spellForecastLength = length;
-		FortuneCookie.saveConfig(FortuneCookie.config);
 	}
 	
 	FortuneCookie.setSimGCs = function(sim){
 		FortuneCookie.config.simGCs = sim;
-		FortuneCookie.saveConfig(FortuneCookie.config);
 	}
 
 	FortuneCookie.getSimGCs = function(){

@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '2.5';
+Horticookie.version = '3.1';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -844,191 +844,171 @@ Horticookie.launch = function(){
 	//    Functions that override the main game
 	//***********************************
 	Horticookie.computeEffs = function(){
-		Horticookie.Backup.computeEffs();
 		Horticookie.recalcTileStatus();
 		Horticookie.recalcPlantStatus();
 		if(!Horticookie.M.freeze) Horticookie.recalcAlerts();
 	}
 
-	Horticookie.seedTooltip = function(id){
+	Horticookie.seedTooltip = function(id, str){
 		var M = Horticookie.M;
-		var old_fn = Horticookie.Backup.seedTooltip(id);
-		return function(){
-			var tt = old_fn();
-			if(id < 0 || id >= M.plantsById.length) {
-				return tt;
+		var tt = str;
+		if(id < 0 || id >= M.plantsById.length) {
+			return tt;
+		} else {
+			var plant = M.plantsById[id];
+			var recipes = Horticookie.getRecipes(plant);
+			var rhtml = '';
+			var ps = Horticookie.plantStatus[plant.key];
+			
+			if(ps.status === Horticookie.statusCodes.DANGER) {
+				rhtml = '<span class="red">This plant is growing in your garden, and is in danger</span>';
+			} else if(ps.status === Horticookie.statusCodes.PREMATURE) {
+				rhtml = '<span class="green">This plant is growing in your garden</span>';
+			} else if(ps.status === Horticookie.statusCodes.MATURE) {
+				rhtml = '<span class="green"><b>This plant is mature in your garden</b></span>';
+			} else if(ps.status === Horticookie.statusCodes.MAYGROW) {
+				rhtml = '<b>This plant may grow in your garden next tick (' + Horticookie.formatPercentage(ps.probGrowthNextTick) +')</b>';
+			} else if(ps.status !== Horticookie.statusCodes.UNLOCKED) {
+				rhtml = "You haven't unlocked this seed yet";
+			}
+			if(rhtml) {
+				rhtml = '<div style="white-space: nowrap; text-align: center; margin-bottom: 0.25em;">' + rhtml + '</div>';
+			}
+			
+			for(var k = 0; k < recipes.length; ++k) {
+				var hh = Horticookie.toHTML(recipes[k]);
+				if(!Horticookie.recipeUnlocked(recipes[k])) {
+					hh = '<s>' + hh + '</s>';
+				}
+				rhtml += '<div style="white-space: nowrap; margin-top: 0.5em;">' + hh + '</div>';
+			}
+			
+			if(rhtml) {
+				return tt.replace(/<\/div>$/, '<div class="line"></div>' + rhtml +
+								  '<div style="margin-top: 0.5em; text-align: center;">' +
+								  '<small>(M) = mature, (AA) = any age</small></div></div>');
 			} else {
-				var plant = M.plantsById[id];
-				var recipes = Horticookie.getRecipes(plant);
-				var rhtml = '';
-				var ps = Horticookie.plantStatus[plant.key];
-				
-				if(ps.status === Horticookie.statusCodes.DANGER) {
-					rhtml = '<span class="red">This plant is growing in your garden, and is in danger</span>';
-				} else if(ps.status === Horticookie.statusCodes.PREMATURE) {
-					rhtml = '<span class="green">This plant is growing in your garden</span>';
-				} else if(ps.status === Horticookie.statusCodes.MATURE) {
-					rhtml = '<span class="green"><b>This plant is mature in your garden</b></span>';
-				} else if(ps.status === Horticookie.statusCodes.MAYGROW) {
-					rhtml = '<b>This plant may grow in your garden next tick (' + Horticookie.formatPercentage(ps.probGrowthNextTick) +')</b>';
-				} else if(ps.status !== Horticookie.statusCodes.UNLOCKED) {
-					rhtml = "You haven't unlocked this seed yet";
-				}
-				if(rhtml) {
-					rhtml = '<div style="white-space: nowrap; text-align: center; margin-bottom: 0.25em;">' + rhtml + '</div>';
-				}
-				
-				for(var k = 0; k < recipes.length; ++k) {
-					var hh = Horticookie.toHTML(recipes[k]);
-					if(!Horticookie.recipeUnlocked(recipes[k])) {
-						hh = '<s>' + hh + '</s>';
-					}
-					rhtml += '<div style="white-space: nowrap; margin-top: 0.5em;">' + hh + '</div>';
-				}
-				
-				if(rhtml) {
-					return tt.replace(/<\/div>$/, '<div class="line"></div>' + rhtml +
-									  '<div style="margin-top: 0.5em; text-align: center;">' +
-									  '<small>(M) = mature, (AA) = any age</small></div></div>');
-				} else {
-					return tt;
-				}
+				return tt;
 			}
 		}
 	}
 
-	Horticookie.tileTooltip = function(x, y){
+	Horticookie.tileTooltip = function(x, y, ret){
 		var M = Horticookie.M;
-		var old_fn = Horticookie.Backup.tileTooltip(x, y);
 		var compare = function(a, b) {return (a < b ? -1 : (a > b ? 1 : 0));}
 		
-		return function() {
-			var str = old_fn();
-			if(!M.isTileUnlocked(x, y)) {
-				return str;
-			} else {
-				var tile = M.plot[y][x];
-				var msg;
-				var ntp = Horticookie.getNTP(x, y);
-				
-				if(tile[0] === 0) {
-					if(ntp.empty === 1) {
-						msg = "<b>Will remain empty next tick</b>";
-					} else {
-						msg = "<div class='line'></div><b>These plants can grow here next tick:</b><br><br><div style='text-align: left;'>";
-						
-						var nextmuts = [];
-						for(var key in ntp.immature) nextmuts.push([M.plants[key].name, ntp.immature[key]]);
-						
-						nextmuts.sort(function(a, b) { return -compare(a[1], b[1]); });
-						for(var i = 0; i < nextmuts.length; ++i) {
-							msg += "<b>" + nextmuts[i][0] + ":</b> " + Horticookie.formatPercentage(nextmuts[i][1]) + "<br>";
-						}
-						
-						msg += "<b>[Nothing]:</b> " + Horticookie.formatPercentage(ntp.empty);
-						msg += "</div>";
-					}
-					
+		var str = ret;
+		if(!M.isTileUnlocked(x, y)) {
+			return str;
+		} else {
+			var tile = M.plot[y][x];
+			var msg;
+			var ntp = Horticookie.getNTP(x, y);
+			
+			if(tile[0] === 0) {
+				if(ntp.empty === 1) {
+					msg = "<b>Will remain empty next tick</b>";
 				} else {
-					msg = '';
-					var plant = M.plantsById[tile[0] - 1];
-					var tmp;
-					var dh = '<div style="margin-top: 0.5em"';
+					msg = "<div class='line'></div><b>These plants can grow here next tick:</b><br><br><div style='text-align: left;'>";
 					
-					if(tile[1] < plant.mature) {
-						tmp = ntp.mature[plant.key];
-						if(tmp === 1) {
-							msg = dh + ' class="green">Will mature next tick (<b>100%</b>)</div>'
-						} else if(tmp > 0) {
-							msg = dh + ' class="green">May mature next tick (<b>' + Horticookie.formatPercentage(tmp) + '</b>)</div>';
-						}
+					var nextmuts = [];
+					for(var key in ntp.immature) nextmuts.push([M.plants[key].name, ntp.immature[key]]);
+					
+					nextmuts.sort(function(a, b) { return -compare(a[1], b[1]); });
+					for(var i = 0; i < nextmuts.length; ++i) {
+						msg += "<b>" + nextmuts[i][0] + ":</b> " + Horticookie.formatPercentage(nextmuts[i][1]) + "<br>";
 					}
 					
-					if(ntp.empty === 1) {
-						msg += dh + ' class="red">Will die next tick (<b>100%</b>)</div>'
-					} else if(ntp.empty) {
-						msg += dh + ' class="red">May die next tick (<b>' + Horticookie.formatPercentage(ntp.empty) + '</b>)</span>';
+					msg += "<b>[Nothing]:</b> " + Horticookie.formatPercentage(ntp.empty);
+					msg += "</div>";
+				}
+				
+			} else {
+				msg = '';
+				var plant = M.plantsById[tile[0] - 1];
+				var tmp;
+				var dh = '<div style="margin-top: 0.5em"';
+				
+				if(tile[1] < plant.mature) {
+					tmp = ntp.mature[plant.key];
+					if(tmp === 1) {
+						msg = dh + ' class="green">Will mature next tick (<b>100%</b>)</div>'
+					} else if(tmp > 0) {
+						msg = dh + ' class="green">May mature next tick (<b>' + Horticookie.formatPercentage(tmp) + '</b>)</div>';
 					}
-					
-					var contam = [];
-					for(var key in ntp.immature) {
-						var p = ntp.immature[key];
-						if(key !== plant.key && p > 0) {
-							contam.push([M.plants[key].name, p]);
-						}
-						contam.sort(function(a, b) { return -compare(a[1], b[1]); });
+				}
+				
+				if(ntp.empty === 1) {
+					msg += dh + ' class="red">Will die next tick (<b>100%</b>)</div>'
+				} else if(ntp.empty) {
+					msg += dh + ' class="red">May die next tick (<b>' + Horticookie.formatPercentage(ntp.empty) + '</b>)</span>';
+				}
+				
+				var contam = [];
+				for(var key in ntp.immature) {
+					var p = ntp.immature[key];
+					if(key !== plant.key && p > 0) {
+						contam.push([M.plants[key].name, p]);
 					}
-					if(contam) {
-						for(var i = 0; i < contam.length; ++i) {
-							msg += dh + ' class="red">May be overtaken by <b>' + contam[i][0] + '</b> (<b>' + Horticookie.formatPercentage(contam[i][1]) + '</b>)</div>';
-						}
-					}
-					
-					if(msg) {
-						msg = '<div class="line"></div>' + msg;
+					contam.sort(function(a, b) { return -compare(a[1], b[1]); });
+				}
+				if(contam) {
+					for(var i = 0; i < contam.length; ++i) {
+						msg += dh + ' class="red">May be overtaken by <b>' + contam[i][0] + '</b> (<b>' + Horticookie.formatPercentage(contam[i][1]) + '</b>)</div>';
 					}
 				}
 				
 				if(msg) {
-					return str.replace(/<q>.*<\/q>/, '').replace(/<\/div>$/, msg + '</div>');
-				} else {
-					return str;
+					msg = '<div class="line"></div>' + msg;
 				}
+			}
+			
+			if(msg) {
+				return str.replace(/<q>.*<\/q>/, '').replace(/<\/div>$/, msg + '</div>');
+			} else {
+				return str;
 			}
 		}
 	}
 
-	Horticookie.getPlantDesc = function(me){
-		var res = Horticookie.Backup.getPlantDesc(me);
+	Horticookie.getPlantDesc = function(me, ret){
 		
 		if(Horticookie.upgradesMap[me.key] && !Game.HasUnlocked(Horticookie.upgradesMap[me.key][0])){
-			res = res.replace(/<\/div>$/,
+			ret = ret.replace(/<\/div>$/,
 				'<div class="line"></div>' +
 				'<div style="text-align: center; white-space: nowrap;">' +
 				'When harvested mature, may drop <span class="green">' + Horticookie.upgradesMap[me.key][0] +
 				'</span> (<b>' + Horticookie.formatPercentage(Horticookie.upgradesMap[me.key][1]) + '</b>)</div></div>');
 		}
 		
-		return res;
+		return ret;
 	}
 
 	Horticookie.buildPanel = function(){
 		var M = Horticookie.M;
 		Horticookie.recalcUnlockables();
 		
-		if(Horticookie.Backup.buildPanel() === false) {
-			return false;
-		}else{
-			if(Horticookie.unlockableCount) {
-				for(var key in Horticookie.unlockables) {
-					var el = document.getElementById('gardenSeed-' + M.plants[key].id);
-					if(el) {
-						var elc = el.cloneNode(true);
-						elc.style.opacity = 0.3;
-						elc.classList.remove('locked');
-						el.parentNode.replaceChild(elc, el);
-					}
+		if(Horticookie.unlockableCount) {
+			for(var key in Horticookie.unlockables) {
+				var el = document.getElementById('gardenSeed-' + M.plants[key].id);
+				if(el) {
+					var elc = el.cloneNode(true);
+					elc.style.opacity = 0.3;
+					elc.classList.remove('locked');
+					el.parentNode.replaceChild(elc, el);
 				}
 			}
 		}
 	}
 
 	Horticookie.unlockSeed = function(me) {
-		if(!Horticookie.Backup.unlockSeed(me)) {
-			return false;
-		} else {
-			Horticookie.recalcPlantStatus();
-			Horticookie.buildPanel();
-		}
+		Horticookie.recalcPlantStatus();
+		Horticookie.buildPanel();
 	}
 
 	Horticookie.lockSeed = function(me) {
-		if(!Horticookie.Backup.lockSeed(me)) {
-			return false;
-		} else {
-			Horticookie.recalcPlantStatus();
-			Horticookie.buildPanel();
-		}
+		Horticookie.recalcPlantStatus();
+		Horticookie.buildPanel();
 	}
 
 
@@ -1054,23 +1034,18 @@ Horticookie.launch = function(){
 
 	Horticookie.ReplaceNativeGarden = function() {
 		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects["Farm"].minigame;
+			var objKey = 'Farm';
+			var M = Game.Objects[objKey].minigame;
 			
-			Horticookie.Backup.computeEffs = M.computeEffs;
-			Horticookie.Backup.seedTooltip = M.seedTooltip;
-			Horticookie.Backup.tileTooltip = M.tileTooltip;
-			Horticookie.Backup.getPlantDesc = M.getPlantDesc;
-			Horticookie.Backup.buildPanel = M.buildPanel;
-			Horticookie.Backup.unlockSeed = M.unlockSeed;
-			Horticookie.Backup.lockSeed = M.lockSeed;
 			
-			M.computeEffs = Horticookie.computeEffs;
-			M.seedTooltip = Horticookie.seedTooltip;
-			M.tileTooltip = Horticookie.tileTooltip;
-			M.getPlantDesc = Horticookie.getPlantDesc;
-			M.buildPanel = Horticookie.buildPanel;
-			M.unlockSeed = Horticookie.unlockSeed;
-			M.lockSeed = Horticookie.lockSeed;
+			Game.customMinigame[objKey].computeEffs.push(Horticookie.computeEffs);
+			Game.customMinigame[objKey].tileTooltip.push(Horticookie.tileTooltip);
+			Game.customMinigame[objKey].seedTooltip.push(Horticookie.seedTooltip);
+			Game.customMinigame[objKey].getPlantDesc.push(Horticookie.getPlantDesc);
+			Game.customMinigame[objKey].buildPanel.push(Horticookie.buildPanel);
+			Game.customMinigame[objKey].unlockSeed.push(Horticookie.unlockSeed);
+			Game.customMinigame[objKey].lockSeed.push(Horticookie.lockSeed);
+			
 			
 			Horticookie.initWithGarden(M);
 			

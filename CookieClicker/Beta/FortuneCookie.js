@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.11';
+FortuneCookie.version = '2.12';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -10,11 +10,10 @@ FortuneCookie.launch = function(){
 		FortuneCookie.isLoaded = 1;
 		FortuneCookie.Backup = {};
 		FortuneCookie.config = {};
-		FortuneCookie.ConfigPrefix = "FortuneCookie";
-		FortuneCookie.loadConfig();
-		if(FortuneCookie.config.spellForecastLength === undefined) FortuneCookie.config.spellForecastLength = 10;
-		if(FortuneCookie.config.simGCs === undefined) FortuneCookie.config.simGCs = 0;
 		
+		FortuneCookie.loadConfig();
+		CCSE.customLoad.push(FortuneCookie.loadConfig);
+		CCSE.customSave.push(FortuneCookie.saveConfig);
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.ReplaceGameMenu();
@@ -40,13 +39,15 @@ FortuneCookie.launch = function(){
 	//    Configuration
 	//***********************************
 	FortuneCookie.saveConfig = function(config){
-		localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
+		CCSE.save.OtherMods.FortuneCookie = FortuneCookie.config;
 	}
 
 	FortuneCookie.loadConfig = function(){
-		if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
-			FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
-		}
+		if(CCSE.save.OtherMods.FortuneCookie) FortuneCookie.config = CCSE.save.OtherMods.FortuneCookie; else FortuneCookie.config = {};
+		
+		// Default values if they're missing
+		if(FortuneCookie.config.spellForecastLength === undefined) FortuneCookie.config.spellForecastLength = 10;
+		if(FortuneCookie.config.simGCs === undefined) FortuneCookie.config.simGCs = 0;
 	}
 
 	FortuneCookie.setForecastLength = function(length){

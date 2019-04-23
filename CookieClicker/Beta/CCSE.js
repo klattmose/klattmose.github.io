@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.43';
+CCSE.version = '0.44';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1981,22 +1981,27 @@ CCSE.launch = function(){
 	Yes, this means across mods as well. 
 	If two mods have things with the same name, the mods cannot be used at the same time.
 	This is because of how the game itself keeps track of these things
+	
+	You can also use CCSE to save your mod data
 	=======================================================================================*/
+	if(!CCSE.customSave) CCSE.customSave = [];
 	CCSE.WriteSave = function(type){
-		for(var name in CCSE.state.Achievements){
+		for(var name in CCSE.save.Achievements){
 			if(Game.Achievements[name]){
-				CCSE.state.Achievements[name].won = Game.Achievements[name].won;
+				CCSE.save.Achievements[name].won = Game.Achievements[name].won;
 			}
 		}
 		
-		for(var name in CCSE.state.Upgrades){
+		for(var name in CCSE.save.Upgrades){
 			if(Game.Upgrades[name]){
-				CCSE.state.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
-				CCSE.state.Upgrades[name].bought = Game.Upgrades[name].bought;
+				CCSE.save.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
+				CCSE.save.Upgrades[name].bought = Game.Upgrades[name].bought;
 			}
 		}
 		
-		var str = JSON.stringify(CCSE.state);
+		for(var i in CCSE.customSave) CCSE.customSave[i]();
+		
+		var str = JSON.stringify(CCSE.save);
 		
 		if(type == 2){
 			return str;
@@ -2012,8 +2017,9 @@ CCSE.launch = function(){
 		}
 	}
 	
+	if(!CCSE.customLoad) CCSE.customLoad = [];
 	CCSE.LoadSave = function(data){
-		CCSE.state = null;
+		CCSE.save = null;
 		var str = '';
 		
 		if(data){
@@ -2025,27 +2031,31 @@ CCSE.launch = function(){
 		if(str != ''){
 			str = str.split('!END!')[0];
 			str = b64_to_utf8(str);
-			CCSE.state = JSON.parse(str);
+			CCSE.save = JSON.parse(str);
 		}
 		
 		
-		if(!CCSE.state) CCSE.state = {};
-		if(!CCSE.state.Achievements) CCSE.state.Achievements = {};
-		if(!CCSE.state.Upgrades) CCSE.state.Upgrades = {};
-		if(!CCSE.state.Buildings) CCSE.state.Buildings = {};
+		if(!CCSE.save) CCSE.save = {};
+		if(!CCSE.save.Achievements) CCSE.save.Achievements = {};
+		if(!CCSE.save.Upgrades) CCSE.save.Upgrades = {};
+		if(!CCSE.save.Buildings) CCSE.save.Buildings = {};
+		if(!CCSE.save.Buffs) CCSE.save.Buffs = {};
+		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
 		
-		for(var name in CCSE.state.Achievements){
+		for(var name in CCSE.save.Achievements){
 			if(Game.Achievements[name]){
-				Game.Achievements[name].won = CCSE.state.Achievements[name].won;
+				Game.Achievements[name].won = CCSE.save.Achievements[name].won;
 			}
 		}
 		
-		for(var name in CCSE.state.Upgrades){
+		for(var name in CCSE.save.Upgrades){
 			if(Game.Upgrades[name]){
-				Game.Upgrades[name].unlocked = CCSE.state.Upgrades[name].unlocked;
-				Game.Upgrades[name].bought = CCSE.state.Upgrades[name].bought;
+				Game.Upgrades[name].unlocked = CCSE.save.Upgrades[name].unlocked;
+				Game.Upgrades[name].bought = CCSE.save.Upgrades[name].bought;
 			}
 		}
+		
+		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
 	}
 	
 	Game.customSave.push(CCSE.WriteSave);
@@ -2059,11 +2069,11 @@ CCSE.launch = function(){
 		var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
 		CCSE.ReplaceUpgrade(name);
 		
-		if(CCSE.state.Upgrades[name]){
-			me.unlocked = CCSE.state.Upgrades[name].unlocked;
-			me.bought = CCSE.state.Upgrades[name].bought;
+		if(CCSE.save.Upgrades[name]){
+			me.unlocked = CCSE.save.Upgrades[name].unlocked;
+			me.bought = CCSE.save.Upgrades[name].bought;
 		}else{
-			CCSE.state.Upgrades[name] = {
+			CCSE.save.Upgrades[name] = {
 				unlocked: 0,
 				bought: 0
 			}
@@ -2098,10 +2108,10 @@ CCSE.launch = function(){
 		var me = new Game.Achievement(name, desc, icon);
 		CCSE.ReplaceAchievement(name);
 		
-		if(CCSE.state.Achievements[name]){
-			me.won = CCSE.state.Achievements[name].won;
+		if(CCSE.save.Achievements[name]){
+			me.won = CCSE.save.Achievements[name].won;
 		}else{
-			CCSE.state.Achievements[name] = {
+			CCSE.save.Achievements[name] = {
 				won: 0
 			}
 		}

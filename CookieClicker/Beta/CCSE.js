@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.41';
+CCSE.version = '0.43';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -17,6 +17,7 @@ CCSE.launch = function(){
 		CCSE.ReplaceMainGame();
 		CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, 'Wizard tower');
 		CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
+		CCSE.MinigameReplacer(CCSE.ReplaceGarden, 'Farm');
 		
 		// Load any custom save data
 		CCSE.LoadSave();
@@ -1699,6 +1700,233 @@ CCSE.launch = function(){
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
 			return str;
 		` + temp.slice(-1));
+		
+	}
+	
+	CCSE.ReplaceGarden = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj;
+		var objKey = 'Farm';
+		var M = Game.Objects[objKey].minigame;
+		
+		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
+		
+		
+		// M.getUnlockedN
+		if(!Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN = [];
+		temp = M.getUnlockedN.toString();
+		eval('M.getUnlockedN = ' + temp.replace('return', 
+			`for(var i in Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN[i]();
+			return`));
+		
+		
+		// M.dropUpgrade
+		if(!Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade = [];
+		temp = M.dropUpgrade.toString();
+		eval('M.dropUpgrade = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade[i](upgrade, rate); 
+		` + temp.slice(-1));
+		
+		
+		// M.computeMatures
+		if(!Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures = [];
+		temp = M.computeMatures.toString();
+		eval('M.computeMatures = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures[i](mult); 
+		` + temp.slice(-1));
+		
+		
+		// M.getMuts
+		// functions should push mutations to muts
+		if(!Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts = [];
+		temp = M.getMuts.toString();
+		eval('M.getMuts = ' + temp.replace('return', 
+			`for(var i in Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts[i](neighs, neighsM, muts);
+			return`));
+		
+		
+		// M.computeBoostPlot
+		// You're going to have to use MAXIMUM EFFORT
+		if(!Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot = [];
+		temp = M.computeBoostPlot.toString();
+		eval('M.computeBoostPlot = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.computeEffs
+		// functions should change effs (or not, I'm a comment, not a cop)
+		if(!Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs = [];
+		temp = M.computeEffs.toString();
+		eval('M.computeEffs = ' + temp.replace('M.effs=effs;', 
+			`for(var i in Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs[i](effs);
+			M.effs=effs;`));
+		
+		
+		// M.tools TODO
+		
+		
+		// M.getCost TODO
+		
+		
+		// M.getPlantDesc
+		// Return ret for no effect
+		if(!Game.customMinigame[objKey].getPlantDesc) Game.customMinigame[objKey].getPlantDesc = [];
+		temp = M.getPlantDesc.toString();
+		eval('M.getPlantDesc = ' + temp.replace('return', 'var ret = ').slice(0, -1) + 
+				`for(var i in Game.customMinigame[objKey].getPlantDesc) ret = Game.customMinigame[objKey].getPlantDesc[i](me, ret);
+				return ret;
+			` + temp.slice(-1));
+		
+		
+		// M.soilTooltip
+		// Return str for no effect
+		if(!Game.customMinigame[objKey].soilTooltip) Game.customMinigame[objKey].soilTooltip = [];
+		temp = M.soilTooltip.toString();
+		eval('M.soilTooltip = ' + temp.replace('return str;', 
+				`for(var i in Game.customMinigame[objKey].soilTooltip) str = Game.customMinigame[objKey].soilTooltip[i](id, str);
+				return str;`));
+		
+		
+		// M.seedTooltip
+		// Return str for no effect
+		if(!Game.customMinigame[objKey].seedTooltip) Game.customMinigame[objKey].seedTooltip = [];
+		temp = M.seedTooltip.toString();
+		eval('M.seedTooltip = ' + temp.replace('return str;', 
+				`for(var i in Game.customMinigame[objKey].seedTooltip) str = Game.customMinigame[objKey].seedTooltip[i](id, str);
+				return str;`));
+		
+		
+		// M.toolTooltip
+		// Return str for no effect
+		if(!Game.customMinigame[objKey].toolTooltip) Game.customMinigame[objKey].toolTooltip = [];
+		temp = M.toolTooltip.toString();
+		eval('M.toolTooltip = ' + temp.replace('return str;', 
+				`for(var i in Game.customMinigame[objKey].toolTooltip) str = Game.customMinigame[objKey].toolTooltip[i](id, str);
+				return str;`));
+		
+		
+		// M.tileTooltip
+		// Return ret for no effect
+		if(!Game.customMinigame[objKey].tileTooltip) Game.customMinigame[objKey].tileTooltip = [];
+		temp = M.tileTooltip.toString();
+		eval('M.tileTooltip = ' + temp.replace('return function(){', `return function(){
+				var ret = ''`).split('return str;').join('ret = str;').replace('};',
+				`for(var i in Game.customMinigame[objKey].tileTooltip) ret = Game.customMinigame[objKey].tileTooltip[i](x, y, ret);
+				return ret;
+			};`));
+		
+		
+		// M.refillTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
+		temp = M.refillTooltip.toString();
+		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
+			return str;
+		` + temp.slice(-1));
+		
+		
+		// M.buildPanel
+		if(!Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel = [];
+		temp = M.buildPanel.toString();
+		eval('M.buildPanel = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.buildPlot
+		if(!Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot = [];
+		temp = M.buildPlot.toString();
+		eval('M.buildPlot = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.clickTile
+		if(!Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile = [];
+		temp = M.clickTile.toString();
+		eval('M.clickTile = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile[i](x, y); 
+		` + temp.slice(-1));
+		
+		
+		// M.useTool
+		
+		
+		// M.getTile
+		// Return ret to have no effect
+		if(!Game.customMinigame[objKey].getTile) Game.customMinigame[objKey].getTile = []; 
+		CCSE.Backup.getTile = M.getTile;
+		M.getTile = function(x, y){
+			var ret = CCSE.Backup.getTile(x, y);
+			for(var i in Game.customMinigame[objKey].getTile) ret = Game.customMinigame[objKey].getTile[i](x, y, ret);
+			return ret;
+		}
+		
+		
+		// M.getTile
+		// Return ret to have no effect
+		if(!Game.customMinigame[objKey].isTileUnlocked) Game.customMinigame[objKey].isTileUnlocked = []; 
+		CCSE.Backup.isTileUnlocked = M.isTileUnlocked;
+		M.isTileUnlocked = function(x, y){
+			var ret = CCSE.Backup.isTileUnlocked(x, y);
+			for(var i in Game.customMinigame[objKey].isTileUnlocked) ret = Game.customMinigame[objKey].isTileUnlocked[i](x, y, ret);
+			return ret;
+		}
+		
+		
+		// M.computeStepT
+		if(!Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT = [];
+		temp = M.computeStepT.toString();
+		eval('M.computeStepT = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.convert
+		if(!Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert = [];
+		temp = M.convert.toString();
+		eval('M.convert = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.harvestAll
+		if(!Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll = [];
+		temp = M.harvestAll.toString();
+		eval('M.harvestAll = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll[i](type, mature, mortal); 
+		` + temp.slice(-1));
+		
+		
+		// M.harvest
+		if(!Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest = [];
+		temp = M.harvest.toString();
+		eval('M.harvest = ' + temp.replace('return true;', 
+				`for(var i in Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest[i](x, y, manual);
+				return true;`));
+		
+		
+		// M.unlockSeed
+		if(!Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed = [];
+		temp = M.unlockSeed.toString();
+		eval('M.unlockSeed = ' + temp.replace('return true;', 
+			`for(var i in Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed[i](me);
+			return true;`));
+		
+		
+		// M.lockSeed
+		if(!Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed = [];
+		temp = M.lockSeed.toString();
+		eval('M.lockSeed = ' + temp.replace('return true;', 
+			`for(var i in Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed[i](me);
+			return true;`));
 		
 	}
 	

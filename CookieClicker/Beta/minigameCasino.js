@@ -1,10 +1,12 @@
+if(Game.Objects['Chancemaker'].minigame) throw new Error("Casino prevented from loading by already present Chancemaker minigame.");
+
 Game.Win('Third-party');
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/Beta/CCSE.js');
 var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.0';
+M.version = '3.1';
 M.GameVersion = '2.019';
 
 M.launch = function(){

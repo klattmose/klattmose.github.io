@@ -1003,12 +1003,12 @@ Horticookie.launch = function(){
 
 	Horticookie.unlockSeed = function(me) {
 		Horticookie.recalcPlantStatus();
-		Horticookie.buildPanel();
+		Horticookie.M.buildPanel();
 	}
 
 	Horticookie.lockSeed = function(me) {
 		Horticookie.recalcPlantStatus();
-		Horticookie.buildPanel();
+		Horticookie.M.buildPanel();
 	}
 
 

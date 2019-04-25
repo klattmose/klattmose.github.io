@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.52';
+CCSE.version = '0.53';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2010,22 +2010,42 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
-	Garden
+	Pantheon
 	=======================================================================================*/
-	CCSE.NewPlant = function(key, spell){
-		var M = Game.Objects['Wizard tower'].minigame;
+	CCSE.NewGod = function(key, god){
+		var M = Game.Objects['Temple'].minigame;
 		
-		M.spells[key] = spell;
+		M.gods[key] = spell;
 		
-		M.spellsById = [];
+		M.godsById = [];
 		var n = 0;
-		for(var i in M.spells){
-			M.spells[i].id = n;
-			M.spellsById[n] = M.spells[i];
+		for(var i in M.gods){
+			M.gods[i].id = n;
+			M.godsById[n] = M.gods[i];
 			n++;
 		}
 		
-		CCSE.RedrawSpells();
+		//CCSE.RedrawSpells();
+	}
+	
+	
+	/*=====================================================================================
+	Garden
+	=======================================================================================*/
+	CCSE.NewPlant = function(key, plant){
+		var M = Game.Objects['Farm'].minigame;
+		
+		M.plants[key] = spell;
+		
+		M.plantsById = [];
+		var n = 0;
+		for(var i in M.plants){
+			M.plants[i].id = n;
+			M.plantsById[n] = M.plants[i];
+			n++;
+		}
+		
+		//CCSE.RedrawSpells();
 	}
 	
 	

@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.54';
+CCSE.version = '0.55';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -998,6 +998,7 @@ CCSE.launch = function(){
 		
 	}
 	
+	if(!CCSE.CCSE.customReplaceShimmerType) CCSE.CCSE.customReplaceShimmerType = [];
 	CCSE.ReplaceShimmerType = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1061,8 +1062,11 @@ CCSE.launch = function(){
 		temp = Game.shimmerTypes[key].getTimeMod.toString();
 		eval('Game.shimmerTypes[key].getTimeMod = ' + temp.replace('{', `{
 					for(var i in Game.customShimmerTypes['` + escKey + `'].getTimeMod) m *= Game.customShimmerTypes['` + escKey + `'].getTimeMod[i](me);`));
+		
+		for(var i in CCSE.customReplaceShimmerType) CCSE.customReplaceShimmerType[i](key);
 	}
 	
+	if(!CCSE.CCSE.customReplaceBuilding) CCSE.CCSE.customReplaceBuilding = [];
 	CCSE.ReplaceBuilding = function(key){
 		// A lot of Copy/Paste happened, hence why I did so many functions.
 		// Also, I may not have fully tested each one.
@@ -1232,8 +1236,10 @@ CCSE.launch = function(){
 			for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);
 			return`));
 		
+		for(var i in CCSE.customReplaceBuilding) CCSE.customReplaceBuilding[i](key, obj);
 	}
 	
+	if(!CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade = [];
 	CCSE.ReplaceUpgrade = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1351,7 +1357,7 @@ CCSE.launch = function(){
 			}
 		}
 		
-		
+		for(var i in CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade[i](key, upgrade);
 	}
 	
 	if(!CCSE.customReplaceAchievement) CCSE.customReplaceAchievement = [];

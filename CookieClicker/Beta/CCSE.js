@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.53';
+CCSE.version = '0.54';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1354,6 +1354,7 @@ CCSE.launch = function(){
 		
 	}
 	
+	if(!CCSE.customReplaceAchievement) CCSE.customReplaceAchievement = [];
 	CCSE.ReplaceAchievement = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1373,6 +1374,7 @@ CCSE.launch = function(){
 				for(var i in Game.customAchievements[this.name].click) Game.customAchievements[this.name].click[i](this); 
 			` + temp.slice(-1));
 		
+		for(var i in CCSE.customReplaceAchievement) CCSE.customReplaceAchievement[i](key, achievement);
 	}
 	
 	

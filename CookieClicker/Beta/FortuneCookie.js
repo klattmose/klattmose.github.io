@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.13';
+FortuneCookie.version = '2.14';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -181,6 +181,10 @@ FortuneCookie.launch = function(){
 	//***********************************
 	//    Grimoire forecast
 	//***********************************
+	
+	// customFateChecker functions are for people who add their own outcome to FtHoF
+	if(!FortuneCookie.customFateCheckerWin) FortuneCookie.customFateCheckerWin = [];
+	if(!FortuneCookie.customFateCheckerFail) FortuneCookie.customFateCheckerFail = [];
 	FortuneCookie.FateChecker = function(spellCount, idx, backfire, active){
 		var res = '';
 		var FTHOFcookie = '';
@@ -202,6 +206,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
 			if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
 			
+			for(var i in FortuneCookie.customFateCheckerWin) FortuneCookie.customFateCheckerWin[i](spellCount, idx, choices);
+			
 			FTHOFcookie = choose(choices);
 			res = '<span class="green">' + FTHOFcookie + '</span><br/>';
 			
@@ -217,6 +223,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
 			if (Math.random() < 0.003) choices.push('Free Sugar Lump');
 			if (Math.random() < 0.1) choices=['Blab'];
+			
+			for(var i in FortuneCookie.customFateCheckerFail) FortuneCookie.customFateCheckerFail[i](spellCount, idx, choices);
 			
 			FTHOFcookie = choose(choices);
 			res = '<span class="red">' + FTHOFcookie + '</span><br/>';
@@ -247,6 +255,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
 			if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
 			
+			for(var i in FortuneCookie.customFateCheckerWin) FortuneCookie.customFateCheckerWin[i](spellCount, idx, choices);
+			
 			return choose(choices);
 			
 		} else {
@@ -261,6 +271,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
 			if (Math.random() < 0.003) choices.push('Free Sugar Lump');
 			if (Math.random() < 0.1) choices = ['Blab'];
+			
+			for(var i in FortuneCookie.customFateCheckerFail) FortuneCookie.customFateCheckerFail[i](spellCount, idx, choices);
 			
 			return choose(choices);
 			
@@ -304,7 +316,10 @@ FortuneCookie.launch = function(){
 			}
 		}
 	}
-
+	
+	// customSpellForecast functions should return HTML to append to the spell tooltip.
+	// Return spellForecast to have no effect
+	if(!FortuneCookie.customSpellForecast) FortuneCookie.customSpellForecast = [];
 	FortuneCookie.spellForecast=function(spell){
 		if(FortuneCookie.config.spellForecastLength == 0) return '';
 		var spellOutcome = '<div width="100%"><b>Forecast:</b><br/>';
@@ -427,6 +442,8 @@ FortuneCookie.launch = function(){
 					Math.seedrandom();
 				}
 		}
+		
+		for(var i in CCSE.customSpellForecast) spellOutcome = CCSE.customSpellForecast[i](spellOutcome, spell);
 		return spellOutcome;
 	}
 

@@ -7,8 +7,6 @@ Just some snippets of code I might use later
 
 TODO:
 
-Demo Game.customMinigame['Farm'].getMuts function
-
 Fortune Cookie: Add customizable colors for FtHoF
 
 
@@ -103,4 +101,17 @@ Game.customRebuildUpgrades.push(function(){
 	}
 	if(cnt) l('upgrades').style.display = 'block';
 	else l('upgrades').style.display = 'none';
+});
+
+
+Game.customMinigame['Farm'].getMuts.push(function(neighs, neighsM, muts){
+	if (neighsM['chocoroot']>=1 && neighsM['thumbcorn']>=1) muts.push(['queenbeetLump',1]);
+})
+
+
+Game.customMinigame['Wizard tower'].fateWin.push(function(choices){
+	if(Math.random() < 0.5) choices.push('free sugar lump');
+});
+FortuneCookie.customFateCheckerWin.push(function(spellCount, idx, choices){
+	if(Math.random() < 0.5) choices.push('Free Sugar Lump');
 });

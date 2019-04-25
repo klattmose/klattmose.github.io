@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.51';
+CCSE.version = '0.52';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1631,6 +1631,24 @@ CCSE.launch = function(){
 			return str;
 		` + temp.slice(-1));
 		
+		
+		// M.spells['hand of fate'].win
+		// functions should push a value to choices
+		if(!Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin = [];
+		temp = M.spells['hand of fate'].win.toString();
+		eval('M.spells["hand of fate"].win = ' + temp.replace('newShimmer.force', 
+					`for(var i in Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin[i](choices);
+					newShimmer.force`));
+		
+		
+		// M.spells['hand of fate'].fail
+		// functions should push a value to choices
+		if(!Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail = [];
+		temp = M.spells['hand of fate'].fail.toString();
+		eval('M.spells["hand of fate"].fail = ' + temp.replace('newShimmer.force', 
+					`for(var i in Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail[i](choices);
+					newShimmer.force`));
+		
 	}
 	
 	CCSE.ReplacePantheon = function(){
@@ -1970,10 +1988,31 @@ CCSE.launch = function(){
 		}
 		
 		for(var i in CCSE.customRedrawSpells) CCSE.customRedrawSpells[i]();
-		if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();
 	}
+	// Cookie Monster compatability because it was here first
+	CCSE.customRedrawSpells.push(function(){if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();});
 	
 	CCSE.NewSpell = function(key, spell){
+		var M = Game.Objects['Wizard tower'].minigame;
+		
+		M.spells[key] = spell;
+		
+		M.spellsById = [];
+		var n = 0;
+		for(var i in M.spells){
+			M.spells[i].id = n;
+			M.spellsById[n] = M.spells[i];
+			n++;
+		}
+		
+		CCSE.RedrawSpells();
+	}
+	
+	
+	/*=====================================================================================
+	Garden
+	=======================================================================================*/
+	CCSE.NewPlant = function(key, spell){
 		var M = Game.Objects['Wizard tower'].minigame;
 		
 		M.spells[key] = spell;

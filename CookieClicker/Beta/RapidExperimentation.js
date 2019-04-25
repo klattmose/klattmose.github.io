@@ -9,6 +9,7 @@ TODO:
 
 Demo Game.customMinigame['Farm'].getMuts function
 
+Fortune Cookie: Add customizable colors for FtHoF
 
 
 **/

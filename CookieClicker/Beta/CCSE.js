@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.58';
+CCSE.version = '0.59';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2128,6 +2128,7 @@ CCSE.launch = function(){
 		
 		for(var name in CCSE.save.Buffs){
 			var buff = CCSE.save.Buffs[name];
+			buff.time = 0;
 			if(Game.buffs[buff.name]){
 				if(Game.buffs[buff.name].time){
 					buff.time = Game.buffs[buff.name].time;

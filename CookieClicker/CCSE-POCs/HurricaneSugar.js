@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(HurricaneSugar === undefined) var HurricaneSugar = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 HurricaneSugar.name = 'Hurricane Sugar';
-HurricaneSugar.version = '0.2';
+HurricaneSugar.version = '1.0';
 HurricaneSugar.GameVersion = '2.019';
 
 HurricaneSugar.launch = function(){
@@ -41,7 +41,6 @@ HurricaneSugar.launch = function(){
 		});
 		
 		Game.customShimmerTypes['golden'].customBuff.push(function(me, buff, choice, effectDurMod, mult){
-			console.log(me, buff, choice, effectDurMod, mult);
 			var ret = buff;
 			if(choice == 'hurricane sugar') ret = Game.gainBuff('hurricane sugar', Math.ceil(5 * effectDurMod), 500);
 			return ret;

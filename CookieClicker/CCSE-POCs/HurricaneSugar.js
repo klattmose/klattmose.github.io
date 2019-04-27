@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(HurricaneSugar === undefined) var HurricaneSugar = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 HurricaneSugar.name = 'Hurricane Sugar';
-HurricaneSugar.version = '1.0';
+HurricaneSugar.version = '1.1';
 HurricaneSugar.GameVersion = '2.019';
 
 HurricaneSugar.launch = function(){
@@ -45,6 +45,8 @@ HurricaneSugar.launch = function(){
 			if(choice == 'hurricane sugar') ret = Game.gainBuff('hurricane sugar', Math.ceil(5 * effectDurMod), 500);
 			return ret;
 		});
+		
+		Game.goldenCookieChoices.push('Hurri-Cane Sugar','hurricane sugar');
 	}
 	
 	HurricaneSugar.InjectIntoHandofFate = function(){

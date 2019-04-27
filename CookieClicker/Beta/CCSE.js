@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.55';
+CCSE.version = '0.56';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -124,17 +124,17 @@ CCSE.launch = function(){
 		// Game.tooltip.draw
 		if(!Game.customTooltipDraw) Game.customTooltipDraw = [];
 		temp = Game.tooltip.draw.toString();
-		eval('Game.tooltip.draw = ' + temp.slice(0, -1) + 
-			'\nfor(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin);\n' 
-			+ temp.slice(-1));
+		eval('Game.tooltip.draw = ' + temp.slice(0, -1) + `
+			for(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin); 
+			` + temp.slice(-1));
 		
 		
 		// Game.tooltip.update
 		if(!Game.customTooltipUpdate) Game.customTooltipUpdate = [];
 		temp = Game.tooltip.update.toString();
-		eval('Game.tooltip.update = ' + temp.slice(0, -1) + 
-			'\nfor(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();\n' + 
-			temp.slice(-1));
+		eval('Game.tooltip.update = ' + temp.slice(0, -1) + `
+			for(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();
+			` + temp.slice(-1));
 		
 		
 		// -----     Ascension block     ----- //
@@ -205,7 +205,6 @@ CCSE.launch = function(){
 		
 		// Game.harvestLumps
 		// I doubt this is useful. The functions get called after the interesting stuff happens
-		// TODO make a function that eases adding a lump type
 		// Same for Game.computeLumpType. Pointless to make a generic hook
 		if(!Game.customHarvestLumps) Game.customHarvestLumps = [];
 		temp = Game.harvestLumps.toString();
@@ -998,7 +997,7 @@ CCSE.launch = function(){
 		
 	}
 	
-	if(!CCSE.CCSE.customReplaceShimmerType) CCSE.CCSE.customReplaceShimmerType = [];
+	if(!CCSE.customReplaceShimmerType) CCSE.customReplaceShimmerType = [];
 	CCSE.ReplaceShimmerType = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1066,7 +1065,7 @@ CCSE.launch = function(){
 		for(var i in CCSE.customReplaceShimmerType) CCSE.customReplaceShimmerType[i](key);
 	}
 	
-	if(!CCSE.CCSE.customReplaceBuilding) CCSE.CCSE.customReplaceBuilding = [];
+	if(!CCSE.customReplaceBuilding) CCSE.customReplaceBuilding = [];
 	CCSE.ReplaceBuilding = function(key){
 		// A lot of Copy/Paste happened, hence why I did so many functions.
 		// Also, I may not have fully tested each one.
@@ -1982,7 +1981,7 @@ CCSE.launch = function(){
 		var str = '';
 		var M = Game.Objects['Wizard tower'].minigame;
 		
-		for (var i in M.spells){
+		for(var i in M.spells){
 			var me = M.spells[i];
 			var icon = me.icon || [28,12];
 			str += '<div class="grimoireSpell titleFont" id="grimoireSpell' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.spellTooltip(' + me.id + ')','this') + '><div class="usesIcon shadowFilter grimoireIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="grimoirePrice" id="grimoirePrice' + me.id + '">-</div></div>';
@@ -1990,7 +1989,7 @@ CCSE.launch = function(){
 		
 		l('grimoireSpells').innerHTML = str;
 		
-		for (var i in M.spells){
+		for(var i in M.spells){
 			var me = M.spells[i];
 			AddEvent(l('grimoireSpell' + me.id), 'click', function(spell){return function(){PlaySound('snd/tick.mp3'); M.castSpell(spell);}}(me));
 		}
@@ -2000,6 +1999,7 @@ CCSE.launch = function(){
 	// Cookie Monster compatability because it was here first
 	CCSE.customRedrawSpells.push(function(){if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();});
 	
+	if(!CCSE.customNewSpell) CCSE.customNewSpell = [];
 	CCSE.NewSpell = function(key, spell){
 		var M = Game.Objects['Wizard tower'].minigame;
 		
@@ -2013,6 +2013,7 @@ CCSE.launch = function(){
 			n++;
 		}
 		
+		for(var i in CCSE.customNewSpell) CCSE.customNewSpell[i](key, spell);
 		CCSE.RedrawSpells();
 	}
 	
@@ -2020,6 +2021,43 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Pantheon
 	=======================================================================================*/
+	if(!CCSE.customRedrawGods) CCSE.customRedrawGods = [];
+	CCSE.RedrawGods = function(){
+		var str = '';
+		var M = Game.Objects['Temple'].minigame;
+		
+		for(var i in M.slot){
+			var me = M.slot[i];
+			str += '<div class="ready templeGod templeGod' + (i % 4) + ' templeSlot titleFont" id="templeSlot' + i + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.slotTooltip(' + i + ')', 'this') + '><div class="usesIcon shadowFilter templeGem templeGem' + (parseInt(i) + 1) + '"></div></div>';
+		}
+		l('templeSlots').innerHTML = str;
+		
+		str = '';
+		for(var i in M.gods){
+			var me = M.gods[i];
+			var icon = me.icon || [0,0];
+			str += '<div class="ready templeGod templeGod' + (me.id % 4) + ' titleFont" id="templeGod' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.godTooltip(' + me.id + ')', 'this') + '><div class="usesIcon shadowFilter templeIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="templeSlotDrag" id="templeGodDrag' + me.id + '"></div></div>';
+			str += '<div class="templeGodPlaceholder" id="templeGodPlaceholder' + me.id + '"></div>';
+		}
+		l('templeGods').innerHTML = str;
+		
+		for(var i in M.slot){
+			var me=M.slot[i];
+			AddEvent(l('templeSlot' + i), 'mouseover', function(what){return function(){M.hoverSlot(what);}}(i));
+			AddEvent(l('templeSlot' + i), 'mouseout', function(what){return function(){M.hoverSlot(-1);}}(i));
+		}
+		
+		for(var i in M.gods){
+			var me = M.gods[i];
+			AddEvent(l('templeGodDrag' + me.id), 'mousedown', function(what){return function(){M.dragGod(what);}}(me));
+			AddEvent(l('templeGodDrag' + me.id), 'mouseup', function(what){return function(){M.dropGod(what);}}(me));
+		}
+		
+		M.load(M.save());
+		for(var i in CCSE.customRedrawGods) CCSE.customRedrawGods[i]();
+	}
+	
+	if(!CCSE.customNewGod) CCSE.customNewGod = [];
 	CCSE.NewGod = function(key, god){
 		var M = Game.Objects['Temple'].minigame;
 		
@@ -2033,13 +2071,15 @@ CCSE.launch = function(){
 			n++;
 		}
 		
-		//CCSE.RedrawSpells();
+		for(var i in CCSE.customNewGod) CCSE.customNewGod[i](key, god);
+		CCSE.RedrawGods();
 	}
 	
 	
 	/*=====================================================================================
 	Garden
 	=======================================================================================*/
+	if(!CCSE.customNewPlant) CCSE.customNewPlant = [];
 	CCSE.NewPlant = function(key, plant){
 		var M = Game.Objects['Farm'].minigame;
 		
@@ -2053,7 +2093,8 @@ CCSE.launch = function(){
 			n++;
 		}
 		
-		//CCSE.RedrawSpells();
+		for(var i in CCSE.customNewPlant) CCSE.customNewPlant[i](key, plant);
+		M.buildPanel();
 	}
 	
 	

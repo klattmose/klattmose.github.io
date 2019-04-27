@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.59';
+CCSE.version = '0.60';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -349,15 +349,18 @@ CCSE.launch = function(){
 		// customListPush functions should push strings to list
 		// customEffectDurMod functions should return a multiplier to the effect's duration
 		// customMult functions should return a multiplier to the effect's magnitude (for Lucky, Chain Cookie, and Cookie Storm drops)
+		// customMult functions should return a a buff (result from Game.gainBuff). Return buff for no effect
 		if(!Game.customShimmerTypes['golden'].customListPush) Game.customShimmerTypes['golden'].customListPush = [];
 		if(!Game.customShimmerTypes['golden'].customEffectDurMod) Game.customShimmerTypes['golden'].customEffectDurMod = [];
 		if(!Game.customShimmerTypes['golden'].customMult) Game.customShimmerTypes['golden'].customMult = [];
+		if(!Game.customShimmerTypes['golden'].customBuff) Game.customShimmerTypes['golden'].customBuff = [];
 		temp = Game.shimmerTypes['golden'].popFunc.toString();
 		eval("Game.shimmerTypes['golden'].popFunc = " + temp.replace('var list=[];', `var list=[];
 					for(var i in Game.customShimmerTypes['golden'].customListPush) Game.customShimmerTypes['golden'].customListPush[i](me, list);`
 			).replace('var buff=0;', `var buff=0;
 					for(var i in Game.customShimmerTypes['golden'].customEffectDurMod) effectDurMod *= Game.customShimmerTypes['golden'].customEffectDurMod[i](me);
-					for(var i in Game.customShimmerTypes['golden'].customMult) mult *= Game.customShimmerTypes['golden'].customMult[i](me);`));
+					for(var i in Game.customShimmerTypes['golden'].customMult) mult *= Game.customShimmerTypes['golden'].customMult[i](me);
+					for(var i in Game.customShimmerTypes['golden'].customBuff) buff = Game.customShimmerTypes['golden'].customBuff[i](me, buff, choice, effectDurMod, mult);`));
 		
 		
 		// Game.shimmerTypes['reindeer'].popFunc

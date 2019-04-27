@@ -9,6 +9,7 @@ TODO:
 
 Fortune Cookie: Add customizable colors for FtHoF
 
+CCSE: addLumpType
 
 **/
 
@@ -114,4 +115,16 @@ Game.customMinigame['Wizard tower'].fateWin.push(function(choices){
 });
 FortuneCookie.customFateCheckerWin.push(function(spellCount, idx, choices){
 	if(Math.random() < 0.5) choices.push('Free Sugar Lump');
+});
+
+
+CCSE.NewBuff('hurricane sugar',function(time, pow){
+	return {
+		name: 'Hurri-Cane Sugar',
+		desc: 'Cookie production x'+pow+' for '+Game.sayTime(time*Game.fps,-1)+'!',
+		icon:[29,14],
+		time:time*Game.fps,
+		add:true,
+		power:pow
+	};
 });

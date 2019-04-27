@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.56';
+CCSE.version = '0.58';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2126,6 +2126,19 @@ CCSE.launch = function(){
 			}
 		}
 		
+		for(var name in CCSE.save.Buffs){
+			var buff = CCSE.save.Buffs[name];
+			if(Game.buffs[buff.name]){
+				if(Game.buffs[buff.name].time){
+					buff.time = Game.buffs[buff.name].time;
+					buff.maxTime = Game.buffs[buff.name].maxTime;
+					buff.arg1 = Game.buffs[buff.name].arg1;
+					buff.arg2 = Game.buffs[buff.name].arg2;
+					buff.arg3 = Game.buffs[buff.name].arg3;
+				}
+			}
+		}
+		
 		for(var i in CCSE.customSave) CCSE.customSave[i]();
 		
 		var str = JSON.stringify(CCSE.save);
@@ -2182,6 +2195,17 @@ CCSE.launch = function(){
 			if(Game.Upgrades[name]){
 				Game.Upgrades[name].unlocked = CCSE.save.Upgrades[name].unlocked;
 				Game.Upgrades[name].bought = CCSE.save.Upgrades[name].bought;
+			}
+		}
+		
+		for(var name in CCSE.save.Buffs){
+			var found = false;
+			for(var i in Game.buffTypes) if(Game.buffTypes[i].name == name) found = true;
+			if(found){
+				if(CCSE.save.Buffs[name].time){
+					var buff = CCSE.save.Buffs[name];
+					Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
+				}
 			}
 		}
 		
@@ -2301,6 +2325,32 @@ CCSE.launch = function(){
 						   'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	
+	
+	/*=====================================================================================
+	Buffs
+	=======================================================================================*/
+	CCSE.NewBuff = function(name, func){
+		var me = new Game.buffType(name, func);
+		
+		if(CCSE.save.Buffs[name]){
+			if(CCSE.save.Buffs[name].time){
+				CCSE.save.Buffs[name].name = func().name;
+				var buff = CCSE.save.Buffs[name];
+				Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
+			}
+		}else{
+			CCSE.save.Buffs[name] = {
+				name: func().name,
+				maxTime: 0,
+				time: 0,
+				arg1: 0,
+				arg2: 0,
+				arg3: 0
+			}
+		}
+		
+		return me;
+	}
 	
 	/*=====================================================================================
 	Start your engines

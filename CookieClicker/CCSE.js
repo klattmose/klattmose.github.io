@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.28';
+CCSE.version = '0.29';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1116,7 +1116,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].buyFree) Game.customBuildings[key].buyFree = [];
 		Game.customBuildings[key].buyFree.push(CCSE.customBuildingsAllbuyFree);
 		temp = obj.buyFree.toString();
-		eval('obj.buyFree = ' + temp.slice(0, -1) + `
+		eval('obj.buyFree = ' + temp.replace('if (Game.cookies>=price)', 'if (Game.cookies>=this.basePrice)').slice(0, -1) + `
 				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount); 
 			` + temp.slice(-1));
 		

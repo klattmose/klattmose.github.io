@@ -131,11 +131,11 @@ CCSE.NewBuff('hurricane sugar',function(time, pow){
 
 
 CCSE.NewBuilding('Test building','test building|test building|processed|[X] extra test|[X] extra tests','Runs cookies through various tests to prove their deliciousness.',11,7,{base:'portal',xV:32,yV:32,w:64,rows:2,x:0,y:0},1666666,function(me){
-			var mult=1;
-			mult*=Game.GetTieredCpsMult(me);
-			mult*=Game.magicCpS(me.name);
-			return me.baseCps*mult;
-		},function(){
-			Game.UnlockTiered(this);
-			if (this.amount>=Game.SpecialGrandmaUnlock && Game.Objects['Grandma'].amount>0) Game.Unlock(this.grandma.name);
-		});
+	var mult=1;
+	mult*=Game.GetTieredCpsMult(me);
+	mult*=Game.magicCpS(me.name);
+	return me.baseCps*mult;
+},function(){
+	Game.UnlockTiered(this);
+	if (this.amount>=Game.SpecialGrandmaUnlock && Game.Objects['Grandma'].amount>0) Game.Unlock(this.grandma.name);
+});

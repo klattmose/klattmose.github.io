@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.70';
+CCSE.version = '0.71';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2370,6 +2370,8 @@ CCSE.launch = function(){
 			}
 		}
 		l('buildingsMute').innerHTML=muteStr;
+		
+		Game.recalculateGains = 1;
 	}
 	
 	CCSE.NewBuff = function(name, func){

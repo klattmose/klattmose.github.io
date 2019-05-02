@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.61';
+CCSE.version = '0.70';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2116,6 +2116,21 @@ CCSE.launch = function(){
 	=======================================================================================*/
 	if(!CCSE.customSave) CCSE.customSave = [];
 	CCSE.WriteSave = function(type){
+		for(var name in CCSE.save.Buildings){
+			if(Game.Objects[name]){
+				var saved = CCSE.save.Buildings[name];
+				var me = Game.Objects[name];
+				
+				saved.amount = me.amount;
+				saved.bought = me.bought;
+				saved.totalCookies = me.totalCookies;
+				saved.level = me.level;
+				saved.muted = me.muted;
+				
+				if(Game.isMinigameReady(me)) saved.minigameSave = me.minigame.save(); else saved.minigameSave = '';
+			}
+		}
+		
 		for(var name in CCSE.save.Achievements){
 			if(Game.Achievements[name]){
 				CCSE.save.Achievements[name].won = Game.Achievements[name].won;
@@ -2189,6 +2204,26 @@ CCSE.launch = function(){
 		if(!CCSE.save.Buffs) CCSE.save.Buffs = {};
 		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
 		
+		for(var name in CCSE.save.Buildings){
+			if(Game.Objects[name]){
+				var saved = CCSE.save.Buildings[name];
+				var me = Game.Objects[name];
+				
+				me.switchMinigame(false);
+				me.pics = [];
+				
+				me.amount = saved.amount;
+				me.bought = saved.bought;
+				me.totalCookies = saved.totalCookies;
+				me.level = saved.level;
+				me.muted = saved.muted;
+				me.minigameSave = saved.minigameSave;
+				if(me.minigame && me.minigameLoaded && me.minigame.reset){me.minigame.reset(true); me.minigame.load(me.minigameSave);}
+				
+				Game.BuildingsOwned += me.amount;
+			}
+		}
+		
 		for(var name in CCSE.save.Achievements){
 			if(Game.Achievements[name]){
 				Game.Achievements[name].won = CCSE.save.Achievements[name].won;
@@ -2232,7 +2267,7 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
-	Upgrades
+	Standard creation helpers
 	=======================================================================================*/
 	CCSE.NewUpgrade = function(name, desc, price, icon, buyFunction){
 		var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
@@ -2269,10 +2304,6 @@ CCSE.launch = function(){
 		return me;
 	}
 	
-	
-	/*=====================================================================================
-	Achievements
-	=======================================================================================*/
 	CCSE.NewAchievement = function(name, desc, icon){
 		var me = new Game.Achievement(name, desc, icon);
 		CCSE.ReplaceAchievement(name);
@@ -2282,6 +2313,82 @@ CCSE.launch = function(){
 		}else{
 			CCSE.save.Achievements[name] = {
 				won: 0
+			}
+		}
+		
+		return me;
+	}
+	
+	CCSE.NewBuilding = function(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction, foolObject){
+		var me = new Game.Object(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction);
+		
+		// This is the name, description, and icon used during Business Season
+		if(foolObject) Game.foolObjects[name] = foolObject;
+		
+		CCSE.ReplaceBuilding(name);
+		Game.BuildStore();
+		
+		if(CCSE.save.Buildings[name]){
+			var saved = CCSE.save.Buildings[name];
+			me.amount = saved.amount;
+			me.bought = saved.bought;
+			me.totalCookies = saved.totalCookies;
+			me.level = saved.level;
+			me.muted = saved.muted;
+			me.minigameSave = saved.minigameSave;
+			
+			Game.BuildingsOwned += me.amount;
+			
+		}else{
+			var saved = {};
+			saved.amount = 0;
+			saved.bought = 0;
+			saved.totalCookies = 0;
+			saved.level = 0;
+			saved.muted = 0;
+			saved.minigameSave = '';
+			
+			CCSE.save.Buildings[name] = saved;
+		}
+		
+		var muteStr='<div style="position:absolute;left:8px;bottom:12px;opacity:0.5;">Muted :</div>';
+		for (var i in Game.Objects)
+		{
+			var me=Game.Objects[i];
+			if (me.id>0)
+			{
+				me.canvas=l('rowCanvas'+me.id);
+				me.ctx=me.canvas.getContext('2d',{alpha:false});
+				me.pics=[];
+				var icon=[0*64,me.icon*64];
+				muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me.id+'" style="display:none;background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me.id+'].mute(0);PlaySound(Game.ObjectsById['+me.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getDynamicTooltip('Game.mutedBuildingTooltip('+me.id+')','this')+'></div>';
+				//muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me.id+'" style="display:none;background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me.id+'].mute(0);PlaySound(Game.ObjectsById['+me.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getTooltip('<div style="width:150px;text-align:center;font-size:11px;"><b>Unmute '+me.plural+'</b><br>(Display this building)</div>')+'></div>';
+				
+				AddEvent(me.canvas,'mouseover',function(me){return function(){me.mouseOn=true;}}(me));
+				AddEvent(me.canvas,'mouseout',function(me){return function(){me.mouseOn=false;}}(me));
+				AddEvent(me.canvas,'mousemove',function(me){return function(e){var box=this.getBoundingClientRect();me.mousePos[0]=e.pageX-box.left;me.mousePos[1]=e.pageY-box.top;}}(me));
+			}
+		}
+		l('buildingsMute').innerHTML=muteStr;
+	}
+	
+	CCSE.NewBuff = function(name, func){
+		var me = new Game.buffType(name, func);
+		
+		if(CCSE.save.Buffs[name]){
+			if(CCSE.save.Buffs[name].time){
+				CCSE.save.Buffs[name].name = func().name;
+				var buff = CCSE.save.Buffs[name];
+				Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
+			}
+		}else{
+			CCSE.save.Buffs[name] = {
+				name: func().name,
+				maxTime: 0,
+				time: 0,
+				arg1: 0,
+				arg2: 0,
+				arg3: 0
 			}
 		}
 		
@@ -2329,32 +2436,6 @@ CCSE.launch = function(){
 						   'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	
-	
-	/*=====================================================================================
-	Buffs
-	=======================================================================================*/
-	CCSE.NewBuff = function(name, func){
-		var me = new Game.buffType(name, func);
-		
-		if(CCSE.save.Buffs[name]){
-			if(CCSE.save.Buffs[name].time){
-				CCSE.save.Buffs[name].name = func().name;
-				var buff = CCSE.save.Buffs[name];
-				Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
-			}
-		}else{
-			CCSE.save.Buffs[name] = {
-				name: func().name,
-				maxTime: 0,
-				time: 0,
-				arg1: 0,
-				arg2: 0,
-				arg3: 0
-			}
-		}
-		
-		return me;
-	}
 	
 	/*=====================================================================================
 	Start your engines

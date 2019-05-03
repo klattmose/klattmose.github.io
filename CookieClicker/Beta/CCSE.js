@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.72';
+CCSE.version = '0.73';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2377,8 +2377,8 @@ CCSE.launch = function(){
 		
 		if(art.customBuildingPic){
 			Game.customBuildStore.push(function(){
-				l('productIcon' + me.id).style.backgroundImage = 'url(img/' + art.customBuildingPic + ')';
-				l('productIconOff' + me.id).style.backgroundImage = 'url(img/' + art.customBuildingPic + ')';
+				l('productIcon' + me.id).style.backgroundImage = 'url(' + art.customBuildingPic + ')';
+				l('productIconOff' + me.id).style.backgroundImage = 'url(' + art.customBuildingPic + ')';
 			});
 		}
 		if(art.customIconsPic){

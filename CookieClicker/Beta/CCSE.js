@@ -506,6 +506,14 @@ CCSE.launch = function(){
 		` + temp.slice(-1));
 		
 		
+		// Game.BuildStore
+		if(!Game.customBuildStore) Game.customBuildStore = [];
+		temp = Game.BuildStore.toString();
+		eval('Game.BuildStore = ' + temp.slice(0, -1) + `
+			for(var i in Game.customBuildStore) Game.customBuildStore[i](); 
+		` + temp.slice(-1));
+		
+		
 		// Game.RefreshStore
 		if(!Game.customRefreshStore) Game.customRefreshStore = [];
 		temp = Game.RefreshStore.toString();
@@ -2366,7 +2374,20 @@ CCSE.launch = function(){
 		if(foolObject) Game.foolObjects[name] = foolObject;
 		
 		CCSE.ReplaceBuilding(name);
-		Game.BuildStore();
+		
+		if(art.customBuildingPic){
+			Game.customBuildStore.push(function(){
+				l('productIcon' + me.id).style.backgroundImage = 'url(img/' + art.customBuildingPic + ')';
+				l('productIconOff' + me.id).style.backgroundImage = 'url(img/' + art.customBuildingPic + ')';
+			});
+		}
+		if(art.customIconsPic){
+			Game.customBuildings[name].tooltip.push(function(obj, ret){
+				return ret.replace('background-position', 'background-image:url(' + obj.art.customIconsPic + ');background-position');
+			});
+		}
+		
+		
 		
 		if(CCSE.save.Buildings[name]){
 			var saved = CCSE.save.Buildings[name];
@@ -2391,6 +2412,9 @@ CCSE.launch = function(){
 			CCSE.save.Buildings[name] = saved;
 		}
 		
+		
+		Game.BuildStore();
+		
 		var muteStr='<div style="position:absolute;left:8px;bottom:12px;opacity:0.5;">Muted :</div>';
 		for (var i in Game.Objects)
 		{
@@ -2411,7 +2435,9 @@ CCSE.launch = function(){
 		}
 		l('buildingsMute').innerHTML=muteStr;
 		
+		
 		Game.recalculateGains = 1;
+		return me;
 	}
 	
 	CCSE.NewBuff = function(name, func){

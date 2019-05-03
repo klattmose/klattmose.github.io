@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.71';
+CCSE.version = '0.72';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -740,6 +740,26 @@ CCSE.launch = function(){
 			return`));
 		
 		
+		// Game.TieredUpgrade
+		temp = Game.TieredUpgrade.toString();
+		eval('Game.TieredUpgrade = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
+		// Game.SynergyUpgrade
+		temp = Game.SynergyUpgrade.toString();
+		eval('Game.SynergyUpgrade = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
+		// Game.GrandmaSynergy
+		temp = Game.GrandmaSynergy.toString();
+		eval('Game.GrandmaSynergy = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
+		// Game.NewUpgradeCookie
+		temp = Game.NewUpgradeCookie.toString();
+		eval('Game.NewUpgradeCookie = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
 		// -----     Seasons block     ----- //
 		
 		// Game.computeSeasons
@@ -782,6 +802,26 @@ CCSE.launch = function(){
 		eval('Game.Win = ' + temp.slice(0, -1) + `
 			for(var i in Game.customWin) Game.customWin[i](what); 
 		` + temp.slice(-1));
+		
+		
+		// Game.TieredAchievement
+		temp = Game.TieredAchievement.toString();
+		eval('Game.TieredAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		
+		
+		// Game.ProductionAchievement
+		temp = Game.ProductionAchievement.toString();
+		eval('Game.ProductionAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		
+		
+		// Game.BankAchievement
+		temp = Game.BankAchievement.toString();
+		eval('Game.BankAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		
+		
+		// Game.CpsAchievement
+		temp = Game.CpsAchievement.toString();
+		eval('Game.CpsAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
 		
 		
 		// -----     Buffs block     ----- //

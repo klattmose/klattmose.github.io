@@ -12,7 +12,7 @@ BlackholeInverter.launch = function(){
 		CCSE.NewBuilding('Black hole inverter',
 			'black hole inverter|black hole inverters|extracted|[X]% larger event horizon|[X]% larger event horizon',
 			'Runs cookies through various tests to prove their deliciousness.',
-			0,
+			1,
 			0,
 			{
 				base:'https://klattmose.github.io/CookieClicker/img/blackholeinverter',
@@ -39,7 +39,7 @@ BlackholeInverter.launch = function(){
 			{
 				name:'Hypnodrone',
 				desc:'Autonomous aerial brand ambassadors to "encourage" more sales!',
-				icon:0
+				icon:1
 			}
 		);
 		

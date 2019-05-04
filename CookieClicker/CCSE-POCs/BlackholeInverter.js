@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.1';
+BlackholeInverter.version = '1.2';
 BlackholeInverter.GameVersion = '2.019';
 
 BlackholeInverter.launch = function(){
@@ -11,7 +11,7 @@ BlackholeInverter.launch = function(){
 		
 		CCSE.NewBuilding('Black hole inverter',
 			'black hole inverter|black hole inverters|extracted|[X]% larger event horizon|[X]% larger event horizon',
-			'Runs cookies through various tests to prove their deliciousness.',
+			'Inverts the flow of gravity to get the infinitely delicious cookies from an infinitely dense singularity.',
 			1,
 			1,
 			{

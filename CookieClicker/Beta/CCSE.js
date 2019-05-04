@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.77';
+CCSE.version = '0.78';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -850,6 +850,21 @@ CCSE.launch = function(){
 		eval('Game.updateBuffs = ' + temp.slice(0, -1) + `
 			for(var i in Game.customUpdateBuffs) Game.customUpdateBuffs[i](); 
 		` + temp.slice(-1));
+		
+		
+		for(var i in Game.buffTypes){
+			var buff = Game.buffTypes[i];
+			if(buff.name == 'building buff'){
+				temp = buff.func.toString();
+				eval('buff.func = ' + temp.replace('icon:[obj.iconColumn,14],',
+				'icon:[obj.iconColumn,14,(obj.art.customIconsPic ? obj.art.customIconsPic : 0)],'));
+			}
+			else if(buff.name == 'building debuff'){
+				temp = buff.func.toString();
+				eval('buff.func = ' + temp.replace('icon:[obj.iconColumn,15],',
+				'icon:[obj.iconColumn,15,(obj.art.customIconsPic ? obj.art.customIconsPic : 0)],'));
+			}
+		}
 		
 		
 		// -----     GRANDMAPOCALYPSE block     ----- //

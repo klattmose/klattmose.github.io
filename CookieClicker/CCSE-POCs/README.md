@@ -12,9 +12,21 @@ If you want to make an add-on that uses CCSE, just put this line at the top of y
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
 ```
 
-To wait for CCSE to finish loading before continuing to load your mod, put this at the end of your mod:
+To wait for CCSE to finish loading before continuing to load your mod, frame your mod in this general style:
 
 ```javascript
+if(MyMod === undefined) var MyMod = {};
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
+
+MyMod.launch = function(){
+	/**
+	
+	All the code you want to delay goes here
+	Put "MyMod.isLoaded = 1;" somewhere within
+	
+	**/
+}
+
 if(!MyMod.isLoaded){
 	if(CCSE && CCSE.isLoaded){
 		MyMod.launch();
@@ -27,5 +39,4 @@ if(!MyMod.isLoaded){
 }
 ```
 
-and wrap all the code whose execution you want to delay within MyMod.launch
 

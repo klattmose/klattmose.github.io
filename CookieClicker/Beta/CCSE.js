@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.73';
+CCSE.version = '0.74';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2418,19 +2418,19 @@ CCSE.launch = function(){
 		var muteStr='<div style="position:absolute;left:8px;bottom:12px;opacity:0.5;">Muted :</div>';
 		for (var i in Game.Objects)
 		{
-			var me=Game.Objects[i];
-			if (me.id>0)
+			var me2 = Game.Objects[i];
+			if (me2.id>0)
 			{
-				me.canvas=l('rowCanvas'+me.id);
-				me.ctx=me.canvas.getContext('2d',{alpha:false});
-				me.pics=[];
-				var icon=[0*64,me.icon*64];
-				muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me.id+'" style="display:none;background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me.id+'].mute(0);PlaySound(Game.ObjectsById['+me.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getDynamicTooltip('Game.mutedBuildingTooltip('+me.id+')','this')+'></div>';
-				//muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me.id+'" style="display:none;background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me.id+'].mute(0);PlaySound(Game.ObjectsById['+me.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getTooltip('<div style="width:150px;text-align:center;font-size:11px;"><b>Unmute '+me.plural+'</b><br>(Display this building)</div>')+'></div>';
+				me2.canvas=l('rowCanvas'+me2.id);
+				me2.ctx=me2.canvas.getContext('2d',{alpha:false});
+				me2.pics=[];
+				var icon=[0*64,me2.icon*64];
+				muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me2.id+'" style="display:none;' + (me2.art.customBuildingPic ? 'background-image:url(' + me2.art.customBuildingPic + ');' : '') + 'background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me2.id+'].mute(0);PlaySound(Game.ObjectsById['+me2.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getDynamicTooltip('Game.mutedBuildingTooltip('+me2.id+')','this')+'></div>';
+				//muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me2.id+'" style="display:none;background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me2.id+'].mute(0);PlaySound(Game.ObjectsById['+me2.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getTooltip('<div style="width:150px;text-align:center;font-size:11px;"><b>Unmute '+me2.plural+'</b><br>(Display this building)</div>')+'></div>';
 				
-				AddEvent(me.canvas,'mouseover',function(me){return function(){me.mouseOn=true;}}(me));
-				AddEvent(me.canvas,'mouseout',function(me){return function(){me.mouseOn=false;}}(me));
-				AddEvent(me.canvas,'mousemove',function(me){return function(e){var box=this.getBoundingClientRect();me.mousePos[0]=e.pageX-box.left;me.mousePos[1]=e.pageY-box.top;}}(me));
+				AddEvent(me2.canvas,'mouseover',function(me2){return function(){me2.mouseOn=true;}}(me2));
+				AddEvent(me2.canvas,'mouseout',function(me2){return function(){me2.mouseOn=false;}}(me2));
+				AddEvent(me2.canvas,'mousemove',function(me2){return function(e){var box=this.getBoundingClientRect();me2.mousePos[0]=e.pageX-box.left;me2.mousePos[1]=e.pageY-box.top;}}(me2));
 			}
 		}
 		l('buildingsMute').innerHTML=muteStr;

@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.76';
+CCSE.version = '0.77';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2362,11 +2362,13 @@ CCSE.launch = function(){
 		return me;
 	}
 	
-	CCSE.NewBuilding = function(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction, foolObject){
+	CCSE.NewBuilding = function(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction, foolObject, buildingSpecial){
 		var me = new Game.Object(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction);
 		
 		// This is the name, description, and icon used during Business Season
 		if(foolObject) Game.foolObjects[name] = foolObject;
+		// The name of this building's golden cookie buff and debuff
+		if(buildingSpecial) Game.goldenCookieBuildingBuffs[name] = buildingSpecial;
 		
 		CCSE.ReplaceBuilding(name);
 		

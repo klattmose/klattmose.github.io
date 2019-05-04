@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.4';
+BlackholeInverter.version = '1.5';
 BlackholeInverter.GameVersion = '2.019';
 
 BlackholeInverter.launch = function(){
@@ -91,6 +91,11 @@ BlackholeInverter.launch = function(){
 		last = CCSE.NewAchievement('M87', 'Reach level <b>10</b> black hole inverters.', [1, 26, iconsURL]); 
 			Game.Objects['Black hole inverter'].levelAchiev10 = last; last.order = order + i / 100; i++;
 		
+		
+		
+		Game.customStatsMenu.push(function(){
+			CCSE.AppendStatsVersionNumber(BlackholeInverter.name, BlackholeInverter.version);
+		});
 		
 		// Finish up
 		BlackholeInverter.isLoaded = 1;

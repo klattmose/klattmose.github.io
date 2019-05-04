@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(HurricaneSugar === undefined) var HurricaneSugar = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 HurricaneSugar.name = 'Hurricane Sugar';
-HurricaneSugar.version = '1.1';
+HurricaneSugar.version = '1.2';
 HurricaneSugar.GameVersion = '2.019';
 
 HurricaneSugar.launch = function(){
@@ -22,6 +22,9 @@ HurricaneSugar.launch = function(){
 		HurricaneSugar.InjectIntoGoldenCookie();
 		CCSE.MinigameReplacer(HurricaneSugar.InjectIntoHandofFate, 'Wizard tower');
 		
+		Game.customStatsMenu.push(function(){
+			CCSE.AppendStatsVersionNumber(HurricaneSugar.name, HurricaneSugar.version);
+		});
 		
 		HurricaneSugar.isLoaded = 1;
 	}

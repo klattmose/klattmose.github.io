@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.3';
+Horticookie.version = '3.4';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -29,6 +29,8 @@ Horticookie.launch = function(){
 		Horticookie.ReplaceNativeGarden();
 		Horticookie.ReplaceMainGame();
 		
+		Game.customDraw.push(Horticookie.draw);
+		
 		
 		//***********************************
 		//    Post-Load Hooks 
@@ -50,8 +52,6 @@ Horticookie.launch = function(){
 		Horticookie.buildUpgradesMap();
 		Horticookie.backupPlants();
 		Horticookie.recalcUnlockables();
-		
-		Game.customDraw.push(Horticookie.draw);
 		
 		var gpl = M.plotLimits[M.plotLimits.length - 1];
 		Horticookie.maxPlotWidth = gpl[2] - gpl[0];
@@ -1034,19 +1034,27 @@ Horticookie.launch = function(){
 	}
 
 	Horticookie.ReplaceNativeGarden = function() {
+		var objKey = 'Farm';
+		
+		if(!Game.customMinigame[objKey].computeEffs)  Game.customMinigame[objKey].computeEffs = [];
+		if(!Game.customMinigame[objKey].tileTooltip)  Game.customMinigame[objKey].tileTooltip = [];
+		if(!Game.customMinigame[objKey].seedTooltip)  Game.customMinigame[objKey].seedTooltip = [];
+		if(!Game.customMinigame[objKey].getPlantDesc) Game.customMinigame[objKey].getPlantDesc = [];
+		if(!Game.customMinigame[objKey].buildPanel)   Game.customMinigame[objKey].buildPanel = [];
+		if(!Game.customMinigame[objKey].unlockSeed)   Game.customMinigame[objKey].unlockSeed = [];
+		if(!Game.customMinigame[objKey].lockSeed)     Game.customMinigame[objKey].lockSeed = [];
+		
+		Game.customMinigame[objKey].computeEffs.push(Horticookie.computeEffs);
+		Game.customMinigame[objKey].tileTooltip.push(Horticookie.tileTooltip);
+		Game.customMinigame[objKey].seedTooltip.push(Horticookie.seedTooltip);
+		Game.customMinigame[objKey].getPlantDesc.push(Horticookie.getPlantDesc);
+		Game.customMinigame[objKey].buildPanel.push(Horticookie.buildPanel);
+		Game.customMinigame[objKey].unlockSeed.push(Horticookie.unlockSeed);
+		Game.customMinigame[objKey].lockSeed.push(Horticookie.lockSeed);
+		
 		CCSE.MinigameReplacer(function(){
 			var objKey = 'Farm';
 			var M = Game.Objects[objKey].minigame;
-			
-			
-			Game.customMinigame[objKey].computeEffs.push(Horticookie.computeEffs);
-			Game.customMinigame[objKey].tileTooltip.push(Horticookie.tileTooltip);
-			Game.customMinigame[objKey].seedTooltip.push(Horticookie.seedTooltip);
-			Game.customMinigame[objKey].getPlantDesc.push(Horticookie.getPlantDesc);
-			Game.customMinigame[objKey].buildPanel.push(Horticookie.buildPanel);
-			Game.customMinigame[objKey].unlockSeed.push(Horticookie.unlockSeed);
-			Game.customMinigame[objKey].lockSeed.push(Horticookie.lockSeed);
-			
 			
 			Horticookie.initWithGarden(M);
 			

@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.74';
+CCSE.version = '0.75';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -11,6 +11,7 @@ CCSE.launch = function(){
 		CCSE.Backup = {};
 		CCSE.collapseMenu = {};
 		if(!Game.customMinigame) Game.customMinigame = {};
+		for(var key in Game.Objects) if(!Game.customMinigame[key]) Game.customMinigame[key] = {};
 	
 		
 		// Inject the hooks into the main game
@@ -1615,7 +1616,7 @@ CCSE.launch = function(){
 	CCSE.MinigameReplacer = function(func, objKey){
 		var me = Game.Objects[objKey];
 		if(me.minigameLoaded) func(me, 'minigameScript-' + me.id);
-		else Game.customMinigameOnLoad[objKey].push(func);
+		Game.customMinigameOnLoad[objKey].push(func);
 	}
 	
 	CCSE.ReplaceGrimoire = function(){
@@ -1628,8 +1629,6 @@ CCSE.launch = function(){
 		var obj;
 		var objKey = 'Wizard tower';
 		var M = Game.Objects[objKey].minigame;
-		
-		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
 		
 		
 		// M.computeMagicM
@@ -1720,8 +1719,6 @@ CCSE.launch = function(){
 		var objKey = 'Temple';
 		var M = Game.Objects[objKey].minigame;
 		
-		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
-		
 		
 		// M.godTooltip
 		// functions should return a string value (Return str for no effect)
@@ -1806,8 +1803,6 @@ CCSE.launch = function(){
 		var obj;
 		var objKey = 'Farm';
 		var M = Game.Objects[objKey].minigame;
-		
-		if(!Game.customMinigame[objKey]) Game.customMinigame[objKey] = {};
 		
 		
 		// M.getUnlockedN
@@ -2432,8 +2427,18 @@ CCSE.launch = function(){
 				AddEvent(me2.canvas,'mouseout',function(me2){return function(){me2.mouseOn=false;}}(me2));
 				AddEvent(me2.canvas,'mousemove',function(me2){return function(e){var box=this.getBoundingClientRect();me2.mousePos[0]=e.pageX-box.left;me2.mousePos[1]=e.pageY-box.top;}}(me2));
 			}
+			
+			// new Game.Object breaks the minigames. Have to reload them
+			if(me2.minigameLoaded){
+				var save = me2.minigame.save();
+				me2.minigame.launch();
+				me2.minigame.load(save);
+				
+				for(var func in Game.customMinigameOnLoad[me2.name]) Game.customMinigameOnLoad[me2.name][func](me2);
+			}
 		}
 		l('buildingsMute').innerHTML=muteStr;
+		
 		
 		
 		Game.recalculateGains = 1;

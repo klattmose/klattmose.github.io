@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.14';
+FortuneCookie.version = '2.15';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -109,17 +109,13 @@ FortuneCookie.launch = function(){
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {
-		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects['Wizard tower'].minigame;
-			
-			Game.customMinigame['Wizard tower'].spellTooltip.push(function(id, str){
-				return str.replace( '</div></div>', 
-									'<div style="height:8px;"></div>' + 
-									FortuneCookie.spellForecast(M.spellsById[id]) + 
-									'</div></div>');
-			});
-			
-		}, 'Wizard tower');
+		if(!Game.customMinigame['Wizard tower'].spellTooltip) Game.customMinigame['Wizard tower'].spellTooltip = [];
+		Game.customMinigame['Wizard tower'].spellTooltip.push(function(id, str){
+			return str.replace( '</div></div>', 
+								'<div style="height:8px;"></div>' + 
+								FortuneCookie.spellForecast(Game.Objects['Wizard tower'].minigame.spellsById[id]) + 
+								'</div></div>');
+		});
 	}
 
 

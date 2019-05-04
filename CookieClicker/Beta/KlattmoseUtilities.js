@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.7';
+KlattmoseUtilities.version = '2.9';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -165,7 +165,7 @@ KlattmoseUtilities.launch = function(){
 		//***********************************
 		if(KlattmoseUtilities.postloadHooks) {
 			for(var i = 0; i < KlattmoseUtilities.postloadHooks.length; ++i) {
-				(KlattmoseUtilities.postloadHooks[i])();
+				KlattmoseUtilities.postloadHooks[i]();
 			}
 		}
 		
@@ -907,14 +907,20 @@ KlattmoseUtilities.launch = function(){
 
 
 	KlattmoseUtilities.ReplaceNativePantheon = function() {
-		CCSE.MinigameReplacer(function(){
+		if(!Game.customMinigame['Temple'].slotGod) Game.customMinigame['Temple'].slotGod = [];
+		
+		Game.customMinigame['Temple'].slotGod.push(function(){
+			if(KlattmoseUtilities.config.patches.slotGodFix) delete Game.Objects['Temple'].minigame.slot[-1];
+		});
+		
+		/*CCSE.MinigameReplacer(function(){
 			var M = Game.Objects['Temple'].minigame;
 			
 			Game.customMinigame['Temple'].slotGod.push(function(){
 				if(KlattmoseUtilities.config.patches.slotGodFix) delete M.slot[-1];
 			});
 			
-		}, 'Temple');
+		}, 'Temple');*/
 		
 	}
 

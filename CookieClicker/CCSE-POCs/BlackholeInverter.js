@@ -87,7 +87,7 @@ BlackholeInverter.launch = function(){
 		last = Game.ProductionAchievement('Primordial black holes', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.ProductionAchievement('Naked singularity', 'Black hole inverter', 3); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
-		last = new Game.Achievement('M87', 'Reach level <b>10</b> black hole inverters.', [0, 26, iconsURL]); 
+		last = new Game.Achievement('M87', 'Reach level <b>10</b> black hole inverters.', [1, 26, iconsURL]); 
 			Game.Objects['Black hole inverter'].levelAchiev10 = last; last.order = order + i / 100; i++;
 		
 		

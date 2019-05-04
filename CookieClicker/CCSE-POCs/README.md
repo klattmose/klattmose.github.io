@@ -1,0 +1,1 @@
+# Cookie Clicker Script Extender

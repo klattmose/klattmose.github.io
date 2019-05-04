@@ -13,7 +13,7 @@ BlackholeInverter.launch = function(){
 			'black hole inverter|black hole inverters|extracted|[X]% larger event horizon|[X]% larger event horizon',
 			'Runs cookies through various tests to prove their deliciousness.',
 			1,
-			0,
+			1,
 			{
 				base:'https://klattmose.github.io/CookieClicker/img/blackholeinverter',
 				xV:8,

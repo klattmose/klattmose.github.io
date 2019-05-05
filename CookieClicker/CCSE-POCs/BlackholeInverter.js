@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.6';
+BlackholeInverter.version = '1.7';
 BlackholeInverter.GameVersion = '2.019';
 
 BlackholeInverter.launch = function(){
@@ -44,7 +44,7 @@ BlackholeInverter.launch = function(){
 			['Kugelblitz', 'Spaghettification']
 		);
 		
-		Game.last.displayName='<span style="font-size:80%;position:relative;bottom:4px;">Black hole inverter</span>'; // Shrink the name since it's so large
+		Game.Objects['Black hole inverter'].displayName='<span style="font-size:80%;position:relative;bottom:4px;">Black hole inverter</span>'; // Shrink the name since it's so large
 		
 		
 		// Upgrades

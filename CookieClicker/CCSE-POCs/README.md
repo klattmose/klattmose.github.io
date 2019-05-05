@@ -39,4 +39,48 @@ if(!MyMod.isLoaded){
 }
 ```
 
+## What can you do with CCSE?
 
+More like what can't you do? Seriously, tell me if it can't do something you want it to do. Just make an issue at https://github.com/klattmose/klattmose.github.io/issues
+
+CCSE puts mod hooks in most of the functions in the game, as well as adds some helper functions to make soem things a little easier. Here's a quick list of some of the features
+
+### Menu functions
+
+There are four separate hooks into Game.UpdateMenu.
+
+```javascript
+Game.customMenu
+Game.customOptionsMenu
+Game.customStatsMenu
+Game.customInfoMenu
+```
+
+To use these, just push your menu function into the array you choose, like so:
+
+```javascript
+Game.customMenu.push(MyMod.menuFunction);
+```
+
+Functions in the Game.customMenu will be called whenerver Game.UpdateMenu is called. The other three arrays are used when their particular menu is in focus (i.e. Game.customOptionsMenu functions are only called when the Options menu is open)
+
+There are several functions in CCSE that make menu functions easier.
+* CCSE.AppendOptionsMenu(inp): Accepts input of either string or html element. Appends {inp} to the Options menu.
+* CCSE.AppendCollapsibleOptionsMenu(title, body): {title} must be a string, {body} can be either a string or html element. Appends {body} to the Options menu under a header with {title} as the text. The header has a button to hide {body}.
+* CCSE.AppendStatsGeneral(inp): Accepts input of either string or html element. Appends {inp} to the General section in the Stats menu.
+* CCSE.AppendStatsSpecial(inp): Accepts input of either string or html element. Appends {inp} to the Special section in the Stats menu.
+* CCSE.AppendStatsVersionNumber(modName, versionString): Both inputs must be strings. Adds a line in the format "{modName} version : {versionString} after the Game version in the General section of the Stats menu.
+
+An example of how these functions might be used:
+```javascript
+Game.customOptionsMenu.push(function(){
+	CCSE.AppendCollapsibleOptionsMenu(MyMod.name, MyMod.getMenuString());
+});
+
+Game.customStatsMenu.push(function(){
+	CCSE.AppendStatsVersionNumber(MyMod.name, MyMod.version);
+});
+```
+Of course, MyMod.name, MyMod.version, and MyMod.getMenuString must be declared elsewhere in your add-on.
+
+### 

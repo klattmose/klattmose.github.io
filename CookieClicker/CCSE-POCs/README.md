@@ -65,11 +65,16 @@ Game.customMenu.push(MyMod.menuFunction);
 Functions in the Game.customMenu will be called whenerver Game.UpdateMenu is called. The other three arrays are used when their particular menu is in focus (i.e. Game.customOptionsMenu functions are only called when the Options menu is open)
 
 There are several functions in CCSE that make menu functions easier.
-* CCSE.AppendOptionsMenu(inp): Accepts input of either string or html element. Appends {inp} to the Options menu.
-* CCSE.AppendCollapsibleOptionsMenu(title, body): {title} must be a string, {body} can be either a string or html element. Appends {body} to the Options menu under a header with {title} as the text. The header has a button to hide {body}.
-* CCSE.AppendStatsGeneral(inp): Accepts input of either string or html element. Appends {inp} to the General section in the Stats menu.
-* CCSE.AppendStatsSpecial(inp): Accepts input of either string or html element. Appends {inp} to the Special section in the Stats menu.
-* CCSE.AppendStatsVersionNumber(modName, versionString): Both inputs must be strings. Adds a line in the format "{modName} version : {versionString} after the Game version in the General section of the Stats menu.
+* CCSE.AppendOptionsMenu(inp)
+	* Accepts input of either string or html element. Appends {inp} to the Options menu.
+* CCSE.AppendCollapsibleOptionsMenu(title, body)
+	* {title} must be a string, {body} can be either a string or html element. Appends {body} to the Options menu under a header with {title} as the text. The header has a button to hide {body}.
+* CCSE.AppendStatsGeneral(inp)
+	* Accepts input of either string or html element. Appends {inp} to the General section in the Stats menu.
+* CCSE.AppendStatsSpecial(inp)
+	* Accepts input of either string or html element. Appends {inp} to the Special section in the Stats menu.
+* CCSE.AppendStatsVersionNumber(modName, versionString)
+	* Both inputs must be strings. Adds a line in the format "{modName} version : {versionString} after the Game version in the General section of the Stats menu.
 
 An example of how these functions might be used:
 ```javascript

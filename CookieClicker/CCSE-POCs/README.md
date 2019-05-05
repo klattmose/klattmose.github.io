@@ -93,6 +93,7 @@ CCSE.customSave.push(function(){
 });
 CCSE.customLoad.push(function(){
 	if(CCSE.save.OtherMods.MyMod) MyMod.config = CCSE.save.OtherMods.MyMod; else MyMod.config = {};
+	// Do other things if you want
 });
 ```
 
@@ -104,4 +105,51 @@ CCSE.ImportEditableSave();
 ```
 
 ### Custom upgrades, achievements, buffs, and buildings
+
+CCSE has functions to ease the creation of the above game items. 
+
+* CCSE.NewUpgrade(name, desc, price, icon, buyFunction)
+* CCSE.NewHeavenlyUpgrade(name, desc, price, icon, posX, posY, parents, buyFunction)
+* CCSE.NewAchievement(name, desc, icon)
+* CCSE.NewBuilding(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction, foolObject, buildingSpecial)
+* CCSE.NewBuff(name, func)
+
+If you use these functions, CCSE will know to save the created items automatically, with no extrea effort needed. In addition, the following base game functions have been altered so CCSE will know to save the resultant items:
+
+* Game.TieredUpgrade
+* Game.SynergyUpgrade
+* Game.GrandmaSynergy
+* Game.NewUpgradeCookie
+* Game.TieredAchievement
+* Game.ProductionAchievement
+* Game.BankAchievement
+* Game.CpsAchievement
+
+### Miscellaneous functions
+
+* CCSE.MinigameReplacer(func, objKey)
+
+Use this function to delay the execution of code to after a minigame has loaded, or run it immediately if the minigame already is loaded. 
+
+```javascript
+CCSE.MinigameReplacer(MyMod.AlterGrimoire, 'Wizard tower');
+```
+
+* CCSE.AddMoreWrinklers(n)
+
+Wrinklers are stored in an array. Use this function to add more.
+
+* CCSE.CreateSpecialObject(name, conditionFunc, pictureFunc, drawFunc)
+
+Special objects are Krumblor and Santa in the bottom left corner. You can totally make your own. 
+
+* CCSE.ConfirmGameVersion(modName, modVersion, version)
+* CCSE.ConfirmCCSEVersion(modName, modVersion, version)
+* CCSE.ConfirmGameCCSEVersion(modName, modVersion, gameVersion, ccseVersion)
+
+Use any one of these to preform a version check before loading the code. If the expected version is different from the current version, it shows a prompt allowing the user to cancel loading the mod. 
+
+```javascript
+if(CCSE.ConfirmGameVersion(MyMod.name, MyMod.version, MyMod.GameVersion)) MyMod.init();
+```
 

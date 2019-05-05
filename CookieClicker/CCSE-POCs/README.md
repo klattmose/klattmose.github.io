@@ -41,9 +41,9 @@ if(!MyMod.isLoaded){
 
 ## What can you do with CCSE?
 
-More like what can't you do? Seriously, tell me if it can't do something you want it to do. Just make an issue at https://github.com/klattmose/klattmose.github.io/issues
+More like what can't you do? Seriously, tell me if it can't do something you want it to do. Just make an issue [here](https://github.com/klattmose/klattmose.github.io/issues).
 
-CCSE puts mod hooks in most of the functions in the game, as well as adds some helper functions to make soem things a little easier. Here's a quick list of some of the features
+CCSE puts mod hooks in most of the functions in the game, as well as adds some helper functions to make soem things a little easier. Here's a quick and incomplete list of some of the features.
 
 ### Menu functions
 
@@ -65,11 +65,16 @@ Game.customMenu.push(MyMod.menuFunction);
 Functions in the Game.customMenu will be called whenerver Game.UpdateMenu is called. The other three arrays are used when their particular menu is in focus (i.e. Game.customOptionsMenu functions are only called when the Options menu is open)
 
 There are several functions in CCSE that make menu functions easier.
-* CCSE.AppendOptionsMenu(inp): Accepts input of either string or html element. Appends {inp} to the Options menu.
-* CCSE.AppendCollapsibleOptionsMenu(title, body): {title} must be a string, {body} can be either a string or html element. Appends {body} to the Options menu under a header with {title} as the text. The header has a button to hide {body}.
-* CCSE.AppendStatsGeneral(inp): Accepts input of either string or html element. Appends {inp} to the General section in the Stats menu.
-* CCSE.AppendStatsSpecial(inp): Accepts input of either string or html element. Appends {inp} to the Special section in the Stats menu.
-* CCSE.AppendStatsVersionNumber(modName, versionString): Both inputs must be strings. Adds a line in the format "{modName} version : {versionString} after the Game version in the General section of the Stats menu.
+* CCSE.AppendOptionsMenu(inp)
+	* Accepts input of either string or html element. Appends {inp} to the Options menu.
+* CCSE.AppendCollapsibleOptionsMenu(title, body)
+	* {title} must be a string, {body} can be either a string or html element. Appends {body} to the Options menu under a header with {title} as the text. The header has a button to hide {body}.
+* CCSE.AppendStatsGeneral(inp)
+	* Accepts input of either string or html element. Appends {inp} to the General section in the Stats menu.
+* CCSE.AppendStatsSpecial(inp)
+	* Accepts input of either string or html element. Appends {inp} to the Special section in the Stats menu.
+* CCSE.AppendStatsVersionNumber(modName, versionString)
+	* Both inputs must be strings. Adds a line in the format "{modName} version : {versionString} after the Game version in the General section of the Stats menu.
 
 An example of how these functions might be used:
 ```javascript
@@ -83,4 +88,136 @@ Game.customStatsMenu.push(function(){
 ```
 Of course, MyMod.name, MyMod.version, and MyMod.getMenuString must be declared elsewhere in your add-on.
 
-### 
+### Saving data
+
+If your mod or add-on has configuration choices or other data you'd like to persist between sessions, you'll have to save it at some point and load it later. You could write your own functions for that, or you could let CCSE handle that for you. How? 
+
+```javascript
+CCSE.customSave.push(function(){
+	CCSE.save.OtherMods.MyMod = MyMod.config;
+});
+CCSE.customLoad.push(function(){
+	if(CCSE.save.OtherMods.MyMod) MyMod.config = CCSE.save.OtherMods.MyMod; else MyMod.config = {};
+	// Do other things if you want
+});
+```
+
+This data gets saved very time the game is saved, and loaded every time the game is loaded. the CCSE section of the Options menu has buttons that let you export and import the custom save. If you desire to change the save manually you can use the following functions through the console:
+
+```javascript
+CCSE.ExportEditableSave();
+CCSE.ImportEditableSave();
+```
+
+### Custom upgrades, achievements, buffs, and buildings
+
+CCSE has functions to ease the creation of the above game items. 
+
+* CCSE.NewUpgrade(name, desc, price, icon, buyFunction)
+* CCSE.NewHeavenlyUpgrade(name, desc, price, icon, posX, posY, parents, buyFunction)
+* CCSE.NewAchievement(name, desc, icon)
+* CCSE.NewBuilding(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction, foolObject, buildingSpecial)
+* CCSE.NewBuff(name, func)
+
+If you use these functions, CCSE will know to save the created items automatically, with no extrea effort needed. In addition, the following base game functions have been altered so CCSE will know to save the resultant items:
+
+* Game.TieredUpgrade
+* Game.SynergyUpgrade
+* Game.GrandmaSynergy
+* Game.NewUpgradeCookie
+* Game.TieredAchievement
+* Game.ProductionAchievement
+* Game.BankAchievement
+* Game.CpsAchievement
+
+### Miscellaneous functions
+
+* CCSE.MinigameReplacer(func, objKey)
+
+Use this function to delay the execution of code to after a minigame has loaded, or run it immediately if the minigame already is loaded. 
+
+```javascript
+CCSE.MinigameReplacer(MyMod.AlterGrimoire, 'Wizard tower');
+```
+
+* CCSE.AddMoreWrinklers(n)
+
+Wrinklers are stored in an array. Use this function to add more.
+
+* CCSE.CreateSpecialObject(name, conditionFunc, pictureFunc, drawFunc)
+
+Special objects are Krumblor and Santa in the bottom left corner. You can totally make your own. 
+
+* CCSE.ConfirmGameVersion(modName, modVersion, version)
+* CCSE.ConfirmCCSEVersion(modName, modVersion, version)
+* CCSE.ConfirmGameCCSEVersion(modName, modVersion, gameVersion, ccseVersion)
+
+Use any one of these to preform a version check before loading the code. If the expected version is different from the current version, it shows a prompt allowing the user to cancel loading the mod. 
+
+```javascript
+if(CCSE.ConfirmGameVersion(MyMod.name, MyMod.version, MyMod.GameVersion)) MyMod.init();
+```
+
+## Demo mods
+
+I made a few quick mods to show off the capability of CCSE and provide example code of some of its features.
+
+### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js)
+```javascript
+javascript: (function(){
+	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js');
+}());
+```
+
+If any part of this reminds you of the Timer Bar in Cookie Monster, there's a very good reason for that: large chunks of code were copied from Cookie Monster. 
+
+Provides examples of: 
+* Creating a special object next to Krumblor and Santa
+* Displaying the version number in the Stats menu
+
+### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js)
+```javascript
+javascript: (function(){
+	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js');
+}());
+```
+
+This adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ripen to 1 second.
+
+Provides examples of: 
+* Creating a buff
+* Altering sugar lump times when that buff is active
+* Making a Golden Cookie effect activate that buff
+* Letting Force the Hand of Fate pick the new buff
+* Syncing up Fortune Cookie to be able to predict if FtHoF will call up the new effect
+
+### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js)
+```javascript
+javascript: (function(){
+	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js');
+}());
+```
+
+This adds a new building and an appropriate amount of upgrades and achievments
+
+Provides examples of: 
+* Creating a building
+* Creating upgrades
+* Creating achievements
+
+## Compatibility
+
+CCSE sinks its grabby hooks into a huge number of the game's functions. I haven't done extensive testing with every single Cookie Clicker add-on in existence, so I can't give any definitives. Tell me of any conflicts you find and I'll add them to the list. 
+
+* CCES must be loaded before Cookie Monster. (Load any mod that uses CCSE before Cookie Monster)
+
+## Bugs and suggestions
+
+Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
+
+## Special thanks
+
+Anyone who gives a suggestion or bugfix, especially code that gets implemented into CCSE, will be listed here along with their contribution.
+
+* klattmose
+	* Writing this thing

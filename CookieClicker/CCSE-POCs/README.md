@@ -41,7 +41,7 @@ if(!MyMod.isLoaded){
 
 ## What can you do with CCSE?
 
-More like what can't you do? Seriously, tell me if it can't do something you want it to do. Just make an issue at https://github.com/klattmose/klattmose.github.io/issues
+More like what can't you do? Seriously, tell me if it can't do something you want it to do. Just make an issue [here](https://github.com/klattmose/klattmose.github.io/issues).
 
 CCSE puts mod hooks in most of the functions in the game, as well as adds some helper functions to make soem things a little easier. Here's a quick list of some of the features
 
@@ -83,4 +83,25 @@ Game.customStatsMenu.push(function(){
 ```
 Of course, MyMod.name, MyMod.version, and MyMod.getMenuString must be declared elsewhere in your add-on.
 
-### 
+### Saving data
+
+If your mod or add-on has configuration choices or other data you'd like to persist between sessions, you'll have to save it at some point and load it later. You could write your own functions for that, or you could let CCSE handle that for you. How? 
+
+```javascript
+CCSE.customSave.push(function(){
+	CCSE.save.OtherMods.MyMod = MyMod.config;
+});
+CCSE.customLoad.push(function(){
+	if(CCSE.save.OtherMods.MyMod) MyMod.config = CCSE.save.OtherMods.MyMod; else MyMod.config = {};
+});
+```
+
+This data gets saved very time the game is saved, and loaded every time the game is loaded. the CCSE section of the Options menu has buttons that let you export and import the custom save. If you desire to change the save manually you can use the following functions through the console:
+
+```javascript
+CCSE.ExportEditableSave();
+CCSE.ImportEditableSave();
+```
+
+### Custom upgrades, achievements, buffs, and buildings
+

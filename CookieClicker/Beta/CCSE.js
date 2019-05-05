@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.80';
+CCSE.version = '1.1';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -478,6 +478,25 @@ CCSE.launch = function(){
 		for(var key in Game.Objects){
 			CCSE.ReplaceBuilding(key);
 		}
+		
+		
+		// Game.Object
+		// Alter this function so creating new buildings doesn't break the minigames
+		temp = Game.Object.toString();
+		eval('Game.Object = ' + temp.replace(
+				`var str='<div class="row" id="row'+this.id+'">`, 
+				`var div = document.createElement('div');
+				div.id = 'row'+this.id;
+				div.classList.add('row');
+				var str='`
+			).replace(
+				`str+='<div class="rowSpecial" id="rowSpecial'+this.id+'"></div>';`, 
+				`str+='<div class="rowSpecial" id="rowSpecial'+this.id+'"></div>';
+				div.innerHTML = str;`
+			).replace(
+				`l('rows').innerHTML=l('rows').innerHTML+str;`,
+				`l('rows').appendChild(div);`
+			));
 		
 		
 		// Game.DrawBuildings
@@ -2463,15 +2482,6 @@ CCSE.launch = function(){
 				AddEvent(me2.canvas,'mouseover',function(me2){return function(){me2.mouseOn=true;}}(me2));
 				AddEvent(me2.canvas,'mouseout',function(me2){return function(){me2.mouseOn=false;}}(me2));
 				AddEvent(me2.canvas,'mousemove',function(me2){return function(e){var box=this.getBoundingClientRect();me2.mousePos[0]=e.pageX-box.left;me2.mousePos[1]=e.pageY-box.top;}}(me2));
-			}
-			
-			// new Game.Object breaks the minigames. Have to reload them
-			if(me2.minigameLoaded){
-				var save = me2.minigame.save();
-				me2.minigame.launch();
-				me2.minigame.load(save);
-				
-				for(var func in Game.customMinigameOnLoad[me2.name]) Game.customMinigameOnLoad[me2.name][func](me2);
 			}
 		}
 		l('buildingsMute').innerHTML=muteStr;

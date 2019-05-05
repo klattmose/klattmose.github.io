@@ -6,7 +6,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.5';
+M.version = '3.6';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -23,7 +23,10 @@ M.launch = function(){
 	
 	M.init = function(div){
 		// It's possible that the save data might get lost if entrusted to the game's save
-		if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix); // Import old version that doesn't use CCSE if necessary
+		if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]){
+			CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix); // Import old version that doesn't use CCSE if necessary
+			localStorage.removeItem(M.savePrefix);
+		}
 		if(!M.parent.minigameSave && CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
 		M.saveString = M.parent.minigameSave;
 		
@@ -774,9 +777,9 @@ M.launch = function(){
 				return ret;
 			});*/
 			CCSE.customLoad.push(function(ret){
-				if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix);
-				if(!M.parent.minigameSave && CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
-				M.saveString = M.parent.minigameSave;
+				//if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix);
+				//if(!M.parent.minigameSave && CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
+				M.saveString = CCSE.save.OtherMods[M.name];
 				
 				M.load(M.saveString);
 				return ret;

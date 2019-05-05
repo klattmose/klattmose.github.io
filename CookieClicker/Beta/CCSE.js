@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.79';
+CCSE.version = '0.80';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1617,9 +1617,9 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.GetMenuString = function(){
-		//var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="KlattmoseUtilities.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
 		var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportSave(); PlaySound(\'snd/tick.mp3\');">Export custom save</a>' +
-										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a></div>';
+										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
+										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
 		return str;
 	}
@@ -2238,20 +2238,25 @@ CCSE.launch = function(){
 	}
 	
 	if(!CCSE.customLoad) CCSE.customLoad = [];
-	CCSE.LoadSave = function(data){
+	CCSE.LoadSave = function(data, isJSON){
 		CCSE.save = null;
 		var str = '';
 		
-		if(data){
-			str = unescape(data);
-		}else{
-			if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
-		}
-		
-		if(str != ''){
-			str = str.split('!END!')[0];
-			str = b64_to_utf8(str);
-			CCSE.save = JSON.parse(str);
+		if(isJSON){
+			CCSE.save = JSON.parse(data);
+		} 
+		else{
+			if(data){
+				str = unescape(data);
+			}else{
+				if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
+			}
+			
+			if(str != ''){
+				str = str.split('!END!')[0];
+				str = b64_to_utf8(str);
+				CCSE.save = JSON.parse(str);
+			}
 		}
 		
 		
@@ -2320,6 +2325,20 @@ CCSE.launch = function(){
 	CCSE.ImportSave = function(){
 		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
 					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+		l('textareaPrompt').focus();
+	}
+	
+	CCSE.ExportEditableSave = function(){
+		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>In JSON format for people who want to edit it.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+					CCSE.WriteSave(3) + 
+					'</textarea></div>',['All done!']);
+		l('textareaPrompt').focus();
+		l('textareaPrompt').select();
+	}
+	
+	CCSE.ImportEditableSave = function(){
+		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here (in JSON format).</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value, 1); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
 		l('textareaPrompt').focus();
 	}
 	

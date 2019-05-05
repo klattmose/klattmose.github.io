@@ -159,7 +159,7 @@ I made a few quick mods to show off the capability of CCSE and provide example c
 
 ### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js)
 ```javascript
-javascript: (function () {
+javascript: (function(){
 	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js');
 }());
 ```
@@ -172,7 +172,7 @@ Provides examples of:
 
 ### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js)
 ```javascript
-javascript: (function () {
+javascript: (function(){
 	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js');
 }());
 ```
@@ -188,7 +188,7 @@ Provides examples of:
 
 ### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js)
 ```javascript
-javascript: (function () {
+javascript: (function(){
 	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js');
 }());
 ```

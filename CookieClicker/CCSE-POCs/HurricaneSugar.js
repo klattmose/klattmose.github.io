@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(HurricaneSugar === undefined) var HurricaneSugar = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 HurricaneSugar.name = 'Hurricane Sugar';
-HurricaneSugar.version = '1.3';
+HurricaneSugar.version = '1.4';
 HurricaneSugar.GameVersion = '2.019';
 
 HurricaneSugar.launch = function(){
@@ -20,7 +20,7 @@ HurricaneSugar.launch = function(){
 		
 		Game.customComputeLumpTimes.push(HurricaneSugar.buffedLumpTime);
 		HurricaneSugar.InjectIntoGoldenCookie();
-		CCSE.MinigameReplacer(HurricaneSugar.InjectIntoHandofFate, 'Wizard tower');
+		HurricaneSugar.InjectIntoHandofFate(); // Don't need CCSE.MinigameReplacer if we just push to CCSE arrays
 		
 		Game.customStatsMenu.push(function(){
 			CCSE.AppendStatsVersionNumber(HurricaneSugar.name, HurricaneSugar.version);
@@ -53,6 +53,7 @@ HurricaneSugar.launch = function(){
 	}
 	
 	HurricaneSugar.InjectIntoHandofFate = function(){
+		if(!Game.customMinigame['Wizard tower'].fateWin) Game.customMinigame['Wizard tower'].fateWin = [];
 		Game.customMinigame['Wizard tower'].fateWin.push(function(choices){
 			if(Math.random() < 0.1) choices.push('hurricane sugar');
 		});

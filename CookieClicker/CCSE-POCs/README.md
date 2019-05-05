@@ -43,7 +43,7 @@ if(!MyMod.isLoaded){
 
 More like what can't you do? Seriously, tell me if it can't do something you want it to do. Just make an issue [here](https://github.com/klattmose/klattmose.github.io/issues).
 
-CCSE puts mod hooks in most of the functions in the game, as well as adds some helper functions to make soem things a little easier. Here's a quick list of some of the features
+CCSE puts mod hooks in most of the functions in the game, as well as adds some helper functions to make soem things a little easier. Here's a quick and incomplete list of some of the features.
 
 ### Menu functions
 
@@ -199,3 +199,20 @@ Provides examples of:
 * Creating a building
 * Creating upgrades
 * Creating achievements
+
+## Compatibility
+
+CCSE sinks its grabby hooks into a huge number of the game's functions. I haven't done extensive testing with every single Cookie Clicker add-on in existence, so I can't give any definitives. Tell me of any conflicts you find and I'll add them to the list. 
+
+* CCES must be loaded before Cookie Monster. (Load any mod that uses CCSE before Cookie Monster)
+
+## Bugs and suggestions
+
+Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
+
+## Special thanks
+
+Anyone who gives a suggestion or bugfix, especially code that gets implemented into CCSE, will be listed here along with their contribution.
+
+* klattmose
+	* Writing this thing

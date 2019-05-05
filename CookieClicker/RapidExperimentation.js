@@ -6,10 +6,10 @@ Just some snippets of code I might use later
 /**
 
 TODO:
-Game.dragonLevels
-Game.dragonAuras
 
+Fortune Cookie: Add customizable colors for FtHoF
 
+CCSE: addLumpType
 
 **/
 
@@ -69,18 +69,14 @@ Game.customShimmerTypes['golden'].customEffectDurMod.push(function(ret){
 })
 
 
-Game.customShimmerTypes['reindeer'].initFunc.push(outInit)
-
-
 Game.customShimmerTypes['reindeer'].spawnConditions.push(function(ret){
 	return true;
 })
 
 
-var outMsg = function(msg){
+Game.customBuildings['Prism'].buyFree.push(function(msg){
 	console.log(msg);
-}
-Game.customBuildings['Prism'].buyFree.push(outMsg);
+});
 
 
 Game.customBuildings['Prism'].tooltip.push(function(obj, ret){
@@ -96,3 +92,50 @@ for(var i in Game.Upgrades){
 	if(up.buyFunction) console.log(i)
 	if(up.buyFunction) console.log(up.buyFunction.toString())
 }
+
+
+Game.customRebuildUpgrades.push(function(){
+	var cnt = 0;
+	for (var i in Game.UpgradesInStore){
+		var me = Game.UpgradesInStore[i];
+		if(me.pool != 'toggle' && me.pool != 'tech' && !(me.isVaulted && Game.Has('Inspired checklist'))) cnt++;
+	}
+	if(cnt) l('upgrades').style.display = 'block';
+	else l('upgrades').style.display = 'none';
+});
+
+
+Game.customMinigame['Farm'].getMuts.push(function(neighs, neighsM, muts){
+	if (neighsM['chocoroot']>=1 && neighsM['thumbcorn']>=1) muts.push(['queenbeetLump',1]);
+})
+
+
+Game.customMinigame['Wizard tower'].fateWin.push(function(choices){
+	if(Math.random() < 0.5) choices.push('free sugar lump');
+});
+FortuneCookie.customFateCheckerWin.push(function(spellCount, idx, choices){
+	if(Math.random() < 0.5) choices.push('Free Sugar Lump');
+});
+
+
+CCSE.NewBuff('hurricane sugar',function(time, pow){
+	return {
+		name: 'Hurri-Cane Sugar',
+		desc: 'Cookie production x'+pow+' for '+Game.sayTime(time*Game.fps,-1)+'!',
+		icon:[29,14],
+		time:time*Game.fps,
+		add:true,
+		power:pow
+	};
+});
+
+
+CCSE.NewBuilding('Test building','test building|test building|processed|[X] extra test|[X] extra tests','Runs cookies through various tests to prove their deliciousness.',11,7,{base:'portal',xV:32,yV:32,w:64,rows:2,x:0,y:0},1666666,function(me){
+	var mult=1;
+	mult*=Game.GetTieredCpsMult(me);
+	mult*=Game.magicCpS(me.name);
+	return me.baseCps*mult;
+},function(){
+	Game.UnlockTiered(this);
+	if (this.amount>=Game.SpecialGrandmaUnlock && Game.Objects['Grandma'].amount>0) Game.Unlock(this.grandma.name);
+});

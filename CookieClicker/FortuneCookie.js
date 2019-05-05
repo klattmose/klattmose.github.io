@@ -1,8 +1,8 @@
 Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.9';
+FortuneCookie.version = '2.16';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -10,11 +10,10 @@ FortuneCookie.launch = function(){
 		FortuneCookie.isLoaded = 1;
 		FortuneCookie.Backup = {};
 		FortuneCookie.config = {};
-		FortuneCookie.ConfigPrefix = "FortuneCookie";
-		FortuneCookie.loadConfig();
-		if(FortuneCookie.config.spellForecastLength === undefined) FortuneCookie.config.spellForecastLength = 10;
-		if(FortuneCookie.config.simGCs === undefined) FortuneCookie.config.simGCs = 0;
 		
+		FortuneCookie.loadConfig();
+		CCSE.customLoad.push(FortuneCookie.loadConfig);
+		CCSE.customSave.push(FortuneCookie.saveConfig);
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.ReplaceGameMenu();
@@ -40,23 +39,23 @@ FortuneCookie.launch = function(){
 	//    Configuration
 	//***********************************
 	FortuneCookie.saveConfig = function(config){
-		localStorage.setItem(FortuneCookie.ConfigPrefix, JSON.stringify(config));
+		CCSE.save.OtherMods.FortuneCookie = FortuneCookie.config;
 	}
 
 	FortuneCookie.loadConfig = function(){
-		if (localStorage.getItem(FortuneCookie.ConfigPrefix) != null) {
-			FortuneCookie.config = JSON.parse(localStorage.getItem(FortuneCookie.ConfigPrefix));
-		}
+		if(CCSE.save.OtherMods.FortuneCookie) FortuneCookie.config = CCSE.save.OtherMods.FortuneCookie; else FortuneCookie.config = {};
+		
+		// Default values if they're missing
+		if(FortuneCookie.config.spellForecastLength === undefined) FortuneCookie.config.spellForecastLength = 10;
+		if(FortuneCookie.config.simGCs === undefined) FortuneCookie.config.simGCs = 0;
 	}
 
 	FortuneCookie.setForecastLength = function(length){
 		FortuneCookie.config.spellForecastLength = length;
-		FortuneCookie.saveConfig(FortuneCookie.config);
 	}
 	
 	FortuneCookie.setSimGCs = function(sim){
 		FortuneCookie.config.simGCs = sim;
-		FortuneCookie.saveConfig(FortuneCookie.config);
 	}
 
 	FortuneCookie.getSimGCs = function(){
@@ -110,16 +109,13 @@ FortuneCookie.launch = function(){
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {
-		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects['Wizard tower'].minigame;
-			
-			eval("Game.Objects['Wizard tower'].minigame.spellTooltip = " + M.spellTooltip.toString()
-				.replace(/('<\/div><\/div>.*)/, `'<div style="height:8px;"></div>' + 
-						FortuneCookie.spellForecast(me) + 
-						$1`
-				)
-			);
-		}, 'Wizard tower');
+		if(!Game.customMinigame['Wizard tower'].spellTooltip) Game.customMinigame['Wizard tower'].spellTooltip = [];
+		Game.customMinigame['Wizard tower'].spellTooltip.push(function(id, str){
+			return str.replace( '</div></div>', 
+								'<div style="height:8px;"></div>' + 
+								FortuneCookie.spellForecast(Game.Objects['Wizard tower'].minigame.spellsById[id]) + 
+								'</div></div>');
+		});
 	}
 
 
@@ -181,6 +177,10 @@ FortuneCookie.launch = function(){
 	//***********************************
 	//    Grimoire forecast
 	//***********************************
+	
+	// customFateChecker functions are for people who add their own outcome to FtHoF
+	if(!FortuneCookie.customFateCheckerWin) FortuneCookie.customFateCheckerWin = [];
+	if(!FortuneCookie.customFateCheckerFail) FortuneCookie.customFateCheckerFail = [];
 	FortuneCookie.FateChecker = function(spellCount, idx, backfire, active){
 		var res = '';
 		var FTHOFcookie = '';
@@ -202,6 +202,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
 			if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
 			
+			for(var i in FortuneCookie.customFateCheckerWin) FortuneCookie.customFateCheckerWin[i](spellCount, idx, choices);
+			
 			FTHOFcookie = choose(choices);
 			res = '<span class="green">' + FTHOFcookie + '</span><br/>';
 			
@@ -217,6 +219,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
 			if (Math.random() < 0.003) choices.push('Free Sugar Lump');
 			if (Math.random() < 0.1) choices=['Blab'];
+			
+			for(var i in FortuneCookie.customFateCheckerFail) FortuneCookie.customFateCheckerFail[i](spellCount, idx, choices);
 			
 			FTHOFcookie = choose(choices);
 			res = '<span class="red">' + FTHOFcookie + '</span><br/>';
@@ -247,6 +251,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
 			if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
 			
+			for(var i in FortuneCookie.customFateCheckerWin) FortuneCookie.customFateCheckerWin[i](spellCount, idx, choices);
+			
 			return choose(choices);
 			
 		} else {
@@ -261,6 +267,8 @@ FortuneCookie.launch = function(){
 			if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
 			if (Math.random() < 0.003) choices.push('Free Sugar Lump');
 			if (Math.random() < 0.1) choices = ['Blab'];
+			
+			for(var i in FortuneCookie.customFateCheckerFail) FortuneCookie.customFateCheckerFail[i](spellCount, idx, choices);
 			
 			return choose(choices);
 			
@@ -304,7 +312,10 @@ FortuneCookie.launch = function(){
 			}
 		}
 	}
-
+	
+	// customSpellForecast functions should return HTML to append to the spell tooltip.
+	// Return spellForecast to have no effect
+	if(!FortuneCookie.customSpellForecast) FortuneCookie.customSpellForecast = [];
 	FortuneCookie.spellForecast=function(spell){
 		if(FortuneCookie.config.spellForecastLength == 0) return '';
 		var spellOutcome = '<div width="100%"><b>Forecast:</b><br/>';
@@ -427,6 +438,8 @@ FortuneCookie.launch = function(){
 					Math.seedrandom();
 				}
 		}
+		
+		for(var i in CCSE.customSpellForecast) spellOutcome = CCSE.customSpellForecast[i](spellOutcome, spell);
 		return spellOutcome;
 	}
 
@@ -438,7 +451,7 @@ FortuneCookie.launch = function(){
 		return KlattmoseUtilities.config.patches.gamblersFeverDreamFix == 1;
 	}
 	
-	FortuneCookie.init();
+	if(CCSE.ConfirmGameVersion(FortuneCookie.name, FortuneCookie.version, FortuneCookie.GameVersion)) FortuneCookie.init();
 }
 
 if(!FortuneCookie.isLoaded){

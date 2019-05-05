@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.29';
+CCSE.version = '1.0';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -10,13 +10,29 @@ CCSE.launch = function(){
 		// Define more parts of CCSE
 		CCSE.Backup = {};
 		CCSE.collapseMenu = {};
+		if(!Game.customMinigame) Game.customMinigame = {};
+		for(var key in Game.Objects) if(!Game.customMinigame[key]) Game.customMinigame[key] = {};
 	
 		
 		// Inject the hooks into the main game
 		CCSE.ReplaceMainGame();
+		CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, 'Wizard tower');
+		CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
+		CCSE.MinigameReplacer(CCSE.ReplaceGarden, 'Farm');
 		
 		
-		// Show the version number in Stats
+		// Load any custom save data and inject save functions
+		CCSE.LoadSave();
+		Game.customSave.push(CCSE.WriteSave);
+		Game.customLoad.push(CCSE.LoadSave);
+		
+		
+		
+		// Inject menu functions
+		Game.customOptionsMenu.push(function(){
+			CCSE.AppendCollapsibleOptionsMenu(CCSE.name, CCSE.GetMenuString());
+		});
+		
 		Game.customStatsMenu.push(function(){
 			CCSE.AppendStatsVersionNumber(CCSE.name, CCSE.version);
 		});
@@ -68,16 +84,11 @@ CCSE.launch = function(){
 		
 		
 		// Game.LoadSave
-		// I do a check before replacing this one. Game.customLoad is already in the game, just unused
-		// Need to do a nesting replace because Game.LoadSave returns a value
-		// This value is passed to the custom functions as ret
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
-			CCSE.Backup.LoadSave = Game.LoadSave;
-			Game.LoadSave = function(data){
-				var ret = CCSE.Backup.LoadSave(data);
-				for(var i in Game.customLoad) ret = Game.customLoad[i](ret);
-				return ret;
-			}
+			temp = Game.LoadSave.toString();
+			eval('Game.LoadSave = ' + temp.replace('if (Game.prefs.showBackupWarning==1)', 
+					`for(var i in Game.customLoad) Game.customLoad[i](); 
+					if (Game.prefs.showBackupWarning==1)`));
 		}
 		
 		
@@ -114,17 +125,17 @@ CCSE.launch = function(){
 		// Game.tooltip.draw
 		if(!Game.customTooltipDraw) Game.customTooltipDraw = [];
 		temp = Game.tooltip.draw.toString();
-		eval('Game.tooltip.draw = ' + temp.slice(0, -1) + 
-			'\nfor(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin);\n' 
-			+ temp.slice(-1));
+		eval('Game.tooltip.draw = ' + temp.slice(0, -1) + `
+			for(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin); 
+			` + temp.slice(-1));
 		
 		
 		// Game.tooltip.update
 		if(!Game.customTooltipUpdate) Game.customTooltipUpdate = [];
 		temp = Game.tooltip.update.toString();
-		eval('Game.tooltip.update = ' + temp.slice(0, -1) + 
-			'\nfor(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();\n' + 
-			temp.slice(-1));
+		eval('Game.tooltip.update = ' + temp.slice(0, -1) + `
+			for(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();
+			` + temp.slice(-1));
 		
 		
 		// -----     Ascension block     ----- //
@@ -195,7 +206,6 @@ CCSE.launch = function(){
 		
 		// Game.harvestLumps
 		// I doubt this is useful. The functions get called after the interesting stuff happens
-		// TODO make a function that eases adding a lump type
 		// Same for Game.computeLumpType. Pointless to make a generic hook
 		if(!Game.customHarvestLumps) Game.customHarvestLumps = [];
 		temp = Game.harvestLumps.toString();
@@ -340,15 +350,18 @@ CCSE.launch = function(){
 		// customListPush functions should push strings to list
 		// customEffectDurMod functions should return a multiplier to the effect's duration
 		// customMult functions should return a multiplier to the effect's magnitude (for Lucky, Chain Cookie, and Cookie Storm drops)
+		// customMult functions should return a a buff (result from Game.gainBuff). Return buff for no effect
 		if(!Game.customShimmerTypes['golden'].customListPush) Game.customShimmerTypes['golden'].customListPush = [];
 		if(!Game.customShimmerTypes['golden'].customEffectDurMod) Game.customShimmerTypes['golden'].customEffectDurMod = [];
 		if(!Game.customShimmerTypes['golden'].customMult) Game.customShimmerTypes['golden'].customMult = [];
+		if(!Game.customShimmerTypes['golden'].customBuff) Game.customShimmerTypes['golden'].customBuff = [];
 		temp = Game.shimmerTypes['golden'].popFunc.toString();
 		eval("Game.shimmerTypes['golden'].popFunc = " + temp.replace('var list=[];', `var list=[];
 					for(var i in Game.customShimmerTypes['golden'].customListPush) Game.customShimmerTypes['golden'].customListPush[i](me, list);`
 			).replace('var buff=0;', `var buff=0;
 					for(var i in Game.customShimmerTypes['golden'].customEffectDurMod) effectDurMod *= Game.customShimmerTypes['golden'].customEffectDurMod[i](me);
-					for(var i in Game.customShimmerTypes['golden'].customMult) mult *= Game.customShimmerTypes['golden'].customMult[i](me);`));
+					for(var i in Game.customShimmerTypes['golden'].customMult) mult *= Game.customShimmerTypes['golden'].customMult[i](me);
+					for(var i in Game.customShimmerTypes['golden'].customBuff) buff = Game.customShimmerTypes['golden'].customBuff[i](me, buff, choice, effectDurMod, mult);`));
 		
 		
 		// Game.shimmerTypes['reindeer'].popFunc
@@ -491,6 +504,14 @@ CCSE.launch = function(){
 		temp = Game.storeBulkButton.toString();
 		eval('Game.storeBulkButton = ' + temp.slice(0, -1) + `
 			for(var i in Game.customStoreBulkButton) Game.customStoreBulkButton[i](); 
+		` + temp.slice(-1));
+		
+		
+		// Game.BuildStore
+		if(!Game.customBuildStore) Game.customBuildStore = [];
+		temp = Game.BuildStore.toString();
+		eval('Game.BuildStore = ' + temp.slice(0, -1) + `
+			for(var i in Game.customBuildStore) Game.customBuildStore[i](); 
 		` + temp.slice(-1));
 		
 		
@@ -728,6 +749,26 @@ CCSE.launch = function(){
 			return`));
 		
 		
+		// Game.TieredUpgrade
+		temp = Game.TieredUpgrade.toString();
+		eval('Game.TieredUpgrade = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
+		// Game.SynergyUpgrade
+		temp = Game.SynergyUpgrade.toString();
+		eval('Game.SynergyUpgrade = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
+		// Game.GrandmaSynergy
+		temp = Game.GrandmaSynergy.toString();
+		eval('Game.GrandmaSynergy = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
+		// Game.NewUpgradeCookie
+		temp = Game.NewUpgradeCookie.toString();
+		eval('Game.NewUpgradeCookie = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		
+		
 		// -----     Seasons block     ----- //
 		
 		// Game.computeSeasons
@@ -772,6 +813,26 @@ CCSE.launch = function(){
 		` + temp.slice(-1));
 		
 		
+		// Game.TieredAchievement
+		temp = Game.TieredAchievement.toString();
+		eval('Game.TieredAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		
+		
+		// Game.ProductionAchievement
+		temp = Game.ProductionAchievement.toString();
+		eval('Game.ProductionAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		
+		
+		// Game.BankAchievement
+		temp = Game.BankAchievement.toString();
+		eval('Game.BankAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		
+		
+		// Game.CpsAchievement
+		temp = Game.CpsAchievement.toString();
+		eval('Game.CpsAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		
+		
 		// -----     Buffs block     ----- //
 		
 		// Game.gainBuff
@@ -789,6 +850,21 @@ CCSE.launch = function(){
 		eval('Game.updateBuffs = ' + temp.slice(0, -1) + `
 			for(var i in Game.customUpdateBuffs) Game.customUpdateBuffs[i](); 
 		` + temp.slice(-1));
+		
+		
+		for(var i in Game.buffTypes){
+			var buff = Game.buffTypes[i];
+			if(buff.name == 'building buff'){
+				temp = buff.func.toString();
+				eval('buff.func = ' + temp.replace('icon:[obj.iconColumn,14],',
+				'icon:[obj.iconColumn,14,(obj.art.customIconsPic ? obj.art.customIconsPic : 0)],'));
+			}
+			else if(buff.name == 'building debuff'){
+				temp = buff.func.toString();
+				eval('buff.func = ' + temp.replace('icon:[obj.iconColumn,15],',
+				'icon:[obj.iconColumn,15,(obj.art.customIconsPic ? obj.art.customIconsPic : 0)],'));
+			}
+		}
 		
 		
 		// -----     GRANDMAPOCALYPSE block     ----- //
@@ -988,6 +1064,7 @@ CCSE.launch = function(){
 		
 	}
 	
+	if(!CCSE.customReplaceShimmerType) CCSE.customReplaceShimmerType = [];
 	CCSE.ReplaceShimmerType = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1051,8 +1128,11 @@ CCSE.launch = function(){
 		temp = Game.shimmerTypes[key].getTimeMod.toString();
 		eval('Game.shimmerTypes[key].getTimeMod = ' + temp.replace('{', `{
 					for(var i in Game.customShimmerTypes['` + escKey + `'].getTimeMod) m *= Game.customShimmerTypes['` + escKey + `'].getTimeMod[i](me);`));
+		
+		for(var i in CCSE.customReplaceShimmerType) CCSE.customReplaceShimmerType[i](key);
 	}
 	
+	if(!CCSE.customReplaceBuilding) CCSE.customReplaceBuilding = [];
 	CCSE.ReplaceBuilding = function(key){
 		// A lot of Copy/Paste happened, hence why I did so many functions.
 		// Also, I may not have fully tested each one.
@@ -1222,8 +1302,10 @@ CCSE.launch = function(){
 			for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);
 			return`));
 		
+		for(var i in CCSE.customReplaceBuilding) CCSE.customReplaceBuilding[i](key, obj);
 	}
 	
+	if(!CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade = [];
 	CCSE.ReplaceUpgrade = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1341,9 +1423,10 @@ CCSE.launch = function(){
 			}
 		}
 		
-		
+		for(var i in CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade[i](key, upgrade);
 	}
 	
+	if(!CCSE.customReplaceAchievement) CCSE.customReplaceAchievement = [];
 	CCSE.ReplaceAchievement = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1363,6 +1446,7 @@ CCSE.launch = function(){
 				for(var i in Game.customAchievements[this.name].click) Game.customAchievements[this.name].click[i](this); 
 			` + temp.slice(-1));
 		
+		for(var i in CCSE.customReplaceAchievement) CCSE.customReplaceAchievement[i](key, achievement);
 	}
 	
 	
@@ -1532,6 +1616,14 @@ CCSE.launch = function(){
 		if(general) general.appendChild(div);
 	}
 	
+	CCSE.GetMenuString = function(){
+		var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportSave(); PlaySound(\'snd/tick.mp3\');">Export custom save</a>' +
+										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
+										 '<label>Back up data added by mods and managed by CCSE</label></div>';
+		
+		return str;
+	}
+	
 	
 	/*=====================================================================================
 	Minigames
@@ -1539,18 +1631,418 @@ CCSE.launch = function(){
 	CCSE.MinigameReplacer = function(func, objKey){
 		var me = Game.Objects[objKey];
 		if(me.minigameLoaded) func(me, 'minigameScript-' + me.id);
-		else Game.customMinigameOnLoad[objKey].push(func);
+		Game.customMinigameOnLoad[objKey].push(func);
+	}
+	
+	CCSE.ReplaceGrimoire = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj;
+		var objKey = 'Wizard tower';
+		var M = Game.Objects[objKey].minigame;
+		
+		
+		// M.computeMagicM
+		if(!Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM = [];
+		temp = M.computeMagicM.toString();
+		eval('M.computeMagicM = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.getFailChance
+		// functions should return a value to multiply failChance by (Return 1 for no effect)
+		if(!Game.customMinigame[objKey].getFailChance) Game.customMinigame[objKey].getFailChance = [];
+		temp = M.getFailChance.toString();
+		eval('M.getFailChance = ' + temp.replace('return', `
+			for(var i in Game.customMinigame[objKey].getFailChance) failChance *= Game.customMinigame[objKey].getFailChance[i](spell);
+			return`));
+		
+		
+		// M.castSpell
+		// I'm open to suggestions
+		
+		
+		// M.getSpellCost
+		// functions should return a value to multiply out by (Return 1 for no effect)
+		if(!Game.customMinigame[objKey].getSpellCost) Game.customMinigame[objKey].getSpellCost = [];
+		temp = M.getSpellCost.toString();
+		eval('M.getSpellCost = ' + temp.replace('return', `
+			for(var i in Game.customMinigame[objKey].getSpellCost) out *= Game.customMinigame[objKey].getSpellCost[i](spell);
+			return`));
+		
+		
+		// M.getSpellCostBreakdown
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].getSpellCostBreakdown) Game.customMinigame[objKey].getSpellCostBreakdown = [];
+		temp = M.getSpellCostBreakdown.toString();
+		eval('M.getSpellCostBreakdown = ' + temp.replace('return', `
+			for(var i in Game.customMinigame[objKey].getSpellCostBreakdown) str = Game.customMinigame[objKey].getSpellCostBreakdown[i](spell, str);
+			return`));
+		
+		
+		// M.spellTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].spellTooltip) Game.customMinigame[objKey].spellTooltip = [];
+		temp = M.spellTooltip.toString();
+		eval('M.spellTooltip = ' + temp.replace('return str', `
+				for(var i in Game.customMinigame[objKey].spellTooltip) str = Game.customMinigame[objKey].spellTooltip[i](id, str);
+				return str`));
+		
+		
+		// M.refillTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
+		temp = M.refillTooltip.toString();
+		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
+			return str;
+		` + temp.slice(-1));
+		
+		
+		// M.spells['hand of fate'].win
+		// functions should push a value to choices
+		if(!Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin = [];
+		temp = M.spells['hand of fate'].win.toString();
+		eval('M.spells["hand of fate"].win = ' + temp.replace('newShimmer.force', 
+					`for(var i in Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin[i](choices);
+					newShimmer.force`));
+		
+		
+		// M.spells['hand of fate'].fail
+		// functions should push a value to choices
+		if(!Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail = [];
+		temp = M.spells['hand of fate'].fail.toString();
+		eval('M.spells["hand of fate"].fail = ' + temp.replace('newShimmer.force', 
+					`for(var i in Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail[i](choices);
+					newShimmer.force`));
+		
+	}
+	
+	CCSE.ReplacePantheon = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj;
+		var objKey = 'Temple';
+		var M = Game.Objects[objKey].minigame;
+		
+		
+		// M.godTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].godTooltip) Game.customMinigame[objKey].godTooltip = [];
+		temp = M.godTooltip.toString();
+		eval('M.godTooltip = ' + temp.replace('return str', `
+				for(var i in Game.customMinigame[objKey].godTooltip) str = Game.customMinigame[objKey].godTooltip[i](id, str);
+				return str`));
+		
+		
+		// M.slotTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].slotTooltip) Game.customMinigame[objKey].slotTooltip = [];
+		temp = M.slotTooltip.toString();
+		eval('M.slotTooltip = ' + temp.replace('return str', `
+				for(var i in Game.customMinigame[objKey].slotTooltip) str = Game.customMinigame[objKey].slotTooltip[i](id, str);
+				return str`));
+		
+		
+		// M.useSwap
+		if(!Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap = [];
+		temp = M.useSwap.toString();
+		eval('M.useSwap = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap[i](n); 
+		` + temp.slice(-1));
+		
+		
+		// M.slotGod
+		if(!Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod = [];
+		temp = M.slotGod.toString();
+		eval('M.slotGod = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod[i](god, slot); 
+		` + temp.slice(-1));
+		
+		
+		// M.dragGod
+		if(!Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod = [];
+		temp = M.dragGod.toString();
+		eval('M.dragGod = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod[i](what); 
+		` + temp.slice(-1));
+		
+		
+		// M.dropGod
+		if(!Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod = [];
+		temp = M.dropGod.toString();
+		eval('M.dropGod = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.hoverSlot
+		if(!Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot = [];
+		temp = M.hoverSlot.toString();
+		eval('M.hoverSlot = ' + temp.slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot[i](what); 
+		` + temp.slice(-1));
+		
+		
+		// Game.hasGod
+		// Game.forceUnslotGod
+		
+		
+		// M.refillTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
+		temp = M.refillTooltip.toString();
+		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
+			return str;
+		` + temp.slice(-1));
+		
+	}
+	
+	CCSE.ReplaceGarden = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj;
+		var objKey = 'Farm';
+		var M = Game.Objects[objKey].minigame;
+		
+		
+		// M.getUnlockedN
+		if(!Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN = [];
+		temp = M.getUnlockedN.toString();
+		eval('M.getUnlockedN = ' + temp.replace('return', 
+			`for(var i in Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN[i]();
+			return`));
+		
+		
+		// M.dropUpgrade
+		if(!Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade = [];
+		temp = M.dropUpgrade.toString();
+		eval('M.dropUpgrade = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade[i](upgrade, rate); 
+		` + temp.slice(-1));
+		
+		
+		// M.computeMatures
+		if(!Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures = [];
+		temp = M.computeMatures.toString();
+		eval('M.computeMatures = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures[i](mult); 
+		` + temp.slice(-1));
+		
+		
+		// M.getMuts
+		// functions should push mutations to muts
+		if(!Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts = [];
+		temp = M.getMuts.toString();
+		eval('M.getMuts = ' + temp.replace('return', 
+			`for(var i in Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts[i](neighs, neighsM, muts);
+			return`));
+		
+		
+		// M.computeBoostPlot
+		// You're going to have to use MAXIMUM EFFORT
+		if(!Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot = [];
+		temp = M.computeBoostPlot.toString();
+		eval('M.computeBoostPlot = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.computeEffs
+		// functions should change effs (or not, I'm a comment, not a cop)
+		if(!Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs = [];
+		temp = M.computeEffs.toString();
+		eval('M.computeEffs = ' + temp.replace('M.effs=effs;', 
+			`for(var i in Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs[i](effs);
+			M.effs=effs;`));
+		
+		
+		// M.tools TODO
+		
+		
+		// M.getCost TODO
+		
+		
+		// M.getPlantDesc
+		// Return ret for no effect
+		if(!Game.customMinigame[objKey].getPlantDesc) Game.customMinigame[objKey].getPlantDesc = [];
+		temp = M.getPlantDesc.toString();
+		eval('M.getPlantDesc = ' + temp.replace('return', 'var ret = ').slice(0, -1) + 
+				`for(var i in Game.customMinigame[objKey].getPlantDesc) ret = Game.customMinigame[objKey].getPlantDesc[i](me, ret);
+				return ret;
+			` + temp.slice(-1));
+		
+		
+		// M.soilTooltip
+		// Return str for no effect
+		if(!Game.customMinigame[objKey].soilTooltip) Game.customMinigame[objKey].soilTooltip = [];
+		temp = M.soilTooltip.toString();
+		eval('M.soilTooltip = ' + temp.replace('return str;', 
+				`for(var i in Game.customMinigame[objKey].soilTooltip) str = Game.customMinigame[objKey].soilTooltip[i](id, str);
+				return str;`));
+		
+		
+		// M.seedTooltip
+		// Return str for no effect
+		if(!Game.customMinigame[objKey].seedTooltip) Game.customMinigame[objKey].seedTooltip = [];
+		temp = M.seedTooltip.toString();
+		eval('M.seedTooltip = ' + temp.replace('return str;', 
+				`for(var i in Game.customMinigame[objKey].seedTooltip) str = Game.customMinigame[objKey].seedTooltip[i](id, str);
+				return str;`));
+		
+		
+		// M.toolTooltip
+		// Return str for no effect
+		if(!Game.customMinigame[objKey].toolTooltip) Game.customMinigame[objKey].toolTooltip = [];
+		temp = M.toolTooltip.toString();
+		eval('M.toolTooltip = ' + temp.replace('return str;', 
+				`for(var i in Game.customMinigame[objKey].toolTooltip) str = Game.customMinigame[objKey].toolTooltip[i](id, str);
+				return str;`));
+		
+		
+		// M.tileTooltip
+		// Return ret for no effect
+		if(!Game.customMinigame[objKey].tileTooltip) Game.customMinigame[objKey].tileTooltip = [];
+		temp = M.tileTooltip.toString();
+		eval('M.tileTooltip = ' + temp.replace('return function(){', `return function(){
+				var ret = ''`).split('return str;').join('ret = str;').replace('};',
+				`for(var i in Game.customMinigame[objKey].tileTooltip) ret = Game.customMinigame[objKey].tileTooltip[i](x, y, ret);
+				return ret;
+			};`));
+		
+		
+		// M.refillTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
+		temp = M.refillTooltip.toString();
+		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
+			return str;
+		` + temp.slice(-1));
+		
+		
+		// M.buildPanel
+		if(!Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel = [];
+		temp = M.buildPanel.toString();
+		eval('M.buildPanel = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.buildPlot
+		if(!Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot = [];
+		temp = M.buildPlot.toString();
+		eval('M.buildPlot = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.clickTile
+		if(!Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile = [];
+		temp = M.clickTile.toString();
+		eval('M.clickTile = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile[i](x, y); 
+		` + temp.slice(-1));
+		
+		
+		// M.useTool
+		
+		
+		// M.getTile
+		// Return ret to have no effect
+		if(!Game.customMinigame[objKey].getTile) Game.customMinigame[objKey].getTile = []; 
+		CCSE.Backup.getTile = M.getTile;
+		M.getTile = function(x, y){
+			var ret = CCSE.Backup.getTile(x, y);
+			for(var i in Game.customMinigame[objKey].getTile) ret = Game.customMinigame[objKey].getTile[i](x, y, ret);
+			return ret;
+		}
+		
+		
+		// M.getTile
+		// Return ret to have no effect
+		if(!Game.customMinigame[objKey].isTileUnlocked) Game.customMinigame[objKey].isTileUnlocked = []; 
+		CCSE.Backup.isTileUnlocked = M.isTileUnlocked;
+		M.isTileUnlocked = function(x, y){
+			var ret = CCSE.Backup.isTileUnlocked(x, y);
+			for(var i in Game.customMinigame[objKey].isTileUnlocked) ret = Game.customMinigame[objKey].isTileUnlocked[i](x, y, ret);
+			return ret;
+		}
+		
+		
+		// M.computeStepT
+		if(!Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT = [];
+		temp = M.computeStepT.toString();
+		eval('M.computeStepT = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.convert
+		if(!Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert = [];
+		temp = M.convert.toString();
+		eval('M.convert = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert[i](); 
+		` + temp.slice(-1));
+		
+		
+		// M.harvestAll
+		if(!Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll = [];
+		temp = M.harvestAll.toString();
+		eval('M.harvestAll = ' + temp.slice(0, -1) + 
+			`for(var i in Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll[i](type, mature, mortal); 
+		` + temp.slice(-1));
+		
+		
+		// M.harvest
+		if(!Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest = [];
+		temp = M.harvest.toString();
+		eval('M.harvest = ' + temp.replace('return true;', 
+				`for(var i in Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest[i](x, y, manual);
+				return true;`));
+		
+		
+		// M.unlockSeed
+		if(!Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed = [];
+		temp = M.unlockSeed.toString();
+		eval('M.unlockSeed = ' + temp.replace('return true;', 
+			`for(var i in Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed[i](me);
+			return true;`));
+		
+		
+		// M.lockSeed
+		if(!Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed = [];
+		temp = M.lockSeed.toString();
+		eval('M.lockSeed = ' + temp.replace('return true;', 
+			`for(var i in Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed[i](me);
+			return true;`));
+		
 	}
 	
 	
 	/*=====================================================================================
 	Grimoire
 	=======================================================================================*/
+	if(!CCSE.customRedrawSpells) CCSE.customRedrawSpells = [];
 	CCSE.RedrawSpells = function(){
 		var str = '';
 		var M = Game.Objects['Wizard tower'].minigame;
 		
-		for (var i in M.spells){
+		for(var i in M.spells){
 			var me = M.spells[i];
 			var icon = me.icon || [28,12];
 			str += '<div class="grimoireSpell titleFont" id="grimoireSpell' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.spellTooltip(' + me.id + ')','this') + '><div class="usesIcon shadowFilter grimoireIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="grimoirePrice" id="grimoirePrice' + me.id + '">-</div></div>';
@@ -1558,14 +2050,17 @@ CCSE.launch = function(){
 		
 		l('grimoireSpells').innerHTML = str;
 		
-		for (var i in M.spells){
+		for(var i in M.spells){
 			var me = M.spells[i];
 			AddEvent(l('grimoireSpell' + me.id), 'click', function(spell){return function(){PlaySound('snd/tick.mp3'); M.castSpell(spell);}}(me));
 		}
 		
-		if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();
+		for(var i in CCSE.customRedrawSpells) CCSE.customRedrawSpells[i]();
 	}
+	// Cookie Monster compatability because it was here first
+	CCSE.customRedrawSpells.push(function(){if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();});
 	
+	if(!CCSE.customNewSpell) CCSE.customNewSpell = [];
 	CCSE.NewSpell = function(key, spell){
 		var M = Game.Objects['Wizard tower'].minigame;
 		
@@ -1579,15 +2074,297 @@ CCSE.launch = function(){
 			n++;
 		}
 		
+		for(var i in CCSE.customNewSpell) CCSE.customNewSpell[i](key, spell);
 		CCSE.RedrawSpells();
 	}
 	
 	
 	/*=====================================================================================
-	Upgrades
+	Pantheon
 	=======================================================================================*/
-	CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
+	if(!CCSE.customRedrawGods) CCSE.customRedrawGods = [];
+	CCSE.RedrawGods = function(){
+		var str = '';
+		var M = Game.Objects['Temple'].minigame;
+		
+		for(var i in M.slot){
+			var me = M.slot[i];
+			str += '<div class="ready templeGod templeGod' + (i % 4) + ' templeSlot titleFont" id="templeSlot' + i + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.slotTooltip(' + i + ')', 'this') + '><div class="usesIcon shadowFilter templeGem templeGem' + (parseInt(i) + 1) + '"></div></div>';
+		}
+		l('templeSlots').innerHTML = str;
+		
+		str = '';
+		for(var i in M.gods){
+			var me = M.gods[i];
+			var icon = me.icon || [0,0];
+			str += '<div class="ready templeGod templeGod' + (me.id % 4) + ' titleFont" id="templeGod' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.godTooltip(' + me.id + ')', 'this') + '><div class="usesIcon shadowFilter templeIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="templeSlotDrag" id="templeGodDrag' + me.id + '"></div></div>';
+			str += '<div class="templeGodPlaceholder" id="templeGodPlaceholder' + me.id + '"></div>';
+		}
+		l('templeGods').innerHTML = str;
+		
+		for(var i in M.slot){
+			var me=M.slot[i];
+			AddEvent(l('templeSlot' + i), 'mouseover', function(what){return function(){M.hoverSlot(what);}}(i));
+			AddEvent(l('templeSlot' + i), 'mouseout', function(what){return function(){M.hoverSlot(-1);}}(i));
+		}
+		
+		for(var i in M.gods){
+			var me = M.gods[i];
+			AddEvent(l('templeGodDrag' + me.id), 'mousedown', function(what){return function(){M.dragGod(what);}}(me));
+			AddEvent(l('templeGodDrag' + me.id), 'mouseup', function(what){return function(){M.dropGod(what);}}(me));
+		}
+		
+		M.load(M.save());
+		for(var i in CCSE.customRedrawGods) CCSE.customRedrawGods[i]();
+	}
+	
+	if(!CCSE.customNewGod) CCSE.customNewGod = [];
+	CCSE.NewGod = function(key, god){
+		var M = Game.Objects['Temple'].minigame;
+		
+		M.gods[key] = spell;
+		
+		M.godsById = [];
+		var n = 0;
+		for(var i in M.gods){
+			M.gods[i].id = n;
+			M.godsById[n] = M.gods[i];
+			n++;
+		}
+		
+		for(var i in CCSE.customNewGod) CCSE.customNewGod[i](key, god);
+		CCSE.RedrawGods();
+	}
+	
+	
+	/*=====================================================================================
+	Garden
+	=======================================================================================*/
+	if(!CCSE.customNewPlant) CCSE.customNewPlant = [];
+	CCSE.NewPlant = function(key, plant){
+		var M = Game.Objects['Farm'].minigame;
+		
+		M.plants[key] = spell;
+		
+		M.plantsById = [];
+		var n = 0;
+		for(var i in M.plants){
+			M.plants[i].id = n;
+			M.plantsById[n] = M.plants[i];
+			n++;
+		}
+		
+		for(var i in CCSE.customNewPlant) CCSE.customNewPlant[i](key, plant);
+		M.buildPanel();
+	}
+	
+	
+	/*=====================================================================================
+	Save custom things
+	If you use CCSE to create custom upgrades or achievements, 
+	it will also save their state to local storage whenever the game is saved.
+		Each custom upgrade or achievement needs a unique name, or they could get overwritten.
+		Yes, this means across mods as well. 
+		If two mods have things with the same name, the mods cannot be used at the same time.
+		This is because of how the game itself keeps track of these things
+	
+	You can also use CCSE to save your mod data. 
+		Add your save data as a child of CCSE.save.OtherMods. Make sure not to step on anyone else's toes!
+		Push your save function into CCSE.customSave, and push your load function into CCSE.customLoad
+	=======================================================================================*/
+	if(!CCSE.customSave) CCSE.customSave = [];
+	CCSE.WriteSave = function(type){
+		for(var name in CCSE.save.Buildings){
+			if(Game.Objects[name]){
+				var saved = CCSE.save.Buildings[name];
+				var me = Game.Objects[name];
+				
+				saved.amount = me.amount;
+				saved.bought = me.bought;
+				saved.totalCookies = me.totalCookies;
+				saved.level = me.level;
+				saved.muted = me.muted;
+				
+				if(Game.isMinigameReady(me)) saved.minigameSave = me.minigame.save(); else saved.minigameSave = '';
+			}
+		}
+		
+		for(var name in CCSE.save.Achievements){
+			if(Game.Achievements[name]){
+				CCSE.save.Achievements[name].won = Game.Achievements[name].won;
+			}
+		}
+		
+		for(var name in CCSE.save.Upgrades){
+			if(Game.Upgrades[name]){
+				CCSE.save.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
+				CCSE.save.Upgrades[name].bought = Game.Upgrades[name].bought;
+			}
+		}
+		
+		for(var name in CCSE.save.Buffs){
+			var buff = CCSE.save.Buffs[name];
+			buff.time = 0;
+			if(Game.buffs[buff.name]){
+				if(Game.buffs[buff.name].time){
+					buff.time = Game.buffs[buff.name].time;
+					buff.maxTime = Game.buffs[buff.name].maxTime;
+					buff.arg1 = Game.buffs[buff.name].arg1;
+					buff.arg2 = Game.buffs[buff.name].arg2;
+					buff.arg3 = Game.buffs[buff.name].arg3;
+				}
+			}
+		}
+		
+		for(var i in CCSE.customSave) CCSE.customSave[i]();
+		
+		var str = JSON.stringify(CCSE.save);
+		
+		if(type == 2){
+			return str;
+		}
+		else if(type == 3){
+			return JSON.stringify(CCSE.save, null, 2);
+		}
+		else if (type==1){
+			str = escape(utf8_to_b64(str) + '!END!');
+			return str;
+		}
+		else{
+			str = utf8_to_b64(str) + '!END!';
+			str = escape(str);
+			Game.localStorageSet(CCSE.name, str);
+		}
+	}
+	
+	if(!CCSE.customLoad) CCSE.customLoad = [];
+	CCSE.LoadSave = function(data, isJSON){
+		CCSE.save = null;
+		var str = '';
+		
+		if(isJSON){
+			CCSE.save = JSON.parse(data);
+		} 
+		else{
+			if(data){
+				str = unescape(data);
+			}else{
+				if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
+			}
+			
+			if(str != ''){
+				str = str.split('!END!')[0];
+				str = b64_to_utf8(str);
+				CCSE.save = JSON.parse(str);
+			}
+		}
+		
+		
+		if(!CCSE.save) CCSE.save = {};
+		if(!CCSE.save.Achievements) CCSE.save.Achievements = {};
+		if(!CCSE.save.Upgrades) CCSE.save.Upgrades = {};
+		if(!CCSE.save.Buildings) CCSE.save.Buildings = {};
+		if(!CCSE.save.Buffs) CCSE.save.Buffs = {};
+		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
+		
+		for(var name in CCSE.save.Buildings){
+			if(Game.Objects[name]){
+				var saved = CCSE.save.Buildings[name];
+				var me = Game.Objects[name];
+				
+				me.switchMinigame(false);
+				me.pics = [];
+				
+				me.amount = saved.amount;
+				me.bought = saved.bought;
+				me.totalCookies = saved.totalCookies;
+				me.level = saved.level;
+				me.muted = saved.muted;
+				me.minigameSave = saved.minigameSave;
+				if(me.minigame && me.minigameLoaded && me.minigame.reset){me.minigame.reset(true); me.minigame.load(me.minigameSave);}
+				
+				Game.BuildingsOwned += me.amount;
+			}
+		}
+		
+		for(var name in CCSE.save.Achievements){
+			if(Game.Achievements[name]){
+				Game.Achievements[name].won = CCSE.save.Achievements[name].won;
+			}
+		}
+		
+		for(var name in CCSE.save.Upgrades){
+			if(Game.Upgrades[name]){
+				Game.Upgrades[name].unlocked = CCSE.save.Upgrades[name].unlocked;
+				Game.Upgrades[name].bought = CCSE.save.Upgrades[name].bought;
+			}
+		}
+		
+		for(var name in CCSE.save.Buffs){
+			var found = false;
+			for(var i in Game.buffTypes) if(Game.buffTypes[i].name == name) found = true;
+			if(found){
+				if(CCSE.save.Buffs[name].time){
+					var buff = CCSE.save.Buffs[name];
+					Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
+				}
+			}
+		}
+		
+		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
+	}
+	
+	CCSE.ExportSave = function(){
+		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>It contains data that other mods authors decided to allow CCSE to manage, as well as data for custom things added through CCSE (i.e. achivements, upgrades, etc)</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+					CCSE.WriteSave(1) + 
+					'</textarea></div>',['All done!']);
+		l('textareaPrompt').focus();
+		l('textareaPrompt').select();
+	}
+	
+	CCSE.ImportSave = function(){
+		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+		l('textareaPrompt').focus();
+	}
+	
+	CCSE.ExportEditableSave = function(){
+		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>In JSON format for people who want to edit it.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+					CCSE.WriteSave(3) + 
+					'</textarea></div>',['All done!']);
+		l('textareaPrompt').focus();
+		l('textareaPrompt').select();
+	}
+	
+	CCSE.ImportEditableSave = function(){
+		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here (in JSON format).</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value, 1); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+		l('textareaPrompt').focus();
+	}
+	
+	
+	/*=====================================================================================
+	Standard creation helpers
+	=======================================================================================*/
+	CCSE.NewUpgrade = function(name, desc, price, icon, buyFunction){
 		var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
+		CCSE.ReplaceUpgrade(name);
+		
+		if(CCSE.save.Upgrades[name]){
+			me.unlocked = CCSE.save.Upgrades[name].unlocked;
+			me.bought = CCSE.save.Upgrades[name].bought;
+		}else{
+			CCSE.save.Upgrades[name] = {
+				unlocked: 0,
+				bought: 0
+			}
+		}
+		
+		return me;
+	}
+	
+	CCSE.NewHeavenlyUpgrade = function(name, desc, price, icon, posX, posY, parents, buyFunction){
+		var me = CCSE.NewUpgrade(name, desc, price, icon, buyFunction);
 		Game.PrestigeUpgrades.push(me);
 		
 		me.pool = 'prestige';
@@ -1599,6 +2376,130 @@ CCSE.launch = function(){
 		me.parents = me.parents || [-1];
 		for(var ii in me.parents){
 			if(me.parents[ii] != -1) me.parents[ii] = Game.Upgrades[me.parents[ii]];
+		}
+		
+		return me;
+	}
+	
+	CCSE.NewAchievement = function(name, desc, icon){
+		var me = new Game.Achievement(name, desc, icon);
+		CCSE.ReplaceAchievement(name);
+		
+		if(CCSE.save.Achievements[name]){
+			me.won = CCSE.save.Achievements[name].won;
+		}else{
+			CCSE.save.Achievements[name] = {
+				won: 0
+			}
+		}
+		
+		return me;
+	}
+	
+	CCSE.NewBuilding = function(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction, foolObject, buildingSpecial){
+		var me = new Game.Object(name, commonName, desc, icon, iconColumn, art, price, cps, buyFunction);
+		
+		// This is the name, description, and icon used during Business Season
+		if(foolObject) Game.foolObjects[name] = foolObject;
+		// The name of this building's golden cookie buff and debuff
+		if(buildingSpecial) Game.goldenCookieBuildingBuffs[name] = buildingSpecial;
+		
+		CCSE.ReplaceBuilding(name);
+		
+		if(art.customBuildingPic){
+			Game.customBuildStore.push(function(){
+				l('productIcon' + me.id).style.backgroundImage = 'url(' + art.customBuildingPic + ')';
+				l('productIconOff' + me.id).style.backgroundImage = 'url(' + art.customBuildingPic + ')';
+			});
+		}
+		if(art.customIconsPic){
+			Game.customBuildings[name].tooltip.push(function(obj, ret){
+				if(me.locked) return ret;
+				else return ret.replace('background-position', 'background-image:url(' + obj.art.customIconsPic + ');background-position');
+			});
+		}
+		
+		
+		
+		if(CCSE.save.Buildings[name]){
+			var saved = CCSE.save.Buildings[name];
+			me.amount = saved.amount;
+			me.bought = saved.bought;
+			me.totalCookies = saved.totalCookies;
+			me.level = saved.level;
+			me.muted = saved.muted;
+			me.minigameSave = saved.minigameSave;
+			
+			Game.BuildingsOwned += me.amount;
+			
+		}else{
+			var saved = {};
+			saved.amount = 0;
+			saved.bought = 0;
+			saved.totalCookies = 0;
+			saved.level = 0;
+			saved.muted = 0;
+			saved.minigameSave = '';
+			
+			CCSE.save.Buildings[name] = saved;
+		}
+		
+		
+		Game.BuildStore();
+		
+		var muteStr='<div style="position:absolute;left:8px;bottom:12px;opacity:0.5;">Muted :</div>';
+		for (var i in Game.Objects)
+		{
+			var me2 = Game.Objects[i];
+			if (me2.id>0)
+			{
+				me2.canvas=l('rowCanvas'+me2.id);
+				me2.ctx=me2.canvas.getContext('2d',{alpha:false});
+				me2.pics=[];
+				var icon=[0*64,me2.icon*64];
+				muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me2.id+'" style="display:none;' + (me2.art.customBuildingPic ? 'background-image:url(' + me2.art.customBuildingPic + ');' : '') + 'background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me2.id+'].mute(0);PlaySound(Game.ObjectsById['+me2.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getDynamicTooltip('Game.mutedBuildingTooltip('+me2.id+')','this')+'></div>';
+				//muteStr+='<div class="tinyProductIcon" id="mutedProduct'+me2.id+'" style="display:none;background-position:-'+icon[0]+'px -'+icon[1]+'px;" '+Game.clickStr+'="Game.ObjectsById['+me2.id+'].mute(0);PlaySound(Game.ObjectsById['+me2.id+'].muted?\'snd/clickOff.mp3\':\'snd/clickOn.mp3\');" '+Game.getTooltip('<div style="width:150px;text-align:center;font-size:11px;"><b>Unmute '+me2.plural+'</b><br>(Display this building)</div>')+'></div>';
+				
+				AddEvent(me2.canvas,'mouseover',function(me2){return function(){me2.mouseOn=true;}}(me2));
+				AddEvent(me2.canvas,'mouseout',function(me2){return function(){me2.mouseOn=false;}}(me2));
+				AddEvent(me2.canvas,'mousemove',function(me2){return function(e){var box=this.getBoundingClientRect();me2.mousePos[0]=e.pageX-box.left;me2.mousePos[1]=e.pageY-box.top;}}(me2));
+			}
+			
+			// new Game.Object breaks the minigames. Have to reload them
+			if(me2.minigameLoaded){
+				var save = me2.minigame.save();
+				me2.minigame.launch();
+				me2.minigame.load(save);
+				
+				for(var func in Game.customMinigameOnLoad[me2.name]) Game.customMinigameOnLoad[me2.name][func](me2);
+			}
+		}
+		l('buildingsMute').innerHTML=muteStr;
+		
+		
+		
+		Game.recalculateGains = 1;
+		return me;
+	}
+	
+	CCSE.NewBuff = function(name, func){
+		var me = new Game.buffType(name, func);
+		
+		if(CCSE.save.Buffs[name]){
+			if(CCSE.save.Buffs[name].time){
+				CCSE.save.Buffs[name].name = func().name;
+				var buff = CCSE.save.Buffs[name];
+				Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
+			}
+		}else{
+			CCSE.save.Buffs[name] = {
+				name: func().name,
+				maxTime: 0,
+				time: 0,
+				arg1: 0,
+				arg2: 0,
+				arg3: 0
+			}
 		}
 		
 		return me;
@@ -1642,14 +2543,48 @@ CCSE.launch = function(){
 	
 	CCSE.SetSpecialMenuImage = function(str, pic, frame){
 		return str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
-						  'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
+						   'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
+	}
+	
+	
+	/*=====================================================================================
+	Confirmation Prompts
+	=======================================================================================*/
+	CCSE.ConfirmGameVersion = function(modName, modVersion, version){
+		var proceed = true;
+		if(Game.version != version){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + version + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		return proceed;
+	}
+	
+	CCSE.ConfirmCCSEVersion = function(modName, modVersion, version){
+		var proceed = true;
+		if(CCSE.version != version){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + version + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		return proceed;
+	}
+	
+	CCSE.ConfirmGameCCSEVersion = function(modName, modVersion, gameVersion, ccseVersion){
+		var proceed = true;
+		if(Game.version != gameVersion && CCSE.version != ccseVersion){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + gameVersion + ' and CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		else if(Game.version != gameVersion){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + gameVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		else if(CCSE.version != ccseVersion){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		return proceed;
 	}
 	
 	
 	/*=====================================================================================
 	Start your engines
 	=======================================================================================*/
-	CCSE.init();
+	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)) CCSE.init();
 }
 
 if(!CCSE.isLoaded) CCSE.launch();

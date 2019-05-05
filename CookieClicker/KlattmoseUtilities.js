@@ -1,9 +1,9 @@
 Game.Win('Third-party');
 if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.5';
+KlattmoseUtilities.version = '2.10';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -165,7 +165,7 @@ KlattmoseUtilities.launch = function(){
 		//***********************************
 		if(KlattmoseUtilities.postloadHooks) {
 			for(var i = 0; i < KlattmoseUtilities.postloadHooks.length; ++i) {
-				(KlattmoseUtilities.postloadHooks[i])();
+				KlattmoseUtilities.postloadHooks[i]();
 			}
 		}
 		
@@ -289,7 +289,6 @@ KlattmoseUtilities.launch = function(){
 	}
 
 	KlattmoseUtilities.exportConfig = function(){
-		Game.prefs.showBackupWarning = 0;
 		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your current configuration.<br>In a nice and readable format!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
 					JSON.stringify(KlattmoseUtilities.config, null, 2) + 
 					'</textarea></div>',['All done!']);
@@ -490,7 +489,7 @@ KlattmoseUtilities.launch = function(){
 
 	KlattmoseUtilities.ReplaceNativeGarden = function() {
 		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects["Farm"].minigame;
+			var M = Game.Objects['Farm'].minigame;
 			
 			KlattmoseUtilities.patches.gardenOrderofOperations = {};
 			KlattmoseUtilities.patches.gardenOrderofOperations.oldFunction = M.logic;
@@ -908,39 +907,27 @@ KlattmoseUtilities.launch = function(){
 
 
 	KlattmoseUtilities.ReplaceNativePantheon = function() {
-		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects["Temple"].minigame;
+		if(!Game.customMinigame['Temple'].slotGod) Game.customMinigame['Temple'].slotGod = [];
+		
+		Game.customMinigame['Temple'].slotGod.push(function(){
+			if(KlattmoseUtilities.config.patches.slotGodFix) delete Game.Objects['Temple'].minigame.slot[-1];
+		});
+		
+		/*CCSE.MinigameReplacer(function(){
+			var M = Game.Objects['Temple'].minigame;
 			
-			KlattmoseUtilities.patches.slotGodFix = {};
-			KlattmoseUtilities.patches.slotGodFix.oldFunction = M.slotGod;
+			Game.customMinigame['Temple'].slotGod.push(function(){
+				if(KlattmoseUtilities.config.patches.slotGodFix) delete M.slot[-1];
+			});
 			
-			
-			KlattmoseUtilities.patches.slotGodFix.newFunction = function(god, slot){
-				if(slot == god.slot) return false;
-				
-				if(slot == -1) M.slot[god.slot] = -1;
-				else if(M.slot[slot] != -1) M.godsById[M.slot[slot]].slot = god.slot;
-				
-				if(god.slot != -1 && slot != -1) M.slot[god.slot] = M.slot[slot];
-				if(slot != -1) M.slot[slot] = god.id;
-				
-				god.slot = slot;
-				Game.recalculateGains = true;
-			}
-			
-			
-			M.slotGod = function(god, slot){
-				if(KlattmoseUtilities.config.patches.slotGodFix) KlattmoseUtilities.patches.slotGodFix.newFunction(god, slot);
-				else KlattmoseUtilities.patches.slotGodFix.oldFunction(god, slot);
-			}
-		}, 'Temple');
+		}, 'Temple');*/
 		
 	}
 
 
 	KlattmoseUtilities.ReplaceNativeGrimoire = function() {
 		CCSE.MinigameReplacer(function(){
-			var M = Game.Objects["Wizard tower"].minigame;
+			var M = Game.Objects['Wizard tower'].minigame;
 			
 			KlattmoseUtilities.patches.gamblersFeverDreamFix = {};
 			KlattmoseUtilities.patches.gamblersFeverDreamFix.oldFunction = M.spells['gambler\'s fever dream'].win;
@@ -977,7 +964,7 @@ KlattmoseUtilities.launch = function(){
 		
 	}
 	
-	KlattmoseUtilities.init();
+	if(CCSE.ConfirmGameVersion(KlattmoseUtilities.name, KlattmoseUtilities.version, KlattmoseUtilities.GameVersion)) KlattmoseUtilities.init();
 }
 
 if(!KlattmoseUtilities.isLoaded){

@@ -153,3 +153,49 @@ Use any one of these to preform a version check before loading the code. If the 
 if(CCSE.ConfirmGameVersion(MyMod.name, MyMod.version, MyMod.GameVersion)) MyMod.init();
 ```
 
+## Demo mods
+
+I made a few quick mods to show off the capability of CCSE and provide example code of some of its features.
+
+### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js)
+```javascript
+javascript: (function () {
+	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js');
+}());
+```
+
+If any part of this reminds you of the Timer Bar in Cookie Monster, there's a very good reason for that: large chunks of code were copied from Cookie Monster. 
+
+Provides examples of: 
+* Creating a special object next to Krumblor and Santa
+* Displaying the version number in the Stats menu
+
+### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js)
+```javascript
+javascript: (function () {
+	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js');
+}());
+```
+
+This adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ripen to 1 second.
+
+Provides examples of: 
+* Creating a buff
+* Altering sugar lump times when that buff is active
+* Making a Golden Cookie effect activate that buff
+* Letting Force the Hand of Fate pick the new buff
+* Syncing up Fortune Cookie to be able to predict if FtHoF will call up the new effect
+
+### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js)
+```javascript
+javascript: (function () {
+	Game.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js');
+}());
+```
+
+This adds a new building and an appropriate amount of upgrades and achievments
+
+Provides examples of: 
+* Creating a building
+* Creating upgrades
+* Creating achievements

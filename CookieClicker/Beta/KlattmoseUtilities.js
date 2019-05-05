@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.9';
+KlattmoseUtilities.version = '2.10';
 KlattmoseUtilities.GameVersion = '2.019';
 
 KlattmoseUtilities.launch = function(){
@@ -964,7 +964,7 @@ KlattmoseUtilities.launch = function(){
 		
 	}
 	
-	KlattmoseUtilities.init();
+	if(CCSE.ConfirmGameVersion(KlattmoseUtilities.name, KlattmoseUtilities.version, KlattmoseUtilities.GameVersion)) KlattmoseUtilities.init();
 }
 
 if(!KlattmoseUtilities.isLoaded){

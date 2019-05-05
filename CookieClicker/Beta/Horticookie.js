@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.4';
+Horticookie.version = '3.5';
 Horticookie.GameVersion = '2.019';
 
 //***********************************
@@ -1079,7 +1079,7 @@ Horticookie.launch = function(){
 	}
 	
 	
-	Horticookie.init();
+	if(CCSE.ConfirmGameVersion(Horticookie.name, Horticookie.version, Horticookie.GameVersion)) Horticookie.init();
 }
 
 

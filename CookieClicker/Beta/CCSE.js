@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '0.78';
+CCSE.version = '0.79';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2529,9 +2529,43 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
+	Confirmation Prompts
+	=======================================================================================*/
+	CCSE.ConfirmGameVersion = function(modName, modVersion, version){
+		var proceed = true;
+		if(Game.version != version){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + version + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		return proceed;
+	}
+	
+	CCSE.ConfirmCCSEVersion = function(modName, modVersion, version){
+		var proceed = true;
+		if(CCSE.version != version){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + version + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		return proceed;
+	}
+	
+	CCSE.ConfirmGameCCSEVersion = function(modName, modVersion, gameVersion, ccseVersion){
+		var proceed = true;
+		if(Game.version != gameVersion && CCSE.version != ccseVersion){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + gameVersion + ' and CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		else if(Game.version != gameVersion){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + gameVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		else if(CCSE.version != ccseVersion){
+			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+		}
+		return proceed;
+	}
+	
+	
+	/*=====================================================================================
 	Start your engines
 	=======================================================================================*/
-	CCSE.init();
+	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)) CCSE.init();
 }
 
 if(!CCSE.isLoaded) CCSE.launch();

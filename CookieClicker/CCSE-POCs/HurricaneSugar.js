@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(HurricaneSugar === undefined) var HurricaneSugar = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 HurricaneSugar.name = 'Hurricane Sugar';
-HurricaneSugar.version = '1.2';
+HurricaneSugar.version = '1.3';
 HurricaneSugar.GameVersion = '2.019';
 
 HurricaneSugar.launch = function(){
@@ -65,7 +65,7 @@ HurricaneSugar.launch = function(){
 	}
 	
 	
-	HurricaneSugar.init();
+	if(CCSE.ConfirmGameVersion(HurricaneSugar.name, HurricaneSugar.version, HurricaneSugar.GameVersion)) HurricaneSugar.init();
 }
 
 

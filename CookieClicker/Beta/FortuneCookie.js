@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.15';
+FortuneCookie.version = '2.16';
 FortuneCookie.GameVersion = '2.019';
 
 FortuneCookie.launch = function(){
@@ -451,7 +451,7 @@ FortuneCookie.launch = function(){
 		return KlattmoseUtilities.config.patches.gamblersFeverDreamFix == 1;
 	}
 	
-	FortuneCookie.init();
+	if(CCSE.ConfirmGameVersion(FortuneCookie.name, FortuneCookie.version, FortuneCookie.GameVersion)) FortuneCookie.init();
 }
 
 if(!FortuneCookie.isLoaded){

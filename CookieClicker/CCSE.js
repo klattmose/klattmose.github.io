@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.1';
+CCSE.version = '1.2';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2141,7 +2141,7 @@ CCSE.launch = function(){
 	CCSE.NewGod = function(key, god){
 		var M = Game.Objects['Temple'].minigame;
 		
-		M.gods[key] = spell;
+		M.gods[key] = god;
 		
 		M.godsById = [];
 		var n = 0;
@@ -2163,7 +2163,7 @@ CCSE.launch = function(){
 	CCSE.NewPlant = function(key, plant){
 		var M = Game.Objects['Farm'].minigame;
 		
-		M.plants[key] = spell;
+		M.plants[key] = plant;
 		
 		M.plantsById = [];
 		var n = 0;

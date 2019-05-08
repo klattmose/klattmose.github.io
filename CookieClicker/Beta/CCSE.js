@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.5';
+CCSE.version = '1.9';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -49,7 +49,10 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	The heart of the mod. Functions to inject code into functions.
 	=======================================================================================*/
-	CCSE.SpliceCodeIntoFunction = function(functionName, row, code){
+	CCSE.SpliceCodeIntoFunction = function(functionName, row, code, preEvalScript){
+		// preEvalScript is to set variables that are used in the function but aren't declared in the function
+		if(preEvalScript) eval(preEvalScript);
+		
 		var proto = eval(functionName + ".prototype");
 		var i = Math.floor(row);
 		if(i == 0) throw new Error("row cannot be zero");
@@ -63,7 +66,10 @@ CCSE.launch = function(){
 		eval(functionName + ".prototype = proto");
 	}
 	
-	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode){
+	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript){
+		// preEvalScript is to set variables that are used in the function but aren't declared in the function
+		if(preEvalScript) eval(preEvalScript);
+		
 		var proto = eval(functionName + ".prototype");
 		var temp = eval(functionName + ".toString()");
 		
@@ -1697,19 +1703,19 @@ CCSE.launch = function(){
 		
 		// M.computeMagicM
 		if(!Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM = [];
-		temp = M.computeMagicM.toString();
-		eval('M.computeMagicM = ' + temp.slice(0, -1) + `
-			for(var i in Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM[i](); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.computeMagicM', -1, `
+			// M.computeMagicM injection point 0
+			for(var i in Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM[i]();`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.getFailChance
 		// functions should return a value to multiply failChance by (Return 1 for no effect)
 		if(!Game.customMinigame[objKey].getFailChance) Game.customMinigame[objKey].getFailChance = [];
-		temp = M.getFailChance.toString();
-		eval('M.getFailChance = ' + temp.replace('return', `
-			for(var i in Game.customMinigame[objKey].getFailChance) failChance *= Game.customMinigame[objKey].getFailChance[i](spell);
-			return`));
+		CCSE.ReplaceCodeIntoFunction('M.getFailChance', 'return', `
+			// M.getFailChance injection point 0
+			for(var i in Game.customMinigame[objKey].getFailChance) failChance *= Game.customMinigame[objKey].getFailChance[i](spell);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.castSpell
@@ -1719,57 +1725,66 @@ CCSE.launch = function(){
 		// M.getSpellCost
 		// functions should return a value to multiply out by (Return 1 for no effect)
 		if(!Game.customMinigame[objKey].getSpellCost) Game.customMinigame[objKey].getSpellCost = [];
-		temp = M.getSpellCost.toString();
-		eval('M.getSpellCost = ' + temp.replace('return', `
-			for(var i in Game.customMinigame[objKey].getSpellCost) out *= Game.customMinigame[objKey].getSpellCost[i](spell);
-			return`));
+		CCSE.ReplaceCodeIntoFunction('M.getSpellCost', 'return', `
+			// M.getSpellCost injection point 0
+			for(var i in Game.customMinigame[objKey].getSpellCost) out *= Game.customMinigame[objKey].getSpellCost[i](spell);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.getSpellCostBreakdown
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].getSpellCostBreakdown) Game.customMinigame[objKey].getSpellCostBreakdown = [];
-		temp = M.getSpellCostBreakdown.toString();
-		eval('M.getSpellCostBreakdown = ' + temp.replace('return', `
-			for(var i in Game.customMinigame[objKey].getSpellCostBreakdown) str = Game.customMinigame[objKey].getSpellCostBreakdown[i](spell, str);
-			return`));
+		CCSE.ReplaceCodeIntoFunction('M.getSpellCostBreakdown', 'return', `
+			// M.getSpellCostBreakdown injection point 0
+			for(var i in Game.customMinigame[objKey].getSpellCostBreakdown) str = Game.customMinigame[objKey].getSpellCostBreakdown[i](spell, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.spellTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].spellTooltip) Game.customMinigame[objKey].spellTooltip = [];
-		temp = M.spellTooltip.toString();
-		eval('M.spellTooltip = ' + temp.replace('return str', `
-				for(var i in Game.customMinigame[objKey].spellTooltip) str = Game.customMinigame[objKey].spellTooltip[i](id, str);
-				return str`));
+		CCSE.ReplaceCodeIntoFunction('M.spellTooltip', 'return str', `
+			// M.spellTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].spellTooltip) str = Game.customMinigame[objKey].spellTooltip[i](id, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.refillTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
-		temp = M.refillTooltip.toString();
-		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+		CCSE.ReplaceCodeIntoFunction('M.refillTooltip', 'return', 'var str = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SpliceCodeIntoFunction('M.refillTooltip', -1, `
+			// M.refillTooltip injection point 0
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
-			return str;
-		` + temp.slice(-1));
+			return str;`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.spells['hand of fate'].win
 		// functions should push a value to choices
 		if(!Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin = [];
-		temp = M.spells['hand of fate'].win.toString();
-		eval('M.spells["hand of fate"].win = ' + temp.replace('newShimmer.force', 
-					`for(var i in Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin[i](choices);
-					newShimmer.force`));
+		CCSE.ReplaceCodeIntoFunction('M.spells["hand of fate"].win', 'newShimmer.force', 
+					`// M.spells["hand of fate"].win injection point 0
+					for(var i in Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin[i](choices);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.spells['hand of fate'].fail
 		// functions should push a value to choices
 		if(!Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail = [];
-		temp = M.spells['hand of fate'].fail.toString();
-		eval('M.spells["hand of fate"].fail = ' + temp.replace('newShimmer.force', 
-					`for(var i in Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail[i](choices);
-					newShimmer.force`));
+		CCSE.ReplaceCodeIntoFunction('M.spells["hand of fate"].fail', 'newShimmer.force', 
+					`// M.spells["hand of fate"].fail injection point 0
+					for(var i in Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail[i](choices);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
+		
+		// M.launch
+		if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
+		CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+	// M.launch injection point 0
+	for(var i in Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch[i](M);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 	}
 	
 	CCSE.ReplacePantheon = function(){
@@ -1787,59 +1802,59 @@ CCSE.launch = function(){
 		// M.godTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].godTooltip) Game.customMinigame[objKey].godTooltip = [];
-		temp = M.godTooltip.toString();
-		eval('M.godTooltip = ' + temp.replace('return str', `
-				for(var i in Game.customMinigame[objKey].godTooltip) str = Game.customMinigame[objKey].godTooltip[i](id, str);
-				return str`));
+		CCSE.ReplaceCodeIntoFunction('M.godTooltip', 'return str', `
+			// M.godTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].godTooltip) str = Game.customMinigame[objKey].godTooltip[i](id, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.slotTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].slotTooltip) Game.customMinigame[objKey].slotTooltip = [];
-		temp = M.slotTooltip.toString();
-		eval('M.slotTooltip = ' + temp.replace('return str', `
-				for(var i in Game.customMinigame[objKey].slotTooltip) str = Game.customMinigame[objKey].slotTooltip[i](id, str);
-				return str`));
+		CCSE.ReplaceCodeIntoFunction('M.slotTooltip', 'return str', `
+			// M.slotTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].slotTooltip) str = Game.customMinigame[objKey].slotTooltip[i](id, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.useSwap
 		if(!Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap = [];
-		temp = M.useSwap.toString();
-		eval('M.useSwap = ' + temp.slice(0, -1) + `
-			for(var i in Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap[i](n); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.useSwap', -1, `
+			// M.useSwap injection point 0
+			for(var i in Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap[i](n);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.slotGod
 		if(!Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod = [];
-		temp = M.slotGod.toString();
-		eval('M.slotGod = ' + temp.slice(0, -1) + `
-			for(var i in Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod[i](god, slot); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.slotGod', -1, `
+			// M.slotGod injection point 0
+			for(var i in Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod[i](god, slot);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.dragGod
 		if(!Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod = [];
-		temp = M.dragGod.toString();
-		eval('M.dragGod = ' + temp.slice(0, -1) + `
-			for(var i in Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod[i](what); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.dragGod', -1, `
+			// M.dragGod injection point 0
+			for(var i in Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod[i](what);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.dropGod
 		if(!Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod = [];
-		temp = M.dropGod.toString();
-		eval('M.dropGod = ' + temp.slice(0, -1) + `
-			for(var i in Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod[i](); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.dropGod', -1, `
+			// M.dropGod injection point 0
+			for(var i in Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod[i]();`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.hoverSlot
 		if(!Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot = [];
-		temp = M.hoverSlot.toString();
-		eval('M.hoverSlot = ' + temp.slice(0, -1) + `
-			for(var i in Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot[i](what); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.hoverSlot', -1, `
+			// M.hoverSlot injection point 0
+			for(var i in Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot[i](what);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// Game.hasGod
@@ -1849,12 +1864,21 @@ CCSE.launch = function(){
 		// M.refillTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
-		temp = M.refillTooltip.toString();
-		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+		CCSE.ReplaceCodeIntoFunction('M.refillTooltip', 'return', 'var str = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SpliceCodeIntoFunction('M.refillTooltip', -1, `
+			// M.refillTooltip injection point 0
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
-			return str;
-		` + temp.slice(-1));
+			return str;`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
+		
+		// M.launch
+		if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
+		CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+	// M.launch injection point 0
+	for(var i in Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch[i](M);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 	}
 	
 	CCSE.ReplaceGarden = function(){
@@ -1871,53 +1895,53 @@ CCSE.launch = function(){
 		
 		// M.getUnlockedN
 		if(!Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN = [];
-		temp = M.getUnlockedN.toString();
-		eval('M.getUnlockedN = ' + temp.replace('return', 
-			`for(var i in Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN[i]();
-			return`));
+		CCSE.ReplaceCodeIntoFunction('M.getUnlockedN', 'return', 
+			`// M.getUnlockedN injection point 0
+			for(var i in Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN[i]();`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.dropUpgrade
 		if(!Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade = [];
-		temp = M.dropUpgrade.toString();
-		eval('M.dropUpgrade = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade[i](upgrade, rate); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.dropUpgrade', -1, 
+			`// M.dropUpgrade injection point 0
+			for(var i in Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade[i](upgrade, rate);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.computeMatures
 		if(!Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures = [];
-		temp = M.computeMatures.toString();
-		eval('M.computeMatures = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures[i](mult); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.computeMatures', -1, 
+			`// M.computeMatures injection point 0
+			for(var i in Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures[i](mult);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.getMuts
 		// functions should push mutations to muts
 		if(!Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts = [];
-		temp = M.getMuts.toString();
-		eval('M.getMuts = ' + temp.replace('return', 
-			`for(var i in Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts[i](neighs, neighsM, muts);
-			return`));
+		CCSE.ReplaceCodeIntoFunction('M.getMuts', 'return', 
+			`// M.getMuts injection point 0
+			for(var i in Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts[i](neighs, neighsM, muts);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.computeBoostPlot
 		// You're going to have to use MAXIMUM EFFORT
 		if(!Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot = [];
-		temp = M.computeBoostPlot.toString();
-		eval('M.computeBoostPlot = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot[i](); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.computeBoostPlot', -1, 
+			`// M.computeBoostPlot injection point 0
+			for(var i in Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot[i]();`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.computeEffs
 		// functions should change effs (or not, I'm a comment, not a cop)
 		if(!Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs = [];
-		temp = M.computeEffs.toString();
-		eval('M.computeEffs = ' + temp.replace('M.effs=effs;', 
-			`for(var i in Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs[i](effs);
-			M.effs=effs;`));
+		CCSE.ReplaceCodeIntoFunction('M.computeEffs', 'M.effs=effs;', 
+			`// M.computeEffs injection point 0
+			for(var i in Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs[i](effs);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.tools TODO
@@ -1929,83 +1953,91 @@ CCSE.launch = function(){
 		// M.getPlantDesc
 		// Return ret for no effect
 		if(!Game.customMinigame[objKey].getPlantDesc) Game.customMinigame[objKey].getPlantDesc = [];
-		temp = M.getPlantDesc.toString();
-		eval('M.getPlantDesc = ' + temp.replace('return', 'var ret = ').slice(0, -1) + 
-				`for(var i in Game.customMinigame[objKey].getPlantDesc) ret = Game.customMinigame[objKey].getPlantDesc[i](me, ret);
-				return ret;
-			` + temp.slice(-1));
+		CCSE.ReplaceCodeIntoFunction('M.getPlantDesc', 'return', 'var ret = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SpliceCodeIntoFunction('M.getPlantDesc', -1, 
+				`// M.getPlantDesc injection point 0
+				for(var i in Game.customMinigame[objKey].getPlantDesc) ret = Game.customMinigame[objKey].getPlantDesc[i](me, ret);
+				return ret;`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.soilTooltip
 		// Return str for no effect
 		if(!Game.customMinigame[objKey].soilTooltip) Game.customMinigame[objKey].soilTooltip = [];
-		temp = M.soilTooltip.toString();
-		eval('M.soilTooltip = ' + temp.replace('return str;', 
-				`for(var i in Game.customMinigame[objKey].soilTooltip) str = Game.customMinigame[objKey].soilTooltip[i](id, str);
-				return str;`));
+		CCSE.ReplaceCodeIntoFunction('M.soilTooltip', 'return str;', 
+				`// M.soilTooltip injection point 0
+				for(var i in Game.customMinigame[objKey].soilTooltip) str = Game.customMinigame[objKey].soilTooltip[i](id, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.seedTooltip
 		// Return str for no effect
 		if(!Game.customMinigame[objKey].seedTooltip) Game.customMinigame[objKey].seedTooltip = [];
-		temp = M.seedTooltip.toString();
-		eval('M.seedTooltip = ' + temp.replace('return str;', 
-				`for(var i in Game.customMinigame[objKey].seedTooltip) str = Game.customMinigame[objKey].seedTooltip[i](id, str);
-				return str;`));
+		CCSE.ReplaceCodeIntoFunction('M.seedTooltip', 'return str;', 
+				`// M.seedTooltip injection point 0
+				for(var i in Game.customMinigame[objKey].seedTooltip) str = Game.customMinigame[objKey].seedTooltip[i](id, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.toolTooltip
 		// Return str for no effect
 		if(!Game.customMinigame[objKey].toolTooltip) Game.customMinigame[objKey].toolTooltip = [];
-		temp = M.toolTooltip.toString();
-		eval('M.toolTooltip = ' + temp.replace('return str;', 
-				`for(var i in Game.customMinigame[objKey].toolTooltip) str = Game.customMinigame[objKey].toolTooltip[i](id, str);
-				return str;`));
+		CCSE.ReplaceCodeIntoFunction('M.toolTooltip', 'return str;', 
+				`// M.toolTooltip injection point 0
+				for(var i in Game.customMinigame[objKey].toolTooltip) str = Game.customMinigame[objKey].toolTooltip[i](id, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.tileTooltip
 		// Return ret for no effect
 		if(!Game.customMinigame[objKey].tileTooltip) Game.customMinigame[objKey].tileTooltip = [];
-		temp = M.tileTooltip.toString();
-		eval('M.tileTooltip = ' + temp.replace('return function(){', `return function(){
-				var ret = ''`).split('return str;').join('ret = str;').replace('};',
-				`for(var i in Game.customMinigame[objKey].tileTooltip) ret = Game.customMinigame[objKey].tileTooltip[i](x, y, ret);
-				return ret;
-			};`));
+		CCSE.ReplaceCodeIntoFunction('M.tileTooltip', 'return function(){', `return function(){
+				var ret = '';`, 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.tileTooltip', /return str;/g, 'ret = str;', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.tileTooltip', '};', 
+				`// M.tileTooltip injection point 0
+				for(var i in Game.customMinigame[objKey].tileTooltip) ret = Game.customMinigame[objKey].tileTooltip[i](x, y, ret);
+				return ret;`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.refillTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
-		temp = M.refillTooltip.toString();
-		eval('M.refillTooltip = ' + temp.replace('return', 'var str = ').slice(0, -1) + `
+		CCSE.ReplaceCodeIntoFunction('M.refillTooltip', 'return', 'var str = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SpliceCodeIntoFunction('M.refillTooltip', -1, `
+			// M.refillTooltip injection point 0
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
-			return str;
-		` + temp.slice(-1));
+			return str;`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.buildPanel
 		if(!Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel = [];
-		temp = M.buildPanel.toString();
-		eval('M.buildPanel = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel[i](); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.buildPanel', -1, 
+			`// M.buildPanel injection point 0
+			for(var i in Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel[i]();`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.buildPlot
 		if(!Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot = [];
-		temp = M.buildPlot.toString();
-		eval('M.buildPlot = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot[i](); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.buildPlot', -1, 
+			`// M.buildPlot injection point 0
+			for(var i in Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot[i]();`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.clickTile
 		if(!Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile = [];
-		temp = M.clickTile.toString();
-		eval('M.clickTile = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile[i](x, y); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.clickTile', -1, 
+			`// M.clickTile injection point 0
+			for(var i in Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile[i](x, y);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.useTool
@@ -2013,73 +2045,88 @@ CCSE.launch = function(){
 		
 		// M.getTile
 		// Return ret to have no effect
-		if(!Game.customMinigame[objKey].getTile) Game.customMinigame[objKey].getTile = []; 
-		CCSE.Backup.getTile = M.getTile;
-		M.getTile = function(x, y){
-			var ret = CCSE.Backup.getTile(x, y);
+		if(!Game.customMinigame[objKey].getTile) Game.customMinigame[objKey].getTile = [];
+		CCSE.ReplaceCodeIntoFunction('M.getTile', '{', 'var ret;', 1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.getTile', 'return', 'ret =', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.getTile', 'return', 'else ret =', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SpliceCodeIntoFunction('M.getTile', -1, 
+			`// M.getTile injection point 0
 			for(var i in Game.customMinigame[objKey].getTile) ret = Game.customMinigame[objKey].getTile[i](x, y, ret);
-			return ret;
-		}
+			return ret;`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.getTile
 		// Return ret to have no effect
 		if(!Game.customMinigame[objKey].isTileUnlocked) Game.customMinigame[objKey].isTileUnlocked = []; 
-		CCSE.Backup.isTileUnlocked = M.isTileUnlocked;
-		M.isTileUnlocked = function(x, y){
-			var ret = CCSE.Backup.isTileUnlocked(x, y);
+		CCSE.ReplaceCodeIntoFunction('M.isTileUnlocked', '{', 'var ret;', 1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.isTileUnlocked', /return/g, 'ret =', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SpliceCodeIntoFunction('M.isTileUnlocked', -1, 
+			`// M.isTileUnlocked injection point 0
 			for(var i in Game.customMinigame[objKey].isTileUnlocked) ret = Game.customMinigame[objKey].isTileUnlocked[i](x, y, ret);
-			return ret;
-		}
+			return ret;`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.computeStepT
 		if(!Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT = [];
-		temp = M.computeStepT.toString();
-		eval('M.computeStepT = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT[i](); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.computeStepT', -1, 
+			`// M.computeStepT injection point 0
+			for(var i in Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT[i]();`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.convert
 		if(!Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert = [];
-		temp = M.convert.toString();
-		eval('M.convert = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert[i](); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.convert', -1, 
+			`// M.convert injection point 0
+			for(var i in Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert[i]();`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.harvestAll
 		if(!Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll = [];
-		temp = M.harvestAll.toString();
-		eval('M.harvestAll = ' + temp.slice(0, -1) + 
-			`for(var i in Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll[i](type, mature, mortal); 
-		` + temp.slice(-1));
+		CCSE.SpliceCodeIntoFunction('M.harvestAll', -1, 
+			`// M.harvestAll injection point 0
+			for(var i in Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll[i](type, mature, mortal);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.harvest
 		if(!Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest = [];
-		temp = M.harvest.toString();
-		eval('M.harvest = ' + temp.replace('return true;', 
-				`for(var i in Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest[i](x, y, manual);
-				return true;`));
+		CCSE.ReplaceCodeIntoFunction('M.harvest', 'return true;', 
+				`// M.harvest injection point 0
+				for(var i in Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest[i](x, y, manual);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.unlockSeed
 		if(!Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed = [];
-		temp = M.unlockSeed.toString();
-		eval('M.unlockSeed = ' + temp.replace('return true;', 
-			`for(var i in Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed[i](me);
-			return true;`));
+		CCSE.ReplaceCodeIntoFunction('M.unlockSeed', 'return true;', 
+			`// M.unlockSeed injection point 0
+			for(var i in Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed[i](me);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.lockSeed
 		if(!Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed = [];
-		temp = M.lockSeed.toString();
-		eval('M.lockSeed = ' + temp.replace('return true;', 
-			`for(var i in Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed[i](me);
-			return true;`));
+		CCSE.ReplaceCodeIntoFunction('M.lockSeed', 'return true;', 
+			`// M.lockSeed injection point 0
+			for(var i in Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed[i](me);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
+		
+		// M.launch
+		if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
+		CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+	// M.launch injection point 0
+	for(var i in Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch[i](M);`,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 	}
 	
 	

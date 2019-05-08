@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.9';
+CCSE.version = '1.91';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1780,11 +1780,13 @@ CCSE.launch = function(){
 		
 		
 		// M.launch
-		if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
-		CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+		if(M.launch.toString().indexOf('// M.launch injection point 0') == -1){
+			if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
+			CCSE.SpliceCodeIntoFunction('M.launch', -1, `
 	// M.launch injection point 0
-	for(var i in Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch[i](M);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);`,
+				"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		}
 	}
 	
 	CCSE.ReplacePantheon = function(){
@@ -1874,11 +1876,13 @@ CCSE.launch = function(){
 		
 		
 		// M.launch
-		if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
-		CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+		if(M.launch.toString().indexOf('// M.launch injection point 0') == -1){
+			if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
+			CCSE.SpliceCodeIntoFunction('M.launch', -1, `
 	// M.launch injection point 0
-	for(var i in Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch[i](M);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);`,
+				"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		}
 	}
 	
 	CCSE.ReplaceGarden = function(){
@@ -2122,11 +2126,13 @@ CCSE.launch = function(){
 		
 		
 		// M.launch
-		if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
-		CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+		if(M.launch.toString().indexOf('// M.launch injection point 0') == -1){
+			if(!Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch = [];
+			CCSE.SpliceCodeIntoFunction('M.launch', -1, `
 	// M.launch injection point 0
-	for(var i in Game.customMinigame[objKey].launch) Game.customMinigame[objKey].launch[i](M);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);`,
+				"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		}
 	}
 	
 	

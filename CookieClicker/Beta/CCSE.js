@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.95';
+CCSE.version = '1.96';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -141,6 +141,10 @@ CCSE.launch = function(){
 					`// Game.LoadSave injection point 0
 					for(var i in Game.customLoad) Game.customLoad[i](); `, -1);
 		}
+		
+		
+		// Game.WriteSave
+		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', '(Game.season?', '((Game.season)?', 0);
 		
 		
 		// randomFloor
@@ -2312,6 +2316,16 @@ CCSE.launch = function(){
 			}
 		}
 		
+		for(var name in CCSE.save.Seasons){
+			var season = CCSE.save.Seasons[name];
+			if(Game.season == name){
+				season.T = Game.seasonT;
+			}
+			else{
+				season.T = -1;
+			}
+		}
+		
 		for(var i in CCSE.customSave) CCSE.customSave[i]();
 		
 		var str = JSON.stringify(CCSE.save);
@@ -2361,6 +2375,7 @@ CCSE.launch = function(){
 		if(!CCSE.save.Upgrades) CCSE.save.Upgrades = {};
 		if(!CCSE.save.Buildings) CCSE.save.Buildings = {};
 		if(!CCSE.save.Buffs) CCSE.save.Buffs = {};
+		if(!CCSE.save.Seasons) CCSE.save.Seasons = {};
 		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
 		
 		for(var name in CCSE.save.Buildings){
@@ -2404,6 +2419,13 @@ CCSE.launch = function(){
 					var buff = CCSE.save.Buffs[name];
 					Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
 				}
+			}
+		}
+		
+		for(var name in CCSE.save.Seasons){
+			if(Game.seasons[name] && CCSE.save.Seasons[name].T > 0){
+				Game.season = name;
+				Game.seasonT = CCSE.save.Seasons[name].T;
 			}
 		}
 		
@@ -2600,9 +2622,11 @@ CCSE.launch = function(){
 		**/
 		Game.customLoad.push(function(){
 			if(Game.season == name && Game.season == Game.baseSeason){
-				Game.Notify(announcement[0], announcement[1], announcement[2], 60*3);
+				Game.Notify(announcement[0], announcement[1], announcement[2], 60 * 3);
 			}
 		});
+		
+		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', '((Game.season', "((Game.season && Game.season != '" + name + "'", 0);
 		
 		Game.computeSeasons();
 		Game.computeSeasonPrices();

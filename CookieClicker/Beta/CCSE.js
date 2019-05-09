@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.96';
+CCSE.version = '1.97';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -144,7 +144,9 @@ CCSE.launch = function(){
 		
 		
 		// Game.WriteSave
+		// This section only exists to support custom seasons
 		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', '(Game.season?', '((Game.season)?', 0);
+		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', '(Game.seasonT)', '((Game.season)?Game.seasonT:-1)', 0);
 		
 		
 		// randomFloor
@@ -2318,6 +2320,7 @@ CCSE.launch = function(){
 		
 		for(var name in CCSE.save.Seasons){
 			var season = CCSE.save.Seasons[name];
+			season.lastTime = Date.now();
 			if(Game.season == name){
 				season.T = Game.seasonT;
 			}
@@ -2426,6 +2429,9 @@ CCSE.launch = function(){
 			if(Game.seasons[name] && CCSE.save.Seasons[name].T > 0){
 				Game.season = name;
 				Game.seasonT = CCSE.save.Seasons[name].T;
+				var framesElapsed = Math.ceil(((Date.now() - CCSE.save.Seasons[name].lastTime) / 1000) * Game.fps);
+				if(Game.seasonT > 0) Game.seasonT = Math.max(Game.seasonT - framesElapsed, 1);
+				if(Game.Has('Season switcher')) Game.Unlock(Game.seasons[name].trigger);
 			}
 		}
 		
@@ -2626,11 +2632,23 @@ CCSE.launch = function(){
 			}
 		});
 		
-		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', '((Game.season', "((Game.season && Game.season != '" + name + "'", 0);
+		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', /\(\(Game.season/g, "((Game.season && Game.season != '" + name + "'", 0);
 		
 		Game.computeSeasons();
 		Game.computeSeasonPrices();
 		Game.LoadSave();
+		
+		if(CCSE.save.Seasons[name]){
+			if(CCSE.save.Seasons[name].T > 0){
+				Game.seasonT = CCSE.save.Seasons[name].T;
+				Game.season = name;
+			}
+		}else{
+			CCSE.save.Seasons[name] = {
+				T: 0
+			}
+			if(Game.Has('Season switcher')) Game.Unlock(Game.seasons[name].trigger);
+		}
 	}
 	
 	

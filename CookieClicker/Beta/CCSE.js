@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.94';
+CCSE.version = '1.95';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2604,8 +2604,8 @@ CCSE.launch = function(){
 			}
 		});
 		
-		Game.computeSeasonPrices();
 		Game.computeSeasons();
+		Game.computeSeasonPrices();
 		Game.LoadSave();
 	}
 	

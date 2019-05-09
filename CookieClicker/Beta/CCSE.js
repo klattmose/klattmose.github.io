@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.97';
+CCSE.version = '1.98';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2426,11 +2426,14 @@ CCSE.launch = function(){
 		}
 		
 		for(var name in CCSE.save.Seasons){
-			if(Game.seasons[name] && CCSE.save.Seasons[name].T > 0){
-				Game.season = name;
-				Game.seasonT = CCSE.save.Seasons[name].T;
-				var framesElapsed = Math.ceil(((Date.now() - CCSE.save.Seasons[name].lastTime) / 1000) * Game.fps);
-				if(Game.seasonT > 0) Game.seasonT = Math.max(Game.seasonT - framesElapsed, 1);
+			if(Game.seasons[name]){
+				if(CCSE.save.Seasons[name].T > 0){
+					Game.season = name;
+					Game.seasonT = CCSE.save.Seasons[name].T;
+					var framesElapsed = Math.ceil(((Date.now() - CCSE.save.Seasons[name].lastTime) / 1000) * Game.fps);
+					if(Game.seasonT > 0) Game.seasonT = Math.max(Game.seasonT - framesElapsed, 1);
+				}
+				
 				if(Game.Has('Season switcher')) Game.Unlock(Game.seasons[name].trigger);
 			}
 		}
@@ -2619,13 +2622,6 @@ CCSE.launch = function(){
 		lastDay.setDate(lastDay.getDate() + 1); // lastDay is inclusive
 		if(Date.now() >= firstDay && Date.now() <= lastDay) Game.baseSeason = name;
 		
-		/**
-			announcement[
-							Title,
-							phrase,
-							icon
-						]
-		**/
 		Game.customLoad.push(function(){
 			if(Game.season == name && Game.season == Game.baseSeason){
 				Game.Notify(announcement[0], announcement[1], announcement[2], 60 * 3);
@@ -2636,19 +2632,23 @@ CCSE.launch = function(){
 		
 		Game.computeSeasons();
 		Game.computeSeasonPrices();
-		Game.LoadSave();
 		
 		if(CCSE.save.Seasons[name]){
 			if(CCSE.save.Seasons[name].T > 0){
 				Game.seasonT = CCSE.save.Seasons[name].T;
 				Game.season = name;
+				var framesElapsed = Math.ceil(((Date.now() - CCSE.save.Seasons[name].lastTime) / 1000) * Game.fps);
+				if(Game.seasonT > 0) Game.seasonT = Math.max(Game.seasonT - framesElapsed, 1);
 			}
 		}else{
 			CCSE.save.Seasons[name] = {
-				T: 0
+				T: 0,
+				lastTime: Date.now()
 			}
-			if(Game.Has('Season switcher')) Game.Unlock(Game.seasons[name].trigger);
 		}
+		
+		if(Game.Has('Season switcher')) Game.Unlock(Game.seasons[name].trigger);
+		Game.upgradesToRebuild = 1;
 	}
 	
 	

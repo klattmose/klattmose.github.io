@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.92';
+CCSE.version = '1.93';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -64,6 +64,8 @@ CCSE.launch = function(){
 		
 		eval(functionName + " = " + temp.join("\n"));
 		eval(functionName + ".prototype = proto");
+		
+		if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript){
@@ -89,6 +91,8 @@ CCSE.launch = function(){
 		
 		eval(functionName + " = " + temp);
 		eval(functionName + ".prototype = proto");
+		
+		if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
 	}
 	
 	
@@ -830,23 +834,19 @@ CCSE.launch = function(){
 		
 		
 		// Game.TieredUpgrade
-		temp = Game.TieredUpgrade.toString();
-		eval('Game.TieredUpgrade = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		CCSE.ReplaceCodeIntoFunction('Game.TieredUpgrade', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0);
 		
 		
 		// Game.SynergyUpgrade
-		temp = Game.SynergyUpgrade.toString();
-		eval('Game.SynergyUpgrade = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		CCSE.ReplaceCodeIntoFunction('Game.SynergyUpgrade', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0);
 		
 		
 		// Game.GrandmaSynergy
-		temp = Game.GrandmaSynergy.toString();
-		eval('Game.GrandmaSynergy = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		CCSE.ReplaceCodeIntoFunction('Game.GrandmaSynergy', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0);
 		
 		
 		// Game.NewUpgradeCookie
-		temp = Game.NewUpgradeCookie.toString();
-		eval('Game.NewUpgradeCookie = ' + temp.replace('new Game.Upgrade', 'CCSE.NewUpgrade'));
+		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0);
 		
 		
 		// -----     Seasons block     ----- //
@@ -894,23 +894,19 @@ CCSE.launch = function(){
 		
 		
 		// Game.TieredAchievement
-		temp = Game.TieredAchievement.toString();
-		eval('Game.TieredAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		CCSE.ReplaceCodeIntoFunction('Game.TieredAchievement', 'new Game.Achievement', 'CCSE.NewAchievement', 0);
 		
 		
 		// Game.ProductionAchievement
-		temp = Game.ProductionAchievement.toString();
-		eval('Game.ProductionAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		CCSE.ReplaceCodeIntoFunction('Game.ProductionAchievement', 'new Game.Achievement', 'CCSE.NewAchievement', 0);
 		
 		
 		// Game.BankAchievement
-		temp = Game.BankAchievement.toString();
-		eval('Game.BankAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		CCSE.ReplaceCodeIntoFunction('Game.BankAchievement', 'new Game.Achievement', 'CCSE.NewAchievement', 0);
 		
 		
 		// Game.CpsAchievement
-		temp = Game.CpsAchievement.toString();
-		eval('Game.CpsAchievement = ' + temp.replace('new Game.Achievement', 'CCSE.NewAchievement'));
+		CCSE.ReplaceCodeIntoFunction('Game.CpsAchievement', 'new Game.Achievement', 'CCSE.NewAchievement', 0);
 		
 		
 		// -----     Buffs block     ----- //
@@ -1451,6 +1447,7 @@ CCSE.launch = function(){
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
 				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this); 
 			}`);
+			if(upgrade.buyFunction.toString().indexOf('// Game.Upgrades') == -1) console.log("Error injecting code into function Game.Upgrades['" + escKey + "'].buyFunction.");
 		}else{
 			eval(`upgrade.buyFunction = function(){
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0

@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.93';
+CCSE.version = '1.94';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -2583,6 +2583,30 @@ CCSE.launch = function(){
 		}
 		
 		return me;
+	}
+	
+	CCSE.NewSeason = function(name, firstDay, lastDay, season, announcement){
+		Game.seasons[name] = season;
+		
+		lastDay.setDate(lastDay.getDate() + 1); // lastDay is inclusive
+		if(Date.now() >= firstDay && Date.now() <= lastDay) Game.baseSeason = name;
+		
+		/**
+			announcement[
+							Title,
+							phrase,
+							icon
+						]
+		**/
+		Game.customLoad.push(function(){
+			if(Game.season == name && Game.season == Game.baseSeason){
+				Game.Notify(announcement[0], announcement[1], announcement[2], 60*3);
+			}
+		});
+		
+		Game.computeSeasonPrices();
+		Game.computeSeasons();
+		Game.LoadSave();
 	}
 	
 	

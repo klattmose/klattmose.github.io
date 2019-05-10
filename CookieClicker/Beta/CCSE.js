@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.002';
+CCSE.version = '2.003';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -25,7 +25,7 @@ CCSE.launch = function(){
 		CCSE.LoadSave();
 		Game.customSave.push(CCSE.WriteSave);
 		Game.customLoad.push(CCSE.LoadSave);
-		Game.customReset.push(CCSE.Reset);
+		//Game.customReset.push(CCSE.Reset); Nevermind
 		
 		
 		// Inject menu functions
@@ -2565,7 +2565,7 @@ CCSE.launch = function(){
 		l('textareaPrompt').focus();
 	}
 	
-	CCSE.Reset = function(hard){
+	/*CCSE.Reset = function(hard){
 		if(hard){
 			for(var name in CCSE.save.Achievements){
 				CCSE.save.Achievements[name].won = 0;
@@ -2587,7 +2587,7 @@ CCSE.launch = function(){
 				CCSE.save.Upgrades[name].bought = Game.Upgrades[name].bought;
 			}
 		}
-	}
+	}*/
 	
 	
 	/*=====================================================================================

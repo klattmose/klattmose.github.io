@@ -14,6 +14,33 @@ CCSE: addLumpType
 **/
 
 
+/**
+Firework upgrades
+
+Types (Just cps increase):
+	Brocade
+	Chrysanthemum
+	Crossette
+	Coconut
+	Palm
+	Peony
+	Pistil
+	Ring
+	Waterfall
+	Wave
+	Whirlwind
+	Willow
+	
+	
+
+
+Shimmer modifiers:
+	Crackle
+	Multi break
+
+**/
+
+
 
 if(Date.now() >= new Date(new Date().getFullYear(), 7 - 1, 1) && Date.now() <= new Date(new Date().getFullYear(), 7 - 1, 7)){
 	Game.baseSeason = 'american';

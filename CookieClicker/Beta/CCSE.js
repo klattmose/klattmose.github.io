@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.98';
+CCSE.version = '1.098';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -27,7 +27,6 @@ CCSE.launch = function(){
 		Game.customLoad.push(CCSE.LoadSave);
 		
 		
-		
 		// Inject menu functions
 		Game.customOptionsMenu.push(function(){
 			CCSE.AppendCollapsibleOptionsMenu(CCSE.name, CCSE.GetMenuString());
@@ -37,6 +36,12 @@ CCSE.launch = function(){
 			CCSE.AppendStatsVersionNumber(CCSE.name, CCSE.version);
 		});
 		
+		Game.customInfoMenu.push(function(){
+			CCSE.PrependCollapsibleInfoMenu(CCSE.name, CCSE.updateLog);
+		});
+		
+		l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
+		
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		if (Game.prefs.popups) Game.Popup('CCSE loaded!');
@@ -45,6 +50,28 @@ CCSE.launch = function(){
 		if(CCSE.postLoadHooks) for(var i in CCSE.postLoadHooks) CCSE.postLoadHooks[i]();
 	}
 	
+	
+	/*=====================================================================================
+	Update history
+	=======================================================================================*/
+	{	CCSE.updateLog = '<div class="subsection"><div class="listing">Cookie Clicker Script Extender is a modding framework intended to make modding this game easier and more accessible.</div>' +
+			'<div class="listing">CCSE is written and maintained by Klattmose (<a href="https://github.com/klattmose" target="_blank">GitHub</a>, <a href="https://www.reddit.com/user/klattmose/" target="_blank">reddit</a>)</div>' +
+			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
+			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
+			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update"><div class="title">05/10/2019 - 2.000</div>' + 
+			'<div class="listing">&bull; Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly</div>' +
+			'<div class="listing">&bull; Added function for creating seasons</div>' +
+			'<div class="listing">&bull; Created this update log, and put the version number in the lower left corner</div>' +
+			
+			'</div><div class="subsection update"><div class="title">05/05/2019 - initial release</div>' +
+			'<div class="listing">&bull; Added a bunch of mod hooks to the game</div>' +
+			'<div class="listing">&bull; Added functions to ease the creation of content like achievements and buildings</div>' +
+			'<div class="listing">&bull; Added a save system to manage game objects created through CCSE</div>' +
+			'<div class="listing">&bull; Further documentation <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a></div>' +
+			'</div><div class="subsection"></div><div class="section">Cookie Clicker</div>';
+	}
 	
 	/*=====================================================================================
 	The heart of the mod. Functions to inject code into functions.
@@ -1682,6 +1709,54 @@ CCSE.launch = function(){
 		return str;
 	}
 	
+	CCSE.PrependCollapsibleInfoMenu = function(title, body){
+		// Title must be a string. Body may be either string or div
+		var titleDiv = document.createElement('div');
+		titleDiv.className = 'title';
+		titleDiv.textContent = title + ' ';
+		
+		if(CCSE.collapseMenu[title + 'info'] === undefined) CCSE.collapseMenu[title + 'info'] = 0;
+		
+		// Stolen wholesale from Cookie Monster
+		var span = document.createElement('span');
+		span.style.cursor = 'pointer';
+		span.style.display = 'inline-block';
+		span.style.height = '14px';
+		span.style.width = '14px';
+		span.style.borderRadius = '7px';
+		span.style.textAlign = 'center';
+		span.style.backgroundColor = '#C0C0C0';
+		span.style.color = 'black';
+		span.style.fontSize = '13px';
+		span.style.verticalAlign = 'middle';
+		span.textContent = (CCSE.collapseMenu[title + 'info'] ? '+' : '-');
+		span.onclick = function(){CCSE.ToggleCollabsibleMenu(title + 'info'); Game.UpdateMenu();};
+		titleDiv.appendChild(span);
+		
+		var bodyDiv;
+		if(typeof body == 'string'){
+			bodyDiv = document.createElement('div');
+			bodyDiv.innerHTML = body;
+		}
+		else{
+			bodyDiv = body;
+		}
+		
+		var div = document.createElement('div');
+		div.appendChild(titleDiv);
+		div.classList.add('subsection');
+		if(!CCSE.collapseMenu[title + 'info']) div.appendChild(bodyDiv);
+		
+		
+		var menu = l('menu');
+		if(menu){
+			var about = menu.getElementsByClassName('subsection')[0];
+			if(about){
+				menu.childNodes[1].insertBefore(div, about);
+			}
+		}
+	}
+	
 	
 	/*=====================================================================================
 	Minigames
@@ -2276,6 +2351,8 @@ CCSE.launch = function(){
 	=======================================================================================*/
 	if(!CCSE.customSave) CCSE.customSave = [];
 	CCSE.WriteSave = function(type){
+		CCSE.save.version = CCSE.version;
+		
 		for(var name in CCSE.save.Buildings){
 			if(Game.Objects[name]){
 				var saved = CCSE.save.Buildings[name];
@@ -2374,12 +2451,20 @@ CCSE.launch = function(){
 		
 		
 		if(!CCSE.save) CCSE.save = {};
+		if(!CCSE.save.version) CCSE.save.version = 1;
 		if(!CCSE.save.Achievements) CCSE.save.Achievements = {};
 		if(!CCSE.save.Upgrades) CCSE.save.Upgrades = {};
 		if(!CCSE.save.Buildings) CCSE.save.Buildings = {};
 		if(!CCSE.save.Buffs) CCSE.save.Buffs = {};
 		if(!CCSE.save.Seasons) CCSE.save.Seasons = {};
 		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
+		
+		if(CCSE.save.version != CCSE.version){
+			l('logButton').classList.add('hasUpdate');
+			CCSE.collapseMenu['CCSEinfo'] = 0;
+		}else{
+			CCSE.collapseMenu['CCSEinfo'] = 1;
+		}
 		
 		for(var name in CCSE.save.Buildings){
 			if(Game.Objects[name]){

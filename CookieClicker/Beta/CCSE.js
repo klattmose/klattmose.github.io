@@ -2534,6 +2534,7 @@ CCSE.launch = function(){
 			}
 		}
 		
+		Game.upgradesToRebuild = 1;
 		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
 	}
 	

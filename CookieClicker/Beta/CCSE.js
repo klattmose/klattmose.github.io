@@ -61,7 +61,8 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
-			'</div><div class="subsection update"><div class="title">05/10/2019 - 2.000</div>' + 
+			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' + 
+			'<div class="listing">&bull; You know that moment where you do something and then immediately realize a better way to do it?</div>' +
 			'<div class="listing">&bull; Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly</div>' +
 			'<div class="listing">&bull; Added function for creating seasons</div>' +
 			'<div class="listing">&bull; Created this update log, and put the version number in the lower left corner</div>' +

@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '1.098';
+CCSE.version = '2.001';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -174,6 +174,13 @@ CCSE.launch = function(){
 		// This section only exists to support custom seasons
 		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', '(Game.season?', '((Game.season)?', 0);
 		CCSE.ReplaceCodeIntoFunction('Game.WriteSave', '(Game.seasonT)', '((Game.season)?Game.seasonT:-1)', 0);
+		
+		
+		// Game.Reset
+		if(!Game.customReset) Game.customReset = [];
+		CCSE.SpliceCodeIntoFunction('Game.Reset', -1, `
+			// Game.Reset injection point 0
+			for(var i in Game.customReset) Game.customReset[i](hard);`);
 		
 		
 		// randomFloor
@@ -2363,6 +2370,7 @@ CCSE.launch = function(){
 				saved.totalCookies = me.totalCookies;
 				saved.level = me.level;
 				saved.muted = me.muted;
+				saved.free = me.free;
 				
 				if(Game.isMinigameReady(me)) saved.minigameSave = me.minigame.save(); else saved.minigameSave = '';
 			}
@@ -2479,6 +2487,8 @@ CCSE.launch = function(){
 				me.totalCookies = saved.totalCookies;
 				me.level = saved.level;
 				me.muted = saved.muted;
+				me.free = saved.free ? saved.free : 0; // Left this out earlier, can't expect it to be there
+				
 				me.minigameSave = saved.minigameSave;
 				if(me.minigame && me.minigameLoaded && me.minigame.reset){me.minigame.reset(true); me.minigame.load(me.minigameSave);}
 				
@@ -2640,6 +2650,7 @@ CCSE.launch = function(){
 			me.totalCookies = saved.totalCookies;
 			me.level = saved.level;
 			me.muted = saved.muted;
+			me.free = saved.free ? saved.free : 0; // Left this out earlier, can't expect it to be there
 			me.minigameSave = saved.minigameSave;
 			
 			Game.BuildingsOwned += me.amount;

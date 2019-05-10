@@ -215,6 +215,13 @@ CCSE sinks its grabby hooks into a huge number of the game's functions. I haven'
 
 Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
 
+## Version History
+
+**Version 1.0 - initial release**
+* Added a bunch of mod hooks to the game
+* Added functions to ease the creation of content like achievements and buildings
+* Added a save system to manage game objects created through CCSE
+
 ## Special thanks
 
 Anyone who gives a suggestion or bugfix, especially code that gets implemented into CCSE, will be listed here along with their contribution.

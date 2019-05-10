@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.001';
+CCSE.version = '2.002';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -25,6 +25,7 @@ CCSE.launch = function(){
 		CCSE.LoadSave();
 		Game.customSave.push(CCSE.WriteSave);
 		Game.customLoad.push(CCSE.LoadSave);
+		Game.customReset.push(CCSE.Reset);
 		
 		
 		// Inject menu functions
@@ -2562,6 +2563,30 @@ CCSE.launch = function(){
 		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here (in JSON format).</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
 					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value, 1); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
 		l('textareaPrompt').focus();
+	}
+	
+	CCSE.Reset = function(hard){
+		if(hard){
+			for(var name in CCSE.save.Achievements){
+				CCSE.save.Achievements[name].won = 0;
+				if(Game.Achievements[name]) Game.Achievements[name].won = 0;
+			}
+		}
+		
+		for(var name in CCSE.save.Upgrades){
+			if(Game.Upgrades[name]){
+				var me=Game.Upgrades[name];
+				if (hard || me.pool != 'prestige') me.bought=0;
+				if (hard || (me.pool != 'prestige' && !me.lasting))
+				{
+					if (!hard && Game.Has('Keepsakes') && Game.seasonDrops.indexOf(me.name) != -1 && Math.random() < 1 / 5){}
+					else me.unlocked = 0;
+				}
+				
+				CCSE.save.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
+				CCSE.save.Upgrades[name].bought = Game.Upgrades[name].bought;
+			}
+		}
 	}
 	
 	

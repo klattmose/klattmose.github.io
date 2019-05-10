@@ -217,7 +217,13 @@ Any bug or suggestion should be **opened as an issue** [in the repository](https
 
 ## Version History
 
-**Version 1.0 - initial release**
+**05/11/2019 - take two (2.003)**
+* You know that moment where you do something and then immediately realize a better way to do it?
+* Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly
+* Added function for creating seasons
+* Created an update log, and put the version number in the lower left corner
+
+**05/05/2019 - initial release (1.0)**
 * Added a bunch of mod hooks to the game
 * Added functions to ease the creation of content like achievements and buildings
 * Added a save system to manage game objects created through CCSE

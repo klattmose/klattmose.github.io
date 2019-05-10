@@ -217,8 +217,10 @@ Any bug or suggestion should be **opened as an issue** [in the repository](https
 
 ## Version History
 
-**Version 1.0**
-* Initial release
+**Version 1.0 - initial release**
+* Added a bunch of mod hooks to the game
+* Added functions to ease the creation of content like achievements and buildings
+* Added a save system to manage game objects created through CCSE
 
 ## Special thanks
 

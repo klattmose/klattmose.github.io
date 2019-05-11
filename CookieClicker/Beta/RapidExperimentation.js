@@ -14,33 +14,6 @@ CCSE: addLumpType
 **/
 
 
-/**
-Firework upgrades
-
-Types (Just cps increase):
-	Brocade
-	Chrysanthemum
-	Crossette
-	Coconut
-	Palm
-	Peony
-	Pistil
-	Ring
-	Waterfall
-	Wave
-	Whirlwind
-	Willow
-	
-	
-
-
-Shimmer modifiers:
-	Crackle
-	Multi break
-
-**/
-
-
 
 if(Date.now() >= new Date(new Date().getFullYear(), 7 - 1, 1) && Date.now() <= new Date(new Date().getFullYear(), 7 - 1, 7)){
 	Game.baseSeason = 'american';
@@ -166,3 +139,21 @@ CCSE.NewBuilding('Test building','test building|test building|processed|[X] extr
 	Game.UnlockTiered(this);
 	if (this.amount>=Game.SpecialGrandmaUnlock && Game.Objects['Grandma'].amount>0) Game.Unlock(this.grandma.name);
 });
+
+var seed = {
+				name:'Baker\'s wheat',
+				icon:0,
+				cost:1,
+				costM:30,
+				ageTick:7,
+				ageTickR:2,
+				mature:35,
+				children:['bakerWheat','thumbcorn','cronerice','bakeberry','clover','goldenClover','chocoroot','tidygrass'],
+				effsStr:'<div class="green">&bull; +1% CpS</div>',
+				q:'A plentiful crop whose hardy grain is used to make flour for pastries.',
+				onHarvest:function(x,y,age)
+				{
+					if (age>=this.mature) M.dropUpgrade('Wheat slims',0.001);
+				},
+			}
+CCSE.NewPlant('test',seed);

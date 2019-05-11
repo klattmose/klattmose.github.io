@@ -6,72 +6,17 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.7';
+M.version = '3.9';
 M.GameVersion = '2.019';
 
 M.launch = function(){
 	var M = this;
-	M.name = M.parent.minigameName;
-	M.savePrefix = 'minigameCasino';
-	var script = l('minigameScript-' + M.parent.id);
-	var src = script.src;
-	M.sourceFolder = src.substring(0, src.lastIndexOf('/') + 1);
-	M.cardsImage = M.sourceFolder + 'img/phantasypantsCards.png';
-	M.iconsImage = M.sourceFolder + 'img/casinoIcons.png';
-	M.chancemakerChance = 0.0003;
-	M.beatLength = 750;
 	
 	M.init = function(div){
 		// It's possible that the save data might get lost if entrusted to the game's save
 		if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix); // Import old version that doesn't use CCSE if necessary
 		if(!M.parent.minigameSave && CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
 		M.saveString = M.parent.minigameSave;
-		
-		
-		//***********************************
-		//    Upgrades
-		//***********************************
-		M.Upgrades = [];
-		M.Upgrades.push(CCSE.NewUpgrade('Raise the stakes', "Can bet a minute of CPS at a time.<q>Now we're getting somewhere!</q>", 10, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewUpgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewUpgrade('Math lessons', "Show the value of your current blackjack hand.<q>C'mon, it's not that hard.</q>", 1, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewUpgrade('Counting cards', "Keeps track of which cards have been played. 2-6 increase the count by 1. 10-K and Aces decrease the count by 1. Higher counts give better odds.<q>Technically not cheating, but casinos frown on this sort of thing.</q>", 21, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewUpgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the dealer now.</q>", 15, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewUpgrade('I make my own luck', "Each Chancemaker gives a <b>0.0<span></span>3%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewUpgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 0, M.iconsImage]));
-		M.Upgrades.push(CCSE.NewUpgrade('Double or nothing', "Multiply your bet by <b>2</b>.<q>The Martingale System sounds good on paper, but one losing streak long enough will bankrupt anyone.</q>", 120, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewUpgrade('Stoned cows', "Multiply your bet by <b>5</b>.<q>The steaks have never been higher!</q>", 300, [0, 0, M.iconsImage])); 
-		M.Upgrades.push(CCSE.NewHeavenlyUpgrade('Actually, do tell me the odds', "Display the probabilities of various outcomes of taking an action in the Casino.<q>2 + 2 is 4 minus 1 that's 3 quick maffs.</q>", 21000000, [0, 0, M.iconsImage], 3, -200, []));
-			Game.last.showIf = function(){return Game.HasAchiev('Card shark');}
-		
-		for(var i = 0; i < M.Upgrades.length; i++){
-			M.Upgrades[i].order = 1000000 + i / 100;
-			if(M.Upgrades[i].pool != 'prestige') M.Upgrades[i].priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
-		}
-		Game.Upgrades['Double or nothing'].order = Game.Upgrades['High roller!'].order + 0.001;
-		Game.Upgrades['Stoned cows'].order = Game.Upgrades['Double or nothing'].order + 0.001;
-		
-		
-		//***********************************
-		//    Achievements
-		//***********************************
-		M.Achievements = [];
-		M.Achievements.push(CCSE.NewAchievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement('Card trout', 'Win <b>210</b> hands of blackjack.', [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>Wait, what game are you playing again?</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [0, 0, M.iconsImage]));
-			Game.last.pool = 'shadow';
-		M.Achievements.push(CCSE.NewAchievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement('Paid off the dealer', "Win <b>" + (13 * 13) + "</b> hands of blackjack through chancemaker intervention in one ascension.<q>Takes money to make money.</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement('Deal with the Devil', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>Just sign right here.</q>", [0, 0, M.iconsImage]));
-			Game.last.pool = 'shadow';
-		M.Achievements.push(CCSE.NewAchievement('Blackjack!', "Be dealt a hand totaling 21 naturally.", [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>My name is Number 2. This is my Italian confidential secretary. Her name is Alotta. Alotta Fagina.</q>", [0, 0, M.iconsImage]));
-		M.Achievements.push(CCSE.NewAchievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [0, 0, M.iconsImage]));
-			Game.last.pool = 'shadow';
-		
-		for(var i = 0; i < M.Achievements.length; i++) M.Achievements[i].order = 1000000 + i / 100;
 		
 		
 		//***********************************
@@ -748,60 +693,6 @@ M.launch = function(){
 		}
 		
 		
-		//***********************************
-		//    End games, back to generic
-		//***********************************
-		// Only run this part once, regardless of hard resets
-		if(!M.loadedCount){
-			Game.customOptionsMenu.push(function(){
-				var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
-				var str = '<div class="listing">' +
-					'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>' + 
-					'This is the time in milliseconds between each card deal.</div>';
-				
-				CCSE.AppendCollapsibleOptionsMenu(M.name, str);
-			});
-			
-			Game.customStatsMenu.push(function(){
-				CCSE.AppendStatsVersionNumber(M.name, M.version);
-				if(M.games.Blackjack.netTotal) CCSE.AppendStatsGeneral('<div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.games.Blackjack.netTotal) + '</div></div>');
-				if(M.games.Blackjack.ownLuckWins) CCSE.AppendStatsSpecial('<div class="listing"><b>Made your own luck :</b> ' + M.games.Blackjack.ownLuckWins + ' times</div>');
-			});
-			
-			
-			/*Game.customLoad.push(function(ret){
-				M.load(M.saveString);
-				return ret;
-			});*/
-			CCSE.customLoad.push(function(ret){
-				if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix);
-				if(CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
-				M.saveString = M.parent.minigameSave;
-				
-				M.load(M.saveString);
-				return ret;
-			});
-			Game.customChecks.push(function(){
-				if(M.games.Blackjack.winsT >= 7) Game.Unlock('Raise the stakes');
-				if(Game.Has('Raise the stakes') && M.games.Blackjack.winsT >= 49) Game.Unlock('High roller!');
-				if(Game.Has('High roller!') && Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
-				if(Game.Has('Double or nothing') && Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
-				if(Game.Has('I make my own luck') && M.games.Blackjack.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
-				if(M.games.Blackjack.tiesLost >= 7) Game.Unlock('Tiebreaker');
-				
-				if(M.games.Blackjack.winsT >= 21) Game.Win('Card minnow');
-				if(M.games.Blackjack.winsT >= 210) Game.Win('Card trout');
-				if(M.games.Blackjack.winsT >= 2100) Game.Win('Card shark');
-				if(M.games.Blackjack.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
-				if(M.games.Blackjack.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
-				if(M.games.Blackjack.ownLuckWins >= 666) Game.Win('Deal with the Devil');
-				
-				if(M.games.choice == 0) M.games.Blackjack.buildSidebar();
-			});
-			
-			if(typeof CM != 'undefined') CM.Sim.InitData(); // Cookie Monster compatibility
-		}
-		
 		
 		var str = '';
 		str += '<style>' + 
@@ -1089,16 +980,128 @@ M.launch = function(){
 	M.init(l('rowSpecial' + M.parent.id));
 }
 
-var M = 0;
-Game.Objects['Chancemaker'].minigameUrl = 'https://klattmose.github.io/CookieClicker/dummyFile.js';
-Game.Objects['Chancemaker'].minigameName = 'Casino';
 
+M.launcher = function(){
+	var M = this;
+	M.name = M.parent.minigameName;
+	M.savePrefix = 'minigameCasino';
+	M.sourceFolder = 'https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '');
+	M.cardsImage = M.sourceFolder + 'img/phantasypantsCards.png';
+	M.iconsImage = M.sourceFolder + 'img/customIcons.png';
+	M.chancemakerChance = 0.0003;
+	M.beatLength = 750;
+	
+	// Stuff that needs to wait for CCSE but should only run once goes here
+	Game.Objects['Chancemaker'].minigameUrl = 'https://klattmose.github.io/CookieClicker/dummyFile.js';
+	Game.Objects['Chancemaker'].minigameName = 'Casino';
+		
+	//***********************************
+	//    Upgrades
+	//***********************************
+	M.Upgrades = [];
+	M.Upgrades.push(CCSE.NewUpgrade('Raise the stakes', "Can bet a minute of CPS at a time.<q>Now we're getting somewhere!</q>", 10, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Math lessons', "Show the value of your current blackjack hand.<q>C'mon, it's not that hard.</q>", 1, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Counting cards', "Keeps track of which cards have been played. 2-6 increase the count by 1. 10-K and Aces decrease the count by 1. Higher counts give better odds.<q>Technically not cheating, but casinos frown on this sort of thing.</q>", 21, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the dealer now.</q>", 15, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('I make my own luck', "Each Chancemaker gives a <b>0.0<span></span>3%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 3, M.iconsImage]));
+	M.Upgrades.push(CCSE.NewUpgrade('Double or nothing', "Multiply your bet by <b>2</b>.<q>The Martingale System sounds good on paper, but one losing streak long enough will bankrupt anyone.</q>", 120, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Stoned cows', "Multiply your bet by <b>5</b>.<q>The steaks have never been higher!</q>", 300, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewHeavenlyUpgrade('Actually, do tell me the odds', "Display the probabilities of various outcomes of taking an action in the Casino.<q>2 + 2 is 4 minus 1 that's 3 quick maffs.</q>", 21000000, [0, 3, M.iconsImage], 3, -200, []));
+		Game.last.showIf = function(){return Game.HasAchiev('Card shark');}
+	
+	for(var i = 0; i < M.Upgrades.length; i++){
+		M.Upgrades[i].order = 1000000 + i / 100;
+		if(M.Upgrades[i].pool != 'prestige') M.Upgrades[i].priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+	}
+	Game.Upgrades['Double or nothing'].order = Game.Upgrades['High roller!'].order + 0.001;
+	Game.Upgrades['Stoned cows'].order = Game.Upgrades['Double or nothing'].order + 0.001;
+	
+	
+	//***********************************
+	//    Achievements
+	//***********************************
+	M.Achievements = [];
+	M.Achievements.push(CCSE.NewAchievement('Card minnow', 'Win <b>21</b> hands of blackjack.', [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('Card trout', 'Win <b>210</b> hands of blackjack.', [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('Card shark', 'Win <b>2100</b> hands of blackjack.', [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('Five card stud', "Win a hand of blackjack with <b>5</b> cards in your hand.<q>Wait, what game are you playing again?</q>", [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement("Why can't I hold all these cards?", 'Win a hand of blackjack with <b>6</b> cards in your hand.', [0, 3, M.iconsImage]));
+		Game.last.pool = 'shadow';
+	M.Achievements.push(CCSE.NewAchievement('Ace up your sleeve', "Win <b>13</b> hands of blackjack through chancemaker intervention in one ascension.<q>I'll tell you what the odds are.</q>", [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('Paid off the dealer', "Win <b>" + (13 * 13) + "</b> hands of blackjack through chancemaker intervention in one ascension.<q>Takes money to make money.</q>", [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('Deal with the Devil', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>Just sign right here.</q>", [0, 3, M.iconsImage]));
+		Game.last.pool = 'shadow';
+	M.Achievements.push(CCSE.NewAchievement('Blackjack!', "Be dealt a hand totaling 21 naturally.", [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>My name is Number 2. This is my Italian confidential secretary. Her name is Alotta. Alotta Fagina.</q>", [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [0, 3, M.iconsImage]));
+		Game.last.pool = 'shadow';
+	
+	for(var i = 0; i < M.Achievements.length; i++) M.Achievements[i].order = 1000000 + i / 100;
+	
+	
+	//***********************************
+	//    CCSE arrays
+	//***********************************
+	Game.customOptionsMenu.push(function(){
+		var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
+		var str = '<div class="listing">' +
+			'<div class="sliderBox"><div style="float:left;">Beat Length</div><div style="float:right;" id="beatLengthSliderRightText">' + M.beatLength + '</div><input class="slider" style="clear:both;" type="range" min="0" max="1000" step="10" value="' + M.beatLength + '" onchange="' + callback + '" oninput="' + callback + '" onmouseup="PlaySound(\'snd/tick.mp3\');" id="beatLengthSlider"/></div><br/>' + 
+			'This is the time in milliseconds between each card deal.</div>';
+		
+		CCSE.AppendCollapsibleOptionsMenu(M.name, str);
+	});
+	
+	Game.customStatsMenu.push(function(){
+		CCSE.AppendStatsVersionNumber(M.name, M.version);
+		if(M.games.Blackjack.netTotal) CCSE.AppendStatsGeneral('<div class="listing"><b>Blackjack has earned you :</b> <div class="price plain">' + Game.tinyCookie() + Beautify(M.games.Blackjack.netTotal) + '</div></div>');
+		if(M.games.Blackjack.ownLuckWins) CCSE.AppendStatsSpecial('<div class="listing"><b>Made your own luck :</b> ' + M.games.Blackjack.ownLuckWins + ' times</div>');
+	});
+	
+	
+	CCSE.customLoad.push(function(ret){
+		if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix);
+		if(CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
+		M.saveString = M.parent.minigameSave;
+		
+		M.load(M.saveString);
+		return ret;
+	});
+	Game.customChecks.push(function(){
+		if(M.loadedCount){
+			if(M.games.Blackjack.winsT >= 7) Game.Unlock('Raise the stakes');
+			if(Game.Has('Raise the stakes') && M.games.Blackjack.winsT >= 49) Game.Unlock('High roller!');
+			if(Game.Has('High roller!') && Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
+			if(Game.Has('Double or nothing') && Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
+			if(Game.Has('I make my own luck') && M.games.Blackjack.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
+			if(M.games.Blackjack.tiesLost >= 7) Game.Unlock('Tiebreaker');
+			
+			if(M.games.Blackjack.winsT >= 21) Game.Win('Card minnow');
+			if(M.games.Blackjack.winsT >= 210) Game.Win('Card trout');
+			if(M.games.Blackjack.winsT >= 2100) Game.Win('Card shark');
+			if(M.games.Blackjack.ownLuckWins >= 13) Game.Win('Ace up your sleeve');
+			if(M.games.Blackjack.ownLuckWins >= (13 * 13)) Game.Win('Paid off the dealer');
+			if(M.games.Blackjack.ownLuckWins >= 666) Game.Win('Deal with the Devil');
+			
+			if(M.games.choice == 0) M.games.Blackjack.buildSidebar();
+		}
+	});
+	
+	
+	if(typeof CM != 'undefined') CM.Sim.InitData(); // Cookie Monster compatibility
+	
+	
+	Game.LoadMinigames();
+}
 
 if(CCSE && CCSE.isLoaded){
-	Game.LoadMinigames();
+	M.launcher();
 }
 else{
 	if(!CCSE) var CCSE = {};
 	if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
-	CCSE.postLoadHooks.push(Game.LoadMinigames);
+	CCSE.postLoadHooks.push(M.launcher);
 }
+
+var M = 0;

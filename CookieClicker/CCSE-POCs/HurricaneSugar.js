@@ -40,7 +40,7 @@ HurricaneSugar.launch = function(){
 	
 	HurricaneSugar.InjectIntoGoldenCookie = function(){
 		Game.customShimmerTypes['golden'].customListPush.push(function(me, list){
-			if(me.wrath == 0 && Game.canLumps() && Math.random() < 0.1) list.push('hurricane sugar');
+			if(me.wrath == 0 && Game.canLumps() && Math.random() < 0.01) list.push('hurricane sugar');
 		});
 		
 		Game.customShimmerTypes['golden'].customBuff.push(function(me, buff, choice, effectDurMod, mult){
@@ -55,13 +55,13 @@ HurricaneSugar.launch = function(){
 	HurricaneSugar.InjectIntoHandofFate = function(){
 		if(!Game.customMinigame['Wizard tower'].fateWin) Game.customMinigame['Wizard tower'].fateWin = [];
 		Game.customMinigame['Wizard tower'].fateWin.push(function(choices){
-			if(Math.random() < 0.1) choices.push('hurricane sugar');
+			if(Math.random() < 0.01) choices.push('hurricane sugar');
 		});
 		
 		if(typeof FortuneCookie == 'undefined') FortuneCookie = {};
 		if(FortuneCookie.customFateCheckerWin === undefined) FortuneCookie.customFateCheckerWin = [];
 		FortuneCookie.customFateCheckerWin.push(function(spellCount, idx, choices){
-			if(Math.random() < 0.1) choices.push('Hurri-Cane Sugar');
+			if(Math.random() < 0.01) choices.push('Hurri-Cane Sugar');
 		});
 	}
 	

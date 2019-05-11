@@ -66,6 +66,7 @@ CCSE.launch = function(){
 			'<div class="listing">&bull; Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly</div>' +
 			'<div class="listing">&bull; Added function for creating seasons</div>' +
 			'<div class="listing">&bull; Created this update log, and put the version number in the lower left corner</div>' +
+			'<div class="listing">&bull; With apologies for pretending to be a game update</div>' +
 			
 			'</div><div class="subsection update"><div class="title">05/05/2019 - initial release</div>' +
 			'<div class="listing">&bull; Added a bunch of mod hooks to the game</div>' +

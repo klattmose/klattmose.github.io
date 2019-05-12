@@ -95,7 +95,7 @@ CCSE.launch = function(){
 		eval(functionName + " = " + temp.join("\n"));
 		eval(functionName + ".prototype = proto");
 		
-		if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript){
@@ -122,7 +122,7 @@ CCSE.launch = function(){
 		eval(functionName + " = " + temp);
 		eval(functionName + ".prototype = proto");
 		
-		if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
+		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
 	}
 	
 	
@@ -986,6 +986,21 @@ CCSE.launch = function(){
 		
 		// -----     GRANDMAPOCALYPSE block     ----- //
 		
+		// I need this because this gets used once and if I leave it out the game breaks
+		function inRect(x,y,rect)
+		{
+			//find out if the point x,y is in the rotated rectangle rect{w,h,r,o} (width,height,rotation in radians,y-origin) (needs to be normalized)
+			//I found this somewhere online I guess
+			var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.o)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.o));
+			var h1 = Math.sqrt(dx*dx + dy*dy);
+			var currA = Math.atan2(dy,dx);
+			var newA = currA - rect.r;
+			var x2 = Math.cos(newA) * h1;
+			var y2 = Math.sin(newA) * h1;
+			if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
+			return false;
+		}
+		
 		// Game.UpdateGrandmapocalypse
 		// executed every logic frame
 		if(!Game.customUpdateGrandmapocalypse) Game.customUpdateGrandmapocalypse = [];
@@ -1010,7 +1025,6 @@ CCSE.launch = function(){
 		
 		
 		// Game.UpdateWrinklers
-		// Need to define this damn function or wrinklers break
 		// customWrinklerSpawnChance functions should return a multiplier to chance. (Return 1 to have no effect)
 		if(!Game.customUpdateWrinklers) Game.customUpdateWrinklers = [];
 		if(!Game.customWrinklerSpawnChance) Game.customWrinklerSpawnChance = [];
@@ -1024,19 +1038,7 @@ CCSE.launch = function(){
 		CCSE.SpliceCodeIntoFunction('Game.UpdateWrinklers', -1, `
 			// Game.UpdateWrinklers injection point 2
 			for(var i in Game.customUpdateWrinklers) Game.customUpdateWrinklers[i]();`, 
-			`function inRect(x,y,rect)
-			{
-				//find out if the point x,y is in the rotated rectangle rect{w,h,r,o} (width,height,rotation in radians,y-origin) (needs to be normalized)
-				//I found this somewhere online I guess
-				var dx = x+Math.sin(-rect.r)*(-(rect.h/2-rect.o)),dy=y+Math.cos(-rect.r)*(-(rect.h/2-rect.o));
-				var h1 = Math.sqrt(dx*dx + dy*dy);
-				var currA = Math.atan2(dy,dx);
-				var newA = currA - rect.r;
-				var x2 = Math.cos(newA) * h1;
-				var y2 = Math.sin(newA) * h1;
-				if (x2 > -0.5 * rect.w && x2 < 0.5 * rect.w && y2 > -0.5 * rect.h && y2 < 0.5 * rect.h) return true;
-				return false;
-			}`);
+			inRect.toString());
 		
 		
 		// Game.DrawWrinklers

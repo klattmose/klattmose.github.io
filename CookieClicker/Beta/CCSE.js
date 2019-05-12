@@ -95,7 +95,7 @@ CCSE.launch = function(){
 		eval(functionName + " = " + temp.join("\n"));
 		eval(functionName + ".prototype = proto");
 		
-		if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript){
@@ -122,7 +122,7 @@ CCSE.launch = function(){
 		eval(functionName + " = " + temp);
 		eval(functionName + ".prototype = proto");
 		
-		if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
+		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
 	}
 	
 	

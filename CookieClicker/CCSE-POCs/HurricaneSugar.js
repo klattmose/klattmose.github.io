@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(HurricaneSugar === undefined) var HurricaneSugar = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 HurricaneSugar.name = 'Hurricane Sugar';
-HurricaneSugar.version = '1.4';
+HurricaneSugar.version = '1.5';
 HurricaneSugar.GameVersion = '2.019';
 
 HurricaneSugar.launch = function(){
@@ -40,7 +40,7 @@ HurricaneSugar.launch = function(){
 	
 	HurricaneSugar.InjectIntoGoldenCookie = function(){
 		Game.customShimmerTypes['golden'].customListPush.push(function(me, list){
-			if(me.wrath == 0 && Game.canLumps() && Math.random() < 0.01) list.push('hurricane sugar');
+			if(me.wrath == 0 && Game.canLumps() && Math.random() < 0.05) list.push('hurricane sugar');
 		});
 		
 		Game.customShimmerTypes['golden'].customBuff.push(function(me, buff, choice, effectDurMod, mult){
@@ -55,13 +55,13 @@ HurricaneSugar.launch = function(){
 	HurricaneSugar.InjectIntoHandofFate = function(){
 		if(!Game.customMinigame['Wizard tower'].fateWin) Game.customMinigame['Wizard tower'].fateWin = [];
 		Game.customMinigame['Wizard tower'].fateWin.push(function(choices){
-			if(Math.random() < 0.01) choices.push('hurricane sugar');
+			if(Math.random() < 0.05) choices.push('hurricane sugar');
 		});
 		
 		if(typeof FortuneCookie == 'undefined') FortuneCookie = {};
 		if(FortuneCookie.customFateCheckerWin === undefined) FortuneCookie.customFateCheckerWin = [];
 		FortuneCookie.customFateCheckerWin.push(function(spellCount, idx, choices){
-			if(Math.random() < 0.01) choices.push('Hurri-Cane Sugar');
+			if(Math.random() < 0.05) choices.push('Hurri-Cane Sugar');
 		});
 	}
 	

@@ -3,7 +3,7 @@ if(TimerWidget === undefined) var TimerWidget = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/img/timer.png';
 TimerWidget.name = 'Timer Widget';
-TimerWidget.version = '1.5';
+TimerWidget.version = '1.6';
 TimerWidget.GameVersion = '2.019';
 
 TimerWidget.launch = function(){
@@ -110,7 +110,15 @@ TimerWidget.launch = function(){
 					TimerBarShimmer.style.height = '12px';
 					TimerBarShimmer.style.margin = '0px 10px';
 					TimerBarShimmer.style.position = 'relative';
-					TimerBarShimmer.appendChild(TimerWidget.bar('Next ' + key, [{id: key + 'TBMinBar', color: '#b3b3b3'}, {id: key + 'TBBar', color: TimerWidget.colorLookup[key]}], key + 'TBTime'));
+					
+					if (typeof TimerWidget.colorLookup[key] !== 'undefined') {
+						classColor = TimerWidget.colorLookup[key];
+					}
+					else {
+						classColor = TimerWidget.colorLookup['default'];
+					}
+					
+					TimerBarShimmer.appendChild(TimerWidget.bar('Next ' + key, [{id: key + 'TBMinBar', color: '#b3b3b3'}, {id: key + 'TBBar', color: classColor}], key + 'TBTime'));
 					l('TimerBar').appendChild(TimerBarShimmer);
 					
 					TimerBarShimmer.style.display = '';

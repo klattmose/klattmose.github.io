@@ -6,7 +6,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.9';
+M.version = '3.10';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -982,7 +982,12 @@ M.launch = function(){
 
 
 M.launcher = function(){
-	var M = this;
+	var M = Game.Objects['Chancemaker'].minigame;
+	
+	// Stuff that needs to wait for CCSE but should only run once goes here
+	M.parent.minigameUrl = 'https://klattmose.github.io/CookieClicker/dummyFile.js';
+	M.parent.minigameName = 'Casino';
+	
 	M.name = M.parent.minigameName;
 	M.savePrefix = 'minigameCasino';
 	M.sourceFolder = 'https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '');
@@ -991,10 +996,6 @@ M.launcher = function(){
 	M.chancemakerChance = 0.0003;
 	M.beatLength = 750;
 	
-	// Stuff that needs to wait for CCSE but should only run once goes here
-	Game.Objects['Chancemaker'].minigameUrl = 'https://klattmose.github.io/CookieClicker/dummyFile.js';
-	Game.Objects['Chancemaker'].minigameName = 'Casino';
-		
 	//***********************************
 	//    Upgrades
 	//***********************************

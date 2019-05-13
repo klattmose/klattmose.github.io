@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.003';
+CCSE.version = '2.007';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -61,6 +61,11 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
+			'</div><div class="subsection update small"><div class="title">05/18/2019 - parallel processing</div>' + 
+			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' + // how optimistic
+			'<div class="listing">&bull; Also loads faster in general</div>' + 
+			'<div class="listing">&bull; Fixed a bug that froze the game when wrinklers were on screen</div>' + 
+			
 			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' + 
 			'<div class="listing">&bull; You know that moment where you do something and then immediately realize a better way to do it?</div>' +
 			'<div class="listing">&bull; Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly</div>' +
@@ -98,6 +103,7 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+		CCSE.Multithreading();
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript, hasPrototype){
@@ -126,6 +132,7 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
+		CCSE.Multithreading();
 	}
 	
 	
@@ -2780,8 +2787,70 @@ CCSE.launch = function(){
 	
 	
 	/*=====================================================================================
-	GRANDMAPOCALYPSE
+	Other
 	=======================================================================================*/
+	CCSE.Multithreading = function(){
+		// This is Game.Loop, altered to run a frame or two when 1000 / Game.fps ms passes instead of, y'know, looping
+		
+		var time = Date.now();
+		
+		if(time - Game.time >= 1000 / Game.fps){
+			Console.log('Save the frames, kill the animals');
+			Timer.say('START');
+			Timer.track('browser stuff');
+			Timer.say('LOGIC');			
+			
+			Game.catchupLogic = 1;
+			var lostFrames = Math.floor((time - Game.time) * Game.fps / 1000);
+			
+			for(var i = 0; i < lostFrames; i++){
+				Game.Logic();
+			}
+			
+			Game.time = time;
+			Game.catchupLogic = 0;
+			
+			Timer.track('logic');
+			Timer.say('END LOGIC');
+			if (!Game.prefs.altDraw)
+			{
+				var hasFocus=document.hasFocus();
+				Timer.say('DRAW');
+				if (hasFocus || Game.prefs.focus || Game.loopT%10==0) requestAnimationFrame(Game.Draw);
+				//if (document.hasFocus() || Game.loopT%5==0) Game.Draw();
+				Timer.say('END DRAW');
+			}
+			else requestAnimationFrame(Game.Draw);
+			
+			if (Game.sesame)
+			{
+				//fps counter and graph
+				Game.previousFps=Game.currentFps;
+				Game.currentFps=Game.getFps();
+					var ctx=Game.fpsGraphCtx;
+					ctx.drawImage(Game.fpsGraph,-1,0);
+					ctx.fillStyle='rgb('+Math.round((1-Game.currentFps/Game.fps)*128)+',0,0)';
+					ctx.fillRect(128-1,0,1,64);
+					ctx.strokeStyle='#fff';
+					ctx.beginPath();
+					ctx.moveTo(128-1,(1-Game.previousFps/Game.fps)*64);
+					ctx.lineTo(128,(1-Game.currentFps/Game.fps)*64);
+					ctx.stroke();
+				
+				l('fpsCounter').innerHTML=Game.currentFps+' fps';
+				var str='';
+				for (var i in Timer.labels) {str+=Timer.labels[i];}
+				if (Game.debugTimersOn) l('debugLog').style.display='block';
+				else l('debugLog').style.display='none';
+				l('debugLog').innerHTML=str;
+				
+			}
+			Timer.reset();
+			
+			Game.loopT++;
+		}
+	}
+	
 	CCSE.AddMoreWrinklers = function(n){
 		var j = Game.wrinklers.length;
 		for (var i = j; i < j + n; i++){
@@ -2789,10 +2858,6 @@ CCSE.launch = function(){
 		}
 	}
 	
-	
-	/*=====================================================================================
-	Special Objects
-	=======================================================================================*/
 	CCSE.CreateSpecialObject = function(name, conditionFunc, pictureFunc, drawFunc){
 		// name            the key to identify this particular special object. Must be unique
 		// conditionFunc   a function that returns true if the object should be shown, false if not

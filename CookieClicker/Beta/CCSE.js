@@ -1,16 +1,13 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.012';
+CCSE.version = '2.013';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
 	
 	CCSE.init = function(){
-		if (Game.prefs.popups) Game.Popup('CCSE is initializing');
-		else Game.Notify('CCSE is initializing', '', '', 6, 1);
-		CCSE.noteId = Game.noteId - 1;
-		Game.NotesById[CCSE.noteId].life *= 100;
+		CCSE.initNote();
 		
 		// Define more parts of CCSE
 		CCSE.Backup = {};
@@ -99,9 +96,8 @@ CCSE.launch = function(){
 		
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
-		Game.CloseNote(CCSE.noteId);
-		if (Game.prefs.popups) Game.Popup('CCSE loaded!');
-		else Game.Notify('CCSE loaded!', '', '', 1, 1);
+		CCSE.Note.title = 'CCSE loaded!';
+		CCSE.Note.life = Game.fps;
 		CCSE.isLoaded = 1;
 		if(CCSE.postLoadHooks) for(var i in CCSE.postLoadHooks) CCSE.postLoadHooks[i]();
 	}
@@ -119,6 +115,7 @@ CCSE.launch = function(){
 			'</div><div class="subsection update small"><div class="title">05/18/2019 - parallel processing</div>' + 
 			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' + // how optimistic
 			'<div class="listing">&bull; Also loads faster in general</div>' + 
+			'<div class="listing">&bull; With a progress meter for feedback</div>' + 
 			'<div class="listing">&bull; Fixed a bug that froze the game when wrinklers were on screen</div>' + 
 			
 			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' + 
@@ -135,6 +132,7 @@ CCSE.launch = function(){
 			'<div class="listing">&bull; Further documentation <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a></div>' +
 			'</div><div class="subsection"></div><div class="section">Cookie Clicker</div>';
 	}
+	
 	
 	/*=====================================================================================
 	The heart of the mod. Functions to inject code into functions.
@@ -153,6 +151,8 @@ CCSE.launch = function(){
 		eval(functionName + " = " + temp);
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
+		CCSE.functionsAltered++;
+		CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
@@ -174,6 +174,8 @@ CCSE.launch = function(){
 		eval(functionName + " = " + temp.join("\n"));
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
+		CCSE.functionsAltered++;
+		CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
@@ -202,12 +204,38 @@ CCSE.launch = function(){
 		eval(functionName + " = " + temp);
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
+		CCSE.functionsAltered++;
+		CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
+	}
+	
+	CCSE.initNote = function(){
+		CCSE.functionsTotal = 173 + 
+							Game.ObjectsN * 18 - 1 + 
+							Game.UpgradesN * 9 + 
+							Game.AchievementsN * 1; // Needs to be manually updated
+		CCSE.functionsAltered = 0;
+		CCSE.progress = 0;
+		
+		Game.Notify('CCSE is initializing (0%)', '', '', 6, 1);
+		CCSE.Note = Game.NotesById[Game.noteId - 1];
+		CCSE.Note.life = 60000; // 10 minutes, just to be sure
+	}
+	
+	CCSE.UpdateNote = function(){
+		CCSE.Note.life = 60000;
+		var progress = Math.floor(CCSE.functionsAltered / CCSE.functionsTotal * 100);
+		if(progress != CCSE.progress){
+			CCSE.progress = progress;
+			CCSE.Note.title = 'CCSE is initializing (' + CCSE.progress + '%)';
+			Game.UpdateNotes();
+		}
 	}
 	
 	
 	/*=====================================================================================
 	Do all replacing in one function
+	Actually don't, it locks up the browser for as long as it's running
 	Also declare hook arrays in the close vicinity of the functions they get used in
 	=======================================================================================*/
 	CCSE.ReplaceMainGame = function(){
@@ -1635,7 +1663,7 @@ CCSE.launch = function(){
 		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].unlock", -1, `
 				// Game.Upgrades['` + escKey + `'].unlock injection point 0
 				for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
-				`);
+			`);
 		
 		
 		// this.lose
@@ -1644,7 +1672,7 @@ CCSE.launch = function(){
 		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].lose", -1, `
 				// Game.Upgrades['` + escKey + `'].lose injection point 0
 				for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this);
-				`);
+			`);
 		
 		
 		// this.toggle
@@ -1653,29 +1681,28 @@ CCSE.launch = function(){
 		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].toggle", -1, `
 				// Game.Upgrades['` + escKey + `'].toggle injection point 0
 				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
-				`);
+			`);
 		
 		
 		// this.buyFunction
 		if(!Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction = [];
 		Game.customUpgrades[key].buyFunction.push(CCSE.customUpgradesAllbuyFunction);
 		if(upgrade.buyFunction){
-			temp = upgrade.buyFunction.toString(); // Irritating one line functions ruining my consistency
-			eval('upgrade.buyFunction = ' + temp.slice(0, -1) + `
-				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
-				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this); 
-			}`);
-			if(upgrade.buyFunction.toString().indexOf('// Game.Upgrades') == -1) console.log("Error injecting code into function Game.Upgrades['" + escKey + "'].buyFunction.");
-		}else{
-			eval(`upgrade.buyFunction = function(){
+			CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buyFunction", -1, `
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
 				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
-			}`);
+			`);
+		}else{
+			upgrade.buyFunction = function(){
+				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
+				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
+			}
+			CCSE.functionsAltered++;
 		}
 		
 		
 		// this.descFunc
-		// Once more, far too disparate for my desired consistency
+		// Far too disparate for my desired consistency
 		if(!Game.customUpgrades[key].descFunc) Game.customUpgrades[key].descFunc = [];
 		Game.customUpgrades[key].descFunc.push(CCSE.customUpgradesAlldescFunc);
 		if(upgrade.descFunc){
@@ -1688,6 +1715,7 @@ CCSE.launch = function(){
 		}else{
 			upgrade.descFunc = function(){
 				var desc = this.desc;
+				// Game.Upgrades['` + escKey + `'].descFunc injection point 0
 				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
 				return desc;
 			}

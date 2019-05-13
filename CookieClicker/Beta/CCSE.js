@@ -152,7 +152,7 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		CCSE.functionsAltered++;
-		CCSE.UpdateNote();
+		if(!CCSE.isLoaded) CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
@@ -175,7 +175,7 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		CCSE.functionsAltered++;
-		CCSE.UpdateNote();
+		if(!CCSE.isLoaded) CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
@@ -205,7 +205,7 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		CCSE.functionsAltered++;
-		CCSE.UpdateNote();
+		if(!CCSE.isLoaded) CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
 	}
 	

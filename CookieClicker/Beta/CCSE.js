@@ -20,7 +20,10 @@ CCSE.launch = function(){
 		CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
 		CCSE.MinigameReplacer(CCSE.ReplaceGarden, 'Farm');
 		
-		
+		requestAnimationFrame(CCSE.ReplaceBuildings);
+	}
+	
+	CCSE.finalize = function(){
 		// Load any custom save data and inject save functions
 		CCSE.LoadSave();
 		Game.customSave.push(CCSE.WriteSave);
@@ -103,7 +106,7 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
-		CCSE.Multithreading();
+		//CCSE.Multithreading();
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript, hasPrototype){
@@ -132,7 +135,7 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
-		CCSE.Multithreading();
+		//CCSE.Multithreading();
 	}
 	
 	
@@ -528,100 +531,6 @@ CCSE.launch = function(){
 		
 		
 		// -----     Buildings block     ----- //
-		if(!Game.customBuildingsAll) Game.customBuildingsAll = {};
-		
-		if(!Game.customBuildingsAll.switchMinigame) Game.customBuildingsAll.switchMinigame = [];
-		CCSE.customBuildingsAllswitchMinigame = function(obj, on){
-			for(var i in Game.customBuildingsAll.switchMinigame) Game.customBuildingsAll.switchMinigame[i](obj, on);
-		}
-		
-		if(!Game.customBuildingsAll.getSellMultiplier) Game.customBuildingsAll.getSellMultiplier = [];
-		CCSE.customBuildingsAllgetSellMultiplier = function(obj, giveBack){
-			for(var i in Game.customBuildingsAll.getSellMultiplier) giveBack = Game.customBuildingsAll.getSellMultiplier[i](obj, giveBack);
-			return giveBack;
-		}
-		
-		if(!Game.customBuildingsAll.buy) Game.customBuildingsAll.buy = [];
-		CCSE.customBuildingsAllbuy = function(obj, amount){
-			for(var i in Game.customBuildingsAll.buy) Game.customBuildingsAll.buy[i](obj, amount);
-		}
-		
-		if(!Game.customBuildingsAll.sell) Game.customBuildingsAll.sell = [];
-		CCSE.customBuildingsAllsell = function(obj, amount, bypass){
-			for(var i in Game.customBuildingsAll.sell) Game.customBuildingsAll.sell[i](obj, amount, bypass);
-		}
-		
-		if(!Game.customBuildingsAll.sacrifice) Game.customBuildingsAll.sacrifice = [];
-		CCSE.customBuildingsAllsacrifice = function(obj, amount){
-			for(var i in Game.customBuildingsAll.sacrifice) Game.customBuildingsAll.sacrifice[i](obj, amount);
-		}
-		
-		if(!Game.customBuildingsAll.buyFree) Game.customBuildingsAll.buyFree = [];
-		CCSE.customBuildingsAllbuyFree = function(obj, amount){
-			for(var i in Game.customBuildingsAll.buyFree) Game.customBuildingsAll.buyFree[i](obj, amount);
-		}
-		
-		if(!Game.customBuildingsAll.getFree) Game.customBuildingsAll.getFree = [];
-		CCSE.customBuildingsAllgetFree = function(obj, amount){
-			for(var i in Game.customBuildingsAll.getFree) Game.customBuildingsAll.getFree[i](obj, amount);
-		}
-		
-		if(!Game.customBuildingsAll.getFreeRanks) Game.customBuildingsAll.getFreeRanks = [];
-		CCSE.customBuildingsAllgetFreeRanks = function(obj, amount){
-			for(var i in Game.customBuildingsAll.getFreeRanks) Game.customBuildingsAll.getFreeRanks[i](obj, amount);
-		}
-		
-		if(!Game.customBuildingsAll.tooltip) Game.customBuildingsAll.tooltip = [];
-		CCSE.customBuildingsAlltooltip = function(obj, ret){
-			for(var i in Game.customBuildingsAll.tooltip) ret = Game.customBuildingsAll.tooltip[i](obj, ret);
-			return ret;
-		}
-		
-		if(!Game.customBuildingsAll.levelTooltip) Game.customBuildingsAll.levelTooltip = [];
-		CCSE.customBuildingsAlllevelTooltip = function(obj, ret){
-			for(var i in Game.customBuildingsAll.levelTooltip) ret = Game.customBuildingsAll.levelTooltip[i](obj, ret);
-			return ret;
-		}
-		
-		if(!Game.customBuildingsAll.refresh) Game.customBuildingsAll.refresh = [];
-		CCSE.customBuildingsAllrefresh = function(obj){
-			for(var i in Game.customBuildingsAll.refresh) Game.customBuildingsAll.refresh[i](obj);
-		}
-		
-		if(!Game.customBuildingsAll.rebuild) Game.customBuildingsAll.rebuild = [];
-		CCSE.customBuildingsAllrebuild = function(obj){
-			for(var i in Game.customBuildingsAll.rebuild) Game.customBuildingsAll.rebuild[i](obj);
-		}
-		
-		if(!Game.customBuildingsAll.mute) Game.customBuildingsAll.mute = [];
-		CCSE.customBuildingsAllmute = function(obj, val){
-			for(var i in Game.customBuildingsAll.mute) Game.customBuildingsAll.mute[i](obj, val);
-		}
-		
-		if(!Game.customBuildingsAll.draw) Game.customBuildingsAll.draw = [];
-		CCSE.customBuildingsAlldraw = function(obj){
-			for(var i in Game.customBuildingsAll.draw) Game.customBuildingsAll.draw[i](obj);
-		}
-		
-		if(!Game.customBuildingsAll.buyFunction) Game.customBuildingsAll.buyFunction = [];
-		CCSE.customBuildingsAllbuyFunction = function(obj){
-			for(var i in Game.customBuildingsAll.buyFunction) Game.customBuildingsAll.buyFunction[i](obj);
-		}
-		
-		if(!Game.customBuildingsAll.cpsMult) Game.customBuildingsAll.cpsMult = [];
-		CCSE.customBuildingsAllcpsMult = function(obj){
-			var mult = 1;
-			for(var i in Game.customBuildingsAll.cpsMult) mult *= Game.customBuildingsAll.cpsMult[i](obj);
-			return mult;
-		}
-		
-		
-		if(!Game.customBuildings) Game.customBuildings = {};
-		CCSE.Backup.customBuildings = {};
-		for(var key in Game.Objects){
-			CCSE.ReplaceBuilding(key);
-		}
-		
 		
 		// Game.Object
 		// Alter this function so creating new buildings doesn't break the minigames
@@ -685,111 +594,7 @@ CCSE.launch = function(){
 			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);`);
 		
 		
-		// -----     Individual Buildings block     ----- //
-		
-		obj = Game.Objects['Cursor'];
-		// Cursor.cps
-		// cpsAdd Functions should return a value to add per non cursor building (Return 0 to have no effect)
-		if(!Game.customBuildings[obj.name].cpsAdd) Game.customBuildings[obj.name].cpsAdd = [];
-		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
-		CCSE.ReplaceCodeIntoFunction("Game.Objects['Cursor'].cps", 'var mult=1;', `
-			// Cursor.cps injection point 1
-			for(var i in Game.customBuildings['` + obj.name + `'].cpsAdd) add += Game.customBuildings['` + obj.name + `'].cpsAdd[i](me);`, -1);
-		
-		
-		obj = Game.Objects['Grandma'];
-		// Grandma.art.pic
-		// Functions should push an image name (sans the .png part) into list
-		if(!Game.customGrandmaPicture) Game.customGrandmaPicture = [];
-		CCSE.ReplaceCodeIntoFunction("Game.Objects['Grandma'].art.pic", 'return', `
-			// Grandma.art.pic injection point 0
-			for(var j in Game.customGrandmaPicture) Game.customGrandmaPicture[j](i, list);`, -1);
-		
-		
-		// Grandma.cps
-		// cpsAdd Functions should return a value to add before multiplying (Return 0 to have no effect)
-		if(!Game.customBuildings[obj.name].cpsAdd) Game.customBuildings[obj.name].cpsAdd = [];
-		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
-		CCSE.ReplaceCodeIntoFunction("Game.Objects['Grandma'].cps", 'return', `
-			// Grandma.cps injection point 1
-			for(var i in Game.customBuildings['` + obj.name + `'].cpsAdd) add += Game.customBuildings['` + obj.name + `'].cpsAdd[i](me);`, -1);
-		
-		
 		// -----     Upgrades block     ----- //
-		if(!Game.customUpgradesAll) Game.customUpgradesAll = {}; 
-		
-		if(!Game.customUpgradesAll.getPrice) Game.customUpgradesAll.getPrice = [];
-		CCSE.customUpgradesAllgetPrice = function(me){
-			var ret = 1
-			for(var i in Game.customUpgradesAll.getPrice) ret *= Game.customUpgradesAll.getPrice[i](me);
-			return ret;
-		}
-		
-		if(!Game.customUpgradesAll.click) Game.customUpgradesAll.click = [];
-		CCSE.customUpgradesAllclick = function(me, e){
-			for(var i in Game.customUpgradesAll.click) Game.customUpgradesAll.click[i](me, e);
-		}
-		
-		if(!Game.customUpgradesAll.buy) Game.customUpgradesAll.buy = []; 
-		CCSE.customUpgradesAllbuy = function(me, bypass, success){
-			for(var i in Game.customUpgradesAll.buy) Game.customUpgradesAll.buy[i](me, bypass, success);
-		}
-		
-		if(!Game.customUpgradesAll.earn) Game.customUpgradesAll.earn = [];
-		CCSE.customUpgradesAllearn = function(me){
-			for(var i in Game.customUpgradesAll.earn) Game.customUpgradesAll.earn[i](me);
-		}
-		
-		if(!Game.customUpgradesAll.unearn) Game.customUpgradesAll.unearn = [];
-		CCSE.customUpgradesAllunearn = function(me){
-			for(var i in Game.customUpgradesAll.unearn) Game.customUpgradesAll.unearn[i](me);
-		}
-		
-		if(!Game.customUpgradesAll.unlock) Game.customUpgradesAll.unlock = [];
-		CCSE.customUpgradesAllunlock = function(me){
-			for(var i in Game.customUpgradesAll.unlock) Game.customUpgradesAll.unlock[i](me);
-		}
-		
-		if(!Game.customUpgradesAll.lose) Game.customUpgradesAll.lose = [];
-		CCSE.customUpgradesAlllose = function(me){
-			for(var i in Game.customUpgradesAll.lose) Game.customUpgradesAll.lose[i](me);
-		}
-		
-		if(!Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle = [];
-		CCSE.customUpgradesAlltoggle = function(me){
-			for(var i in Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle[i](me);
-		}
-		
-		if(!Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction = [];
-		CCSE.customUpgradesAllbuyFunction = function(me){
-			for(var i in Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction[i](me);
-		}
-		
-		if(!Game.customUpgradesAll.descFunc) Game.customUpgradesAll.descFunc = [];
-		CCSE.customUpgradesAlldescFunc = function(me, desc){
-			for(var i in Game.customUpgradesAll.descFunc) desc = Game.customUpgradesAll.descFunc[i](me, desc);
-			return desc;
-		}
-		
-		
-		if(!Game.customUpgrades) Game.customUpgrades = {};
-		CCSE.Backup.customUpgrades = {};
-		for(var key in Game.Upgrades){
-			CCSE.ReplaceUpgrade(key);
-		}
-		
-		
-		// Correct these descFuncs
-		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
-		for (var i=0;i<slots.length;i++)
-		{
-			Game.Upgrades[slots[i]].olddescFunc=function(i){return function(){
-				if (Game.permanentUpgrades[i]==-1) return Game.Upgrades[slots[i]].desc;
-				var upgrade=Game.UpgradesById[Game.permanentUpgrades[i]];
-				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
-			};}(i);
-		}
-		
 		
 		// Game.storeBuyAll
 		if(!Game.customStoreBuyAll) Game.customStoreBuyAll = [];
@@ -923,20 +728,6 @@ CCSE.launch = function(){
 		
 		
 		// -----     Achievements block     ----- //
-		if(!Game.customAchievementsAll) Game.customAchievementsAll = {};
-		
-		if(!Game.customAchievementsAll.click) Game.customAchievementsAll.click = [];
-		CCSE.customAchievementsAllclick = function(me){
-			for(var i in Game.customAchievementsAll.click) Game.customAchievementsAll.click[i](me);
-		}
-	
-	
-		if(!Game.customAchievements) Game.customAchievements = {};
-		CCSE.Backup.customAchievements = {};
-		for(var key in Game.Achievements){
-			CCSE.ReplaceAchievement(key);
-		}
-		
 		
 		// Game.Win
 		if(!Game.customWin) Game.customWin = [];
@@ -1248,6 +1039,135 @@ CCSE.launch = function(){
 	}
 	
 	if(!CCSE.customReplaceBuilding) CCSE.customReplaceBuilding = [];
+	CCSE.ReplaceBuildings = function(){
+		if(!Game.customBuildingsAll) Game.customBuildingsAll = {};
+		
+		if(!Game.customBuildingsAll.switchMinigame) Game.customBuildingsAll.switchMinigame = [];
+		CCSE.customBuildingsAllswitchMinigame = function(obj, on){
+			for(var i in Game.customBuildingsAll.switchMinigame) Game.customBuildingsAll.switchMinigame[i](obj, on);
+		}
+		
+		if(!Game.customBuildingsAll.getSellMultiplier) Game.customBuildingsAll.getSellMultiplier = [];
+		CCSE.customBuildingsAllgetSellMultiplier = function(obj, giveBack){
+			for(var i in Game.customBuildingsAll.getSellMultiplier) giveBack = Game.customBuildingsAll.getSellMultiplier[i](obj, giveBack);
+			return giveBack;
+		}
+		
+		if(!Game.customBuildingsAll.buy) Game.customBuildingsAll.buy = [];
+		CCSE.customBuildingsAllbuy = function(obj, amount){
+			for(var i in Game.customBuildingsAll.buy) Game.customBuildingsAll.buy[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.sell) Game.customBuildingsAll.sell = [];
+		CCSE.customBuildingsAllsell = function(obj, amount, bypass){
+			for(var i in Game.customBuildingsAll.sell) Game.customBuildingsAll.sell[i](obj, amount, bypass);
+		}
+		
+		if(!Game.customBuildingsAll.sacrifice) Game.customBuildingsAll.sacrifice = [];
+		CCSE.customBuildingsAllsacrifice = function(obj, amount){
+			for(var i in Game.customBuildingsAll.sacrifice) Game.customBuildingsAll.sacrifice[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.buyFree) Game.customBuildingsAll.buyFree = [];
+		CCSE.customBuildingsAllbuyFree = function(obj, amount){
+			for(var i in Game.customBuildingsAll.buyFree) Game.customBuildingsAll.buyFree[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.getFree) Game.customBuildingsAll.getFree = [];
+		CCSE.customBuildingsAllgetFree = function(obj, amount){
+			for(var i in Game.customBuildingsAll.getFree) Game.customBuildingsAll.getFree[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.getFreeRanks) Game.customBuildingsAll.getFreeRanks = [];
+		CCSE.customBuildingsAllgetFreeRanks = function(obj, amount){
+			for(var i in Game.customBuildingsAll.getFreeRanks) Game.customBuildingsAll.getFreeRanks[i](obj, amount);
+		}
+		
+		if(!Game.customBuildingsAll.tooltip) Game.customBuildingsAll.tooltip = [];
+		CCSE.customBuildingsAlltooltip = function(obj, ret){
+			for(var i in Game.customBuildingsAll.tooltip) ret = Game.customBuildingsAll.tooltip[i](obj, ret);
+			return ret;
+		}
+		
+		if(!Game.customBuildingsAll.levelTooltip) Game.customBuildingsAll.levelTooltip = [];
+		CCSE.customBuildingsAlllevelTooltip = function(obj, ret){
+			for(var i in Game.customBuildingsAll.levelTooltip) ret = Game.customBuildingsAll.levelTooltip[i](obj, ret);
+			return ret;
+		}
+		
+		if(!Game.customBuildingsAll.refresh) Game.customBuildingsAll.refresh = [];
+		CCSE.customBuildingsAllrefresh = function(obj){
+			for(var i in Game.customBuildingsAll.refresh) Game.customBuildingsAll.refresh[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.rebuild) Game.customBuildingsAll.rebuild = [];
+		CCSE.customBuildingsAllrebuild = function(obj){
+			for(var i in Game.customBuildingsAll.rebuild) Game.customBuildingsAll.rebuild[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.mute) Game.customBuildingsAll.mute = [];
+		CCSE.customBuildingsAllmute = function(obj, val){
+			for(var i in Game.customBuildingsAll.mute) Game.customBuildingsAll.mute[i](obj, val);
+		}
+		
+		if(!Game.customBuildingsAll.draw) Game.customBuildingsAll.draw = [];
+		CCSE.customBuildingsAlldraw = function(obj){
+			for(var i in Game.customBuildingsAll.draw) Game.customBuildingsAll.draw[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.buyFunction) Game.customBuildingsAll.buyFunction = [];
+		CCSE.customBuildingsAllbuyFunction = function(obj){
+			for(var i in Game.customBuildingsAll.buyFunction) Game.customBuildingsAll.buyFunction[i](obj);
+		}
+		
+		if(!Game.customBuildingsAll.cpsMult) Game.customBuildingsAll.cpsMult = [];
+		CCSE.customBuildingsAllcpsMult = function(obj){
+			var mult = 1;
+			for(var i in Game.customBuildingsAll.cpsMult) mult *= Game.customBuildingsAll.cpsMult[i](obj);
+			return mult;
+		}
+		
+		
+		if(!Game.customBuildings) Game.customBuildings = {};
+		CCSE.Backup.customBuildings = {};
+		for(var key in Game.Objects){
+			CCSE.ReplaceBuilding(key);
+		}
+		
+		
+		// -----     Individual Buildings block     ----- //
+		
+		obj = Game.Objects['Cursor'];
+		// Cursor.cps
+		// cpsAdd Functions should return a value to add per non cursor building (Return 0 to have no effect)
+		if(!Game.customBuildings[obj.name].cpsAdd) Game.customBuildings[obj.name].cpsAdd = [];
+		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Objects['Cursor'].cps", 'var mult=1;', `
+			// Cursor.cps injection point 1
+			for(var i in Game.customBuildings['` + obj.name + `'].cpsAdd) add += Game.customBuildings['` + obj.name + `'].cpsAdd[i](me);`, -1);
+		
+		
+		obj = Game.Objects['Grandma'];
+		// Grandma.art.pic
+		// Functions should push an image name (sans the .png part) into list
+		if(!Game.customGrandmaPicture) Game.customGrandmaPicture = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Objects['Grandma'].art.pic", 'return', `
+			// Grandma.art.pic injection point 0
+			for(var j in Game.customGrandmaPicture) Game.customGrandmaPicture[j](i, list);`, -1);
+		
+		
+		// Grandma.cps
+		// cpsAdd Functions should return a value to add before multiplying (Return 0 to have no effect)
+		if(!Game.customBuildings[obj.name].cpsAdd) Game.customBuildings[obj.name].cpsAdd = [];
+		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Objects['Grandma'].cps", 'return', `
+			// Grandma.cps injection point 1
+			for(var i in Game.customBuildings['` + obj.name + `'].cpsAdd) add += Game.customBuildings['` + obj.name + `'].cpsAdd[i](me);`, -1);
+		
+		
+		requestAnimationFrame(CCSE.ReplaceUpgrades);
+	}
+	
 	CCSE.ReplaceBuilding = function(key){
 		// A lot of Copy/Paste happened, hence why I did so many functions.
 		// Also, I may not have fully tested each one.
@@ -1415,6 +1335,84 @@ CCSE.launch = function(){
 	}
 	
 	if(!CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade = [];
+	CCSE.ReplaceUpgrades = function(){
+		if(!Game.customUpgradesAll) Game.customUpgradesAll = {}; 
+		
+		if(!Game.customUpgradesAll.getPrice) Game.customUpgradesAll.getPrice = [];
+		CCSE.customUpgradesAllgetPrice = function(me){
+			var ret = 1
+			for(var i in Game.customUpgradesAll.getPrice) ret *= Game.customUpgradesAll.getPrice[i](me);
+			return ret;
+		}
+		
+		if(!Game.customUpgradesAll.click) Game.customUpgradesAll.click = [];
+		CCSE.customUpgradesAllclick = function(me, e){
+			for(var i in Game.customUpgradesAll.click) Game.customUpgradesAll.click[i](me, e);
+		}
+		
+		if(!Game.customUpgradesAll.buy) Game.customUpgradesAll.buy = []; 
+		CCSE.customUpgradesAllbuy = function(me, bypass, success){
+			for(var i in Game.customUpgradesAll.buy) Game.customUpgradesAll.buy[i](me, bypass, success);
+		}
+		
+		if(!Game.customUpgradesAll.earn) Game.customUpgradesAll.earn = [];
+		CCSE.customUpgradesAllearn = function(me){
+			for(var i in Game.customUpgradesAll.earn) Game.customUpgradesAll.earn[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.unearn) Game.customUpgradesAll.unearn = [];
+		CCSE.customUpgradesAllunearn = function(me){
+			for(var i in Game.customUpgradesAll.unearn) Game.customUpgradesAll.unearn[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.unlock) Game.customUpgradesAll.unlock = [];
+		CCSE.customUpgradesAllunlock = function(me){
+			for(var i in Game.customUpgradesAll.unlock) Game.customUpgradesAll.unlock[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.lose) Game.customUpgradesAll.lose = [];
+		CCSE.customUpgradesAlllose = function(me){
+			for(var i in Game.customUpgradesAll.lose) Game.customUpgradesAll.lose[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle = [];
+		CCSE.customUpgradesAlltoggle = function(me){
+			for(var i in Game.customUpgradesAll.toggle) Game.customUpgradesAll.toggle[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction = [];
+		CCSE.customUpgradesAllbuyFunction = function(me){
+			for(var i in Game.customUpgradesAll.buyFunction) Game.customUpgradesAll.buyFunction[i](me);
+		}
+		
+		if(!Game.customUpgradesAll.descFunc) Game.customUpgradesAll.descFunc = [];
+		CCSE.customUpgradesAlldescFunc = function(me, desc){
+			for(var i in Game.customUpgradesAll.descFunc) desc = Game.customUpgradesAll.descFunc[i](me, desc);
+			return desc;
+		}
+		
+		
+		if(!Game.customUpgrades) Game.customUpgrades = {};
+		CCSE.Backup.customUpgrades = {};
+		for(var key in Game.Upgrades){
+			CCSE.ReplaceUpgrade(key);
+		}
+		
+		
+		// Correct these descFuncs
+		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
+		for (var i=0;i<slots.length;i++)
+		{
+			Game.Upgrades[slots[i]].olddescFunc=function(i){return function(){
+				if (Game.permanentUpgrades[i]==-1) return Game.Upgrades[slots[i]].desc;
+				var upgrade=Game.UpgradesById[Game.permanentUpgrades[i]];
+				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
+			};}(i);
+		}
+		
+		requestAnimationFrame(CCSE.ReplaceAchievements);
+	}
+	
 	CCSE.ReplaceUpgrade = function(key){
 		var temp = '';
 		var pos = 0;
@@ -1532,6 +1530,24 @@ CCSE.launch = function(){
 	}
 	
 	if(!CCSE.customReplaceAchievement) CCSE.customReplaceAchievement = [];
+	CCSE.ReplaceAchievements = function(){
+		if(!Game.customAchievementsAll) Game.customAchievementsAll = {};
+		
+		if(!Game.customAchievementsAll.click) Game.customAchievementsAll.click = [];
+		CCSE.customAchievementsAllclick = function(me){
+			for(var i in Game.customAchievementsAll.click) Game.customAchievementsAll.click[i](me);
+		}
+	
+	
+		if(!Game.customAchievements) Game.customAchievements = {};
+		CCSE.Backup.customAchievements = {};
+		for(var key in Game.Achievements){
+			CCSE.ReplaceAchievement(key);
+		}
+		
+		requestAnimationFrame(CCSE.finalize);
+	}
+	
 	CCSE.ReplaceAchievement = function(key){
 		var temp = '';
 		var pos = 0;
@@ -2789,13 +2805,13 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Other
 	=======================================================================================*/
-	CCSE.Multithreading = function(){
+	/*CCSE.Multithreading = function(){
 		// This is Game.Loop, altered to run a frame or two when 1000 / Game.fps ms passes instead of, y'know, looping
 		
 		var time = Date.now();
 		
 		if(time - Game.time >= 1000 / Game.fps){
-			console.log('Save the frames, kill the animals');
+			//console.log('Save the frames, kill the animals');
 			Timer.say('START');
 			Timer.track('browser stuff');
 			Timer.say('LOGIC');			
@@ -2849,7 +2865,7 @@ CCSE.launch = function(){
 			
 			Game.loopT++;
 		}
-	}
+	}*/
 	
 	CCSE.AddMoreWrinklers = function(n){
 		var j = Game.wrinklers.length;

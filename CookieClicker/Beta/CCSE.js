@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.007';
+CCSE.version = '2.009';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -12,15 +12,61 @@ CCSE.launch = function(){
 		CCSE.collapseMenu = {};
 		if(!Game.customMinigame) Game.customMinigame = {};
 		for(var key in Game.Objects) if(!Game.customMinigame[key]) Game.customMinigame[key] = {};
-	
 		
-		// Inject the hooks into the main game
-		CCSE.ReplaceMainGame();
-		CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, 'Wizard tower');
-		CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
-		CCSE.MinigameReplacer(CCSE.ReplaceGarden, 'Farm');
 		
-		requestAnimationFrame(CCSE.ReplaceBuildings);
+		// Build a list of functions to feed to requestAnimationFrame
+		CCSE.playlist = [];
+		CCSE.track = 0;
+		
+		CCSE.playlist.push(function(){
+			CCSE.ReplaceMainGame();
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		CCSE.playlist.push(function(){
+			CCSE.MinigameReplacer(CCSE.ReplaceGrimoire, 'Wizard tower');
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		CCSE.playlist.push(function(){
+			CCSE.MinigameReplacer(CCSE.ReplacePantheon, 'Temple');
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		CCSE.playlist.push(function(){
+			CCSE.MinigameReplacer(CCSE.ReplaceGarden, 'Farm');
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		
+		
+		CCSE.playlist.push(function(){
+			CCSE.ReplaceBuildingsStart();
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		CCSE.playlist.push(CCSE.ReplaceBuildings); // We'll call the next one from here
+		CCSE.playlist.push(function(){
+			CCSE.ReplaceBuildingsFinish();
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		
+		
+		CCSE.playlist.push(function(){
+			CCSE.ReplaceUpgradesStart();
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		CCSE.playlist.push(CCSE.ReplaceUpgrades); // We'll call the next one from here
+		CCSE.playlist.push(function(){
+			CCSE.ReplaceUpgradesFinish();
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		
+		
+		CCSE.playlist.push(function(){
+			CCSE.ReplaceAchievements();
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		
+		
+		CCSE.playlist.push(CCSE.finalize);
+		
+		requestAnimationFrame(CCSE.playlist[CCSE.track++]);
 	}
 	
 	CCSE.finalize = function(){
@@ -87,6 +133,23 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	The heart of the mod. Functions to inject code into functions.
 	=======================================================================================*/
+	CCSE.SliceCodeIntoFunction = function(functionName, pos, code, preEvalScript, hasPrototype){
+		// preEvalScript is to set variables that are used in the function but aren't declared in the function
+		if(preEvalScript) eval(preEvalScript);
+		
+		var proto;
+		if(hasPrototype) proto = eval(functionName + ".prototype");
+		
+		var temp = eval(functionName + ".toString()");
+		temp = temp.slice(0, pos) + code + temp.slice(pos);
+		
+		//console.log(functionName);
+		eval(functionName + " = " + temp);
+		if(hasPrototype) eval(functionName + ".prototype = proto");
+		
+		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+	}
+	
 	CCSE.SpliceCodeIntoFunction = function(functionName, row, code, preEvalScript, hasPrototype){
 		// preEvalScript is to set variables that are used in the function but aren't declared in the function
 		if(preEvalScript) eval(preEvalScript);
@@ -106,7 +169,6 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
-		//CCSE.Multithreading();
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript, hasPrototype){
@@ -135,7 +197,6 @@ CCSE.launch = function(){
 		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
-		//CCSE.Multithreading();
 	}
 	
 	
@@ -158,7 +219,7 @@ CCSE.launch = function(){
 		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		if(!Game.customInfoMenu) Game.customInfoMenu = [];
-		CCSE.SpliceCodeIntoFunction('Game.UpdateMenu', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UpdateMenu', -1, `
 			if(Game.onMenu == 'prefs'){
 				// Game.UpdateMenu injection point 0
 				for(var i in Game.customOptionsMenu) Game.customOptionsMenu[i]();
@@ -174,8 +235,8 @@ CCSE.launch = function(){
 			
 			// Any that don't want to fit into a label
 			// Game.UpdateMenu injection point 3
-			for(var i in Game.customMenu) Game.customMenu[i]();`
-		);
+			for(var i in Game.customMenu) Game.customMenu[i]();
+		`);
 		
 		
 		// Game.LoadSave
@@ -1039,7 +1100,7 @@ CCSE.launch = function(){
 	}
 	
 	if(!CCSE.customReplaceBuilding) CCSE.customReplaceBuilding = [];
-	CCSE.ReplaceBuildings = function(){
+	CCSE.ReplaceBuildingsStart = function(){
 		if(!Game.customBuildingsAll) Game.customBuildingsAll = {};
 		
 		if(!Game.customBuildingsAll.switchMinigame) Game.customBuildingsAll.switchMinigame = [];
@@ -1130,14 +1191,32 @@ CCSE.launch = function(){
 		
 		if(!Game.customBuildings) Game.customBuildings = {};
 		CCSE.Backup.customBuildings = {};
-		for(var key in Game.Objects){
-			CCSE.ReplaceBuilding(key);
+		CCSE.i = 0;
+	}
+	
+	CCSE.ReplaceBuildings = function(){
+		var time = Date.now();
+		
+		for(var i = CCSE.i; i < Game.ObjectsN; i++){
+			CCSE.ReplaceBuilding(Game.ObjectsById[i].name);
+			if(Date.now() > time + 500 / Game.fps) break;
 		}
 		
+		CCSE.i = i + 1;
+		if(CCSE.i < Game.ObjectsN){
+			// Didn't do all of them. Wait for priority and go again
+			requestAnimationFrame(CCSE.ReplaceBuildings);
+		}else{
+			// Continue on
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		}
+	}
+	
+	CCSE.ReplaceBuildingsFinish = function(){
 		
 		// -----     Individual Buildings block     ----- //
 		
-		obj = Game.Objects['Cursor'];
+		var obj = Game.Objects['Cursor'];
 		// Cursor.cps
 		// cpsAdd Functions should return a value to add per non cursor building (Return 0 to have no effect)
 		if(!Game.customBuildings[obj.name].cpsAdd) Game.customBuildings[obj.name].cpsAdd = [];
@@ -1164,8 +1243,6 @@ CCSE.launch = function(){
 			// Grandma.cps injection point 1
 			for(var i in Game.customBuildings['` + obj.name + `'].cpsAdd) add += Game.customBuildings['` + obj.name + `'].cpsAdd[i](me);`, -1);
 		
-		
-		requestAnimationFrame(CCSE.ReplaceUpgrades);
 	}
 	
 	CCSE.ReplaceBuilding = function(key){
@@ -1179,7 +1256,6 @@ CCSE.launch = function(){
 		
 		if(!Game.customBuildings[key]) Game.customBuildings[key] = {};
 		CCSE.Backup.customBuildings[key] = {};
-		
 		
 		// this.switchMinigame
 		if(!Game.customBuildings[key].switchMinigame) Game.customBuildings[key].switchMinigame = [];
@@ -1335,7 +1411,7 @@ CCSE.launch = function(){
 	}
 	
 	if(!CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade = [];
-	CCSE.ReplaceUpgrades = function(){
+	CCSE.ReplaceUpgradesStart = function(){
 		if(!Game.customUpgradesAll) Game.customUpgradesAll = {}; 
 		
 		if(!Game.customUpgradesAll.getPrice) Game.customUpgradesAll.getPrice = [];
@@ -1394,11 +1470,10 @@ CCSE.launch = function(){
 		
 		if(!Game.customUpgrades) Game.customUpgrades = {};
 		CCSE.Backup.customUpgrades = {};
-		for(var key in Game.Upgrades){
-			CCSE.ReplaceUpgrade(key);
-		}
-		
-		
+		CCSE.i = 0;
+	}
+	
+	CCSE.ReplaceUpgradesFinish = function(){
 		// Correct these descFuncs
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
@@ -1409,8 +1484,24 @@ CCSE.launch = function(){
 				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
 			};}(i);
 		}
+	}
+	
+	CCSE.ReplaceUpgrades = function(){
+		var time = Date.now();
 		
-		requestAnimationFrame(CCSE.ReplaceAchievements);
+		for(var i = CCSE.i; i < Game.UpgradesN; i++){
+			CCSE.ReplaceUpgrade(Game.UpgradesById[i].name);
+			if(Date.now() > time + 500 / Game.fps) break;
+		}
+		
+		CCSE.i = i + 1;
+		if(CCSE.i < Game.UpgradesN){
+			// Didn't do all of them. Wait for priority and go again
+			requestAnimationFrame(CCSE.ReplaceUpgrades);
+		}else{
+			// Continue on
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		}
 	}
 	
 	CCSE.ReplaceUpgrade = function(key){
@@ -1545,13 +1636,9 @@ CCSE.launch = function(){
 			CCSE.ReplaceAchievement(key);
 		}
 		
-		requestAnimationFrame(CCSE.finalize);
 	}
 	
 	CCSE.ReplaceAchievement = function(key){
-		var temp = '';
-		var pos = 0;
-		var proto;
 		var escKey = key.replace(/'/g, "\\'");
 		var achievement = Game.Achievements[key];
 		
@@ -1562,9 +1649,10 @@ CCSE.launch = function(){
 		// this.click
 		if(!Game.customAchievements[key].click) Game.customAchievements[key].click = [];
 		Game.customAchievements[key].click.push(CCSE.customAchievementsAllclick);
-		CCSE.SpliceCodeIntoFunction("Game.Achievements['" + escKey + "'].click", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Achievements['" + escKey + "'].click", -1, `
 				// Game.Achievements['` + escKey + `'].click injection point 0
-				for(var i in Game.customAchievements[this.name].click) Game.customAchievements[this.name].click[i](this);`);
+				for(var i in Game.customAchievements[this.name].click) Game.customAchievements[this.name].click[i](this);
+			`);
 		
 		
 		for(var i in CCSE.customReplaceAchievement) CCSE.customReplaceAchievement[i](key, achievement);
@@ -2805,68 +2893,6 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Other
 	=======================================================================================*/
-	/*CCSE.Multithreading = function(){
-		// This is Game.Loop, altered to run a frame or two when 1000 / Game.fps ms passes instead of, y'know, looping
-		
-		var time = Date.now();
-		
-		if(time - Game.time >= 1000 / Game.fps){
-			//console.log('Save the frames, kill the animals');
-			Timer.say('START');
-			Timer.track('browser stuff');
-			Timer.say('LOGIC');			
-			
-			Game.catchupLogic = 1;
-			var lostFrames = Math.floor((time - Game.time) * Game.fps / 1000);
-			
-			for(var i = 0; i < lostFrames; i++){
-				Game.Logic();
-			}
-			
-			Game.time += lostFrames * 1000 / Game.fps;
-			Game.catchupLogic = 0;
-			
-			Timer.track('logic');
-			Timer.say('END LOGIC');
-			if (!Game.prefs.altDraw)
-			{
-				var hasFocus=document.hasFocus();
-				Timer.say('DRAW');
-				if (hasFocus || Game.prefs.focus || Game.loopT%10==0) requestAnimationFrame(Game.Draw);
-				//if (document.hasFocus() || Game.loopT%5==0) Game.Draw();
-				Timer.say('END DRAW');
-			}
-			else requestAnimationFrame(Game.Draw);
-			
-			if (Game.sesame)
-			{
-				//fps counter and graph
-				Game.previousFps=Game.currentFps;
-				Game.currentFps=Game.getFps();
-					var ctx=Game.fpsGraphCtx;
-					ctx.drawImage(Game.fpsGraph,-1,0);
-					ctx.fillStyle='rgb('+Math.round((1-Game.currentFps/Game.fps)*128)+',0,0)';
-					ctx.fillRect(128-1,0,1,64);
-					ctx.strokeStyle='#fff';
-					ctx.beginPath();
-					ctx.moveTo(128-1,(1-Game.previousFps/Game.fps)*64);
-					ctx.lineTo(128,(1-Game.currentFps/Game.fps)*64);
-					ctx.stroke();
-				
-				l('fpsCounter').innerHTML=Game.currentFps+' fps';
-				var str='';
-				for (var i in Timer.labels) {str+=Timer.labels[i];}
-				if (Game.debugTimersOn) l('debugLog').style.display='block';
-				else l('debugLog').style.display='none';
-				l('debugLog').innerHTML=str;
-				
-			}
-			Timer.reset();
-			
-			Game.loopT++;
-		}
-	}*/
-	
 	CCSE.AddMoreWrinklers = function(n){
 		var j = Game.wrinklers.length;
 		for (var i = j; i < j + n; i++){

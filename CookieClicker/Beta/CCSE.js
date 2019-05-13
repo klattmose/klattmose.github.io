@@ -1,12 +1,17 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.011';
+CCSE.version = '2.012';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
 	
 	CCSE.init = function(){
+		if (Game.prefs.popups) Game.Popup('CCSE is initializing');
+		else Game.Notify('CCSE is initializing', '', '', 6, 1);
+		CCSE.noteId = Game.noteId - 1;
+		Game.NotesById[CCSE.noteId].life *= 100;
+		
 		// Define more parts of CCSE
 		CCSE.Backup = {};
 		CCSE.collapseMenu = {};
@@ -94,6 +99,7 @@ CCSE.launch = function(){
 		
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
+		Game.CloseNote(CCSE.noteId);
 		if (Game.prefs.popups) Game.Popup('CCSE loaded!');
 		else Game.Notify('CCSE loaded!', '', '', 1, 1);
 		CCSE.isLoaded = 1;

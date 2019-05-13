@@ -2795,7 +2795,7 @@ CCSE.launch = function(){
 		var time = Date.now();
 		
 		if(time - Game.time >= 1000 / Game.fps){
-			Console.log('Save the frames, kill the animals');
+			console.log('Save the frames, kill the animals');
 			Timer.say('START');
 			Timer.track('browser stuff');
 			Timer.say('LOGIC');			
@@ -2807,7 +2807,7 @@ CCSE.launch = function(){
 				Game.Logic();
 			}
 			
-			Game.time = time;
+			Game.time += lostFrames * 1000 / Game.fps;
 			Game.catchupLogic = 0;
 			
 			Timer.track('logic');

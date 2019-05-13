@@ -79,11 +79,12 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	The heart of the mod. Functions to inject code into functions.
 	=======================================================================================*/
-	CCSE.SpliceCodeIntoFunction = function(functionName, row, code, preEvalScript){
+	CCSE.SpliceCodeIntoFunction = function(functionName, row, code, preEvalScript, hasPrototype){
 		// preEvalScript is to set variables that are used in the function but aren't declared in the function
 		if(preEvalScript) eval(preEvalScript);
 		
-		var proto = eval(functionName + ".prototype");
+		var proto;
+		if(hasPrototype) proto = eval(functionName + ".prototype");
 		var i = Math.floor(row);
 		if(i == 0) throw new Error("row cannot be zero");
 		
@@ -92,17 +93,19 @@ CCSE.launch = function(){
 		i = row < 0 ? temp.length + row : row;
 		temp.splice(i, 0, code);
 		
+		//console.log(functionName);
 		eval(functionName + " = " + temp.join("\n"));
-		eval(functionName + ".prototype = proto");
+		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
 	}
 	
-	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript){
+	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript, hasPrototype){
 		// preEvalScript is to set variables that are used in the function but aren't declared in the function
 		if(preEvalScript) eval(preEvalScript);
 		
-		var proto = eval(functionName + ".prototype");
+		var proto;
+		if(hasPrototype) proto = eval(functionName + ".prototype");
 		var temp = eval(functionName + ".toString()");
 		
 		switch(mode){
@@ -120,7 +123,7 @@ CCSE.launch = function(){
 		}
 		
 		eval(functionName + " = " + temp);
-		eval(functionName + ".prototype = proto");
+		if(hasPrototype) eval(functionName + ".prototype = proto");
 		
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
 	}
@@ -414,8 +417,7 @@ CCSE.launch = function(){
 		if(!Game.customShimmer) Game.customShimmer = [];
 		CCSE.SpliceCodeIntoFunction('Game.shimmer', -1, `
 			// Game.shimmer injection point 0
-			for(var i in Game.customShimmer) Game.customShimmer[i](this);`);
-		
+			for(var i in Game.customShimmer) Game.customShimmer[i](this);`, 0, 1);
 		
 		// Game.updateShimmers
 		// Runs every logic frame when shimmers matter

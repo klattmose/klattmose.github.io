@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.009';
+CCSE.version = '2.011';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -255,9 +255,10 @@ CCSE.launch = function(){
 		
 		// Game.Reset
 		if(!Game.customReset) Game.customReset = [];
-		CCSE.SpliceCodeIntoFunction('Game.Reset', -1, `
+		CCSE.SliceCodeIntoFunction('Game.Reset', -1, `
 			// Game.Reset injection point 0
-			for(var i in Game.customReset) Game.customReset[i](hard);`);
+			for(var i in Game.customReset) Game.customReset[i](hard);
+		`);
 		
 		
 		// randomFloor
@@ -294,16 +295,18 @@ CCSE.launch = function(){
 		
 		// Game.tooltip.draw
 		if(!Game.customTooltipDraw) Game.customTooltipDraw = [];
-		CCSE.SpliceCodeIntoFunction('Game.tooltip.draw', -1, `
+		CCSE.SliceCodeIntoFunction('Game.tooltip.draw', -1, `
 			// Game.tooltip.draw injection point 0
-			for(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin);`);
+			for(var i in Game.customTooltipDraw) Game.customTooltipDraw[i](from, text, origin);
+		`);
 		
 		
 		// Game.tooltip.update
 		if(!Game.customTooltipUpdate) Game.customTooltipUpdate = [];
-		CCSE.SpliceCodeIntoFunction('Game.tooltip.update', -1, `
+		CCSE.SliceCodeIntoFunction('Game.tooltip.update', -1, `
 			// Game.tooltip.update injection point 0
-			for(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();`);
+			for(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();
+			`);
 		
 		
 		// -----     Ascension block     ----- //
@@ -312,20 +315,22 @@ CCSE.launch = function(){
 		// Return ret to have no effect
 		if(!Game.customHowMuchPrestige) Game.customHowMuchPrestige = [];
 		CCSE.ReplaceCodeIntoFunction('Game.HowMuchPrestige', 'return', "var ret = ", 0);
-		CCSE.SpliceCodeIntoFunction('Game.HowMuchPrestige', -1, `
+		CCSE.SliceCodeIntoFunction('Game.HowMuchPrestige', -1, `
 			// Game.HowMuchPrestige injection point 0
 			for(var i in Game.customHowMuchPrestige) ret = Game.customHowMuchPrestige[i](cookies, ret);
-			return ret;`);
+			return ret;
+		`);
 		
 		
 		// Game.HowManyCookiesReset
 		// Return ret to have no effect
 		if(!Game.customHowManyCookiesReset) Game.customHowManyCookiesReset = []; 
 		CCSE.ReplaceCodeIntoFunction('Game.HowManyCookiesReset', 'return', "var ret = ", 0);
-		CCSE.SpliceCodeIntoFunction('Game.HowManyCookiesReset', -1, `
+		CCSE.SliceCodeIntoFunction('Game.HowManyCookiesReset', -1, `
 			// Game.HowManyCookiesReset injection point 0
 			for(var i in Game.customHowManyCookiesReset) ret = Game.customHowManyCookiesReset[i](chips, ret);
-			return ret;`);
+			return ret;
+		`);
 		
 		
 		// Game.GetHeavenlyMultiplier
@@ -338,40 +343,45 @@ CCSE.launch = function(){
 		
 		// Game.UpdateAscensionModePrompt
 		if(!Game.customUpdateAscensionModePrompt) Game.customUpdateAscensionModePrompt = [];
-		CCSE.SpliceCodeIntoFunction('Game.UpdateAscensionModePrompt', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UpdateAscensionModePrompt', -1, `
 			// Game.UpdateAscensionModePrompt injection point 0
-			for(var i in Game.customUpdateAscensionModePrompt) Game.customUpdateAscensionModePrompt[i]();`);
+			for(var i in Game.customUpdateAscensionModePrompt) Game.customUpdateAscensionModePrompt[i]();
+		`);
 		
 		
 		// Game.Reincarnate
 		// Only runs when bypass == 1 (i.e. passed the confirmation prompt)
 		if(!Game.customReincarnate) Game.customReincarnate = [];
-		CCSE.SpliceCodeIntoFunction('Game.Reincarnate', -2, `
+		CCSE.SliceCodeIntoFunction('Game.Reincarnate', -2, `
 				// Game.Reincarnate injection point 0
-				for(var i in Game.customReincarnate) Game.customReincarnate[i]();`);
+				for(var i in Game.customReincarnate) Game.customReincarnate[i]();
+			`);
 		
 		
 		// Game.Ascend
 		// Only runs when bypass == 1 (i.e. passed the confirmation prompt)
 		if(!Game.customAscend) Game.customAscend = [];
-		CCSE.SpliceCodeIntoFunction('Game.Ascend', -2, `
+		CCSE.SliceCodeIntoFunction('Game.Ascend', -2, `
 				// Game.Ascend injection point 0
-				for(var i in Game.customAscend) Game.customAscend[i]();`);
+				for(var i in Game.customAscend) Game.customAscend[i]();
+			`);
 		
 		
 		// Game.UpdateAscend
 		// Runs every frame while on the Ascension tree
 		if(!Game.customUpdateAscend) Game.customUpdateAscend = [];
-		CCSE.SpliceCodeIntoFunction('Game.UpdateAscend', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UpdateAscend', -1, `
 			// Game.UpdateAscend injection point 0
-			for(var i in Game.customUpdateAscend) Game.customUpdateAscend[i]();`);
+			for(var i in Game.customUpdateAscend) Game.customUpdateAscend[i]();
+		`);
 		
 		
 		// Game.BuildAscendTree
 		if(!Game.customBuildAscendTree) Game.customBuildAscendTree = [];
-		CCSE.SpliceCodeIntoFunction('Game.BuildAscendTree', -1, `
+		CCSE.SliceCodeIntoFunction('Game.BuildAscendTree', -1, `
 			// Game.BuildAscendTree injection point 0
-			for(var i in Game.customBuildAscendTree) Game.customBuildAscendTree[i]();`);
+			for(var i in Game.customBuildAscendTree) Game.customBuildAscendTree[i]();
+		`);
 		
 		
 		// -----     Sugar Lumps block     ----- //
@@ -386,23 +396,26 @@ CCSE.launch = function(){
 		
 		// Game.computeLumpTimes
 		if(!Game.customComputeLumpTimes) Game.customComputeLumpTimes = [];
-		CCSE.SpliceCodeIntoFunction('Game.computeLumpTimes', -1, `
+		CCSE.SliceCodeIntoFunction('Game.computeLumpTimes', -1, `
 			// Game.computeLumpTimes injection point 0
-			for(var i in Game.customComputeLumpTimes) Game.customComputeLumpTimes[i]();`);
+			for(var i in Game.customComputeLumpTimes) Game.customComputeLumpTimes[i]();
+		`);
 		
 		
 		// Game.gainLumps
 		if(!Game.customGainLumps) Game.customGainLumps = [];
-		CCSE.SpliceCodeIntoFunction('Game.gainLumps', -1, `
+		CCSE.SliceCodeIntoFunction('Game.gainLumps', -1, `
 			// Game.gainLumps injection point 0
-			for(var i in Game.customGainLumps) Game.customGainLumps[i](total);`);
+			for(var i in Game.customGainLumps) Game.customGainLumps[i](total);
+		`);
 		
 		
 		// Game.clickLump
 		if(!Game.customClickLump) Game.customClickLump = [];
-		CCSE.SpliceCodeIntoFunction('Game.clickLump', -1, `
+		CCSE.SliceCodeIntoFunction('Game.clickLump', -1, `
 			// Game.clickLump injection point 0
-			for(var i in Game.customClickLump) Game.customClickLump[i]();`);
+			for(var i in Game.customClickLump) Game.customClickLump[i]();
+		`);
 		
 		
 		// Game.harvestLumps
@@ -411,9 +424,10 @@ CCSE.launch = function(){
 			`// Game.harvestLumps injection point 0`, -1);
 		CCSE.ReplaceCodeIntoFunction('Game.harvestLumps', "Game.Win('Maillard reaction');", 
 			`// Game.harvestLumps injection point 1`, 1);
-		CCSE.SpliceCodeIntoFunction('Game.harvestLumps', -1, `
+		CCSE.SliceCodeIntoFunction('Game.harvestLumps', -1, `
 			// Game.harvestLumps injection point 2
-			for(var i in Game.customHarvestLumps) Game.customHarvestLumps[i](amount, silent);`);
+			for(var i in Game.customHarvestLumps) Game.customHarvestLumps[i](amount, silent);
+		`);
 		
 		
 		// Game.computeLumpType
@@ -440,26 +454,29 @@ CCSE.launch = function(){
 		// Return ret to have no effect
 		if(!Game.customLumpRefillMax) Game.customLumpRefillMax = []; 
 		CCSE.ReplaceCodeIntoFunction('Game.getLumpRefillMax', 'return', 'var ret =', 0);
-		CCSE.SpliceCodeIntoFunction('Game.getLumpRefillMax', -1, 
+		CCSE.SliceCodeIntoFunction('Game.getLumpRefillMax', -1, 
 			`// Game.getLumpRefillMax injection point 0
 			for(var i in Game.customLumpRefillMax) ret = Game.customLumpRefillMax[i](ret);
-			return ret;`);
+			return ret;
+		`);
 		
 		
 		// Game.refillLump
 		if(!Game.customRefillLump) Game.customRefillLump = [];
-		CCSE.SpliceCodeIntoFunction('Game.refillLump', -1, `
+		CCSE.SliceCodeIntoFunction('Game.refillLump', -1, `
 			// Game.refillLump injection point 0
-			for(var i in Game.customRefillLump) Game.customRefillLump[i]();`);
+			for(var i in Game.customRefillLump) Game.customRefillLump[i]();
+		`);
 		
 		
 		// Game.doLumps
 		// Runs every logic frame when lumps matter
 		if(!Game.customDoLumps) Game.customDoLumps = [];
 		CCSE.ReplaceCodeIntoFunction('Game.doLumps', 'var icon=', '// Game.doLumps injection point 0', -1);
-		CCSE.SpliceCodeIntoFunction('Game.doLumps', -1, `
+		CCSE.SliceCodeIntoFunction('Game.doLumps', -1, `
 			// Game.doLumps injection point 1
-			for(var i in Game.customDoLumps) Game.customDoLumps[i]();`);
+			for(var i in Game.customDoLumps) Game.customDoLumps[i]();
+		`);
 		
 		
 		// -----     Economics block     ----- //
@@ -486,24 +503,27 @@ CCSE.launch = function(){
 		// Runs when a shimmer (Golden cookie or reindeer) gets created
 		// You can push a function that pops it immediately, but it will mess up any FtHoF predictor you use
 		if(!Game.customShimmer) Game.customShimmer = [];
-		CCSE.SpliceCodeIntoFunction('Game.shimmer', -1, `
+		CCSE.SliceCodeIntoFunction('Game.shimmer', -1, `
 			// Game.shimmer injection point 0
-			for(var i in Game.customShimmer) Game.customShimmer[i](this);`, 0, 1);
+			for(var i in Game.customShimmer) Game.customShimmer[i](this);
+		`, 0, 1);
 		
 		// Game.updateShimmers
 		// Runs every logic frame when shimmers matter
 		if(!Game.customUpdateShimmers) Game.customUpdateShimmers = [];
-		CCSE.SpliceCodeIntoFunction('Game.updateShimmers', -1, `
+		CCSE.SliceCodeIntoFunction('Game.updateShimmers', -1, `
 			// Game.updateShimmers injection point 0
-			for(var i in Game.customUpdateShimmers) Game.customUpdateShimmers[i]();`);
+			for(var i in Game.customUpdateShimmers) Game.customUpdateShimmers[i]();
+		`);
 		
 		
 		// Game.killShimmers
 		// Runs when we want to remove all shimmers
 		if(!Game.customKillShimmers) Game.customKillShimmers = [];
-		CCSE.SpliceCodeIntoFunction('Game.killShimmers', -1, `
+		CCSE.SliceCodeIntoFunction('Game.killShimmers', -1, `
 			// Game.killShimmers injection point 0
-			for(var i in Game.customKillShimmers) Game.customKillShimmers[i]();`);
+			for(var i in Game.customKillShimmers) Game.customKillShimmers[i]();
+		`);
 		
 		
 		// Game.shimmerTypes
@@ -609,9 +629,10 @@ CCSE.launch = function(){
 		// Game.DrawBuildings
 		// Runs every draw frame if we're not ascending
 		if(!Game.customDrawBuildings) Game.customDrawBuildings = [];
-		CCSE.SpliceCodeIntoFunction('Game.DrawBuildings', -1, `
+		CCSE.SliceCodeIntoFunction('Game.DrawBuildings', -1, `
 			// Game.DrawBuildings injection point 0
-			for(var i in Game.customDrawBuildings) Game.customDrawBuildings[i]();`);
+			for(var i in Game.customDrawBuildings) Game.customDrawBuildings[i]();
+		`);
 		
 		
 		// Game.modifyBuildingPrice
@@ -625,23 +646,26 @@ CCSE.launch = function(){
 		
 		// Game.storeBulkButton
 		if(!Game.customStoreBulkButton) Game.customStoreBulkButton = [];
-		CCSE.SpliceCodeIntoFunction('Game.storeBulkButton', -1, `
+		CCSE.SliceCodeIntoFunction('Game.storeBulkButton', -1, `
 			// Game.storeBulkButton injection point 0
-			for(var i in Game.customStoreBulkButton) Game.customStoreBulkButton[i]();`);
+			for(var i in Game.customStoreBulkButton) Game.customStoreBulkButton[i]();
+		`);
 		
 		
 		// Game.BuildStore
 		if(!Game.customBuildStore) Game.customBuildStore = [];
-		CCSE.SpliceCodeIntoFunction('Game.BuildStore', -1, `
+		CCSE.SliceCodeIntoFunction('Game.BuildStore', -1, `
 			// Game.BuildStore injection point 0
-			for(var i in Game.customBuildStore) Game.customBuildStore[i]();`);
+			for(var i in Game.customBuildStore) Game.customBuildStore[i]();
+		`);
 		
 		
 		// Game.RefreshStore
 		if(!Game.customRefreshStore) Game.customRefreshStore = [];
-		CCSE.SpliceCodeIntoFunction('Game.RefreshStore', -1, `
+		CCSE.SliceCodeIntoFunction('Game.RefreshStore', -1, `
 			// Game.RefreshStore injection point 0
-			for(var i in Game.customRefreshStore) Game.customRefreshStore[i]();`);
+			for(var i in Game.customRefreshStore) Game.customRefreshStore[i]();
+		`);
 		
 		
 		// Game.scriptLoaded
@@ -649,19 +673,21 @@ CCSE.launch = function(){
 		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
 		for(key in Game.Objects) if(!Game.customMinigameOnLoad[key]) Game.customMinigameOnLoad[key] = [];
 		
-		CCSE.SpliceCodeIntoFunction('Game.scriptLoaded', -1, `
+		CCSE.SliceCodeIntoFunction('Game.scriptLoaded', -1, `
 			// Game.scriptLoaded injection point 0
 			for(var i in Game.customScriptLoaded) Game.customScriptLoaded[i](who, script); // Who knows, maybe those arguments might be needed
-			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);`);
+			for(var i in Game.customMinigameOnLoad[who.name]) Game.customMinigameOnLoad[who.name][i](who, script);
+		`);
 		
 		
 		// -----     Upgrades block     ----- //
 		
 		// Game.storeBuyAll
 		if(!Game.customStoreBuyAll) Game.customStoreBuyAll = [];
-		CCSE.SpliceCodeIntoFunction('Game.storeBuyAll', -1, `
+		CCSE.SliceCodeIntoFunction('Game.storeBuyAll', -1, `
 			// Game.storeBuyAll injection point 0
-			for(var i in Game.customStoreBuyAll) Game.customStoreBuyAll[i]();`);
+			for(var i in Game.customStoreBuyAll) Game.customStoreBuyAll[i]();
+		`);
 		
 		
 		// Game.CountsAsUpgradeOwned
@@ -669,31 +695,35 @@ CCSE.launch = function(){
 		if(!Game.customCountsAsUpgradeOwned) Game.customCountsAsUpgradeOwned = [];
 		CCSE.SpliceCodeIntoFunction('Game.CountsAsUpgradeOwned', 2, 'var ret;');
 		CCSE.ReplaceCodeIntoFunction('Game.CountsAsUpgradeOwned', /return/g, 'ret =', 0);
-		CCSE.SpliceCodeIntoFunction('Game.CountsAsUpgradeOwned', -1, `
+		CCSE.SliceCodeIntoFunction('Game.CountsAsUpgradeOwned', -1, `
 			// Game.CountsAsUpgradeOwned injection point 0
 			for(var i in Game.customCountsAsUpgradeOwned) ret = Game.customCountsAsUpgradeOwned[i](pool, ret);
-			return ret;`);
+			return ret;
+		`);
 		
 		
 		// Game.Unlock
 		if(!Game.customUnlock) Game.customUnlock = [];
-		CCSE.SpliceCodeIntoFunction('Game.Unlock', -1, `
+		CCSE.SliceCodeIntoFunction('Game.Unlock', -1, `
 			// Game.Unlock injection point 0
-			for(var i in Game.customUnlock) Game.customUnlock[i](what);`);
+			for(var i in Game.customUnlock) Game.customUnlock[i](what);
+		`);
 		
 		
 		// Game.Lock
 		if(!Game.customLock) Game.customLock = [];
-		CCSE.SpliceCodeIntoFunction('Game.Lock', -1, `
+		CCSE.SliceCodeIntoFunction('Game.Lock', -1, `
 			// Game.Lock injection point 0
-			for(var i in Game.customLock) Game.customLock[i](what);`);
+			for(var i in Game.customLock) Game.customLock[i](what);
+		`);
 		
 		
 		// Game.RebuildUpgrades
 		if(!Game.customRebuildUpgrades) Game.customRebuildUpgrades = [];
-		CCSE.SpliceCodeIntoFunction('Game.RebuildUpgrades', -1, `
+		CCSE.SliceCodeIntoFunction('Game.RebuildUpgrades', -1, `
 			// Game.RebuildUpgrades injection point 0
-			for(var i in Game.customRebuildUpgrades) Game.customRebuildUpgrades[i]();`);
+			for(var i in Game.customRebuildUpgrades) Game.customRebuildUpgrades[i]();
+		`);
 		
 		
 		// Game.GetTieredCpsMult
@@ -706,16 +736,18 @@ CCSE.launch = function(){
 		
 		// Game.UnlockTiered
 		if(!Game.customUnlockTiered) Game.customUnlockTiered = [];
-		CCSE.SpliceCodeIntoFunction('Game.UnlockTiered', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UnlockTiered', -1, `
 			// Game.UnlockTiered injection point 0
-			for(var i in Game.customUnlockTiered) Game.customUnlockTiered[i](me);`);
+			for(var i in Game.customUnlockTiered) Game.customUnlockTiered[i](me);
+		`);
 		
 		
 		// Game.SetResearch
 		if(!Game.customSetResearch) Game.customSetResearch = [];
-		CCSE.SpliceCodeIntoFunction('Game.SetResearch', -1, `
+		CCSE.SliceCodeIntoFunction('Game.SetResearch', -1, `
 			// Game.SetResearch injection point 0
-			for(var i in Game.customSetResearch) Game.customSetResearch[i](what, time);`);
+			for(var i in Game.customSetResearch) Game.customSetResearch[i](what, time);
+		`);
 		
 		
 		// Game.DropEgg
@@ -732,16 +764,18 @@ CCSE.launch = function(){
 		
 		// Game.PutUpgradeInPermanentSlot
 		if(!Game.customPutUpgradeInPermanentSlot) Game.customPutUpgradeInPermanentSlot = [];
-		CCSE.SpliceCodeIntoFunction('Game.PutUpgradeInPermanentSlot', -1, `
+		CCSE.SliceCodeIntoFunction('Game.PutUpgradeInPermanentSlot', -1, `
 			// Game.PutUpgradeInPermanentSlot injection point 0
-			for(var i in Game.customPutUpgradeInPermanentSlot) Game.customPutUpgradeInPermanentSlot[i](upgrade, slot);`);
+			for(var i in Game.customPutUpgradeInPermanentSlot) Game.customPutUpgradeInPermanentSlot[i](upgrade, slot);
+		`);
 		
 		
 		// Game.loseShimmeringVeil
 		if(!Game.customLoseShimmeringVeil) Game.customLoseShimmeringVeil = [];
-		CCSE.SpliceCodeIntoFunction('Game.loseShimmeringVeil', -1, `
+		CCSE.SliceCodeIntoFunction('Game.loseShimmeringVeil', -1, `
 			// Game.loseShimmeringVeil injection point 0
-			for(var i in Game.customLoseShimmeringVeil) Game.customLoseShimmeringVeil[i](context);`);
+			for(var i in Game.customLoseShimmeringVeil) Game.customLoseShimmeringVeil[i](context);
+		`);
 		
 		
 		// Game.listTinyOwnedUpgrades
@@ -792,9 +826,10 @@ CCSE.launch = function(){
 		
 		// Game.Win
 		if(!Game.customWin) Game.customWin = [];
-		CCSE.SpliceCodeIntoFunction('Game.Win', -1, `
+		CCSE.SliceCodeIntoFunction('Game.Win', -1, `
 			// Game.Win injection point 0
-			for(var i in Game.customWin) Game.customWin[i](what);`);
+			for(var i in Game.customWin) Game.customWin[i](what);
+		`);
 		
 		
 		// Game.TieredAchievement
@@ -825,9 +860,10 @@ CCSE.launch = function(){
 		// Game.updateBuffs
 		// executed every logic frame
 		if(!Game.customUpdateBuffs) Game.customUpdateBuffs = [];
-		CCSE.SpliceCodeIntoFunction('Game.updateBuffs', -1, `
+		CCSE.SliceCodeIntoFunction('Game.updateBuffs', -1, `
 			// Game.updateBuffs injection point 0
-			for(var i in Game.customUpdateBuffs) Game.customUpdateBuffs[i]();`);
+			for(var i in Game.customUpdateBuffs) Game.customUpdateBuffs[i]();
+		`);
 		
 		
 		for(var i in Game.buffTypes){
@@ -865,9 +901,10 @@ CCSE.launch = function(){
 		// Game.UpdateGrandmapocalypse
 		// executed every logic frame
 		if(!Game.customUpdateGrandmapocalypse) Game.customUpdateGrandmapocalypse = [];
-		CCSE.SpliceCodeIntoFunction('Game.UpdateGrandmapocalypse', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UpdateGrandmapocalypse', -1, `
 			// Game.UpdateGrandmapocalypse injection point 0
-			for(var i in Game.customUpdateGrandmapocalypse) Game.customUpdateGrandmapocalypse[i]();`);
+			for(var i in Game.customUpdateGrandmapocalypse) Game.customUpdateGrandmapocalypse[i]();
+		`);
 		
 		
 		// Game.getWrinklersMax
@@ -896,17 +933,18 @@ CCSE.launch = function(){
 		CCSE.ReplaceCodeIntoFunction('Game.UpdateWrinklers', 'Game.Earn(me.sucked);', `
 					// Game.UpdateWrinklers injection point 1
 					for(var i in Game.customWrinklerPop) Game.customWrinklerPop[i](me);`, -1);
-		CCSE.SpliceCodeIntoFunction('Game.UpdateWrinklers', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UpdateWrinklers', -1, `
 			// Game.UpdateWrinklers injection point 2
-			for(var i in Game.customUpdateWrinklers) Game.customUpdateWrinklers[i]();`, 
-			inRect.toString());
+			for(var i in Game.customUpdateWrinklers) Game.customUpdateWrinklers[i]();
+		`, inRect.toString());
 		
 		
 		// Game.DrawWrinklers
 		if(!Game.customDrawWrinklers) Game.customDrawWrinklers = [];
-		CCSE.SpliceCodeIntoFunction('Game.DrawWrinklers', -1, `
+		CCSE.SliceCodeIntoFunction('Game.DrawWrinklers', -1, `
 			// Game.DrawWrinklers injection point 0
-			for(var i in Game.customDrawWrinklers) Game.customDrawWrinklers[i]();`);
+			for(var i in Game.customDrawWrinklers) Game.customDrawWrinklers[i]();
+		`);
 		
 		
 		// Game.SaveWrinklers
@@ -915,17 +953,19 @@ CCSE.launch = function(){
 		CCSE.ReplaceCodeIntoFunction('Game.SaveWrinklers', 'return', `
 			// Game.SaveWrinklers injection point 0
 			var ret =`, 0);
-		CCSE.SpliceCodeIntoFunction('Game.SaveWrinklers', -1, `
+		CCSE.SliceCodeIntoFunction('Game.SaveWrinklers', -1, `
 			// Game.SaveWrinklers injection point 1
 			for(var i in Game.customSaveWrinklers) ret = Game.customSaveWrinklers[i](ret);
-			return ret;`);
+			return ret;
+		`);
 		
 		
 		// Game.LoadWrinklers
 		if(!Game.customLoadWrinklers) Game.customLoadWrinklers = [];
-		CCSE.SpliceCodeIntoFunction('Game.LoadWrinklers', -1, `
+		CCSE.SliceCodeIntoFunction('Game.LoadWrinklers', -1, `
 			// Game.LoadWrinklers injection point 0
-			for(var i in Game.customLoadWrinklers) Game.customLoadWrinklers[i](amount, number, shinies, amountShinies);`);
+			for(var i in Game.customLoadWrinklers) Game.customLoadWrinklers[i](amount, number, shinies, amountShinies);
+		`);
 		
 		
 		// -----     Special things and stuff block     ----- //
@@ -940,9 +980,10 @@ CCSE.launch = function(){
 		
 		// Game.UpgradeSanta
 		if(!Game.customUpgradeSanta) Game.customUpgradeSanta = [];
-		CCSE.SpliceCodeIntoFunction('Game.UpgradeSanta', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UpgradeSanta', -1, `
 			// Game.UpgradeSanta injection point 0
-			for(var i in Game.customUpgradeSanta) Game.customUpgradeSanta[i]();`);
+			for(var i in Game.customUpgradeSanta) Game.customUpgradeSanta[i]();
+		`);
 		
 		
 		// Game.hasAura
@@ -950,10 +991,11 @@ CCSE.launch = function(){
 		if(!Game.customHasAura) Game.customHasAura = [];
 		CCSE.SpliceCodeIntoFunction('Game.hasAura', 2, 'var ret;');
 		CCSE.ReplaceCodeIntoFunction('Game.hasAura', /return/g, 'ret =', 0);
-		CCSE.SpliceCodeIntoFunction('Game.hasAura', -1, `
+		CCSE.SliceCodeIntoFunction('Game.hasAura', -1, `
 			// Game.hasAura injection point 0
 			for(var i in Game.customHasAura) ret = Game.customHasAura[i](what, ret);
-			return ret;`);
+			return ret;
+		`);
 		
 		
 		// Game.SelectDragonAura
@@ -973,16 +1015,18 @@ CCSE.launch = function(){
 		
 		// Game.DescribeDragonAura
 		if(!Game.customDescribeDragonAura) Game.customDescribeDragonAura = [];
-		CCSE.SpliceCodeIntoFunction('Game.DescribeDragonAura', -1, `
+		CCSE.SliceCodeIntoFunction('Game.DescribeDragonAura', -1, `
 			// Game.DescribeDragonAura injection point 0
-			for(var i in Game.customDescribeDragonAura) Game.customDescribeDragonAura[i](aura);`);
+			for(var i in Game.customDescribeDragonAura) Game.customDescribeDragonAura[i](aura);
+		`);
 		
 		
 		// Game.UpgradeDragon
 		if(!Game.customUpgradeDragon) Game.customUpgradeDragon = [];
-		CCSE.SpliceCodeIntoFunction('Game.UpgradeDragon', -1, `
+		CCSE.SliceCodeIntoFunction('Game.UpgradeDragon', -1, `
 			// Game.UpgradeDragon injection point 0
-			for(var i in Game.customUpgradeDragon) Game.customUpgradeDragon[i]();`);
+			for(var i in Game.customUpgradeDragon) Game.customUpgradeDragon[i]();
+		`);
 		
 		
 		// Game.ToggleSpecialMenu
@@ -1005,9 +1049,10 @@ CCSE.launch = function(){
 				var picframe = {pic:pic, frame:frame};
 				for(var j in Game.customDrawSpecialPic) Game.customDrawSpecialPic[j](picframe, Game.specialTabs[i]);
 				pic = picframe.pic; frame = picframe.frame;`, -1);
-		CCSE.SpliceCodeIntoFunction('Game.DrawSpecial', -1, `
+		CCSE.SliceCodeIntoFunction('Game.DrawSpecial', -1, `
 			// Game.DrawSpecial injection point 1
-			for(var i in Game.customDrawSpecial) Game.customDrawSpecial[i]();`);
+			for(var i in Game.customDrawSpecial) Game.customDrawSpecial[i]();
+		`);
 		
 		
 		// -----     Visual Effects block     ----- //
@@ -1053,25 +1098,28 @@ CCSE.launch = function(){
 		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", 'me.dur=dur;', 
 					`// Game.shimmerTypes['` + escKey + `'].initFunc injection point 0
 					for(var i in Game.customShimmerTypes['` + escKey + `'].durationMult) dur *= Game.customShimmerTypes['` + escKey + `'].durationMult[i]();`, -1);
-		CCSE.SpliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", -1, `
+		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", -1, `
 					// Game.shimmerTypes['` + escKey + `'].initFunc injection point 1
-					for(var i in Game.customShimmerTypes['` + escKey + `'].initFunc) Game.customShimmerTypes['` + escKey + `'].initFunc[i]();`);
+					for(var i in Game.customShimmerTypes['` + escKey + `'].initFunc) Game.customShimmerTypes['` + escKey + `'].initFunc[i]();
+				`);
 		
 		
 		// Game.shimmerTypes[key].updateFunc
 		if(!Game.customShimmerTypes[key].updateFunc) Game.customShimmerTypes[key].updateFunc = [];
 		Game.customShimmerTypes[key].updateFunc.push(CCSE.customShimmerTypesAllupdateFunc);
-		CCSE.SpliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].updateFunc", -1, `
+		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].updateFunc", -1, `
 					// Game.shimmerTypes['` + escKey + `'].updateFunc injection point 0
-					for(var i in Game.customShimmerTypes['` + escKey + `'].updateFunc) Game.customShimmerTypes['` + escKey + `'].updateFunc[i]();`);
+					for(var i in Game.customShimmerTypes['` + escKey + `'].updateFunc) Game.customShimmerTypes['` + escKey + `'].updateFunc[i]();
+				`);
 		
 		
 		// Game.shimmerTypes[key].popFunc
 		if(!Game.customShimmerTypes[key].popFunc) Game.customShimmerTypes[key].popFunc = [];
 		Game.customShimmerTypes[key].popFunc.push(CCSE.customShimmerTypesAllpopFunc);
-		CCSE.SpliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].popFunc", -1, `
+		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].popFunc", -1, `
 					// Game.shimmerTypes['` + escKey + `'].popFunc injection point 0
-					for(var i in Game.customShimmerTypes['` + escKey + `'].popFunc) Game.customShimmerTypes['` + escKey + `'].popFunc[i]();`);
+					for(var i in Game.customShimmerTypes['` + escKey + `'].popFunc) Game.customShimmerTypes['` + escKey + `'].popFunc[i]();
+				`);
 		
 		
 		// Game.shimmerTypes[key].spawnConditions
@@ -1080,10 +1128,11 @@ CCSE.launch = function(){
 		Game.customShimmerTypes[key].spawnConditions.push(CCSE.customShimmerTypesAllspawnConditions);
 		CCSE.SpliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].spawnConditions", 2, 'var ret;');
 		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].spawnConditions", /return/g, 'ret =', 0);
-		CCSE.SpliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].spawnConditions", -1, `
+		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].spawnConditions", -1, `
 					// Game.shimmerTypes['` + escKey + `'].spawnConditions injection point 0
 					for(var i in Game.customShimmerTypes['` + escKey + `'].spawnConditions) ret = Game.customShimmerTypes['` + escKey + `'].spawnConditions[i](ret);
-					return ret;`);
+					return ret;
+				`);
 		
 		
 		// Game.shimmerTypes[key].getTimeMod
@@ -1260,9 +1309,10 @@ CCSE.launch = function(){
 		// this.switchMinigame
 		if(!Game.customBuildings[key].switchMinigame) Game.customBuildings[key].switchMinigame = [];
 		Game.customBuildings[key].switchMinigame.push(CCSE.customBuildingsAllswitchMinigame);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].switchMinigame", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].switchMinigame", -1, `
 				// Game.Objects['` + escKey + `'].switchMinigame injection point 0
-				for(var i in Game.customBuildings[this.name].switchMinigame) Game.customBuildings[this.name].switchMinigame[i](this, on);`);
+				for(var i in Game.customBuildings[this.name].switchMinigame) Game.customBuildings[this.name].switchMinigame[i](this, on);
+			`);
 		
 		
 		// this.getSellMultiplier
@@ -1277,49 +1327,55 @@ CCSE.launch = function(){
 		// this.buy
 		if(!Game.customBuildings[key].buy) Game.customBuildings[key].buy = [];
 		Game.customBuildings[key].buy.push(CCSE.customBuildingsAllbuy);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].buy", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].buy", -1, `
 				// Game.Objects['` + escKey + `'].buy injection point 0
-				for(var i in Game.customBuildings[this.name].buy) Game.customBuildings[this.name].buy[i](this, amount);`);
+				for(var i in Game.customBuildings[this.name].buy) Game.customBuildings[this.name].buy[i](this, amount);
+			`);
 		
 		
 		// this.sell
 		if(!Game.customBuildings[key].sell) Game.customBuildings[key].sell = [];
 		Game.customBuildings[key].sell.push(CCSE.customBuildingsAllsell);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].sell", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].sell", -1, `
 				// Game.Objects['` + escKey + `'].sell injection point 0
-				for(var i in Game.customBuildings[this.name].sell) Game.customBuildings[this.name].sell[i](this, amount, bypass);`);
+				for(var i in Game.customBuildings[this.name].sell) Game.customBuildings[this.name].sell[i](this, amount, bypass);
+			`);
 		
 		
 		// this.sacrifice
 		if(!Game.customBuildings[key].sacrifice) Game.customBuildings[key].sacrifice = [];
 		Game.customBuildings[key].sacrifice.push(CCSE.customBuildingsAllsacrifice);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].sacrifice", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].sacrifice", -1, `
 				// Game.Objects['` + escKey + `'].sacrifice injection point 0
-				for(var i in Game.customBuildings[this.name].sacrifice) Game.customBuildings[this.name].sacrifice[i](this, amount);`);
+				for(var i in Game.customBuildings[this.name].sacrifice) Game.customBuildings[this.name].sacrifice[i](this, amount);
+			`);
 		
 		
 		// this.buyFree
 		if(!Game.customBuildings[key].buyFree) Game.customBuildings[key].buyFree = [];
 		Game.customBuildings[key].buyFree.push(CCSE.customBuildingsAllbuyFree);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].buyFree", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].buyFree", -1, `
 				// Game.Objects['` + escKey + `'].buyFree injection point 0
-				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount);`);
+				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount);
+			`);
 		
 		
 		// this.getFree
 		if(!Game.customBuildings[key].getFree) Game.customBuildings[key].getFree = [];
 		Game.customBuildings[key].getFree.push(CCSE.customBuildingsAllgetFree);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].getFree", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].getFree", -1, `
 				// Game.Objects['` + escKey + `'].getFree injection point 0
-				for(var i in Game.customBuildings[this.name].getFree) Game.customBuildings[this.name].getFree[i](this, amount);`);
+				for(var i in Game.customBuildings[this.name].getFree) Game.customBuildings[this.name].getFree[i](this, amount);
+			`);
 		
 		
 		// this.getFreeRanks
 		if(!Game.customBuildings[key].getFreeRanks) Game.customBuildings[key].getFreeRanks = [];
 		Game.customBuildings[key].getFreeRanks.push(CCSE.customBuildingsAllgetFreeRanks);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].getFreeRanks", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].getFreeRanks", -1, `
 				// Game.Objects['` + escKey + `'].getFreeRanks injection point 0
-				for(var i in Game.customBuildings[this.name].getFreeRanks) Game.customBuildings[this.name].getFreeRanks[i](this, amount);`);
+				for(var i in Game.customBuildings[this.name].getFreeRanks) Game.customBuildings[this.name].getFreeRanks[i](this, amount);
+			`);
 		
 		
 		// this.tooltip
@@ -1327,10 +1383,11 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].tooltip) Game.customBuildings[key].tooltip = []; 
 		Game.customBuildings[key].tooltip.push(CCSE.customBuildingsAlltooltip);
 		CCSE.ReplaceCodeIntoFunction("Game.Objects['" + escKey + "'].tooltip", 'return', 'var ret =', 0);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].tooltip", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].tooltip", -1, `
 				// Game.Objects['` + escKey + `'].tooltip injection point 0
 				for(var i in Game.customBuildings[this.name].tooltip) ret = Game.customBuildings[this.name].tooltip[i](this, ret);
-				return ret;`);
+				return ret;
+			`);
 		
 		
 		// this.levelTooltip
@@ -1338,10 +1395,11 @@ CCSE.launch = function(){
 		if(!Game.customBuildings[key].levelTooltip) Game.customBuildings[key].levelTooltip = []; 
 		Game.customBuildings[key].levelTooltip.push(CCSE.customBuildingsAlllevelTooltip);
 		CCSE.ReplaceCodeIntoFunction("Game.Objects['" + escKey + "'].levelTooltip", 'return', 'var ret =', 0);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].levelTooltip", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].levelTooltip", -1, `
 				// Game.Objects['` + escKey + `'].levelTooltip injection point 0
 				for(var i in Game.customBuildings[this.name].levelTooltip) ret = Game.customBuildings[this.name].levelTooltip[i](this, ret);
-				return ret;`);
+				return ret;
+			`);
 		
 		
 		// this.levelUp
@@ -1352,25 +1410,28 @@ CCSE.launch = function(){
 		// this.refresh
 		if(!Game.customBuildings[key].refresh) Game.customBuildings[key].refresh = [];
 		Game.customBuildings[key].refresh.push(CCSE.customBuildingsAllrefresh);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].refresh", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].refresh", -1, `
 				// Game.Objects['` + escKey + `'].refresh injection point 0
-				for(var i in Game.customBuildings[this.name].refresh) Game.customBuildings[this.name].refresh[i](this);`);
+				for(var i in Game.customBuildings[this.name].refresh) Game.customBuildings[this.name].refresh[i](this);
+			`);
 		
 		
 		// this.rebuild
 		if(!Game.customBuildings[key].rebuild) Game.customBuildings[key].rebuild = [];
 		Game.customBuildings[key].rebuild.push(CCSE.customBuildingsAllrebuild);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].rebuild", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].rebuild", -1, `
 				// Game.Objects['` + escKey + `'].rebuild injection point 0
-				for(var i in Game.customBuildings[this.name].rebuild) Game.customBuildings[this.name].rebuild[i](this);`);
+				for(var i in Game.customBuildings[this.name].rebuild) Game.customBuildings[this.name].rebuild[i](this);
+			`);
 		
 		
 		// this.mute
 		if(!Game.customBuildings[key].mute) Game.customBuildings[key].mute = [];
 		Game.customBuildings[key].mute.push(CCSE.customBuildingsAllmute);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].mute", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].mute", -1, `
 				// Game.Objects['` + escKey + `'].mute injection point 0
-				for(var i in Game.customBuildings[this.name].mute) Game.customBuildings[this.name].mute[i](this, val);`);
+				for(var i in Game.customBuildings[this.name].mute) Game.customBuildings[this.name].mute[i](this, val);
+			`);
 		
 		
 		// this.draw
@@ -1383,9 +1444,10 @@ CCSE.launch = function(){
 			}
 		}
 		else{
-			CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].draw", -1, `
+			CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].draw", -1, `
 				// Game.Objects['` + escKey + `'].draw injection point 0
-				for(var i in Game.customBuildings[this.name].draw) Game.customBuildings[this.name].draw[i](this);`);
+				for(var i in Game.customBuildings[this.name].draw) Game.customBuildings[this.name].draw[i](this);
+			`);
 		}
 		
 		
@@ -1393,18 +1455,20 @@ CCSE.launch = function(){
 		// this.buyFunction
 		if(!Game.customBuildings[key].buyFunction) Game.customBuildings[key].buyFunction = [];
 		Game.customBuildings[key].buyFunction.push(CCSE.customBuildingsAllbuyFunction);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].buyFunction", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].buyFunction", -1, `
 				// Game.Objects['` + escKey + `'].buyFunction injection point 0
-				for(var i in Game.customBuildings[this.name].buyFunction) Game.customBuildings[this.name].buyFunction[i](this);`);
+				for(var i in Game.customBuildings[this.name].buyFunction) Game.customBuildings[this.name].buyFunction[i](this);
+			`);
 		
 		
 		// this.cps
 		// cpsMult Functions should return a value to multiply the price by (Return 1 to have no effect)
 		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
 		Game.customBuildings[key].cpsMult.push(CCSE.customBuildingsAllcpsMult);
-		CCSE.SpliceCodeIntoFunction("Game.Objects['" + escKey + "'].cps", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].cps", -1, `
 				// Game.Objects['` + escKey + `'].cps injection point 0
-				for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);`);
+				for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);
+			`);
 		
 		
 		for(var i in CCSE.customReplaceBuilding) CCSE.customReplaceBuilding[i](key, obj);
@@ -1527,9 +1591,10 @@ CCSE.launch = function(){
 		// this.click
 		if(!Game.customUpgrades[key].click) Game.customUpgrades[key].click = [];
 		Game.customUpgrades[key].click.push(CCSE.customUpgradesAllclick);
-		CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].click", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].click", -1, `
 				// Game.Upgrades['` + escKey + `'].click injection point 0
-				for(var i in Game.customUpgrades[this.name].click) Game.customUpgrades[this.name].click[i](this, e);`);
+				for(var i in Game.customUpgrades[this.name].click) Game.customUpgrades[this.name].click[i](this, e);
+			`);
 		
 		
 		// this.buy
@@ -1543,41 +1608,46 @@ CCSE.launch = function(){
 		// this.earn 
 		if(!Game.customUpgrades[key].earn) Game.customUpgrades[key].earn = [];
 		Game.customUpgrades[key].earn.push(CCSE.customUpgradesAllearn);
-		CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].earn", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].earn", -1, `
 				// Game.Upgrades['` + escKey + `'].earn injection point 0
-				for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this);`);
+				for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this);
+			`);
 		
 		
 		// this.unearn
 		if(!Game.customUpgrades[key].unearn) Game.customUpgrades[key].unearn = [];
 		Game.customUpgrades[key].unearn.push(CCSE.customUpgradesAllunearn);
-		CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].unearn", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].unearn", -1, `
 				// Game.Upgrades['` + escKey + `'].unearn injection point 0
-				for(var i in Game.customUpgrades[this.name].unearn) Game.customUpgrades[this.name].unearn[i](this);`);
+				for(var i in Game.customUpgrades[this.name].unearn) Game.customUpgrades[this.name].unearn[i](this);
+			`);
 		
 		
 		// this.unlock
 		if(!Game.customUpgrades[key].unlock) Game.customUpgrades[key].unlock = [];
 		Game.customUpgrades[key].unlock.push(CCSE.customUpgradesAllunlock);
-		CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].unlock", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].unlock", -1, `
 				// Game.Upgrades['` + escKey + `'].unlock injection point 0
-				for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);`);
+				for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
+				`);
 		
 		
 		// this.lose
 		if(!Game.customUpgrades[key].lose) Game.customUpgrades[key].lose = [];
 		Game.customUpgrades[key].lose.push(CCSE.customUpgradesAlllose);
-		CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].lose", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].lose", -1, `
 				// Game.Upgrades['` + escKey + `'].lose injection point 0
-				for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this);`);
+				for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this);
+				`);
 		
 		
 		// this.toggle
 		if(!Game.customUpgrades[key].toggle) Game.customUpgrades[key].toggle = [];
 		Game.customUpgrades[key].toggle.push(CCSE.customUpgradesAlltoggle);
-		CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].toggle", -1, `
+		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].toggle", -1, `
 				// Game.Upgrades['` + escKey + `'].toggle injection point 0
-				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);`);
+				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
+				`);
 		
 		
 		// this.buyFunction
@@ -1905,10 +1975,10 @@ CCSE.launch = function(){
 		
 		// M.computeMagicM
 		if(!Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM = [];
-		CCSE.SpliceCodeIntoFunction('M.computeMagicM', -1, `
+		CCSE.SliceCodeIntoFunction('M.computeMagicM', -1, `
 			// M.computeMagicM injection point 0
-			for(var i in Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM[i]();`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].computeMagicM) Game.customMinigame[objKey].computeMagicM[i]();
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.getFailChance
@@ -1956,11 +2026,11 @@ CCSE.launch = function(){
 		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
 		CCSE.ReplaceCodeIntoFunction('M.refillTooltip', 'return', 'var str = ', 0,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
-		CCSE.SpliceCodeIntoFunction('M.refillTooltip', -1, `
+		CCSE.SliceCodeIntoFunction('M.refillTooltip', -1, `
 			// M.refillTooltip injection point 0
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
-			return str;`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			return str;
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.spells['hand of fate'].win
@@ -1983,10 +2053,10 @@ CCSE.launch = function(){
 		
 		// M.launch
 		if(M.launch.toString().indexOf('// M.launch injection point 0') == -1){
-			CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+			CCSE.SliceCodeIntoFunction('M.launch', -1, `
 	// M.launch injection point 0
-	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);`,
-				"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);
+`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		}
 	}
 	
@@ -2022,42 +2092,42 @@ CCSE.launch = function(){
 		
 		// M.useSwap
 		if(!Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap = [];
-		CCSE.SpliceCodeIntoFunction('M.useSwap', -1, `
+		CCSE.SliceCodeIntoFunction('M.useSwap', -1, `
 			// M.useSwap injection point 0
-			for(var i in Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap[i](n);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].useSwap) Game.customMinigame[objKey].useSwap[i](n);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.slotGod
 		if(!Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod = [];
-		CCSE.SpliceCodeIntoFunction('M.slotGod', -1, `
+		CCSE.SliceCodeIntoFunction('M.slotGod', -1, `
 			// M.slotGod injection point 0
-			for(var i in Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod[i](god, slot);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].slotGod) Game.customMinigame[objKey].slotGod[i](god, slot);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.dragGod
 		if(!Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod = [];
-		CCSE.SpliceCodeIntoFunction('M.dragGod', -1, `
+		CCSE.SliceCodeIntoFunction('M.dragGod', -1, `
 			// M.dragGod injection point 0
-			for(var i in Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod[i](what);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].dragGod) Game.customMinigame[objKey].dragGod[i](what);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.dropGod
 		if(!Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod = [];
-		CCSE.SpliceCodeIntoFunction('M.dropGod', -1, `
+		CCSE.SliceCodeIntoFunction('M.dropGod', -1, `
 			// M.dropGod injection point 0
-			for(var i in Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod[i]();`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].dropGod) Game.customMinigame[objKey].dropGod[i]();
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.hoverSlot
 		if(!Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot = [];
-		CCSE.SpliceCodeIntoFunction('M.hoverSlot', -1, `
+		CCSE.SliceCodeIntoFunction('M.hoverSlot', -1, `
 			// M.hoverSlot injection point 0
-			for(var i in Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot[i](what);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].hoverSlot) Game.customMinigame[objKey].hoverSlot[i](what);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// Game.hasGod
@@ -2069,19 +2139,19 @@ CCSE.launch = function(){
 		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
 		CCSE.ReplaceCodeIntoFunction('M.refillTooltip', 'return', 'var str = ', 0,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
-		CCSE.SpliceCodeIntoFunction('M.refillTooltip', -1, `
+		CCSE.SliceCodeIntoFunction('M.refillTooltip', -1, `
 			// M.refillTooltip injection point 0
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
-			return str;`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			return str;
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.launch
 		if(M.launch.toString().indexOf('// M.launch injection point 0') == -1){
-			CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+			CCSE.SliceCodeIntoFunction('M.launch', -1, `
 	// M.launch injection point 0
-	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);`,
-				"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);
+`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		}
 	}
 	
@@ -2107,18 +2177,18 @@ CCSE.launch = function(){
 		
 		// M.dropUpgrade
 		if(!Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade = [];
-		CCSE.SpliceCodeIntoFunction('M.dropUpgrade', -1, 
+		CCSE.SliceCodeIntoFunction('M.dropUpgrade', -1, 
 			`// M.dropUpgrade injection point 0
-			for(var i in Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade[i](upgrade, rate);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade[i](upgrade, rate);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.computeMatures
 		if(!Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures = [];
-		CCSE.SpliceCodeIntoFunction('M.computeMatures', -1, 
+		CCSE.SliceCodeIntoFunction('M.computeMatures', -1, 
 			`// M.computeMatures injection point 0
-			for(var i in Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures[i](mult);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures[i](mult);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.getMuts
@@ -2133,10 +2203,10 @@ CCSE.launch = function(){
 		// M.computeBoostPlot
 		// You're going to have to use MAXIMUM EFFORT
 		if(!Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot = [];
-		CCSE.SpliceCodeIntoFunction('M.computeBoostPlot', -1, 
+		CCSE.SliceCodeIntoFunction('M.computeBoostPlot', -1, 
 			`// M.computeBoostPlot injection point 0
-			for(var i in Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot[i]();`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot[i]();
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.computeEffs
@@ -2159,11 +2229,11 @@ CCSE.launch = function(){
 		if(!Game.customMinigame[objKey].getPlantDesc) Game.customMinigame[objKey].getPlantDesc = [];
 		CCSE.ReplaceCodeIntoFunction('M.getPlantDesc', 'return', 'var ret = ', 0,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
-		CCSE.SpliceCodeIntoFunction('M.getPlantDesc', -1, 
+		CCSE.SliceCodeIntoFunction('M.getPlantDesc', -1, 
 				`// M.getPlantDesc injection point 0
 				for(var i in Game.customMinigame[objKey].getPlantDesc) ret = Game.customMinigame[objKey].getPlantDesc[i](me, ret);
-				return ret;`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+				return ret;
+			`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.soilTooltip
@@ -2213,35 +2283,35 @@ CCSE.launch = function(){
 		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
 		CCSE.ReplaceCodeIntoFunction('M.refillTooltip', 'return', 'var str = ', 0,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
-		CCSE.SpliceCodeIntoFunction('M.refillTooltip', -1, `
+		CCSE.SliceCodeIntoFunction('M.refillTooltip', -1, `
 			// M.refillTooltip injection point 0
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
-			return str;`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			return str;
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.buildPanel
 		if(!Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel = [];
-		CCSE.SpliceCodeIntoFunction('M.buildPanel', -1, 
+		CCSE.SliceCodeIntoFunction('M.buildPanel', -1, 
 			`// M.buildPanel injection point 0
-			for(var i in Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel[i]();`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel[i]();
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.buildPlot
 		if(!Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot = [];
-		CCSE.SpliceCodeIntoFunction('M.buildPlot', -1, 
+		CCSE.SliceCodeIntoFunction('M.buildPlot', -1, 
 			`// M.buildPlot injection point 0
-			for(var i in Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot[i]();`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot[i]();
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.clickTile
 		if(!Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile = [];
-		CCSE.SpliceCodeIntoFunction('M.clickTile', -1, 
+		CCSE.SliceCodeIntoFunction('M.clickTile', -1, 
 			`// M.clickTile injection point 0
-			for(var i in Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile[i](x, y);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile[i](x, y);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.useTool
@@ -2256,11 +2326,11 @@ CCSE.launch = function(){
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		CCSE.ReplaceCodeIntoFunction('M.getTile', 'return', 'else ret =', 0,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
-		CCSE.SpliceCodeIntoFunction('M.getTile', -1, 
+		CCSE.SliceCodeIntoFunction('M.getTile', -1, 
 			`// M.getTile injection point 0
 			for(var i in Game.customMinigame[objKey].getTile) ret = Game.customMinigame[objKey].getTile[i](x, y, ret);
-			return ret;`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			return ret;
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.getTile
@@ -2270,35 +2340,35 @@ CCSE.launch = function(){
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		CCSE.ReplaceCodeIntoFunction('M.isTileUnlocked', /return/g, 'ret =', 0,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
-		CCSE.SpliceCodeIntoFunction('M.isTileUnlocked', -1, 
+		CCSE.SliceCodeIntoFunction('M.isTileUnlocked', -1, 
 			`// M.isTileUnlocked injection point 0
 			for(var i in Game.customMinigame[objKey].isTileUnlocked) ret = Game.customMinigame[objKey].isTileUnlocked[i](x, y, ret);
-			return ret;`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			return ret;
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.computeStepT
 		if(!Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT = [];
-		CCSE.SpliceCodeIntoFunction('M.computeStepT', -1, 
+		CCSE.SliceCodeIntoFunction('M.computeStepT', -1, 
 			`// M.computeStepT injection point 0
-			for(var i in Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT[i]();`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT[i]();
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.convert
 		if(!Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert = [];
-		CCSE.SpliceCodeIntoFunction('M.convert', -1, 
+		CCSE.SliceCodeIntoFunction('M.convert', -1, 
 			`// M.convert injection point 0
-			for(var i in Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert[i]();`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert[i]();
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.harvestAll
 		if(!Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll = [];
-		CCSE.SpliceCodeIntoFunction('M.harvestAll', -1, 
+		CCSE.SliceCodeIntoFunction('M.harvestAll', -1, 
 			`// M.harvestAll injection point 0
-			for(var i in Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll[i](type, mature, mortal);`,
-			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+			for(var i in Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll[i](type, mature, mortal);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.harvest
@@ -2327,10 +2397,10 @@ CCSE.launch = function(){
 		
 		// M.launch
 		if(M.launch.toString().indexOf('// M.launch injection point 0') == -1){
-			CCSE.SpliceCodeIntoFunction('M.launch', -1, `
+			CCSE.SliceCodeIntoFunction('M.launch', -1, `
 	// M.launch injection point 0
-	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);`,
-				"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);
+`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		}
 	}
 	

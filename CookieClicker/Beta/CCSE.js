@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.014';
+CCSE.version = '2.015';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -61,9 +61,10 @@ CCSE.launch = function(){
 		
 		
 		CCSE.playlist.push(function(){
-			CCSE.ReplaceAchievements();
+			CCSE.ReplaceAchievementsStart();
 			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
 		});
+		CCSE.playlist.push(CCSE.ReplaceAchievements); // We'll call the next one from here
 		
 		
 		CCSE.playlist.push(CCSE.finalize);
@@ -1572,19 +1573,6 @@ CCSE.launch = function(){
 		CCSE.i = 0;
 	}
 	
-	CCSE.ReplaceUpgradesFinish = function(){
-		// Correct these descFuncs
-		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
-		for (var i=0;i<slots.length;i++)
-		{
-			Game.Upgrades[slots[i]].olddescFunc=function(i){return function(){
-				if (Game.permanentUpgrades[i]==-1) return Game.Upgrades[slots[i]].desc;
-				var upgrade=Game.UpgradesById[Game.permanentUpgrades[i]];
-				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
-			};}(i);
-		}
-	}
-	
 	CCSE.ReplaceUpgrades = function(){
 		var time = Date.now();
 		
@@ -1600,6 +1588,19 @@ CCSE.launch = function(){
 		}else{
 			// Continue on
 			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		}
+	}
+	
+	CCSE.ReplaceUpgradesFinish = function(){
+		// Correct these descFuncs
+		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
+		for (var i=0;i<slots.length;i++)
+		{
+			Game.Upgrades[slots[i]].olddescFunc=function(i){return function(){
+				if (Game.permanentUpgrades[i]==-1) return Game.Upgrades[slots[i]].desc;
+				var upgrade=Game.UpgradesById[Game.permanentUpgrades[i]];
+				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
+			};}(i);
 		}
 	}
 	
@@ -1726,21 +1727,35 @@ CCSE.launch = function(){
 	}
 	
 	if(!CCSE.customReplaceAchievement) CCSE.customReplaceAchievement = [];
-	CCSE.ReplaceAchievements = function(){
+	CCSE.ReplaceAchievementsStart = function(){
 		if(!Game.customAchievementsAll) Game.customAchievementsAll = {};
 		
 		if(!Game.customAchievementsAll.click) Game.customAchievementsAll.click = [];
 		CCSE.customAchievementsAllclick = function(me){
 			for(var i in Game.customAchievementsAll.click) Game.customAchievementsAll.click[i](me);
 		}
-	
-	
+		
 		if(!Game.customAchievements) Game.customAchievements = {};
 		CCSE.Backup.customAchievements = {};
-		for(var key in Game.Achievements){
-			CCSE.ReplaceAchievement(key);
+		CCSE.i = 0;
+	}
+	
+	CCSE.ReplaceAchievements = function(){
+		var time = Date.now();
+		
+		for(var i = CCSE.i; i < Game.AchievementsN; i++){
+			CCSE.ReplaceAchievement(Game.AchievementsById[i].name);
+			if(Date.now() > time + 500 / Game.fps) break;
 		}
 		
+		CCSE.i = i + 1;
+		if(CCSE.i < Game.AchievementsN){
+			// Didn't do all of them. Wait for priority and go again
+			requestAnimationFrame(CCSE.ReplaceAchievements);
+		}else{
+			// Continue on
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		}
 	}
 	
 	CCSE.ReplaceAchievement = function(key){

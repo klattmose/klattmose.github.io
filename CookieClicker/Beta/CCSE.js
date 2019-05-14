@@ -1393,7 +1393,7 @@ CCSE.launch = function(){
 		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].buyFree", -1, `
 				// Game.Objects['` + escKey + `'].buyFree injection point 0
 				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount);
-			`);
+			`, 'var price = Game.Objects["' + escKey + '"].basePrice');
 		
 		
 		// this.getFree

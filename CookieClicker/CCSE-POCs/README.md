@@ -217,6 +217,11 @@ Any bug or suggestion should be **opened as an issue** [in the repository](https
 
 ## Version History
 
+**05/14/2019 - parallel processing (2.015)**
+* Won't freeze the game while CCSE is loading
+* Also has a progress meter for feedback
+* Bug fixes
+
 **05/11/2019 - take two (2.003)**
 * You know that moment where you do something and then immediately realize a better way to do it?
 * Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly

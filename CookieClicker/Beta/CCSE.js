@@ -1,13 +1,13 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.013';
+CCSE.version = '2.014';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
 	
 	CCSE.init = function(){
-		CCSE.initNote();
+		CCSE.InitNote();
 		
 		// Define more parts of CCSE
 		CCSE.Backup = {};
@@ -209,7 +209,8 @@ CCSE.launch = function(){
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
 	}
 	
-	CCSE.initNote = function(){
+	CCSE.InitNote = function(){
+		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/customIcons.png';
 		CCSE.functionsTotal = 173 + 
 							Game.ObjectsN * 18 - 1 + 
 							Game.UpgradesN * 9 + 
@@ -217,7 +218,7 @@ CCSE.launch = function(){
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
 		
-		Game.Notify('CCSE is initializing (0%)', '', '', 6, 1);
+		Game.Notify('CCSE is initializing', '0%', [1, 3, CCSE.iconURL], 6, 1);
 		CCSE.Note = Game.NotesById[Game.noteId - 1];
 		CCSE.Note.life = 60000; // 10 minutes, just to be sure
 	}
@@ -227,7 +228,7 @@ CCSE.launch = function(){
 		var progress = Math.floor(CCSE.functionsAltered / CCSE.functionsTotal * 100);
 		if(progress != CCSE.progress){
 			CCSE.progress = progress;
-			CCSE.Note.title = 'CCSE is initializing (' + CCSE.progress + '%)';
+			CCSE.Note.desc = CCSE.progress + '%';
 			Game.UpdateNotes();
 		}
 	}

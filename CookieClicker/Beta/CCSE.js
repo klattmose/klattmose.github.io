@@ -113,11 +113,10 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">05/18/2019 - parallel processing</div>' + 
-			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' + // how optimistic
-			'<div class="listing">&bull; Also loads faster in general</div>' + 
-			'<div class="listing">&bull; With a progress meter for feedback</div>' + 
-			'<div class="listing">&bull; Fixed a bug that froze the game when wrinklers were on screen</div>' + 
+			'</div><div class="subsection update small"><div class="title">05/14/2019 - parallel processing</div>' + 
+			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' +
+			'<div class="listing">&bull; Also has a progress meter for feedback</div>' + 
+			'<div class="listing">&bull; Bug fixes</div>' + 
 			
 			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' + 
 			'<div class="listing">&bull; You know that moment where you do something and then immediately realize a better way to do it?</div>' +

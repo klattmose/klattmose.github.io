@@ -211,7 +211,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.InitNote = function(){
-		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/customIcons.png';
+		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		CCSE.functionsTotal = 173 + 
 							Game.ObjectsN * 18 - 1 + 
 							Game.UpgradesN * 9 + 

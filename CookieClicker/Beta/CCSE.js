@@ -218,17 +218,17 @@ CCSE.launch = function(){
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
 		
-		Game.Notify('CCSE is initializing', '0%', [1, 3, CCSE.iconURL], 6, 1);
+		Game.Notify('CCSE is initializing', '<div style="text-align: center;font-weight: bold;color: #ffffff;">0%</div>', [1, 3, CCSE.iconURL], 6, 1);
 		CCSE.Note = Game.NotesById[Game.noteId - 1];
-		CCSE.Note.life = 60000; // 10 minutes, just to be sure
+		CCSE.Note.life = 600000; // 10 minutes, just to be sure
 	}
 	
 	CCSE.UpdateNote = function(){
-		CCSE.Note.life = 60000;
+		CCSE.Note.life = 600000;
 		var progress = Math.floor(CCSE.functionsAltered / CCSE.functionsTotal * 100);
 		if(progress != CCSE.progress){
 			CCSE.progress = progress;
-			CCSE.Note.desc = CCSE.progress + '%';
+			CCSE.Note.desc = '<div style="text-align: center;font-weight: bold;color: #ffffff;">' + CCSE.progress + '%</div>';
 			Game.UpdateNotes();
 		}
 	}

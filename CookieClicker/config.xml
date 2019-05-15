@@ -14,5 +14,6 @@
 	</files>
 	<directories>
 		<directory>img</directory>
+		<directory>snd</directory>
 	</directories>
 </root>

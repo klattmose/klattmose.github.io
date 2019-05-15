@@ -1,13 +1,15 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '0.5';
+AmericanSeason.version = '0.7';
 AmericanSeason.GameVersion = '2.019';
 
 AmericanSeason.launch = function(){
 	AmericanSeason.init = function(){
 		AmericanSeason.iconsURL = 'https://klattmose.github.io/CookieClicker/img/customIcons.png';
-		AmericanSeason.config = {};
+		AmericanSeason.config = AmericanSeason.defaultConfig();
+		AmericanSeason.loadConfig();
+		
 		
 		AmericanSeason.createSeason();
 		AmericanSeason.createUpgrades();
@@ -16,22 +18,116 @@ AmericanSeason.launch = function(){
 		AmericanSeason.initFireworks();
 		
 		
-		Game.customDraw.push(AmericanSeason.draw);
-		Game.customLogic.push(function(){
-			AmericanSeason.launchManualFirework();
-			AmericanSeason.cleanCanvas();
-		});
+		Game.customLogic.push(AmericanSeason.Logic);
+		CCSE.customLoad.push(AmericanSeason.loadConfig);
+		CCSE.customSave.push(AmericanSeason.saveConfig);
 		
 		Game.customStatsMenu.push(function(){
 			CCSE.AppendStatsVersionNumber(AmericanSeason.name, AmericanSeason.version);
 		});
-		
+		Game.customOptionsMenu.push(function(){
+			CCSE.AppendCollapsibleOptionsMenu(AmericanSeason.name, AmericanSeason.getMenuString());
+		});
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		if (Game.prefs.popups) Game.Popup('American Season loaded!');
 		else Game.Notify('American Season loaded!', '', '', 1, 1);
 		AmericanSeason.isLoaded = 1;
 		for(var i in AmericanSeason.postloadHooks) AmericanSeason.postloadHooks[i]();
+	}
+	
+	
+	//***********************************
+	//    Menu/config
+	//***********************************
+	AmericanSeason.getMenuString = function(){
+		function header(text){
+			return '<div class="listing" style="padding:5px 16px;opacity:0.7;font-size:17px;font-family:\\"Kavoon\\", Georgia, serif;">' + text + '</div>';
+		}
+		
+		function inputBoxListing(prefName, prefDisplayName, desc){
+			var listing = '<div class="listing">';
+			listing += '<input id="AS_' + prefName + '" class="option" style="width:65px;" value="' + AmericanSeason.config[prefName] + '" onChange="AmericanSeason.UpdatePref(\'' + prefName + '\', this.value)"></input>'
+			listing += '<label>' + prefDisplayName + (desc ? ' : ' + desc : '') + '</label>';
+			listing += '</div>';
+			return listing;
+		}
+		
+		var str = '<div class="listing"><a class="option" ' + Game.clickStr + '="AmericanSeason.config = AmericanSeason.defaultConfig(); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>';
+		
+		str += header('Projectiles');
+		str += inputBoxListing('FIREWORK_ACCELERATION', 'Base firework acceleration', '1.0 causes fireworks to travel at a constant speed. Higher number increases rate firework accelerates over time');
+		str += inputBoxListing('FIREWORK_BRIGHTNESS_MIN', 'Minimum firework brightness');
+		str += inputBoxListing('FIREWORK_BRIGHTNESS_MAX', 'Maximum firework brightness');
+		str += inputBoxListing('FIREWORK_SPEED', 'Base speed of fireworks');
+		str += inputBoxListing('FIREWORK_TRAIL_LENGTH', 'Base length of firework trails');
+		
+		str += header('Stars');
+		str += '<div class="listing"><label>The pretty lights that explode out of a firework are called stars</label></div>';
+		str += inputBoxListing('STAR_BRIGHTNESS_MIN', 'Minimum star brightness');
+		str += inputBoxListing('STAR_BRIGHTNESS_MAX', 'Maximum star brightness');
+		str += inputBoxListing('STAR_COUNT', 'Base star count per firework');
+		str += inputBoxListing('STAR_DECAY_MIN', 'Minimum star decay rate');
+		str += inputBoxListing('STAR_DECAY_MAX', 'Maximum star decay rate');
+		str += inputBoxListing('STAR_FRICTION', 'Base star friction', 'Slows the speed of particles over time');
+		str += inputBoxListing('STAR_GRAVITY', 'Base star gravity', 'How quickly particles move toward a downward trajectory');
+		str += inputBoxListing('STAR_HUE_VARIANCE', 'Variance in star coloration');
+		str += inputBoxListing('STAR_TRANSPARENCY', 'Base star transparency');
+		str += inputBoxListing('STAR_SPEED_MIN', 'Minimum star speed');
+		str += inputBoxListing('STAR_SPEED_MAX', 'Maximum star speed');
+		str += inputBoxListing('STAR_TRAIL_LENGTH', 'Base length of explosion star trails');
+		
+		str += header('Other');
+		str += inputBoxListing('CANVAS_CLEANUP_ALPHA', 'Alpha level that canvas cleanup iteration removes existing trails', 'Lower value increases trail duration');
+		str += inputBoxListing('HUE_STEP_INCREASE', 'Hue change per loop', 'Used to rotate through different firework colors');
+		str += inputBoxListing('TICKS_PER_FIREWORK_MIN', 'Minimum number of ticks per manual firework launch');
+		
+		return str;
+	}
+	
+	AmericanSeason.defaultConfig = function(){
+		return {
+			FIREWORK_ACCELERATION 	: 1.1,		// Base firework acceleration. // 1.0 causes fireworks to travel at a constant speed. // Higher number increases rate firework accelerates over time.
+			FIREWORK_BRIGHTNESS_MIN : 50,		// Minimum firework brightness.
+			FIREWORK_BRIGHTNESS_MAX : 70,		// Maximum firework brightness.
+			FIREWORK_SPEED 			: 10,		// Base speed of fireworks.
+			FIREWORK_TRAIL_LENGTH 	: 3,		// Base length of firework trails.
+			
+			STAR_BRIGHTNESS_MIN 	: 50,		// Minimum star brightness.
+			STAR_BRIGHTNESS_MAX 	: 80,		// Maximum star brightness.
+			STAR_COUNT 				: 100,		// Base star count per firework.
+			STAR_DECAY_MIN 			: 0.015,	// Minimum star decay rate.
+			STAR_DECAY_MAX 			: 0.03,		// Maximum star decay rate.
+			STAR_FRICTION 			: 0.9,		// Base star friction. // Slows the speed of particles over time.
+			STAR_GRAVITY 			: 1.4,		// Base star gravity. // How quickly particles move toward a downward trajectory.
+			STAR_HUE_VARIANCE 		: 20,		// Variance in star coloration.
+			STAR_TRANSPARENCY 		: 1,		// Base star transparency.
+			STAR_SPEED_MIN 			: 2,		// Minimum star speed.
+			STAR_SPEED_MAX 			: 20,		// Maximum star speed.
+			STAR_TRAIL_LENGTH 		: 5,		// Base length of explosion star trails.
+			
+			CANVAS_CLEANUP_ALPHA 	: 0.15,		// Alpha level that canvas cleanup iteration removes existing trails. // Lower value increases trail duration.
+			HUE_STEP_INCREASE 		: 1,		// Hue change per loop, used to rotate through different firework colors.
+			
+			TICKS_PER_FIREWORK_MIN 	: 5,		// Minimum number of ticks per manual firework launch.
+		}
+	}
+	
+	AmericanSeason.saveConfig = function(){
+		CCSE.save.OtherMods.AmericanSeason = AmericanSeason.config;
+	}
+	
+	AmericanSeason.loadConfig = function(){
+		var config = CCSE.save.OtherMods.AmericanSeason;
+		for(var pref in config){
+			AmericanSeason.config[pref] = config[pref];
+		}
+	}
+	
+	AmericanSeason.UpdatePref = function(prefName, value){
+		var val = parseFloat(value);
+		if(!isNaN(val)) AmericanSeason.config[prefName] = val;
+		Game.UpdateMenu();
 	}
 	
 	
@@ -314,37 +410,8 @@ AmericanSeason.launch = function(){
 	//    Fireworks on the left
 	//***********************************
 	AmericanSeason.initFireworks = function(){
-		AmericanSeason.config.FIREWORK_ACCELERATION = 1.1; // Base firework acceleration. // 1.0 causes fireworks to travel at a constant speed. // Higher number increases rate firework accelerates over time.
-		AmericanSeason.config.FIREWORK_BRIGHTNESS_MIN = 50; // Minimum firework brightness.
-		AmericanSeason.config.FIREWORK_BRIGHTNESS_MAX = 70; // Maximum firework brightness.
-		AmericanSeason.config.FIREWORK_SPEED = 10; // Base speed of fireworks.
-		AmericanSeason.config.FIREWORK_TRAIL_LENGTH = 3; // Base length of firework trails.
-		
-		AmericanSeason.config.PARTICLE_BRIGHTNESS_MIN = 50; // Minimum particle brightness.
-		AmericanSeason.config.PARTICLE_BRIGHTNESS_MAX = 80; // Maximum particle brightness.
-		AmericanSeason.config.PARTICLE_COUNT = 100; // Base particle count per firework.
-		AmericanSeason.config.PARTICLE_DECAY_MIN = 0.015; // Minimum particle decay rate.
-		AmericanSeason.config.PARTICLE_DECAY_MAX = 0.03; // Maximum particle decay rate.
-		AmericanSeason.config.PARTICLE_FRICTION = 0.9; // Base particle friction. // Slows the speed of particles over time.
-		AmericanSeason.config.PARTICLE_GRAVITY = 1.4; // Base particle gravity. // How quickly particles move toward a downward trajectory.
-		AmericanSeason.config.PARTICLE_HUE_VARIANCE = 20; // Variance in particle coloration.
-		AmericanSeason.config.PARTICLE_TRANSPARENCY = 1; // Base particle transparency.
-		AmericanSeason.config.PARTICLE_SPEED_MIN = 2; // Minimum particle speed.
-		AmericanSeason.config.PARTICLE_SPEED_MAX = 20; // Maximum particle speed.
-		AmericanSeason.config.PARTICLE_TRAIL_LENGTH = 5; // Base length of explosion particle trails.
-		
-		AmericanSeason.config.CANVAS_CLEANUP_ALPHA = 0.15; // Alpha level that canvas cleanup iteration removes existing trails. // Lower value increases trail duration.
-		AmericanSeason.config.HUE_STEP_INCREASE = 1; // Hue change per loop, used to rotate through different firework colors.
-		
-		AmericanSeason.config.TICKS_PER_FIREWORK_MIN = 5; // Minimum number of ticks per manual firework launch.
-		AmericanSeason.config.TICKS_PER_FIREWORK_AUTOMATED_MIN = 20; // Minimum number of ticks between each automatic firework launch.
-		AmericanSeason.config.TICKS_PER_FIREWORK_AUTOMATED_MAX = 80; // Maximum number of ticks between each automatic firework launch.
-		
-		
-		//AmericanSeason.canvas = Game.LeftBackground.canvas;
-		//AmericanSeason.context = Game.LeftBackground;
 		AmericanSeason.fireworks = [];
-		AmericanSeason.particles = [];
+		AmericanSeason.stars = [];
 		AmericanSeason.hue = 120;
 		AmericanSeason.ticksSinceFirework = 0;
 	}
@@ -375,7 +442,7 @@ AmericanSeason.launch = function(){
 		
 		
 		this.update = function(index){
-			this.trail.pop(); // Remove the oldest trail particle.
+			this.trail.pop(); // Remove the oldest trail star.
 			this.trail.unshift([this.x, this.y]); // Add the current position to the start of trail.
 			
 			this.speed *= this.acceleration; // Increase speed based on acceleration rate.
@@ -408,27 +475,27 @@ AmericanSeason.launch = function(){
 		}
 	}
 	
-	AmericanSeason.Particle = function(x, y){
+	AmericanSeason.Star = function(x, y){
 		this.x = x;
 		this.y = y;
 		this.angle = AmericanSeason.randBetween(0, Math.PI * 2);
-		this.friction = AmericanSeason.config.PARTICLE_FRICTION;
-		this.gravity = AmericanSeason.config.PARTICLE_GRAVITY;
+		this.friction = AmericanSeason.config.STAR_FRICTION;
+		this.gravity = AmericanSeason.config.STAR_GRAVITY;
 		
 		// Set the hue to somewhat randomized number.
 		// This gives the particles within a firework explosion an appealing variance.
-		this.hue 		= AmericanSeason.randBetween(AmericanSeason.hue - AmericanSeason.config.PARTICLE_HUE_VARIANCE, AmericanSeason.hue + AmericanSeason.config.PARTICLE_HUE_VARIANCE);
-		this.brightness = AmericanSeason.randBetween(AmericanSeason.config.PARTICLE_BRIGHTNESS_MIN, AmericanSeason.config.PARTICLE_BRIGHTNESS_MAX);
-		this.decay 		= AmericanSeason.randBetween(AmericanSeason.config.PARTICLE_DECAY_MIN, AmericanSeason.config.PARTICLE_DECAY_MAX); 
-		this.speed 		= AmericanSeason.randBetween(AmericanSeason.config.PARTICLE_SPEED_MIN, AmericanSeason.config.PARTICLE_SPEED_MAX);
+		this.hue 		= AmericanSeason.randBetween(AmericanSeason.hue - AmericanSeason.config.STAR_HUE_VARIANCE, AmericanSeason.hue + AmericanSeason.config.STAR_HUE_VARIANCE);
+		this.brightness = AmericanSeason.randBetween(AmericanSeason.config.STAR_BRIGHTNESS_MIN, AmericanSeason.config.STAR_BRIGHTNESS_MAX);
+		this.decay 		= AmericanSeason.randBetween(AmericanSeason.config.STAR_DECAY_MIN, AmericanSeason.config.STAR_DECAY_MAX); 
+		this.speed 		= AmericanSeason.randBetween(AmericanSeason.config.STAR_SPEED_MIN, AmericanSeason.config.STAR_SPEED_MAX);
 		
 		this.trail = [];
-		this.trailLength = AmericanSeason.config.PARTICLE_TRAIL_LENGTH;
+		this.trailLength = AmericanSeason.config.STAR_TRAIL_LENGTH;
 		// While the trail length remains, add current point to trail list.
 		while(this.trailLength--) {
 			this.trail.push([this.x, this.y]);
 		}
-		this.transparency = AmericanSeason.config.PARTICLE_TRANSPARENCY;
+		this.transparency = AmericanSeason.config.STAR_TRANSPARENCY;
 		
 		
 		this.update = function(index) {
@@ -441,7 +508,7 @@ AmericanSeason.launch = function(){
 			
 			this.transparency -= this.decay;
 			if(this.transparency <= this.decay) {
-				AmericanSeason.particles.splice(index, 1);
+				AmericanSeason.stars.splice(index, 1);
 			}
 		}
 		
@@ -482,12 +549,23 @@ AmericanSeason.launch = function(){
 			AmericanSeason.fireworks[i].update(i);
 		}
 		
-		for (var i = AmericanSeason.particles.length - 1; i >= 0; --i) {
-			AmericanSeason.particles[i].draw();
-			AmericanSeason.particles[i].update(i);
+		for (var i = AmericanSeason.stars.length - 1; i >= 0; --i) {
+			AmericanSeason.stars[i].draw();
+			AmericanSeason.stars[i].update(i);
 		}
 		
 		AmericanSeason.hue += AmericanSeason.config.HUE_STEP_INCREASE;
+	}
+	
+	AmericanSeason.Logic = function(){
+		if(Game.season == 'american'){
+			AmericanSeason.launchManualFirework();
+			AmericanSeason.cleanCanvas();
+			AmericanSeason.draw();
+		}else{
+			AmericanSeason.context.clearRect(0, 0, AmericanSeason.canvas.width, AmericanSeason.canvas.height);
+		}
+		
 	}
 	
 	
@@ -507,8 +585,8 @@ AmericanSeason.launch = function(){
 	}
 	
 	AmericanSeason.createParticles = function(x, y) {
-		for(var i = 0; i < AmericanSeason.config.PARTICLE_COUNT; i++){
-			AmericanSeason.particles.push(new AmericanSeason.Particle(x, y));
+		for(var i = 0; i < AmericanSeason.config.STAR_COUNT; i++){
+			AmericanSeason.stars.push(new AmericanSeason.Star(x, y));
 		}
 	}
 	

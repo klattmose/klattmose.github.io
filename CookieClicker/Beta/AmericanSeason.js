@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '0.8';
+AmericanSeason.version = '0.10';
 AmericanSeason.GameVersion = '2.019';
 
 AmericanSeason.launch = function(){
@@ -240,7 +240,7 @@ AmericanSeason.launch = function(){
 			reset: function(){
 			},
 			initFunc: function(me){
-				if(!this.spawned && Game.chimeType == 1 && Game.ascensionMode != 1) PlaySound('snd/jingle.mp3');
+				if(!this.spawned && Game.chimeType == 1 && Game.ascensionMode != 1) PlaySound('snd/rocketLaunch.mp3');
 				
 				me.x = Math.floor(Math.random() * Math.max(0, Game.bounds.right - Game.bounds.left - 256) + Game.bounds.left + 128) - 128;
 				me.y = Game.bounds.bottom;
@@ -305,7 +305,7 @@ AmericanSeason.launch = function(){
 				
 				//sparkle and kill the shimmer
 				Game.SparkleAt(Game.mouseX, Game.mouseY);
-				PlaySound('snd/jingleClick.mp3');
+				PlaySound('snd/rocketBoom.mp3');
 				me.die();
 			},
 			missFunc: function(me){
@@ -353,6 +353,10 @@ AmericanSeason.launch = function(){
 			me.minTime = me.getMinTime(me);
 			me.maxTime = me.getMaxTime(me);
 		}
+		
+		// Preload sound effects
+		Sounds['snd/rocketLaunch.mp3'] = new Audio('https://klattmose.github.io/CookieClicker/snd/rocketLaunch.mp3');
+		Sounds['snd/rocketBoom.mp3'] = new Audio('https://klattmose.github.io/CookieClicker/snd/rocketBoom.mp3');
 	}
 	
 	AmericanSeason.createCanvas = function(){

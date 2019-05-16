@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '0.10';
+AmericanSeason.version = '0.12';
 AmericanSeason.GameVersion = '2.019';
 
 AmericanSeason.launch = function(){
@@ -23,6 +23,7 @@ AmericanSeason.launch = function(){
 		Game.customReset.push(AmericanSeason.Reset);
 		CCSE.customLoad.push(AmericanSeason.loadConfig);
 		CCSE.customSave.push(AmericanSeason.saveConfig);
+		Game.customCpsMult.push(AmericanSeason.GetCpsMultiplier);
 		
 		Game.customStatsMenu.push(function(){
 			CCSE.AppendStatsVersionNumber(AmericanSeason.name, AmericanSeason.version);
@@ -31,6 +32,7 @@ AmericanSeason.launch = function(){
 		Game.customOptionsMenu.push(function(){
 			CCSE.AppendCollapsibleOptionsMenu(AmericanSeason.name, AmericanSeason.getMenuString());
 		});
+		
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		if (Game.prefs.popups) Game.Popup('American Season loaded!');
@@ -85,36 +87,38 @@ AmericanSeason.launch = function(){
 		str += inputBoxListing('HUE_STEP_INCREASE', 'Hue change per loop', 'Used to rotate through different firework colors');
 		str += inputBoxListing('STROKE_WIDTH', 'Line width for canvas strokes');
 		str += inputBoxListing('TICKS_PER_FIREWORK_MIN', 'Minimum number of ticks per manual firework launch');
+		str += inputBoxListing('GLOBAL_COMPOSITE_OPERATION', 'Override for globalCompositeOperation', 'See <a href="https://www.w3schools.com/tags/canvas_globalcompositeoperation.asp" target="_blank">here</a>.');
 		
 		return str;
 	}
 	
 	AmericanSeason.defaultConfig = function(){
 		return {
-			FIREWORK_ACCELERATION 	: 1.1,		// Base firework acceleration. // 1.0 causes fireworks to travel at a constant speed. // Higher number increases rate firework accelerates over time.
-			FIREWORK_BRIGHTNESS_MIN : 50,		// Minimum firework brightness.
-			FIREWORK_BRIGHTNESS_MAX : 70,		// Maximum firework brightness.
-			FIREWORK_SPEED 			: 10,		// Base speed of fireworks.
-			FIREWORK_TRAIL_LENGTH 	: 3,		// Base length of firework trails.
+			FIREWORK_ACCELERATION 		: 1.1,		// Base firework acceleration. // 1.0 causes fireworks to travel at a constant speed. // Higher number increases rate firework accelerates over time.
+			FIREWORK_BRIGHTNESS_MIN		: 50,		// Minimum firework brightness.
+			FIREWORK_BRIGHTNESS_MAX		: 70,		// Maximum firework brightness.
+			FIREWORK_SPEED 				: 10,		// Base speed of fireworks.
+			FIREWORK_TRAIL_LENGTH	 	: 3,		// Base length of firework trails.
 			
-			STAR_BRIGHTNESS_MIN 	: 50,		// Minimum star brightness.
-			STAR_BRIGHTNESS_MAX 	: 80,		// Maximum star brightness.
-			STAR_COUNT 				: 100,		// Base star count per firework.
-			STAR_DECAY_MIN 			: 0.015,	// Minimum star decay rate.
-			STAR_DECAY_MAX 			: 0.03,		// Maximum star decay rate.
-			STAR_FRICTION 			: 0.9,		// Base star friction. // Slows the speed of particles over time.
-			STAR_GRAVITY 			: 1.4,		// Base star gravity. // How quickly particles move toward a downward trajectory.
-			STAR_HUE_VARIANCE 		: 20,		// Variance in star coloration.
-			STAR_TRANSPARENCY 		: 1,		// Base star transparency.
-			STAR_SPEED_MIN 			: 2,		// Minimum star speed.
-			STAR_SPEED_MAX 			: 20,		// Maximum star speed.
-			STAR_TRAIL_LENGTH 		: 5,		// Base length of explosion star trails.
+			STAR_BRIGHTNESS_MIN 		: 50,		// Minimum star brightness.
+			STAR_BRIGHTNESS_MAX	 		: 80,		// Maximum star brightness.
+			STAR_COUNT 					: 100,		// Base star count per firework.
+			STAR_DECAY_MIN 				: 0.015,	// Minimum star decay rate.
+			STAR_DECAY_MAX 				: 0.03,		// Maximum star decay rate.
+			STAR_FRICTION	 			: 0.9,		// Base star friction. // Slows the speed of particles over time.
+			STAR_GRAVITY 				: 1.4,		// Base star gravity. // How quickly particles move toward a downward trajectory.
+			STAR_HUE_VARIANCE 			: 20,		// Variance in star coloration.
+			STAR_TRANSPARENCY	 		: 1,		// Base star transparency.
+			STAR_SPEED_MIN 				: 2,		// Minimum star speed.
+			STAR_SPEED_MAX 				: 20,		// Maximum star speed.
+			STAR_TRAIL_LENGTH	 		: 5,		// Base length of explosion star trails.
 			
-			CANVAS_CLEANUP_ALPHA 	: 0.2,		// Alpha level that canvas cleanup iteration removes existing trails. // Lower value increases trail duration.
-			HUE_STEP_INCREASE 		: 1,		// Hue change per loop, used to rotate through different firework colors.
+			CANVAS_CLEANUP_ALPHA 		: 0.2,		// Alpha level that canvas cleanup iteration removes existing trails. // Lower value increases trail duration.
+			HUE_STEP_INCREASE 			: 1,		// Hue change per loop, used to rotate through different firework colors.
 			
-			TICKS_PER_FIREWORK_MIN 	: 5,		// Minimum number of ticks per manual firework launch.
-			STROKE_WIDTH 			: 1,		// Line width for canvas strokes.
+			TICKS_PER_FIREWORK_MIN 		: 5,		// Minimum number of ticks per manual firework launch.
+			STROKE_WIDTH 				: 1,		// Line width for canvas strokes.
+			GLOBAL_COMPOSITE_OPERATION	: 'default',// Override for globalCompositeOperation
 		}
 	}
 	
@@ -141,6 +145,7 @@ AmericanSeason.launch = function(){
 	AmericanSeason.UpdatePref = function(prefName, value){
 		var val = parseFloat(value);
 		if(!isNaN(val)) AmericanSeason.config[prefName] = val;
+		if(prefName == 'GLOBAL_COMPOSITE_OPERATION') AmericanSeason.config[prefName] = value;
 		Game.UpdateMenu();
 	}
 	
@@ -193,7 +198,7 @@ AmericanSeason.launch = function(){
 		var upPrice2 = 99999999999999;
 		
 		last = CCSE.NewUpgrade('Ring burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>O say can you see, by the dawn\'s early light</q>', upPrice, [1, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
-		last = CCSE.NewUpgrade('Dahlia burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>What so proudly we hailed at the twilight\'s last gleaming</q>', upPrice, [2, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
+		last = CCSE.NewUpgrade('Peony burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>What so proudly we hailed at the twilight\'s last gleaming</q>', upPrice, [2, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
 		last = CCSE.NewUpgrade('Palm burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>Whose broad stripes and bright stars through the perilous fight</q>', upPrice, [3, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
 		last = CCSE.NewUpgrade('Bees burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>O\'er the ramparts we watched, were so gallantly streaming?</q>', upPrice, [4, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
 		last = CCSE.NewUpgrade('Crossette burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>And the rockets\' red glare, the bombs bursting in air</q>', upPrice, [5, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
@@ -225,12 +230,27 @@ AmericanSeason.launch = function(){
 				return Math.pow(3, AmericanSeason.GetHowManyFireworkDrops()) * 999;
 			}
 		}
-	}
-	
-	AmericanSeason.GetHowManyFireworkDrops = function(){
-		var num = 0;
-		for(var i in AmericanSeason.upgrades) if(Game.Has(AmericanSeason.upgrades[i])) num++;
-		return num;
+		
+		// Other upgrades
+		last = CCSE.NewUpgrade('Grand finale', 'Rockets spawn much more frequently.<q>Fireworks and flamethrowers: a match made in hell.</q>', 7, [0, 4, AmericanSeason.iconsURL], function(){
+			// Simulate Game.killShimmers
+			if(this.reset) this.reset();
+			this.n = 0;
+			if(this.spawnsOnTimer){
+				this.time = 0;
+				this.spawned = 0;
+				this.minTime = this.getMinTime(this);
+				this.maxTime = this.getMaxTime(this);
+			}
+		}); last.order = Game.Upgrades['Reindeer season'].order + 0.0001;
+			last.pool = 'debug';
+		last = CCSE.NewHeavenlyUpgrade('Starburst', 'Firework upgrades drop <b>5%</b> more often.<br>Rockets appear <b>5%</b> more often.', 111111, [0, 4, AmericanSeason.iconsURL], -630, 111, ['Season switcher']);
+			Game.Upgrades["Keepsakes"].parents.push(last);
+			Game.Upgrades["Starsnow"].posX = -630; Game.Upgrades["Starsnow"].posY = -344;
+			Game.Upgrades["Starlove"].posX = -685; Game.Upgrades["Starlove"].posY = -255;
+			Game.Upgrades["Starterror"].posX = -720; Game.Upgrades["Starterror"].posY = -166;
+			Game.Upgrades["Startrade"].posX = -720; Game.Upgrades["Startrade"].posY = -77;
+			Game.Upgrades["Starspawn"].posX = -685; Game.Upgrades["Starspawn"].posY = 22;
 	}
 	
 	AmericanSeason.createShimmer = function(){
@@ -318,16 +338,16 @@ AmericanSeason.launch = function(){
 			time: 0,
 			minTime: 0,
 			maxTime: 0,
-			getTimeMod: function(me,m){
+			getTimeMod: function(me, m){
 				if(Game.Has('Short fuse')) m /= 2;
-				// if(Game.Has('Starburst')) m *= 0.95;
+				if(Game.Has('Starburst')) m *= 0.95;
 				if(Game.hasGod){
 					var godLvl = Game.hasGod('seasons');
 					if(godLvl == 1) m *= 0.9;
 					else if(godLvl == 2) m *= 0.95;
 					else if(godLvl == 3) m *= 0.97;
 				}
-				// if (Game.Has('Reindeer season')) m = 0.01;
+				if (Game.Has('Grand finale')) m = 0.01;
 				return Math.ceil(Game.fps * 60 * m);
 			},
 			getMinTime: function(me){
@@ -398,6 +418,7 @@ AmericanSeason.launch = function(){
 		this.startY = startY;
 		this.endX = endX;
 		this.endY = endY;
+		this.globalCompositeOperation = (AmericanSeason.config.GLOBAL_COMPOSITE_OPERATION == 'default' ? 'lighter' : AmericanSeason.config.GLOBAL_COMPOSITE_OPERATION);
 		
 		this.distanceToEnd = AmericanSeason.calculateDistance(startX, startY, endX, endY);
 		this.distanceTraveled = 0;
@@ -443,6 +464,7 @@ AmericanSeason.launch = function(){
 			var trailEndX = this.trail[this.trail.length - 1][0]; 
 			var trailEndY = this.trail[this.trail.length - 1][1];
 			
+			AmericanSeason.context.globalCompositeOperation = this.globalCompositeOperation;
 			AmericanSeason.context.lineWidth = this.lineWidth;
 			AmericanSeason.context.lineCap = this.lineCap;
 			AmericanSeason.context.moveTo(trailEndX, trailEndY);
@@ -468,6 +490,7 @@ AmericanSeason.launch = function(){
 		this.trailLength = AmericanSeason.config.STAR_TRAIL_LENGTH;
 		this.lineWidth	= AmericanSeason.config.STROKE_WIDTH;
 		this.lineCap 	= "round";
+		this.globalCompositeOperation = 'lighter';
 		// Chrysanthemum type is default
 		
 		if(type == 'ring'){
@@ -476,7 +499,7 @@ AmericanSeason.launch = function(){
 			this.trailLength = Math.ceil(AmericanSeason.config.STAR_TRAIL_LENGTH / 5);
 			this.lineWidth = AmericanSeason.config.STROKE_WIDTH * 5;
 		}
-		else if(type == 'dahlia'){
+		else if(type == 'peony'){
 			this.angle = Math.PI * 2 * itr / 100 * 2;
 			this.speed = AmericanSeason.config.STAR_SPEED_MAX;
 			this.transparency = AmericanSeason.config.STAR_TRANSPARENCY / 2;
@@ -485,9 +508,9 @@ AmericanSeason.launch = function(){
 		}
 		else if(type == 'palm'){
 			this.lineWidth = AmericanSeason.config.STROKE_WIDTH * 10;
-			this.brightness = 100;
 			this.speed = Math.min(this.speed * 2, AmericanSeason.config.STAR_SPEED_MAX);
 			this.trailLength *= 1.5;
+			this.globalCompositeOperation = 'source-over';
 		}
 		else if(type == 'bees'){
 			this.lineWidth = AmericanSeason.config.STROKE_WIDTH * 2;
@@ -525,6 +548,7 @@ AmericanSeason.launch = function(){
 			this[item] = override[item];
 		}
 		
+		if(AmericanSeason.config.GLOBAL_COMPOSITE_OPERATION != 'default') this.globalCompositeOperation = AmericanSeason.config.GLOBAL_COMPOSITE_OPERATION;
 		
 		this.trail = [];
 		for(var i = 0; i < this.trailLength; i++){
@@ -571,6 +595,7 @@ AmericanSeason.launch = function(){
 			var trailEndX = this.trail[this.trail.length - 1][0];
 			var trailEndY = this.trail[this.trail.length - 1][1];
 			
+			AmericanSeason.context.globalCompositeOperation = this.globalCompositeOperation;
 			AmericanSeason.context.lineWidth = this.lineWidth;
 			AmericanSeason.context.lineCap = this.lineCap;
 			AmericanSeason.context.moveTo(trailEndX, trailEndY);
@@ -641,7 +666,7 @@ AmericanSeason.launch = function(){
 	AmericanSeason.createParticles = function(x, y) {
 		var types = ['chrysanthemum', 'chrysanthemum', 'chrysanthemum']; // Most common
 		if(Game.Has('Ring burst')) types.push('ring');
-		if(Game.Has('Dahlia burst')) types.push('dahlia');
+		if(Game.Has('Peony burst')) types.push('peony');
 		if(Game.Has('Palm burst')) types.push('palm');
 		if(Game.Has('Bees burst')) types.push('bees');
 		if(Game.Has('Crossette burst')) types.push('crossette');
@@ -653,7 +678,7 @@ AmericanSeason.launch = function(){
 		
 		var count = AmericanSeason.config.STAR_COUNT;
 		if(type == 'ring') count /= 4;
-		if(type == 'dahlia') count /= 2;
+		if(type == 'peony') count /= 2;
 		if(type == 'palm') count /= 10;
 		if(type == 'bees') count /= 2;
 		if(type == 'crossette') count /= 7;
@@ -670,7 +695,18 @@ AmericanSeason.launch = function(){
 		AmericanSeason.context.globalCompositeOperation = 'destination-out';
 		AmericanSeason.context.fillStyle = `rgba(0, 0, 0, ${AmericanSeason.config.CANVAS_CLEANUP_ALPHA})`;
 		AmericanSeason.context.fillRect(0, 0, AmericanSeason.canvas.width, AmericanSeason.canvas.height);
-		AmericanSeason.context.globalCompositeOperation = 'lighter';
+	}
+	
+	AmericanSeason.GetHowManyFireworkDrops = function(){
+		var num = 0;
+		for(var i in AmericanSeason.upgrades) if(Game.Has(AmericanSeason.upgrades[i])) num++;
+		return num;
+	}
+	
+	AmericanSeason.GetCpsMultiplier = function(){
+		var mult = 1;
+		for(var i in AmericanSeason.fireworkTypes) if(Game.Has(AmericanSeason.fireworkTypes[i])) mult *= 1.01;
+		return mult;
 	}
 	
 	

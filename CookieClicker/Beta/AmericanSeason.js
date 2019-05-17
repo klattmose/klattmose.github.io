@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '0.12';
+AmericanSeason.version = '0.13';
 AmericanSeason.GameVersion = '2.019';
 
 AmericanSeason.launch = function(){
@@ -14,6 +14,7 @@ AmericanSeason.launch = function(){
 		
 		AmericanSeason.createSeason();
 		AmericanSeason.createUpgrades();
+		AmericanSeason.createAchievement();
 		AmericanSeason.createShimmer();
 		AmericanSeason.createCanvas();
 		AmericanSeason.initFireworks();
@@ -206,9 +207,9 @@ AmericanSeason.launch = function(){
 		last = CCSE.NewUpgrade('Pearl burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>O say does that star-spangled banner yet wave</q>', upPrice, [7, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
 		last = CCSE.NewUpgrade('Pistil burst', 'Cookie production multiplier <b>+1%</b>.<br>Cost scales with how many firework upgrades you own.<q>O\'er the land of the free and the home of the brave?</q>', upPrice, [8, 4, AmericanSeason.iconsURL]); AmericanSeason.fireworkTypes.push(last.name);
 		
-		last = CCSE.NewUpgrade('Short fuse', 'Fireworks appear <b>twice as frequently</b>.<br>Cost scales with how many firework upgrades you own.<q></q>', upPrice2, [1, 5, AmericanSeason.iconsURL]); AmericanSeason.shimmerModifiers.push(last.name);
-		last = CCSE.NewUpgrade('Slow burn', 'Fireworks fly <b>half as fast</b>.<br>Cost scales with how many firework upgrades you own.<q></q>', upPrice2, [2, 5, AmericanSeason.iconsURL]); AmericanSeason.shimmerModifiers.push(last.name);
-		last = CCSE.NewUpgrade('High explosive', 'Fireworks give <b>twice as much</b>.<br>Cost scales with how many firework upgrades you own.<q></q>', upPrice2, [3, 5, AmericanSeason.iconsURL]); AmericanSeason.shimmerModifiers.push(last.name);
+		last = CCSE.NewUpgrade('Short fuse', 'Fireworks appear <b>twice as frequently</b>.<br>Cost scales with how many firework upgrades you own.<q>Swish</q>', upPrice2, [0, 5, AmericanSeason.iconsURL]); AmericanSeason.shimmerModifiers.push(last.name);
+		last = CCSE.NewUpgrade('Slow burn', 'Fireworks fly <b>half as fast</b>.<br>Cost scales with how many firework upgrades you own.<q>Fwoosh</q>', upPrice2, [1, 5, AmericanSeason.iconsURL]); AmericanSeason.shimmerModifiers.push(last.name);
+		last = CCSE.NewUpgrade('High explosive', 'Fireworks give <b>twice as much</b>.<br>Cost scales with how many firework upgrades you own.<q>BOOM!</q>', upPrice2, [2, 5, AmericanSeason.iconsURL]); AmericanSeason.shimmerModifiers.push(last.name);
 		
 		
 		AmericanSeason.upgrades = AmericanSeason.fireworkTypes.concat(AmericanSeason.shimmerModifiers);
@@ -234,13 +235,14 @@ AmericanSeason.launch = function(){
 		// Other upgrades
 		last = CCSE.NewUpgrade('Grand finale', 'Rockets spawn much more frequently.<q>Fireworks and flamethrowers: a match made in hell.</q>', 7, [0, 4, AmericanSeason.iconsURL], function(){
 			// Simulate Game.killShimmers
-			if(this.reset) this.reset();
-			this.n = 0;
-			if(this.spawnsOnTimer){
-				this.time = 0;
-				this.spawned = 0;
-				this.minTime = this.getMinTime(this);
-				this.maxTime = this.getMaxTime(this);
+			var me = Game.shimmerTypes['rocket'];
+			if(me.reset) me.reset();
+			me.n = 0;
+			if(me.spawnsOnTimer){
+				me.time = 0;
+				me.spawned = 0;
+				me.minTime = me.getMinTime(me);
+				me.maxTime = me.getMaxTime(me);
 			}
 		}); last.order = Game.Upgrades['Reindeer season'].order + 0.0001;
 			last.pool = 'debug';
@@ -298,9 +300,9 @@ AmericanSeason.launch = function(){
 				
 				var upgrade = '';
 				var failRate = 0.8;
-				//if(Game.HasAchiev('Full barrage')) failRate = 0.6;
+				if(Game.HasAchiev('Full barrage')) failRate = 0.6;
 				failRate *= 1 / Game.dropRateMult();
-				//if(Game.Has('Starburst')) failRate *= 0.95;
+				if(Game.Has('Starburst')) failRate *= 0.95;
 				if(Game.hasGod){
 					var godLvl = Game.hasGod('seasons');
 					if(godLvl == 1) failRate *= 0.9;
@@ -377,6 +379,22 @@ AmericanSeason.launch = function(){
 		// Preload sound effects
 		Sounds['snd/rocketLaunch.mp3'] = new Audio('https://klattmose.github.io/CookieClicker/snd/rocketLaunch.mp3');
 		Sounds['snd/rocketBoom.mp3'] = new Audio('https://klattmose.github.io/CookieClicker/snd/rocketBoom.mp3');
+	}
+	
+	AmericanSeason.createAchievement = function(){
+		var last;
+		var order = Game.Achievements['Hide & seek champion'].order + 0.001;
+		
+		last = CCSE.NewAchievement('Full barrage', 'Unlock <b>every fireworks upgrade.</b><div class="line"></div>Owning this achievement makes fireworks upgrades drop more frequently in future playthroughs.', [0, 4, AmericanSeason.iconsURL]);
+			last.order = order; order += 0.001;
+		
+		Game.customChecks.push(function(){
+			var haveAll = true;
+			for(var i in AmericanSeason.upgrades){
+				if(!Game.Has(AmericanSeason.upgrades[i])) haveAll = false;
+			}
+			if(haveAll) Game.Win('Full barrage');
+		});
 	}
 	
 	AmericanSeason.createCanvas = function(){
@@ -508,7 +526,7 @@ AmericanSeason.launch = function(){
 		}
 		else if(type == 'palm'){
 			this.lineWidth = AmericanSeason.config.STROKE_WIDTH * 10;
-			this.speed = Math.min(this.speed * 2, AmericanSeason.config.STAR_SPEED_MAX);
+			this.speed = AmericanSeason.randBetween(Math.max(AmericanSeason.config.STAR_SPEED_MIN, AmericanSeason.config.STAR_SPEED_MAX / 2), AmericanSeason.config.STAR_SPEED_MAX);
 			this.trailLength *= 1.5;
 			this.globalCompositeOperation = 'source-over';
 		}
@@ -710,6 +728,9 @@ AmericanSeason.launch = function(){
 	}
 	
 	
+	//***********************************
+	//    Start the mod
+	//***********************************
 	if(CCSE.ConfirmGameVersion(AmericanSeason.name, AmericanSeason.version, AmericanSeason.GameVersion)) AmericanSeason.init();
 }
 

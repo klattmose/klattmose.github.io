@@ -677,11 +677,13 @@ AmericanSeason.launch = function(){
 	
 	AmericanSeason.Logic = function(){
 		if(Game.season == 'american'){
+			AmericanSeason.canvas.style.display = 'block';
 			AmericanSeason.launchManualFirework();
 			AmericanSeason.cleanCanvas();
 			AmericanSeason.Draw();
 		}else{
 			AmericanSeason.context.clearRect(0, 0, AmericanSeason.canvas.width, AmericanSeason.canvas.height);
+			AmericanSeason.canvas.style.display = 'none';
 		}
 		
 	}

@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '1.1';
+AmericanSeason.version = '1.2';
 AmericanSeason.GameVersion = '2.019';
 
 AmericanSeason.launch = function(){
@@ -59,7 +59,15 @@ AmericanSeason.launch = function(){
 			return listing;
 		}
 		
+		function ToggleButton(prefName, button, on, off, callback, invert){
+			var invert = invert ? 1 : 0;
+			if(!callback) callback = '';
+			callback += 'PlaySound(\'snd/tick.mp3\');';
+			return '<a class="option' + ((AmericanSeason.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="AmericanSeason.Toggle(\'' + prefName + '\', \'' + button + '\', \'' + on + '\', \'' + off + '\', \'' + invert + '\');' + callback + '">' + (AmericanSeason.config[prefName] ? on : off) + '</a>';
+		}
+		
 		var str = '<div class="listing"><a class="option" ' + Game.clickStr + '="AmericanSeason.config = AmericanSeason.defaultConfig(); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>';
+		str += '<div class="listing">' + ToggleButton('SHOW_CANVAS', 'SHOW_CANVASButton', 'Canvas ON', 'Canvas OFF', '') + '<label>Display fireworks in the left panel. Inhibits clicking wrinklers.</label></div>';
 		
 		str += header('Projectiles');
 		str += inputBoxListing('FIREWORK_ACCELERATION', 'Base firework acceleration', '1.0 causes fireworks to travel at a constant speed');
@@ -95,30 +103,32 @@ AmericanSeason.launch = function(){
 	
 	AmericanSeason.defaultConfig = function(){
 		return {
-			FIREWORK_ACCELERATION 		: 1.1,		// Base firework acceleration. // 1.0 causes fireworks to travel at a constant speed. // Higher number increases rate firework accelerates over time.
+			SHOW_CANVAS					: true,		// Display fireworks in the left panel.
+			
+			FIREWORK_ACCELERATION		: 1.1,		// Base firework acceleration. // 1.0 causes fireworks to travel at a constant speed. // Higher number increases rate firework accelerates over time.
 			FIREWORK_BRIGHTNESS_MIN		: 50,		// Minimum firework brightness.
 			FIREWORK_BRIGHTNESS_MAX		: 70,		// Maximum firework brightness.
-			FIREWORK_SPEED 				: 10,		// Base speed of fireworks.
+			FIREWORK_SPEED				: 10,		// Base speed of fireworks.
 			FIREWORK_TRAIL_LENGTH	 	: 3,		// Base length of firework trails.
 			
-			STAR_BRIGHTNESS_MIN 		: 50,		// Minimum star brightness.
-			STAR_BRIGHTNESS_MAX	 		: 80,		// Maximum star brightness.
-			STAR_COUNT 					: 100,		// Base star count per firework.
-			STAR_DECAY_MIN 				: 0.015,	// Minimum star decay rate.
-			STAR_DECAY_MAX 				: 0.03,		// Maximum star decay rate.
-			STAR_FRICTION	 			: 0.9,		// Base star friction. // Slows the speed of particles over time.
-			STAR_GRAVITY 				: 1.4,		// Base star gravity. // How quickly particles move toward a downward trajectory.
-			STAR_HUE_VARIANCE 			: 20,		// Variance in star coloration.
+			STAR_BRIGHTNESS_MIN			: 50,		// Minimum star brightness.
+			STAR_BRIGHTNESS_MAX			: 80,		// Maximum star brightness.
+			STAR_COUNT					: 100,		// Base star count per firework.
+			STAR_DECAY_MIN				: 0.015,	// Minimum star decay rate.
+			STAR_DECAY_MAX				: 0.03,		// Maximum star decay rate.
+			STAR_FRICTION				: 0.9,		// Base star friction. // Slows the speed of particles over time.
+			STAR_GRAVITY				: 1.4,		// Base star gravity. // How quickly particles move toward a downward trajectory.
+			STAR_HUE_VARIANCE			: 20,		// Variance in star coloration.
 			STAR_TRANSPARENCY	 		: 1,		// Base star transparency.
-			STAR_SPEED_MIN 				: 2,		// Minimum star speed.
-			STAR_SPEED_MAX 				: 20,		// Maximum star speed.
-			STAR_TRAIL_LENGTH	 		: 5,		// Base length of explosion star trails.
+			STAR_SPEED_MIN				: 2,		// Minimum star speed.
+			STAR_SPEED_MAX				: 20,		// Maximum star speed.
+			STAR_TRAIL_LENGTH			: 5,		// Base length of explosion star trails.
 			
-			CANVAS_CLEANUP_ALPHA 		: 0.2,		// Alpha level that canvas cleanup iteration removes existing trails. // Lower value increases trail duration.
-			HUE_STEP_INCREASE 			: 1,		// Hue change per loop, used to rotate through different firework colors.
+			CANVAS_CLEANUP_ALPHA		: 0.2,		// Alpha level that canvas cleanup iteration removes existing trails. // Lower value increases trail duration.
+			HUE_STEP_INCREASE			: 1,		// Hue change per loop, used to rotate through different firework colors.
 			
-			TICKS_PER_FIREWORK_MIN 		: 5,		// Minimum number of ticks per manual firework launch.
-			STROKE_WIDTH 				: 1,		// Line width for canvas strokes.
+			TICKS_PER_FIREWORK_MIN		: 5,		// Minimum number of ticks per manual firework launch.
+			STROKE_WIDTH				: 1,		// Line width for canvas strokes.
 			GLOBAL_COMPOSITE_OPERATION	: 'default',// Override for globalCompositeOperation
 		}
 	}
@@ -148,6 +158,18 @@ AmericanSeason.launch = function(){
 		if(!isNaN(val)) AmericanSeason.config[prefName] = val;
 		if(prefName == 'GLOBAL_COMPOSITE_OPERATION') AmericanSeason.config[prefName] = value;
 		Game.UpdateMenu();
+	}
+	
+	AmericanSeason.Toggle = function(prefName, button, on, off, invert){
+		if(AmericanSeason.config[prefName]){
+			l(button).innerHTML = off;
+			AmericanSeason.config[prefName] = 0;
+		}
+		else{
+			l(button).innerHTML = on;
+			AmericanSeason.config[prefName] = 1;
+		}
+		l(button).className = 'option' + ((AmericanSeason.config[prefName] ^ invert) ? '' : ' off');
 	}
 	
 	AmericanSeason.Reset = function(hard){
@@ -676,7 +698,7 @@ AmericanSeason.launch = function(){
 	}
 	
 	AmericanSeason.Logic = function(){
-		if(Game.season == 'american'){
+		if(Game.season == 'american' && AmericanSeason.config.SHOW_CANVAS){
 			AmericanSeason.canvas.style.display = 'block';
 			AmericanSeason.launchManualFirework();
 			AmericanSeason.cleanCanvas();

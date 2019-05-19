@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '1.0';
+AmericanSeason.version = '1.1';
 AmericanSeason.GameVersion = '2.019';
 
 AmericanSeason.launch = function(){
@@ -428,14 +428,14 @@ AmericanSeason.launch = function(){
 		l('sectionLeft').appendChild(canvas);
 		
 		canvas.width = canvas.parentNode.offsetWidth;
-		canvas.height = canvas.parentNode.offsetHeight;
+		canvas.height = canvas.parentNode.offsetHeight - 21;
 		
 		AmericanSeason.canvas = canvas;
 		AmericanSeason.context = canvas.getContext('2d');
 		
 		window.addEventListener('resize', function(event){
 			canvas.width = canvas.parentNode.offsetWidth;
-			canvas.height = canvas.parentNode.offsetHeight;
+			canvas.height = canvas.parentNode.offsetHeight - 21;
 		});
 	}
 	

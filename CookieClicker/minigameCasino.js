@@ -6,7 +6,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.10';
+M.version = '3.11';
 M.GameVersion = '2.019';
 
 M.launch = function(){
@@ -812,7 +812,7 @@ M.launch = function(){
 		
 		CCSE.save.OtherMods[M.name] = str;
 		M.saveString = str;
-		return str;
+		return ''; //str;
 	}
 	
 	M.load = function(str){

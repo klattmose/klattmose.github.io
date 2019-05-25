@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.103';
+CCSE.version = '2.104';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1962,17 +1962,15 @@ CCSE.launch = function(){
 			var mod = CCSE.save.ModManager[i];
 			str += '<div class="listing">';
 			str += '<a class="option' + (i == 0 ? ' off' : '') + '" ' + Game.clickStr + '="CCSE.MoveModUp(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↑</a>';
-			str += CCSE.ToggleModButton(i);
-			str += CCSE.LoadModButton(i);
+			str += '<a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>';
+			str += '<a class="option" ' + Game.clickStr + '="CCSE.save.ModManager.splice(' + i + ', 1); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">Remove</a>';
 			str += '<label>' + mod.name + '</label>';
 			str += '</div><div class="listing">';
 			str += '<a class="option' + (i == CCSE.save.ModManager.length - 1 ? ' off' : '') + '" ' + Game.clickStr + '="CCSE.MoveModDown(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↓</a>';
-			str += '<a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>';
-			str += '<a class="option" ' + Game.clickStr + '="CCSE.save.ModManager.splice(' + i + ', 1); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">Remove</a>';
+			str += CCSE.ToggleModButton(i);
+			str += CCSE.LoadModButton(i);
 			str += '</div>';
 			str += '<div class="line"></div>';
-			
-			
 		}
 		
 		return str;

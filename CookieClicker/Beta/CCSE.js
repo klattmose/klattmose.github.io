@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.102';
+CCSE.version = '2.103';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1956,16 +1956,21 @@ CCSE.launch = function(){
 		
 		str += '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">Mods</div>';
 		str += '<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + CCSE.save.ModManager.length + '); PlaySound(\'snd/tick.mp3\');">Register mod</a></div>';
+		str += '<div class="line"></div>';
 		
 		for(var i = 0; i < CCSE.save.ModManager.length; i++){
 			var mod = CCSE.save.ModManager[i];
 			str += '<div class="listing">';
-			str += '<a class="option" ' + Game.clickStr + '="CCSE.MoveModUp(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↑</a>';
-			str += '<a class="option" ' + Game.clickStr + '="CCSE.MoveModDown(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↓</a>';
+			str += '<a class="option' + (i == 0 ? ' off' : '') + '" ' + Game.clickStr + '="CCSE.MoveModUp(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↑</a>';
+			str += CCSE.ToggleModButton(i);
+			str += CCSE.LoadModButton(i);
+			str += '<label>' + mod.name + '</label>';
+			str += '</div><div class="listing">';
+			str += '<a class="option' + (i == CCSE.save.ModManager.length - 1 ? ' off' : '') + '" ' + Game.clickStr + '="CCSE.MoveModDown(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↓</a>';
 			str += '<a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>';
 			str += '<a class="option" ' + Game.clickStr + '="CCSE.save.ModManager.splice(' + i + ', 1); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">Remove</a>';
-			str += '<label>' + mod.name + '</label></div>';
-			
+			str += '</div>';
+			str += '<div class="line"></div>';
 			
 			
 		}
@@ -3184,6 +3189,35 @@ CCSE.launch = function(){
 			CCSE.save.ModManager[index] = CCSE.save.ModManager[index + 1];
 			CCSE.save.ModManager[index + 1] = temp;
 		}
+	}
+	
+	CCSE.ToggleModButton = function(index){
+		var mod = CCSE.save.ModManager[index];
+		return '<a id="CCSEModToggle' + index + '" class="option' + (mod.autoLoad ? '' : ' off') + '" ' + Game.clickStr + '="CCSE.ToggleMod(' + index + '); PlaySound(\'snd/tick.mp3\');">' + (mod.autoLoad ? 'Enabled' : 'Disabled') + '</a>';
+	}
+	
+	CCSE.ToggleMod = function(index){
+		var mod = CCSE.save.ModManager[index];
+		mod.autoLoad = (mod.autoLoad ? 0 : 1);
+		l('CCSEModToggle' + index).className = 'option' + (mod.autoLoad ? '' : ' off');
+		l('CCSEModToggle' + index).innerHTML = (mod.autoLoad ? 'Enabled' : 'Disabled');
+	}
+	
+	CCSE.LoadModButton = function(index){
+		var mod = CCSE.save.ModManager[index];
+		if(mod.isLoaded){
+			return '<a id="CCSEModLoad' + index + '" class="option off" >Loaded</a>';
+		}else{
+			return '<a id="CCSEModLoad' + index + '" class="option" ' + Game.clickStr + '="CCSE.LoadModManual(' + index + '); PlaySound(\'snd/tick.mp3\');">Load</a>';
+		}
+	}
+	
+	CCSE.LoadModManual = function(index){
+		var mod = CCSE.save.ModManager[index];
+		Game.LoadMod(mod.url);
+		mod.isLoaded = 1;
+		l('CCSEModLoad' + index).className = 'option off';
+		l('CCSEModLoad' + index).innerHTML = 'Loaded';
 	}
 	
 	

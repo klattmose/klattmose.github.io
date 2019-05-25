@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '3.000';
+CCSE.version = '2.102';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -1955,7 +1955,20 @@ CCSE.launch = function(){
 										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
 		str += '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">Mods</div>';
-		str += '<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.RegisterMod(); PlaySound(\'snd/tick.mp3\');">Register mod</a></div>';
+		str += '<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + CCSE.save.ModManager.length + '); PlaySound(\'snd/tick.mp3\');">Register mod</a></div>';
+		
+		for(var i = 0; i < CCSE.save.ModManager.length; i++){
+			var mod = CCSE.save.ModManager[i];
+			str += '<div class="listing">';
+			str += '<a class="option" ' + Game.clickStr + '="CCSE.MoveModUp(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↑</a>';
+			str += '<a class="option" ' + Game.clickStr + '="CCSE.MoveModDown(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↓</a>';
+			str += '<a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>';
+			str += '<a class="option" ' + Game.clickStr + '="CCSE.save.ModManager.splice(' + i + ', 1); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">Remove</a>';
+			str += '<label>' + mod.name + '</label></div>';
+			
+			
+			
+		}
 		
 		return str;
 	}
@@ -3102,7 +3115,7 @@ CCSE.launch = function(){
 		var nextFunc = CCSE.onMod < CCSE.save.ModManager.length ? CCSE.LoadMod : function(){}; // dummy function if we're done with mods
 		
 		if(mod.autoLoad){
-			var id = mod.url.split('/'); id = id[id.length - 1].split('.')[0];
+			var id = CCSE.GuessModId(mod.url);
 			
 			var delayFunc = mod.extraDelay ? function(){setTimeout(nextFunc, mod.extraDelay);} : function(){requestAnimationFrame(nextFunc)};
 			
@@ -3118,14 +3131,59 @@ CCSE.launch = function(){
 				delayFunc();
 			}
 			console.log('Loaded the mod ' + mod.url + ', ' + id + '.');
+			mod.isLoaded = 1;
 			
 		}else{ // Skip this one
 			requestAnimationFrame(nextFunc);
+			mod.isLoaded = 0;
 		}
 	}
 	
-	CCSE.RegisterMod = function(){
+	CCSE.GuessModId = function(url){
+		var id = url.split('/'); 
+		id = id[id.length - 1].split('.')[0];
+		return id;
+	}
+	
+	CCSE.EditMod = function(index){
+		if(index < CCSE.save.ModManager.length){
+			CCSE.tempMod = JSON.parse(JSON.stringify(CCSE.save.ModManager[index]));
+		} else {
+			CCSE.tempMod = {name : '', url : '', autoLoad : 1, waitForScriptLoad : 0, extraDelay : 0, isLoaded : 0};
+		}
+		var mod = CCSE.tempMod;
 		
+		var str = '<h3>Edit Mod</h3><div class="block" style="overflow: auto;">';
+		str += '<table style="width:100%;">';
+		str += '<tr><td style="text-align:right; width:15%;">URL:</td><td style="width:5%;"></td><td style="text-align:left; width:70%;">' +
+				'<input id="urlEditor" class="option" type="text" value="' + mod.url + '" style="width: 90%;" onchange="l(\'nameEditor\').value = CCSE.GuessModId(l(\'urlEditor\').value);" /></td></tr>';
+		str += '<tr><td style="text-align:right;">Name:</td><td></td><td style="text-align:left;"><input id="nameEditor" class="option" type="text" value="' + mod.name + '" style="width: 90%;" /></td></tr>';
+		str += '</table></div>';
+		
+		Game.Prompt(str, [['Save', 'CCSE.saveNewMod(' + index + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
+						  ['Nevermind', 'Game.ClosePrompt();']], 0, 'widePrompt');
+	}
+	
+	CCSE.saveNewMod = function(index){
+		CCSE.tempMod.url = l('urlEditor').value;
+		CCSE.tempMod.name = l('nameEditor').value;
+		CCSE.save.ModManager[index] = CCSE.tempMod;
+	}
+	
+	CCSE.MoveModUp = function(index){
+		if(index > 0){
+			var temp = CCSE.save.ModManager[index];
+			CCSE.save.ModManager[index] = CCSE.save.ModManager[index - 1];
+			CCSE.save.ModManager[index - 1] = temp;
+		}
+	}
+	
+	CCSE.MoveModDown = function(index){
+		if(index < CCSE.save.ModManager.length - 1){
+			var temp = CCSE.save.ModManager[index];
+			CCSE.save.ModManager[index] = CCSE.save.ModManager[index + 1];
+			CCSE.save.ModManager[index + 1] = temp;
+		}
 	}
 	
 	

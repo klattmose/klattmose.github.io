@@ -1,0 +1,93 @@
+﻿{
+  "mods": [
+    {
+      "name": "CCSE",
+      "url": "https://klattmose.github.io/CookieClicker/CCSE.js",
+      "enabled": 1,
+      "waitForScriptLoad": 1,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Fortune Cookie",
+      "url": "https://klattmose.github.io/CookieClicker/FortuneCookie.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Klattmose Utilities",
+      "url": "https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Horticookie",
+      "url": "https://klattmose.github.io/CookieClicker/Horticookie.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Casino",
+      "url": "https://klattmose.github.io/CookieClicker/minigameCasino.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "American Season",
+      "url": "https://klattmose.github.io/CookieClicker/AmericanSeason.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Timer Widget",
+      "url": "https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Hurricane Sugar",
+      "url": "https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Blackhole Inverter",
+      "url": "https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js",
+      "enabled": 1,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "Cookie Monster",
+      "url": "https://aktanusa.github.io/CookieMonster/CookieMonster.js",
+      "enabled": 0,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 1
+    },
+    {
+      "name": "SeedSeek",
+      "url": "https://ardub23.github.io/CookieClicker/SeedSeek.js",
+      "enabled": 0,
+      "waitForScriptLoad": 0,
+      "extraDelay": 0,
+      "isLoaded": 0
+    }
+  ],
+  "enabled": true
+}

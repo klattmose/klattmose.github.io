@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.104';
+CCSE.version = '2.015';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
@@ -65,6 +65,8 @@ CCSE.launch = function(){
 			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
 		});
 		CCSE.playlist.push(CCSE.ReplaceAchievements); // We'll call the next one from here
+		
+		
 		CCSE.playlist.push(CCSE.finalize);
 		
 		requestAnimationFrame(CCSE.playlist[CCSE.track++]);
@@ -77,7 +79,6 @@ CCSE.launch = function(){
 		Game.customLoad.push(CCSE.LoadSave);
 		//Game.customReset.push(CCSE.Reset); Nevermind
 		
-		CCSE.LoadMods();
 		
 		// Inject menu functions
 		Game.customOptionsMenu.push(function(){
@@ -112,15 +113,12 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
-			'</div><div class="subsection update"><div class="title">05/??/2019 - a mod-est proposal</div>' +
-			'<div class="listing">&bull; Created a hopefully user-friendly mod manager</div>' +
-			
 			'</div><div class="subsection update small"><div class="title">05/14/2019 - parallel processing</div>' + 
 			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' +
 			'<div class="listing">&bull; Also has a progress meter for feedback</div>' + 
-			'<div class="listing">&bull; Bug fixes</div>' +
+			'<div class="listing">&bull; Bug fixes</div>' + 
 			
-			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' +
+			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' + 
 			'<div class="listing">&bull; You know that moment where you do something and then immediately realize a better way to do it?</div>' +
 			'<div class="listing">&bull; Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly</div>' +
 			'<div class="listing">&bull; Added function for creating seasons</div>' +
@@ -1954,25 +1952,6 @@ CCSE.launch = function(){
 										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
 										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
-		str += '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">Mods</div>';
-		str += '<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + CCSE.save.ModManager.length + '); PlaySound(\'snd/tick.mp3\');">Register mod</a></div>';
-		str += '<div class="line"></div>';
-		
-		for(var i = 0; i < CCSE.save.ModManager.length; i++){
-			var mod = CCSE.save.ModManager[i];
-			str += '<div class="listing">';
-			str += '<a class="option' + (i == 0 ? ' off' : '') + '" ' + Game.clickStr + '="CCSE.MoveModUp(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↑</a>';
-			str += '<a class="option" ' + Game.clickStr + '="CCSE.EditMod(' + i + '); PlaySound(\'snd/tick.mp3\');">Edit</a>';
-			str += '<a class="option" ' + Game.clickStr + '="CCSE.save.ModManager.splice(' + i + ', 1); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">Remove</a>';
-			str += '<label>' + mod.name + '</label>';
-			str += '</div><div class="listing">';
-			str += '<a class="option' + (i == CCSE.save.ModManager.length - 1 ? ' off' : '') + '" ' + Game.clickStr + '="CCSE.MoveModDown(' + i + '); Game.UpdateMenu(); PlaySound(\'snd/tick.mp3\');">↓</a>';
-			str += CCSE.ToggleModButton(i);
-			str += CCSE.LoadModButton(i);
-			str += '</div>';
-			str += '<div class="line"></div>';
-		}
-		
 		return str;
 	}
 	
@@ -2726,7 +2705,6 @@ CCSE.launch = function(){
 		if(!CCSE.save.Buffs) CCSE.save.Buffs = {};
 		if(!CCSE.save.Seasons) CCSE.save.Seasons = {};
 		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
-		if(!CCSE.save.ModManager) CCSE.save.ModManager = [];
 		
 		if(CCSE.save.version != CCSE.version){
 			l('logButton').classList.add('hasUpdate');
@@ -3102,120 +3080,6 @@ CCSE.launch = function(){
 			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
 		}
 		return proceed;
-	}
-	
-	
-	/*=====================================================================================
-	Mod Management
-	=======================================================================================*/
-	CCSE.LoadMods = function(){
-		CCSE.onMod = 0;
-		if(CCSE.onMod < CCSE.save.ModManager.length) requestAnimationFrame(CCSE.LoadMod);
-	}
-	
-	CCSE.LoadMod = function(){
-		var mod = CCSE.save.ModManager[CCSE.onMod++];
-		var nextFunc = CCSE.onMod < CCSE.save.ModManager.length ? CCSE.LoadMod : function(){}; // dummy function if we're done with mods
-		
-		if(mod.autoLoad){
-			var id = CCSE.GuessModId(mod.url);
-			
-			var delayFunc = mod.extraDelay ? function(){setTimeout(nextFunc, mod.extraDelay);} : function(){requestAnimationFrame(nextFunc)};
-			
-			var script = document.createElement('script');
-			script.id = 'modscript_' + id;
-			script.setAttribute('src', mod.url);
-			
-			if(mod.waitForScriptLoad){
-				script.onload = delayFunc;
-				document.head.appendChild(script);
-			}else{
-				document.head.appendChild(script);
-				delayFunc();
-			}
-			console.log('Loaded the mod ' + mod.url + ', ' + id + '.');
-			mod.isLoaded = 1;
-			
-		}else{ // Skip this one
-			requestAnimationFrame(nextFunc);
-			mod.isLoaded = 0;
-		}
-	}
-	
-	CCSE.GuessModId = function(url){
-		var id = url.split('/'); 
-		id = id[id.length - 1].split('.')[0];
-		return id;
-	}
-	
-	CCSE.EditMod = function(index){
-		if(index < CCSE.save.ModManager.length){
-			CCSE.tempMod = JSON.parse(JSON.stringify(CCSE.save.ModManager[index]));
-		} else {
-			CCSE.tempMod = {name : '', url : '', autoLoad : 1, waitForScriptLoad : 0, extraDelay : 0, isLoaded : 0};
-		}
-		var mod = CCSE.tempMod;
-		
-		var str = '<h3>Edit Mod</h3><div class="block" style="overflow: auto;">';
-		str += '<table style="width:100%;">';
-		str += '<tr><td style="text-align:right; width:15%;">URL:</td><td style="width:5%;"></td><td style="text-align:left; width:70%;">' +
-				'<input id="urlEditor" class="option" type="text" value="' + mod.url + '" style="width: 90%;" onchange="l(\'nameEditor\').value = CCSE.GuessModId(l(\'urlEditor\').value);" /></td></tr>';
-		str += '<tr><td style="text-align:right;">Name:</td><td></td><td style="text-align:left;"><input id="nameEditor" class="option" type="text" value="' + mod.name + '" style="width: 90%;" /></td></tr>';
-		str += '</table></div>';
-		
-		Game.Prompt(str, [['Save', 'CCSE.saveNewMod(' + index + '); Game.ClosePrompt(); Game.UpdateMenu();'], 
-						  ['Nevermind', 'Game.ClosePrompt();']], 0, 'widePrompt');
-	}
-	
-	CCSE.saveNewMod = function(index){
-		CCSE.tempMod.url = l('urlEditor').value;
-		CCSE.tempMod.name = l('nameEditor').value;
-		CCSE.save.ModManager[index] = CCSE.tempMod;
-	}
-	
-	CCSE.MoveModUp = function(index){
-		if(index > 0){
-			var temp = CCSE.save.ModManager[index];
-			CCSE.save.ModManager[index] = CCSE.save.ModManager[index - 1];
-			CCSE.save.ModManager[index - 1] = temp;
-		}
-	}
-	
-	CCSE.MoveModDown = function(index){
-		if(index < CCSE.save.ModManager.length - 1){
-			var temp = CCSE.save.ModManager[index];
-			CCSE.save.ModManager[index] = CCSE.save.ModManager[index + 1];
-			CCSE.save.ModManager[index + 1] = temp;
-		}
-	}
-	
-	CCSE.ToggleModButton = function(index){
-		var mod = CCSE.save.ModManager[index];
-		return '<a id="CCSEModToggle' + index + '" class="option' + (mod.autoLoad ? '' : ' off') + '" ' + Game.clickStr + '="CCSE.ToggleMod(' + index + '); PlaySound(\'snd/tick.mp3\');">' + (mod.autoLoad ? 'Enabled' : 'Disabled') + '</a>';
-	}
-	
-	CCSE.ToggleMod = function(index){
-		var mod = CCSE.save.ModManager[index];
-		mod.autoLoad = (mod.autoLoad ? 0 : 1);
-		l('CCSEModToggle' + index).className = 'option' + (mod.autoLoad ? '' : ' off');
-		l('CCSEModToggle' + index).innerHTML = (mod.autoLoad ? 'Enabled' : 'Disabled');
-	}
-	
-	CCSE.LoadModButton = function(index){
-		var mod = CCSE.save.ModManager[index];
-		if(mod.isLoaded){
-			return '<a id="CCSEModLoad' + index + '" class="option off" >Loaded</a>';
-		}else{
-			return '<a id="CCSEModLoad' + index + '" class="option" ' + Game.clickStr + '="CCSE.LoadModManual(' + index + '); PlaySound(\'snd/tick.mp3\');">Load</a>';
-		}
-	}
-	
-	CCSE.LoadModManual = function(index){
-		var mod = CCSE.save.ModManager[index];
-		Game.LoadMod(mod.url);
-		mod.isLoaded = 1;
-		l('CCSEModLoad' + index).className = 'option off';
-		l('CCSEModLoad' + index).innerHTML = 'Loaded';
 	}
 	
 	

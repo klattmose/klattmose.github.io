@@ -211,7 +211,10 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 173 + 
+		CCSE.functionsTotal = 120 + 
+							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
+							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
+							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
 							Game.ObjectsN * 18 - 1 + 
 							Game.UpgradesN * 9 + 
 							Game.AchievementsN * 1; // Needs to be manually updated

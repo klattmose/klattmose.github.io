@@ -241,3 +241,5 @@ Anyone who gives a suggestion or bugfix, especially code that gets implemented i
 
 * klattmose
 	* Writing this thing
+* [Or0b0ur0s](https://www.reddit.com/user/Or0b0ur0s)
+	* Assisting in making CCSE less strenuous on computers with fewer resources

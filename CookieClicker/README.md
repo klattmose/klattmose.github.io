@@ -64,5 +64,5 @@ Just some files I'm backing up here
 
 ### [Save.txt](https://klattmose.github.io/CookieClicker/Save.txt)
 ### [CCSEsave.txt](https://klattmose.github.io/CookieClicker/CCSEsave.txt)
-### [KU config.js](https://klattmose.github.io/CookieClicker/KU config.js)
+### [KU config.js](https://klattmose.github.io/CookieClicker/KU%20config.js)
 ### [CCMMconfig.txt](https://klattmose.github.io/CookieClicker/CCMMconfig.txt)

@@ -5,6 +5,7 @@ CCSE.version = '2.015';
 CCSE.GameVersion = '2.019';
 
 CCSE.launch = function(){
+	CCSE.loading = 1;
 	
 	CCSE.init = function(){
 		CCSE.InitNote();
@@ -100,6 +101,7 @@ CCSE.launch = function(){
 		CCSE.Note.title = 'CCSE loaded!';
 		CCSE.Note.life = Game.fps;
 		CCSE.isLoaded = 1;
+		CCSE.loading = 0;
 		if(CCSE.postLoadHooks) for(var i in CCSE.postLoadHooks) CCSE.postLoadHooks[i]();
 	}
 	
@@ -3089,4 +3091,4 @@ CCSE.launch = function(){
 	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)) CCSE.init();
 }
 
-if(!CCSE.isLoaded) CCSE.launch();
+if(!CCSE.isLoaded && !CCSE.loading) CCSE.launch();

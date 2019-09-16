@@ -3,7 +3,7 @@ if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
 FortuneCookie.version = '2.17';
-FortuneCookie.GameVersion = '2.019';
+FortuneCookie.GameVersion = '2.02';
 
 FortuneCookie.launch = function(){
 	FortuneCookie.init = function(){

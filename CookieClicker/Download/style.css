@@ -406,6 +406,10 @@ oh forget it this is just a mess
 {color:#06c;}
 #topBar a.blueLink:hover
 {color:#28f;text-shadow:0px 0px 3px #06c;}
+#topBar a.lightblueLink
+{color:#6ad3ff;}
+#topBar a.lightblueLink:hover
+{color:#74fffd;text-shadow:0px 0px 3px #6ad3ff;}
 a.orangeLink,#topBar a.orangeLink
 {color:#f65f4d;}
 a.orangeLink:hover,#topBar a.orangeLink:hover
@@ -2175,7 +2179,7 @@ from {background-position:0px 0px;}
 	position:absolute;
 	left:0px;
 	top:0px;
-	background:url(img/buildings.png?v=3);
+	background:url(img/buildings.png?v=4);
 	background-repeat:no-repeat;
 	margin:0px;
 }
@@ -2196,7 +2200,7 @@ from {background-position:0px 0px;}
 	height:64px;
 	left:0px;
 	top:0px;
-	background:url(img/buildings.png?v=3);
+	background:url(img/buildings.png?v=4);
 	background-repeat:no-repeat;
 	margin:-16px;
 	transform:scale(0.5);
@@ -2236,7 +2240,7 @@ from {background-position:0px 0px;}
 {
 	z-index:100;
 	opacity:1;
-	background:url(img/buildings.png?v=3);
+	background:url(img/buildings.png?v=4);
 	background-repeat:no-repeat;
 	-webkit-transition: opacity 2s ease-out;
 	-moz-transition: opacity 2s ease-out;

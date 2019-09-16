@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.015';
+CCSE.version = '2.016';
 CCSE.GameVersion = '2.02';
 
 CCSE.launch = function(){
@@ -97,7 +97,10 @@ CCSE.launch = function(){
 		//l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
 		var versionDiv = document.createElement('p');
 		versionDiv.innerHTML = 'CCSE v. ' + CCSE.version;
+		var textDiv = document.createElement('text');
+		textDiv.innerHTML = 'Game ';
 		l('versionNumber').appendChild(versionDiv);
+		l('versionNumber').prepend(textDiv);
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		CCSE.Note.title = 'CCSE loaded!';

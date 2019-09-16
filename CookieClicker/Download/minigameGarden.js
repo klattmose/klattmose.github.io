@@ -1197,7 +1197,6 @@ M.launch=function()
 		M.tileTooltip=function(x,y)
 		{
 			return function(){
-				if (Game.keys[16]) return '';
 				var tile=M.plot[y][x];
 				if (tile[0]==0)
 				{
@@ -1205,7 +1204,7 @@ M.launch=function()
 					var str='<div style="padding:8px 4px;min-width:350px;text-align:center;">'+
 						'<div class="name">Empty tile</div>'+'<div class="line"></div><div class="description">'+
 							'This tile of soil is empty.<br>Pick a seed and plant something!'+
-							(me?'<div class="line"></div>Click to plant <b>'+me.name+'</b> for <span class="price'+(M.canPlant(me)?'':' disabled')+'">'+Beautify(Math.round(M.getCost(me)))+'</span>.<br><small>(Shift-click to plant multiple.)</small><br><small>(Holding the shift key pressed will also hide tooltips.)</small>':'')+
+							(me?'<div class="line"></div>Click to plant <b>'+me.name+'</b> for <span class="price'+(M.canPlant(me)?'':' disabled')+'">'+Beautify(Math.round(M.getCost(me)))+'</span>.<br><small>(Shift-click to plant multiple.)</small>':'')+
 							(M.plotBoost[y][x]!=[1,1,1]?('<small>'+
 								(M.plotBoost[y][x][0]!=1?'<br>Aging multiplier : '+Beautify(M.plotBoost[y][x][0]*100)+'%':'')+
 								(M.plotBoost[y][x][1]!=1?'<br>Effect multiplier : '+Beautify(M.plotBoost[y][x][1]*100)+'%':'')+

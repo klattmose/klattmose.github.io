@@ -1516,6 +1516,16 @@ from {background-position:0px -24px;}
 	content:"-";
 	padding-left:64px;
 }
+.fortune
+{
+	color:#ade000;
+	cursor:pointer;
+}
+.fortune:hover
+{
+	color:#d2ff00;
+	text-shadow:0px 0px 4px #ade000;
+}
 
 #commentsText
 {

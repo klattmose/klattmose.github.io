@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
 CCSE.version = '2.015';
-CCSE.GameVersion = '2.019';
+CCSE.GameVersion = '2.021';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -94,8 +94,13 @@ CCSE.launch = function(){
 			CCSE.PrependCollapsibleInfoMenu(CCSE.name, CCSE.updateLog);
 		});
 		
-		l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
-		
+		//l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
+		var versionDiv = document.createElement('p');
+		versionDiv.innerHTML = 'CCSE v. ' + CCSE.version;
+		var textDiv = document.createElement('text');
+		textDiv.innerHTML = 'Game ';
+		l('versionNumber').appendChild(versionDiv);
+		l('versionNumber').prepend(textDiv);
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		CCSE.Note.title = 'CCSE loaded!';

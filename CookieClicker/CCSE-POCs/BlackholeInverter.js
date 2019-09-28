@@ -3,7 +3,7 @@ if(BlackholeInverter === undefined) var BlackholeInverter = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 BlackholeInverter.name = 'Black Hole Inverter';
 BlackholeInverter.version = '1.8';
-BlackholeInverter.GameVersion = '2.02';
+BlackholeInverter.GameVersion = '2.021';
 
 BlackholeInverter.launch = function(){
 	BlackholeInverter.init = function(){

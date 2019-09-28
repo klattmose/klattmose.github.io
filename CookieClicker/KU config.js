@@ -38,7 +38,7 @@
       "ctrl": false,
       "shift": false,
       "alt": false,
-      "script": "Game.Objects[\"Mine\"].sell(600); Game.Objects[\"Mine\"].buy(600);"
+      "script": "var amt = Game.Objects[\"Mine\"].amount;\nGame.Objects[\"Mine\"].sell(amt); \nGame.Objects[\"Mine\"].buy(amt);"
     },
     {
       "keyCode": 51,
@@ -88,7 +88,7 @@
       "shift": false,
       "alt": false,
       "period": "500",
-      "script": "Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } })"
+      "script": "Game.shimmers.forEach(function(shimmer) { shimmer.pop() })"
     },
     {
       "keyCode": 99,
@@ -114,8 +114,17 @@
       "ctrl": false,
       "shift": false,
       "alt": false,
-      "script": "if(typeof CM == 'undefined' || typeof CM.Cache == 'undefined'){}\nelse{\n\tvar waitForUpgrade = false;\n\tfor (var i in CM.Cache['Upgrades']) {\n\t\tvar obj = Game.Upgrades[i];\n\t\tif((CM.Cache['Upgrades'][i].color == 'Green' || CM.Cache['Upgrades'][i].color == 'Blue') && obj.pool != \"toggle\"){\n\t\t\tif(obj.getPrice() < Game.cookies) {\n\t\t\t\tobj.buy();\n\t\t\t\tGame.Notify('Bought ' + obj.name, '', '', 1, 1);\n\t\t\t\twaitForUpgrade = false;\n\t\t\t}else{\n\t\t\t\twaitForUpgrade = true;\n\t\t\t}\n\t\t}\n\t}\n\tif(!waitForUpgrade){\n\t\tfor (var i in CM.Cache['Objects']) {\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(CM.Cache['Objects'][i].color == 'Green' && obj.price < Game.cookies){\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
-      "period": "1000"
+      "script": "if(typeof CM == 'undefined' || typeof CM.Cache == 'undefined'){}\nelse{\n\tvar waitForUpgrade = false;\n\tfor (var i in CM.Cache['Upgrades']) {\n\t\tvar obj = Game.Upgrades[i];\n\t\tif((CM.Cache['Upgrades'][i].color == 'Green' || CM.Cache['Upgrades'][i].color == 'Blue') && obj.pool != \"toggle\" && !obj.isVaulted()){\n\t\t\tif(obj.getPrice() < Game.cookies) {\n\t\t\t\tobj.buy();\n\t\t\t\tGame.Notify('Bought ' + obj.name, '', '', 1, 1);\n\t\t\t\twaitForUpgrade = false;\n\t\t\t}else{\n\t\t\t\twaitForUpgrade = true;\n\t\t\t}\n\t\t}\n\t}\n\tif(!waitForUpgrade){\n\t\tfor (var i in CM.Cache['Objects']) {\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(CM.Cache['Objects'][i].color == 'Green' && obj.price < Game.cookies){\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
+      "period": "100"
+    },
+    {
+      "keyCode": 102,
+      "nickname": "Ticker Autoclicker",
+      "ctrl": false,
+      "shift": false,
+      "alt": false,
+      "script": "if(Game.TickerEffect != 0) Game.tickerL.click();",
+      "period": "5000"
     }
   ],
   "patches": {
@@ -125,16 +134,12 @@
   },
   "onLoadFunctions": [
     {
-      "nickname": "Load Mods",
-      "script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/FortuneCookie.js');\n\nGame.LoadMod('https://klattmose.github.io/CookieClicker/Horticookie.js');\n\nGame.LoadMod('https://klattmose.github.io/CookieClicker/minigameCasino.js');\n\nGame.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js');\n\nGame.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js');\n\nGame.LoadMod('https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js');\n\nGame.LoadMod('https://aktanusa.github.io/CookieMonster/CookieMonster.js');"
-    },
-    {
       "nickname": "Use normal cards",
       "script": "setTimeout(function(){\n\tvar M = Game.Objects[\"Chancemaker\"].minigame;\n\tM.cardsImage = M.sourceFolder + 'img/cards.png';\n}, 1000);"
     },
     {
       "nickname": "Hide empty upgrade store",
-      "script": "Game.customRebuildUpgrades.push(function(){\n\tvar cnt = 0;\n\tfor (var i in Game.UpgradesInStore){\n\t\tvar me = Game.UpgradesInStore[i];\n\t\tif(me.pool != 'toggle' && me.pool != 'tech' && !(me.isVaulted() && Game.Has('Inspired checklist'))) cnt++;\n\t}\n\tif(cnt) l('upgrades').style.display = 'block';\n\telse l('upgrades').style.display = 'none';\n});\n\nGame.upgradesToRebuild = 1;"
+      "script": "Game.customRebuildUpgrades.push(function(){\n\tvar cnt = 0;\n\tfor (var i in Game.UpgradesInStore){\n\t\tvar me = Game.UpgradesInStore[i];\n\t\tif(me.pool != 'toggle' && me.pool != 'tech' && !(me.isVaulted() && Game.Has('Inspired checklist'))) cnt++;\n\t}\n\tif(cnt) l('upgrades').style.display = 'block';\n\telse l('upgrades').style.display = 'none';\n});\n\nGame.Upgrades['Elder Pledge'].order += 36000;\nGame.Upgrades['Elder Covenant'].order += 36000;\nGame.Upgrades['Revoke Elder Covenant'].order += 36000;\n\nGame.upgradesToRebuild = 1;"
     }
   ]
 }

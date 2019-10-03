@@ -100,7 +100,7 @@ CCSE.launch = function(){
 		var textDiv = document.createElement('text');
 		textDiv.innerHTML = 'Game ';
 		l('versionNumber').appendChild(versionDiv);
-		l('versionNumber').prepend(textDiv);
+		l('versionNumber').insertBefore(textDiv, l('versionNumber').firstChild);
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		CCSE.Note.title = 'CCSE loaded!';

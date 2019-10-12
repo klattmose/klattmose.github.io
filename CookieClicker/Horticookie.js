@@ -2,13 +2,13 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.5';
+Horticookie.version = '3.7';
 Horticookie.GameVersion = '2.021';
 
 //***********************************
 //    For testing
 //***********************************
-//Game.LoadMod('https://bitbucket.org/Acharvak/cookie-clicker-agronomicon/downloads/Agronomicon.js');
+Game.LoadMod('https://bitbucket.org/Acharvak/cookie-clicker-agronomicon/downloads/Agronomicon.js');
 
 Horticookie.launch = function(){
 	Horticookie.init = function(){
@@ -597,6 +597,7 @@ Horticookie.launch = function(){
 		
 		ntp.empty = 1;
 		for(var i in M.plants){ntp.immature[i] = 0;}
+		var ntpLooped = JSON.parse(JSON.stringify(ntp));
 		
 		var nextCombo = function(combos){
 			var toggle = true;
@@ -655,18 +656,19 @@ Horticookie.launch = function(){
 					var chance = muts[ii][1];
 					chance *= (M.plants[muts[ii][0]].weed ? Math.min(1, weedMult) : 1);
 					chance *= ((M.plants[muts[ii][0]].weed || M.plants[muts[ii][0]].fungus) ? Math.min(1, M.plotBoost[y][x][2]) : 1);
-					chance = 1 - Math.pow(1 - chance, loops);
 					list.push({key: muts[ii][0], chance: (chance*comboChance)});
 				}
 				
 				list = Horticookie.Feynman(list);
+				
 				for(var i = 0; i < list.length; i++){ list2[list[i].key] = 0; }
 				for(var i = 0; i < list.length; i++){ list2[list[i].key] = 1 - (1 - list2[list[i].key]) * (1 - list[i].chance); }
 				for(var key in list2){
 					ntp.immature[key] += list2[key];
+					ntpLooped.immature[key] += list2[key];
 					ntp.empty -= list2[key];
+					ntpLooped.empty -= list2[key];
 				}
-				
 			} else {
 				//weeds in empty tiles (no other plants must be nearby)
 				var chance = 0.002 * weedMult * M.plotBoost[y][x][2];
@@ -675,6 +677,16 @@ Horticookie.launch = function(){
 			}
 			
 		}while(nextCombo(combos));
+		
+		//***********************************
+		//    Things get loopy
+		//***********************************
+		for(var i = 1; i < loops; i++){
+			for(var key in ntp.immature){
+				ntp.immature[key] = ntpLooped.immature[key] + ntp.immature[key] * ntpLooped.empty;
+			}
+			ntp.empty *= ntpLooped.empty;
+		}
 		
 		//***********************************
 		//    Delete 0% possibilities

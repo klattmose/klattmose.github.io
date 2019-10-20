@@ -3,8 +3,8 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.10';
-KlattmoseUtilities.GameVersion = '2.021';
+KlattmoseUtilities.version = '2.11';
+KlattmoseUtilities.GameVersion = '2.022';
 
 KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.defaultConfig = function(){
@@ -118,6 +118,15 @@ KlattmoseUtilities.launch = function(){
 			  "alt": false,
 			  "script": "if(typeof CM == 'undefined' || typeof CM.Cache == 'undefined'){}\nelse{\n\tvar waitForUpgrade = false;\n\tfor (var i in CM.Cache['Upgrades']) {\n\t\tvar obj = Game.Upgrades[i];\n\t\tif((CM.Cache['Upgrades'][i].color == 'Green' || CM.Cache['Upgrades'][i].color == 'Blue') && obj.pool != \"toggle\"){\n\t\t\tif(obj.getPrice() < Game.cookies) {\n\t\t\t\tobj.buy();\n\t\t\t\tGame.Notify('Bought ' + obj.name, '', '', 1, 1);\n\t\t\t\twaitForUpgrade = false;\n\t\t\t}else{\n\t\t\t\twaitForUpgrade = true;\n\t\t\t}\n\t\t}\n\t}\n\tif(!waitForUpgrade){\n\t\tfor (var i in CM.Cache['Objects']) {\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(CM.Cache['Objects'][i].color == 'Green' && obj.price < Game.cookies){\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
 			  "period": "1000"
+			},
+			{
+			  "keyCode": 102,
+			  "nickname": "Ticker Autoclicker",
+			  "ctrl": false,
+			  "shift": false,
+			  "alt": false,
+			  "script": "if(Game.TickerEffect != 0) Game.tickerL.click();",
+			  "period": "5000"
 			}
 		  ],
 		  "patches": {

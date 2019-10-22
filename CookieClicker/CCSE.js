@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.015';
+CCSE.version = '2.016';
 CCSE.GameVersion = '2.022';
 
 CCSE.launch = function(){
@@ -119,6 +119,9 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">10/22/2019</div>' + 
+			'<div class="listing">&bull; Added hook for the new function Game.auraMult</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">05/14/2019 - parallel processing</div>' + 
 			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' +
@@ -1041,6 +1044,15 @@ CCSE.launch = function(){
 			for(var i in Game.customHasAura) ret = Game.customHasAura[i](what, ret);
 			return ret;
 		`);
+		
+		
+		// Game.auraMult
+		// Return 1 to have no effect
+		if(!Game.customAuraMult) Game.customAuraMult = [];
+		CCSE.ReplaceCodeIntoFunction('Game.auraMult', 'return', `
+			// Game.auraMult injection point 0
+			for(var i in Game.customAuraMult) n *= Game.customAuraMult[i](what);
+			return`, 0);
 		
 		
 		// Game.SelectDragonAura
@@ -2714,7 +2726,7 @@ CCSE.launch = function(){
 		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
 		
 		if(CCSE.save.version != CCSE.version){
-			l('logButton').classList.add('hasUpdate');
+			//l('logButton').classList.add('hasUpdate');
 			CCSE.collapseMenu['CCSEinfo'] = 0;
 		}else{
 			CCSE.collapseMenu['CCSEinfo'] = 1;

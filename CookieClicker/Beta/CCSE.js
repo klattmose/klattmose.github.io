@@ -121,7 +121,7 @@ CCSE.launch = function(){
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">10/22/2019</div>' + 
-			'<div class="listing">&bull; Added hook for new function Game.auraMult</div>' +
+			'<div class="listing">&bull; Added hook for the new function Game.auraMult</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">05/14/2019 - parallel processing</div>' + 
 			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' +

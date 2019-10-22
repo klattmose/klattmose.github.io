@@ -1,6 +1,6 @@
 # Cookie Clicker Script Extender (CCSE)
 
-*Current version : 2.015*
+*Current version : 2.016*
 
 **CCSE** is a modding framework for the game <code>https://orteil.dashnet.org/cookieclicker/</code>. On its own, it makes no changes to the game. Instead, it makes modding the game much easier.
 
@@ -218,6 +218,9 @@ CCSE sinks its grabby hooks into a huge number of the game's functions. I haven'
 Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
 
 ## Version History
+
+**10/22/2019 - (2.016)**
+* Added hook for the new function Game.auraMult
 
 **05/14/2019 - parallel processing (2.015)**
 * Won't freeze the game while CCSE is loading

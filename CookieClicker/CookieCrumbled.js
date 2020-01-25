@@ -39,7 +39,7 @@ CookieCrumbled.launch = function(){
 			
 			var bodyDiv;
 			bodyDiv = document.createElement('div');
-			bodyDiv.innerHTML = '';
+			bodyDiv.innerHTML = '<div class="listing"><a class="option warning" ' + Game.clickStr + '="CookieCrumbled.uninstalled=true;PlaySound(\'snd/tick.mp3\');">Uninstall</a><label>Prevent this mod from loading in the future.</label></div>';
 			
 			var div = document.createElement('div');
 			div.appendChild(titleDiv);
@@ -67,13 +67,13 @@ CookieCrumbled.launch = function(){
 	eval("Game.WriteSave = " + Game.WriteSave.toString().replace("Game.bakeryName", "CookieCrumbled.GetBakeryNameForSaving()"));
 	
 	CookieCrumbled.ReplaceUpdateMenu = function(){
-		var temp = eval(functionName + ".toString()");
+		var temp = Game.UpdateMenu.toString();
 		temp = temp.slice(0, -1) + `
 			CookieCrumbled.MenuAddition()
 			` + temp.slice(-1);
 		
 		//console.log(functionName);
-		eval(functionName + " = " + temp);
+		eval("Game.UpdateMenu = " + temp);
 	}
 	
 	//***********************************

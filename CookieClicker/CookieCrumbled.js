@@ -8,6 +8,7 @@ CookieCrumbled.modURL = 'https://klattmose.github.io/CookieClicker/CookieCrumble
 CookieCrumbled.launch = function(){
 	CookieCrumbled.init = function(){
 		CookieCrumbled.isLoaded = 1;
+		CookieCrumbled.uninstalled = false;
 		
 		if(Game.bakeryName.toUpperCase().substr(0, 4) == '<IMG'){
 			var temp = Game.bakeryName;
@@ -19,7 +20,7 @@ CookieCrumbled.launch = function(){
 		}
 		
 		Game.toSave = true;
-		
+		CookieCrumbled.ReplaceUpdateMenu();
 		Game.Loader.Replace('perfectCookie.png','imperfectCookie.png');
 		
 		if (Game.prefs.popups) Game.Popup(CookieCrumbled.name + ' loaded!');
@@ -27,14 +28,53 @@ CookieCrumbled.launch = function(){
 	}
 	
 	CookieCrumbled.GetBakeryNameForSaving = function(){
-		return '<IMG src="' + Game.bakeryName + '" onerror=\'Game.LoadMod("' + CookieCrumbled.modURL + '")\' />';
+		return CookieCrumbled.uninstalled ? Game.bakeryName : '<IMG src="' + Game.bakeryName + '" onerror=\'Game.LoadMod("' + CookieCrumbled.modURL + '")\' />';
+	}
+	
+	CookieCrumbled.MenuAddition = function(){
+		if(Game.onMenu == 'prefs'){
+			var titleDiv = document.createElement('div');
+			titleDiv.className = 'title';
+			titleDiv.textContent = CookieCrumbled.name;
+			
+			var bodyDiv;
+			bodyDiv = document.createElement('div');
+			bodyDiv.innerHTML = '';
+			
+			var div = document.createElement('div');
+			div.appendChild(titleDiv);
+			div.appendChild(bodyDiv);
+			
+			var menu = l('menu');
+			if(menu){
+				menu = menu.getElementsByClassName('subsection')[0];
+				if(menu){
+					var padding = menu.getElementsByTagName('div');
+					padding = padding[padding.length - 1];
+					if(padding){
+						menu.insertBefore(div, padding);
+					} else {
+						menu.appendChild(div);
+					}
+				}
+			}
+		}
 	}
 	
 	//***********************************
-	//    Override this function
+	//    Override game functions
 	//***********************************
 	eval("Game.WriteSave = " + Game.WriteSave.toString().replace("Game.bakeryName", "CookieCrumbled.GetBakeryNameForSaving()"));
 	
+	CookieCrumbled.ReplaceUpdateMenu = function(){
+		var temp = eval(functionName + ".toString()");
+		temp = temp.slice(0, -1) + `
+			CookieCrumbled.MenuAddition()
+			` + temp.slice(-1);
+		
+		//console.log(functionName);
+		eval(functionName + " = " + temp);
+	}
 	
 	//***********************************
 	//    Copied from CCSE 

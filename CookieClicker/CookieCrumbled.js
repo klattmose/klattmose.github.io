@@ -76,7 +76,7 @@ CookieCrumbled.launch = function(){
 		var temp = Game.UpdateMenu.toString();
 		temp = temp.slice(0, -1) + `
 			CookieCrumbled.MenuAddition()
-			` + temp.slice(-1);
+		` + temp.slice(-1);
 		
 		//console.log(functionName);
 		eval("Game.UpdateMenu = " + temp);

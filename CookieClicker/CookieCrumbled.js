@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CookieCrumbled === undefined) var CookieCrumbled = {};
 CookieCrumbled.name = 'Cookie Crumbled';
-CookieCrumbled.version = '0.1';
+CookieCrumbled.version = '1.0';
 CookieCrumbled.GameVersion = '2.022';
 CookieCrumbled.modURL = 'https://klattmose.github.io/CookieClicker/CookieCrumbled.js';
 
@@ -19,6 +19,8 @@ CookieCrumbled.launch = function(){
 		}
 		
 		Game.toSave = true;
+		
+		Game.Loader.Replace('perfectCookie.png','imperfectCookie.png');
 		
 		if (Game.prefs.popups) Game.Popup(CookieCrumbled.name + ' loaded!');
 		else Game.Notify(CookieCrumbled.name + ' loaded!', '', '', 1, 1);

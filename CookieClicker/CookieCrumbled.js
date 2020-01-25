@@ -39,7 +39,7 @@ CookieCrumbled.launch = function(){
 			
 			var bodyDiv;
 			bodyDiv = document.createElement('div');
-			bodyDiv.innerHTML = '<div class="listing"><a class="option warning" ' + Game.clickStr + '="CookieCrumbled.uninstalled=true;PlaySound(\'snd/tick.mp3\');">Uninstall</a><label>Prevent this mod from loading in the future.</label></div>';
+			bodyDiv.innerHTML = '<div class="listing"><a class="option warning" ' + Game.clickStr + '="CookieCrumbled.Uninstall();PlaySound(\'snd/tick.mp3\');">Uninstall</a><label>Prevent this mod from loading in the future.</label></div>';
 			
 			var div = document.createElement('div');
 			div.appendChild(titleDiv);
@@ -59,6 +59,12 @@ CookieCrumbled.launch = function(){
 				}
 			}
 		}
+	}
+	
+	CookieCrumbled.Uninstall = function(){
+		CookieCrumbled.uninstalled = true;
+		Game.toSave = true;
+		alert('Reload the game to finish removing ' + CookieCrumbled.name);
 	}
 	
 	//***********************************

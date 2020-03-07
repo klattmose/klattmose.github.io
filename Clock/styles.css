@@ -11,6 +11,10 @@ body {
 	overflow: hidden; /* Hide scrollbars */
 }
 
+div {
+	float: left;
+}
+
 #clock {
 	border-spacing: 0px 0px;
 	color: rgb(233, 233, 233);
@@ -31,4 +35,22 @@ body {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+}
+
+#hhmm {
+	width: 70%;
+}
+
+#ampmss {
+	width: 29%;
+	font-size: 13vw;
+}
+
+#ampm {
+	width: 100%;
+	vertical-align: text-bottom;
+}
+
+#sec {
+	width: 100%;
 }

@@ -15,10 +15,11 @@ var UpdateTime = function(){
 	if(h == 0) h = 12;
 	
 	var t = leadingZero(h) + ":" + leadingZero(m);
-	var ts = t + ":" + leadingZero(s);
 	
 	l("title").innerHTML = t;
-	l("clock").innerHTML = ts;
+	l("ampm").innerHTML = ampm;
+	l("sec").innerHTML = leadingZero(s);
+	l("hhmm").innerHTML = t;
 	
 	requestAnimationFrame(UpdateTime);
 }

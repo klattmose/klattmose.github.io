@@ -13,6 +13,7 @@ body {
 
 div {
 	float: left;
+	/*border-style: solid;*/
 }
 
 #clock {
@@ -38,14 +39,15 @@ div {
 }
 
 #hhmm {
-	width: 70%;
+	width: 73%;
 }
 
 #ampmss {
-	width: 29%;
+	width: 27%;
 	font-size: 13vw;
+	text-align: left;
 }
-
+/*
 #ampm {
 	width: 100%;
 	vertical-align: text-bottom;
@@ -54,3 +56,4 @@ div {
 #sec {
 	width: 100%;
 }
+*/

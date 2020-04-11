@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.17';
+FortuneCookie.version = '2.2';
 FortuneCookie.GameVersion = '2.022';
 
 FortuneCookie.launch = function(){
@@ -464,6 +464,22 @@ FortuneCookie.launch = function(){
 					Math.seedrandom();
 				}
 				break;
+				
+			case "Conjure Baked Goods":
+				while(spellsCast < target){
+					Math.seedrandom(Game.seed + '/' + spellsCast);
+					if(Math.random() < (1 - backfire)){
+						var val = Math.max(7, Math.min(Game.cookies * 0.15, Game.cookiesPs * 60 * 30));
+						spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + Beautify(val) + ' cookie' + (val == 1 ? '' : 's') + '</span><br/>';
+					}else{
+						var val = Math.min(Game.cookies * 0.15, Game.cookiesPs * 60 * 15) + 13;
+						val = Math.min(Game.cookies, val);
+						spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + Beautify(val) + ' cookie' + (val == 1 ? '' : 's') + '</span><br/>';
+					}
+					
+					spellsCast += 1;
+					Math.seedrandom();
+				}
 				
 			default:
 				while(spellsCast < target){

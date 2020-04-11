@@ -480,6 +480,7 @@ FortuneCookie.launch = function(){
 					spellsCast += 1;
 					Math.seedrandom();
 				}
+				break;
 				
 			default:
 				while(spellsCast < target){

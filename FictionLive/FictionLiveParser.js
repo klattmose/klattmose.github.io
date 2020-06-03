@@ -1,23 +1,36 @@
 if(FictionLiveParser === undefined) var FictionLiveParser = {};
-if(FictionLiveParser.Users === undefined) FictionLiveParser.Users = {};
-if(FictionLiveParser.Database === undefined){
-	var request = window.indexedDB.open("FictionLiveParser", 1);
-	request.onerror = function(event){
-		console.log(event);
-		FictionLiveParser.unveilChatmessages(document);
-		FictionLiveParser.pollEspionage();
+
+FictionLiveParser.init = function(){
+	if(FictionLiveParser.Users === undefined) FictionLiveParser.Users = {};
+	if(FictionLiveParser.Database === undefined){
+		var request = window.indexedDB.open("FictionLiveParser", 1);
+		request.onerror = function(event){
+			console.log(event);
+			FictionLiveParser.unveilChatmessages(document);
+			FictionLiveParser.pollEspionage();
+		}
+		request.onsuccess = function(event){
+			FictionLiveParser.Database = request.result;
+			FictionLiveParser.readDBIntoLocalVariable();
+		}
+		request.onupgradeneeded = function(event){
+			var db = event.target.result;
+			var objectStore = db.createObjectStore("Users", {keyPath: "_id"});
+		}
 	}
-	request.onsuccess = function(event){
-		FictionLiveParser.Database = request.result;
-		FictionLiveParser.readDBIntoLocalVariable();
-	}
-	request.onupgradeneeded = function(event){
-		var db = event.target.result;
-		var objectStore = db.createObjectStore("Users", {keyPath: "_id"});
-	}
+	if(FictionLiveParser.activeCalls === undefined) FictionLiveParser.activeCalls = 0;
+	if(FictionLiveParser.searched === undefined) FictionLiveParser.searched = {};
+	
+	var showHideBtn = document.createElement("li");
+	showHideBtn.innerHTML = '<a onclick="FictionLiveParser.toggleShowVotes()"><div id="FictionLiveParser_showHideBtn" class="btn"><span>Voters hidden</span></div></a>';
+	$("li.storyMenu.dropdown-main").parent().append(showHideBtn);
+	
+	var processStoryBtn = document.createElement("li");
+	processStoryBtn.id = 'FictionLiveParser_processStoryBtn';
+	processStoryBtn.innerHTML = '<a onclick="FictionLiveParser.parseThisStory()"><div class="btn"><span>Process story</span></div></a>';
+	$("li.storyMenu.dropdown-main").parent().append(processStoryBtn);
+	
 }
-if(FictionLiveParser.activeCalls === undefined) FictionLiveParser.activeCalls = 0;
-if(FictionLiveParser.searched === undefined) FictionLiveParser.searched = {};
 
 FictionLiveParser.put = function(_id, name) {
 	FictionLiveParser.Users[_id] = name;
@@ -189,6 +202,7 @@ FictionLiveParser.ChatObserver.observe(document.documentElement, {
 });
 
 FictionLiveParser.parseThisStory = function(){
+	document.getElementById("FictionLiveParser_processStoryBtn").remove();
 	$.get("https://fiction.live/api/anonkun/chapters/" + angular.element(document.getElementById("storyPosts")).scope().story._id + "/0/9999999999998", FictionLiveParser.receiveStoryChapters);
 }
 
@@ -221,8 +235,12 @@ FictionLiveParser.pollEspionage = function(){
 						user = (FictionLiveParser.Users[chapter.uidUser[voter]] == "Anon") ? chapter.uidUser[voter] : FictionLiveParser.Users[chapter.uidUser[voter]];
 					}
 					
-					for(var k = 0; k < chapter.votes[voter].length; k++){
-						choices[chapter.votes[voter][k]].voters.push(user);
+					if(chapter.multiple){
+						for(var k = 0; k < chapter.votes[voter].length; k++){
+							choices[chapter.votes[voter][k]].voters.push(user);
+						}
+					} else {
+						choices[chapter.votes[voter]].voters.push(user);
 					}
 				}
 				
@@ -250,3 +268,20 @@ FictionLiveParser.pollEspionage = function(){
 		}
 	}
 }
+
+FictionLiveParser.toggleShowVotes = function(){
+	FictionLiveParser.ShowVoters = !FictionLiveParser.ShowVoters;
+	FictionLiveParser.pollEspionage();
+	
+	var showHideBtn = document.getElementById("FictionLiveParser_showHideBtn");
+	if(FictionLiveParser.ShowVoters){
+		showHideBtn.classList.add("active");
+		showHideBtn.innerHTML = '<span>Voters shown</span>';
+	} else {
+		showHideBtn.classList.remove("active");
+		showHideBtn.innerHTML = '<span>Voters hidden</span>';
+	}
+}
+
+
+FictionLiveParser.init();

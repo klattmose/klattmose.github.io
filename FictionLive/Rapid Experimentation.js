@@ -48,3 +48,6 @@ var getallll = function(){
 		}
 	};
 }
+
+javascript:(function(){var script = document.createElement('script');script.setAttribute('src','https://klattmose.github.io/FictionLive/FictionLiveParser.js');document.head.appendChild(script);}())
+javascript:(function(){FictionLiveParser.ShowVoters = !FictionLiveParser.ShowVoters;FictionLiveParser.pollEspionage();}())

@@ -371,7 +371,7 @@ FortuneCookie.launch = function(){
 		var backfire = M.getFailChance(spell);
 		var spellsCast = M.spellsCastTotal;
 		var target = spellsCast + FortuneCookie.config.spellForecastLength;
-		var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0) + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
+		var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0); // + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
 		
 		switch(spell.name){
 			case "Force the Hand of Fate":

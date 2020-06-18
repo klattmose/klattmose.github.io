@@ -1,9 +1,9 @@
 Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.2';
-FortuneCookie.GameVersion = '2.022';
+FortuneCookie.version = '2.3';
+FortuneCookie.GameVersion = '2.026';
 
 FortuneCookie.launch = function(){
 	FortuneCookie.init = function(){
@@ -118,11 +118,20 @@ FortuneCookie.launch = function(){
 					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.UpdatePref('spellForecastLength', Math.round(l('spellForecastSlider').value)); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
 				'</div>';
 		
-		str += WriteHeader('Force the Hand of Fate') + 
+		// Changed functionality of FtHoF spell
+		/*str += WriteHeader('Force the Hand of Fate') + 
 				'<div class="listing">This spell\'s outcome changes based on the season, if the Golden cookie sound selector is on, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
 				'<div class="listing">Column 1 : Golden cookie sound selector is Off <b>AND</b> the season is neither Easter nor Valentine\'s.</div>' + 
 				'<div class="listing">Column 2 : Golden cookie sound selector is On <b>OR</b> the season is either Easter or Valentine\'s.</div>' + 
 				'<div class="listing">Column 3 : Golden cookie sound selector is On <b>AND</b> the season is either Easter or Valentine\'s.</div>' +
+				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
+				'<div class="listing">' +
+					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
+				'</div>';*/
+		str += WriteHeader('Force the Hand of Fate') + 
+				'<div class="listing">This spell\'s outcome changes based on the season, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
+				'<div class="listing">Column 1 : The season is <b>neither</b> Easter nor Valentine\'s.</div>' + 
+				'<div class="listing">Column 2 : The season is <b>either</b> Easter or Valentine\'s.</div>' + 
 				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
 				'<div class="listing">' +
 					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
@@ -192,8 +201,8 @@ FortuneCookie.launch = function(){
 	}
 
 	FortuneCookie.forecastMembrane = function(context, offset){
-		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + offset));
-		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
+		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + Game.reindeerClicked + offset));
+		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + Game.reindeerClicked + offset));
 		
 		if (Math.random() < 0.1){
 			return true;
@@ -370,13 +379,13 @@ FortuneCookie.launch = function(){
 			
 				spellOutcome = spellOutcome.replace('<br/>', '<span style="color:yellow;">This spell is a bit complicated. See the Options menu for an explanation.</span><br/>') + 
 					'<table width="100%"><tr>';
-				for(var i = 0; i < 3; i++)
+				for(var i = 0; i < 2; i++)
 					spellOutcome += '<td width="33%">' + ((i == idx) ? 'Active' : '') + '</td>';
 				spellOutcome += '</tr><br/>';
 				
 				while(spellsCast < target){
 					spellOutcome += '<tr>';
-					for(var i = 0; i < 3; i++)
+					for(var i = 0; i < 2; i++)
 						spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire, false); // Change false to idx == i for an identifier
 					spellOutcome += '</tr>';
 					

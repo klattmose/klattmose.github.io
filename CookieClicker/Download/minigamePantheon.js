@@ -1,4 +1,4 @@
-﻿var M={};
+var M={};
 M.parent=Game.Objects['Temple'];
 M.parent.minigame=M;
 M.launch=function()
@@ -406,7 +406,7 @@ M.launch=function()
 		
 		M.refillTooltip=function(){
 			return '<div style="padding:8px;width:300px;font-size:11px;text-align:center;">Click to refill all your worship swaps for <span class="price lump">1 sugar lump</span>.'+
-				(Game.canRefillLump()?'<br><small>(can be done once every '+Game.sayTime(Game.getLumpRefillMax(),-1)+')</small>':('<br><small class="red">(usable again in '+Game.sayTime(Game.getLumpRefillRemaining()+Game.fps,-1)+')</small>'))+
+				(Game.canRefillLump()?'<br><small>(can be done once every '+Game.sayTime((Game.getLumpRefillMax()/1000)*Game.fps,-1)+')</small>':('<br><small class="red">(usable again in '+Game.sayTime((Game.getLumpRefillRemaining()/1000+1)*Game.fps,-1)+')</small>'))+
 			'</div>';
 		};
 		AddEvent(M.lumpRefill,'click',function(){

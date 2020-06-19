@@ -163,7 +163,7 @@ FortuneCookie.launch = function(){
 		}
 		
 		str += WriteHeader('Dragon Drop forecast') + 
-				'<div class="listing">' + ToggleButton('forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', 'Game.ToggleSpecialMenu(0);') + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
+				'<div class="listing">' + ToggleButton('forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', "if(Game.specialTab=='dragon')Game.ToggleSpecialMenu(1);") + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
 		
 		return str;
 	}

@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.3';
+FortuneCookie.version = '2.4';
 FortuneCookie.GameVersion = '2.026';
 
 FortuneCookie.launch = function(){
@@ -18,6 +18,7 @@ FortuneCookie.launch = function(){
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.initMembraneForecast();
+		FortuneCookie.initDragonDropForecast();
 		
 		
 		Game.customOptionsMenu.push(function(){
@@ -68,7 +69,8 @@ FortuneCookie.launch = function(){
 				'Click Frenzy'		: "#4BB8F0",
 				'Elder Frenzy'		: "#E1C699",
 				'Free Sugar Lump'	: "#DAA560"
-			}
+			},
+			forecastDragonDrop : true
 		}
 	}
 	
@@ -114,6 +116,13 @@ FortuneCookie.launch = function(){
 			return '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>';
 		}
 		
+		function ToggleButton(prefName, button, on, off, callback, invert){
+			var invert = invert ? 1 : 0;
+			if(!callback) callback = '';
+			callback += 'PlaySound(\'snd/tick.mp3\');';
+			return '<a class="option' + ((FortuneCookie.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="FortuneCookie.Toggle(\'' + prefName + '\', \'' + button + '\', \'' + on + '\', \'' + off + '\', \'' + invert + '\');' + callback + '">' + (FortuneCookie.config[prefName] ? on : off) + '</a>';
+		}
+		
 		var str = '<div class="listing">' +
 					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.UpdatePref('spellForecastLength', Math.round(l('spellForecastSlider').value)); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
 				'</div>';
@@ -153,7 +162,22 @@ FortuneCookie.launch = function(){
 				'</div>';
 		}
 		
+		str += WriteHeader('Dragon Drop forecast') + 
+				'<div class="listing">' + ToggleButton('forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', 'Game.ToggleSpecialMenu(0);') + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
+		
 		return str;
+	}
+	
+	FortuneCookie.Toggle = function(prefName, button, on, off, invert){
+		if(FortuneCookie.config[prefName]){
+			l(button).innerHTML = off;
+			FortuneCookie.config[prefName] = 0;
+		}
+		else{
+			l(button).innerHTML = on;
+			FortuneCookie.config[prefName] = 1;
+		}
+		l(button).className = 'option' + ((FortuneCookie.config[prefName] ^ invert) ? '' : ' off');
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {
@@ -222,6 +246,48 @@ FortuneCookie.launch = function(){
 	}
 
 
+	//***********************************
+	//    Dragon drop forecast
+	//***********************************
+	
+	FortuneCookie.initDragonDropForecast = function(){
+		var descFunc = function(str){
+			var temp = str;
+			
+			if(temp.search("cursor:pointer") > -1 && FortuneCookie.config.forecastDragonDrop){
+				temp = temp.replace('></div>', ' ' + Game.getTooltip(
+					'<div style="min-width:200px;text-align:center;"><h4>Dragon Drops</h4>' +
+					'<div class="line"></div>' +
+					FortuneCookie.forecastDragonDrop() +
+					'</div>', 'bottom-right') + 
+				' ></div>');
+			}
+			
+			return temp;
+		}
+		
+		Game.customToggleSpecialMenu.push(descFunc);
+	}
+	
+	FortuneCookie.forecastDragonDrop = function(){
+		var str = '<table>';
+		
+		Math.seedrandom(Game.seed + '/dragonTime');
+		var drops = ['Dragon scale', 'Dragon claw', 'Dragon fang', 'Dragon teddy bear'];
+		drops = shuffle(drops);
+		Math.seedrandom();
+		
+		var j = Math.floor((new Date().getMinutes() / 60) * drops.length);
+		for(var i = 0; i < drops.length; i++){
+			str += '<tr><td>' + (j == i ? 'Current --&gt; ' : '') + '</td><td>' + drops[i] + '</td><td>' + (Game.Has(drops[i]) || Game.HasUnlocked(drops[i]) ? '✔' : '') + '</td></tr>'
+		}
+		
+		str += '</table>';
+		
+		return str;
+	}
+	
+	
 	//***********************************
 	//    Grimoire forecast
 	//***********************************

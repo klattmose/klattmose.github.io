@@ -124,6 +124,10 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
+			'</div><div class="subsection update small"><div class="title">06/20/2020</div>' + 
+			'<div class="listing">&bull; Added hooks for the new stock market minigame</div>' +
+			'<div class="listing">&bull; Added hook for the new function Game.ClickSpecialPic</div>' +
+			
 			'</div><div class="subsection update small"><div class="title">10/22/2019</div>' + 
 			'<div class="listing">&bull; Added hook for the new function Game.auraMult</div>' +
 			
@@ -229,7 +233,7 @@ CCSE.launch = function(){
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
-							(Game.Objects['Bank'].minigameLoaded ? 21 : 0) +
+							(Game.Objects['Bank'].minigameLoaded ? 22 : 0) +
 							Game.ObjectsN * 18 - 1 + 
 							Game.UpgradesN * 9 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
@@ -2315,6 +2319,14 @@ CCSE.launch = function(){
 			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
 			return str;
 		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.tick
+		if(!Game.customMinigame[objKey].tick) Game.customMinigame[objKey].tick = [];
+		CCSE.SliceCodeIntoFunction('M.tick', -1, `
+		// M.tick injection point 0
+		for(var i in Game.customMinigame[objKey].tick) Game.customMinigame[objKey].tick[i]();
+	`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.launch

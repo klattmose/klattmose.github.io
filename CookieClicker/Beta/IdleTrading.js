@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
-IdleTrading.version = '1.0';
+IdleTrading.version = '1.1';
 IdleTrading.GameVersion = '2.026';
 
 IdleTrading.launch = function(){
@@ -15,7 +15,6 @@ IdleTrading.launch = function(){
 		};
 		
 		for(var iG = 0; iG < M.goodsById.length; iG++){
-			// var it=M.goodsById[iG];
 			conf.goods.push({
 				active: true,
 				buyThresh: -1,
@@ -198,10 +197,10 @@ IdleTrading.launch = function(){
 			var good = M.goodsById[iG];
 			var conf = IdleTrading.config.goods[iG];
 			
-			if(conf.buyThresh != -1){
+			if(IdleTrading.config.autoBuy && conf.buyThresh != -1){
 				if(M.getGoodPrice(good) <= conf.buyThresh) M.buyGood(iG, 10000);
 			}
-			if(conf.sellThresh != -1){
+			if(IdleTrading.config.autoSell && conf.sellThresh != -1){
 				if(M.getGoodPrice(good) >= conf.sellThresh) M.sellGood(iG, 10000);
 			}
 		}

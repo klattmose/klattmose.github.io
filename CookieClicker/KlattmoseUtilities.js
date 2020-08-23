@@ -3,8 +3,8 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.11';
-KlattmoseUtilities.GameVersion = '2.022';
+KlattmoseUtilities.version = '2.12';
+KlattmoseUtilities.GameVersion = '2.028';
 
 KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.defaultConfig = function(){
@@ -436,7 +436,7 @@ KlattmoseUtilities.launch = function(){
 				KlattmoseUtilities.waitingForInput = 0;
 			}
 			
-		} else if (!Game.OnAscend && Game.AscendTimer == 0 && !Game.promptOn) {
+		} else if (!Game.OnAscend && Game.AscendTimer == 0 && !Game.promptOn && !(CCSE.collapseMenu[KlattmoseUtilities.name] && Game.onMenu == 'prefs')) {
 			for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
 				var hotkey = KlattmoseUtilities.config.hotkeys[i];
 				if((e.ctrlKey == hotkey.ctrl) && (e.shiftKey == hotkey.shift) && (e.altKey == hotkey.alt) && (e.keyCode == hotkey.keyCode))

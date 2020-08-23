@@ -2,8 +2,8 @@ Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.2';
-FortuneCookie.GameVersion = '2.022';
+FortuneCookie.version = '2.4';
+FortuneCookie.GameVersion = '2.028';
 
 FortuneCookie.launch = function(){
 	FortuneCookie.init = function(){
@@ -18,6 +18,7 @@ FortuneCookie.launch = function(){
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.initMembraneForecast();
+		FortuneCookie.initDragonDropForecast();
 		
 		
 		Game.customOptionsMenu.push(function(){
@@ -68,7 +69,8 @@ FortuneCookie.launch = function(){
 				'Click Frenzy'		: "#4BB8F0",
 				'Elder Frenzy'		: "#E1C699",
 				'Free Sugar Lump'	: "#DAA560"
-			}
+			},
+			forecastDragonDrop : true
 		}
 	}
 	
@@ -114,15 +116,31 @@ FortuneCookie.launch = function(){
 			return '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>';
 		}
 		
+		function ToggleButton(prefName, button, on, off, callback, invert){
+			var invert = invert ? 1 : 0;
+			if(!callback) callback = '';
+			callback += 'PlaySound(\'snd/tick.mp3\');';
+			return '<a class="option' + ((FortuneCookie.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="FortuneCookie.Toggle(\'' + prefName + '\', \'' + button + '\', \'' + on + '\', \'' + off + '\', \'' + invert + '\');' + callback + '">' + (FortuneCookie.config[prefName] ? on : off) + '</a>';
+		}
+		
 		var str = '<div class="listing">' +
 					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.UpdatePref('spellForecastLength', Math.round(l('spellForecastSlider').value)); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
 				'</div>';
 		
-		str += WriteHeader('Force the Hand of Fate') + 
+		// Changed functionality of FtHoF spell
+		/*str += WriteHeader('Force the Hand of Fate') + 
 				'<div class="listing">This spell\'s outcome changes based on the season, if the Golden cookie sound selector is on, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
 				'<div class="listing">Column 1 : Golden cookie sound selector is Off <b>AND</b> the season is neither Easter nor Valentine\'s.</div>' + 
 				'<div class="listing">Column 2 : Golden cookie sound selector is On <b>OR</b> the season is either Easter or Valentine\'s.</div>' + 
 				'<div class="listing">Column 3 : Golden cookie sound selector is On <b>AND</b> the season is either Easter or Valentine\'s.</div>' +
+				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
+				'<div class="listing">' +
+					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
+				'</div>';*/
+		str += WriteHeader('Force the Hand of Fate') + 
+				'<div class="listing">This spell\'s outcome changes based on the season, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
+				'<div class="listing">Column 1 : The season is <b>neither</b> Easter nor Valentine\'s.</div>' + 
+				'<div class="listing">Column 2 : The season is <b>either</b> Easter or Valentine\'s.</div>' + 
 				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
 				'<div class="listing">' +
 					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
@@ -144,7 +162,22 @@ FortuneCookie.launch = function(){
 				'</div>';
 		}
 		
+		str += WriteHeader('Dragon Drop forecast') + 
+				'<div class="listing">' + ToggleButton('forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', "if(Game.specialTab=='dragon')Game.ToggleSpecialMenu(1);") + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
+		
 		return str;
+	}
+	
+	FortuneCookie.Toggle = function(prefName, button, on, off, invert){
+		if(FortuneCookie.config[prefName]){
+			l(button).innerHTML = off;
+			FortuneCookie.config[prefName] = 0;
+		}
+		else{
+			l(button).innerHTML = on;
+			FortuneCookie.config[prefName] = 1;
+		}
+		l(button).className = 'option' + ((FortuneCookie.config[prefName] ^ invert) ? '' : ' off');
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {
@@ -192,8 +225,8 @@ FortuneCookie.launch = function(){
 	}
 
 	FortuneCookie.forecastMembrane = function(context, offset){
-		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + offset));
-		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
+		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + Game.reindeerClicked + offset));
+		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + Game.reindeerClicked + offset));
 		
 		if (Math.random() < 0.1){
 			return true;
@@ -213,6 +246,48 @@ FortuneCookie.launch = function(){
 	}
 
 
+	//***********************************
+	//    Dragon drop forecast
+	//***********************************
+	
+	FortuneCookie.initDragonDropForecast = function(){
+		var descFunc = function(str){
+			var temp = str;
+			
+			if(temp.search("cursor:pointer") > -1 && FortuneCookie.config.forecastDragonDrop){
+				temp = temp.replace('></div>', ' ' + Game.getTooltip(
+					'<div style="min-width:200px;text-align:center;"><h4>Dragon Drops</h4>' +
+					'<div class="line"></div>' +
+					FortuneCookie.forecastDragonDrop() +
+					'</div>', 'bottom-right') + 
+				' ></div>');
+			}
+			
+			return temp;
+		}
+		
+		Game.customToggleSpecialMenu.push(descFunc);
+	}
+	
+	FortuneCookie.forecastDragonDrop = function(){
+		var str = '<table>';
+		
+		Math.seedrandom(Game.seed + '/dragonTime');
+		var drops = ['Dragon scale', 'Dragon claw', 'Dragon fang', 'Dragon teddy bear'];
+		drops = shuffle(drops);
+		Math.seedrandom();
+		
+		var j = Math.floor((new Date().getMinutes() / 60) * drops.length);
+		for(var i = 0; i < drops.length; i++){
+			str += '<tr><td>' + (j == i ? 'Current --&gt; ' : '') + '</td><td>' + drops[i] + '</td><td>' + (Game.Has(drops[i]) || Game.HasUnlocked(drops[i]) ? '✔' : '') + '</td></tr>'
+		}
+		
+		str += '</table>';
+		
+		return str;
+	}
+	
+	
 	//***********************************
 	//    Grimoire forecast
 	//***********************************
@@ -362,7 +437,7 @@ FortuneCookie.launch = function(){
 		var backfire = M.getFailChance(spell);
 		var spellsCast = M.spellsCastTotal;
 		var target = spellsCast + FortuneCookie.config.spellForecastLength;
-		var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0) + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
+		var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0); // + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
 		
 		switch(spell.name){
 			case "Force the Hand of Fate":
@@ -370,13 +445,13 @@ FortuneCookie.launch = function(){
 			
 				spellOutcome = spellOutcome.replace('<br/>', '<span style="color:yellow;">This spell is a bit complicated. See the Options menu for an explanation.</span><br/>') + 
 					'<table width="100%"><tr>';
-				for(var i = 0; i < 3; i++)
+				for(var i = 0; i < 2; i++)
 					spellOutcome += '<td width="33%">' + ((i == idx) ? 'Active' : '') + '</td>';
 				spellOutcome += '</tr><br/>';
 				
 				while(spellsCast < target){
 					spellOutcome += '<tr>';
-					for(var i = 0; i < 3; i++)
+					for(var i = 0; i < 2; i++)
 						spellOutcome += FortuneCookie.FateChecker(spellsCast, i, backfire, false); // Change false to idx == i for an identifier
 					spellOutcome += '</tr>';
 					

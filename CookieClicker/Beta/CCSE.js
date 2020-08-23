@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
 CCSE.version = '2.017';
-CCSE.GameVersion = '2.026';
+CCSE.GameVersion = '2.028';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -233,7 +233,7 @@ CCSE.launch = function(){
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
-							(Game.Objects['Bank'].minigameLoaded ? 22 : 0) +
+							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
 							Game.ObjectsN * 18 - 1 + 
 							Game.UpgradesN * 9 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
@@ -1674,7 +1674,7 @@ CCSE.launch = function(){
 		// this.buy
 		if(!Game.customUpgrades[key].buy) Game.customUpgrades[key].buy = []; 
 		Game.customUpgrades[key].buy.push(CCSE.customUpgradesAllbuy);
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buy", 'return', `
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buy", 'return success', `
 			// Game.Upgrades['` + escKey + `'].buy injection point 0
 			for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);`, -1);
 		
@@ -2226,6 +2226,18 @@ CCSE.launch = function(){
 			// M.sellGood injection point 0
 			for(var i in Game.customMinigame[objKey].sellGood) Game.customMinigame[objKey].sellGood[i](id, n);`, -1,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.getRestingVal
+		// functions should return a number value (Return ret for no effect)
+		if(!Game.customMinigame[objKey].getRestingVal) Game.customMinigame[objKey].getRestingVal = [];
+		CCSE.ReplaceCodeIntoFunction('M.getRestingVal', 'return', 'var ret = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.getRestingVal', '}', `
+			// M.getRestingVal injection point 0
+			for(var i in Game.customMinigame[objKey].getRestingVal) ret = Game.customMinigame[objKey].getRestingVal[i](id, ret);
+			return ret;
+		`, -1, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.updateGoodStyle

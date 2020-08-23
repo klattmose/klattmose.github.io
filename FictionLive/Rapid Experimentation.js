@@ -51,3 +51,10 @@ var getallll = function(){
 
 javascript:(function(){var script = document.createElement('script');script.setAttribute('src','https://klattmose.github.io/FictionLive/FictionLiveParser.js');document.head.appendChild(script);}())
 javascript:(function(){FictionLiveParser.ShowVoters = !FictionLiveParser.ShowVoters;FictionLiveParser.pollEspionage();}())
+
+
+var i = 0;
+Game.wrinklers.forEach(function(item){
+    if(item.phase == 2) i++;
+});
+if(i == Game.getWrinklersMax()) Game.CollectWrinklers();

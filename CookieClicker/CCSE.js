@@ -1,8 +1,8 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.016';
-CCSE.GameVersion = '2.022';
+CCSE.version = '2.017';
+CCSE.GameVersion = '2.028';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -35,6 +35,10 @@ CCSE.launch = function(){
 		});
 		CCSE.playlist.push(function(){
 			CCSE.MinigameReplacer(CCSE.ReplaceGarden, 'Farm');
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		CCSE.playlist.push(function(){
+			CCSE.MinigameReplacer(CCSE.ReplaceMarket, 'Bank');
 			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
 		});
 		
@@ -119,6 +123,10 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">06/20/2020</div>' + 
+			'<div class="listing">&bull; Added hooks for the new stock market minigame</div>' +
+			'<div class="listing">&bull; Added hook for the new function Game.ClickSpecialPic</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">10/22/2019</div>' + 
 			'<div class="listing">&bull; Added hook for the new function Game.auraMult</div>' +
@@ -221,10 +229,11 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 120 + 
+		CCSE.functionsTotal = 121 + 
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
+							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
 							Game.ObjectsN * 18 - 1 + 
 							Game.UpgradesN * 9 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
@@ -1086,6 +1095,14 @@ CCSE.launch = function(){
 		`);
 		
 		
+		// Game.ClickSpecialPic
+		if(!Game.customClickSpecialPic) Game.customClickSpecialPic = [];
+		CCSE.SliceCodeIntoFunction('Game.ClickSpecialPic', -1, `
+			// Game.ClickSpecialPic injection point 0
+			for(var i in Game.customClickSpecialPic) Game.customClickSpecialPic[i]();
+		`);
+		
+		
 		// Game.ToggleSpecialMenu
 		// customToggleSpecialMenu functions should return a string for l('specialPopup').innerHTML (Return str for no effect)
 		// str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', <your pic here>)
@@ -1657,7 +1674,7 @@ CCSE.launch = function(){
 		// this.buy
 		if(!Game.customUpgrades[key].buy) Game.customUpgrades[key].buy = []; 
 		Game.customUpgrades[key].buy.push(CCSE.customUpgradesAllbuy);
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buy", 'return', `
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buy", 'return success', `
 			// Game.Upgrades['` + escKey + `'].buy injection point 0
 			for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);`, -1);
 		
@@ -2120,6 +2137,208 @@ CCSE.launch = function(){
 					`// M.spells["hand of fate"].fail injection point 0
 					for(var i in Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail[i](choices);`, -1,
 			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.launch
+		if(M.launch.toString().indexOf('// M.launch injection point 0') == -1){
+			CCSE.SliceCodeIntoFunction('M.launch', -1, `
+	// M.launch injection point 0
+	for(var i in Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey][i](M.parent);
+`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		}
+	}
+	
+	CCSE.ReplaceMarket = function(){
+		// Temporary variable for storing function strings
+		// Slightly more efficient than nesting functions
+		// Doubt it really matters
+		var temp = '';
+		var pos = 0;
+		var proto;
+		var obj;
+		var objKey = 'Bank';
+		var M = Game.Objects[objKey].minigame;
+		
+		
+		// M.goodTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].goodTooltip) Game.customMinigame[objKey].goodTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.goodTooltip', 'return str', `
+			// M.goodTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].goodTooltip) str = Game.customMinigame[objKey].goodTooltip[i](id, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.tradeTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].tradeTooltip) Game.customMinigame[objKey].tradeTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.tradeTooltip', 'return str', `
+			// M.tradeTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].tradeTooltip) str = Game.customMinigame[objKey].tradeTooltip[i](id, n, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.goodDelta
+		// functions should return a value to multiply val by (Return 1 for no effect)
+		if(!Game.customMinigame[objKey].goodDelta) Game.customMinigame[objKey].goodDelta = [];
+		CCSE.ReplaceCodeIntoFunction('M.goodDelta', 'return', `
+			// M.goodDelta injection point 0
+			for(var i in Game.customMinigame[objKey].goodDelta) val *= Game.customMinigame[objKey].goodDelta[i](id, back);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.getGoodMaxStock
+		// functions should return an int value (Return ret for no effect)
+		if(!Game.customMinigame[objKey].getGoodMaxStock) Game.customMinigame[objKey].getGoodMaxStock = [];
+		CCSE.ReplaceCodeIntoFunction('M.getGoodMaxStock', 'return', 'var ret = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SliceCodeIntoFunction('M.getGoodMaxStock', -1, `
+			// M.getGoodMaxStock injection point 0
+			for(var i in Game.customMinigame[objKey].getGoodMaxStock) ret = Game.customMinigame[objKey].getGoodMaxStock[i](good, ret);
+			return ret;
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.getGoodPrice
+		// functions should return a value to multiply val by (Return 1 for no effect)
+		if(!Game.customMinigame[objKey].getGoodPrice) Game.customMinigame[objKey].getGoodPrice = [];
+		CCSE.ReplaceCodeIntoFunction('M.getGoodPrice', 'return good.val;', 
+			`var val = good.val;
+			// M.getGoodPrice injection point 0
+			for(var i in Game.customMinigame[objKey].getGoodPrice) val *= Game.customMinigame[objKey].getGoodPrice[i](good);
+			return val;`, 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.buyGood
+		// functions that run when a good is purchased
+		if(!Game.customMinigame[objKey].buyGood) Game.customMinigame[objKey].buyGood = [];
+		CCSE.ReplaceCodeIntoFunction('M.buyGood', 'return true', `
+			// M.buyGood injection point 0
+			for(var i in Game.customMinigame[objKey].buyGood) Game.customMinigame[objKey].buyGood[i](id, n);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.sellGood
+		// functions that run when a good is sold
+		if(!Game.customMinigame[objKey].sellGood) Game.customMinigame[objKey].sellGood = [];
+		CCSE.ReplaceCodeIntoFunction('M.sellGood', 'return true', `
+			// M.sellGood injection point 0
+			for(var i in Game.customMinigame[objKey].sellGood) Game.customMinigame[objKey].sellGood[i](id, n);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.getRestingVal
+		// functions should return a number value (Return ret for no effect)
+		if(!Game.customMinigame[objKey].getRestingVal) Game.customMinigame[objKey].getRestingVal = [];
+		CCSE.ReplaceCodeIntoFunction('M.getRestingVal', 'return', 'var ret = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.getRestingVal', '}', `
+			// M.getRestingVal injection point 0
+			for(var i in Game.customMinigame[objKey].getRestingVal) ret = Game.customMinigame[objKey].getRestingVal[i](id, ret);
+			return ret;
+		`, -1, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.updateGoodStyle
+		if(!Game.customMinigame[objKey].updateGoodStyle) Game.customMinigame[objKey].updateGoodStyle = [];
+		CCSE.SliceCodeIntoFunction('M.updateGoodStyle', -1, `
+			// M.updateGoodStyle injection point 0
+			for(var i in Game.customMinigame[objKey].updateGoodStyle) Game.customMinigame[objKey].updateGoodStyle[i](id, me);
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.officeTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].officeTooltip) Game.customMinigame[objKey].officeTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.officeTooltip', 'return str', `
+			// M.officeTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].officeTooltip) str = Game.customMinigame[objKey].officeTooltip[i](me, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.getMaxBrokers
+		// functions should return an int value (Return ret for no effect)
+		if(!Game.customMinigame[objKey].getMaxBrokers) Game.customMinigame[objKey].getMaxBrokers = [];
+		CCSE.ReplaceCodeIntoFunction('M.getMaxBrokers', 'return', 'var ret = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.getMaxBrokers', '}', `
+			// M.getMaxBrokers injection point 0
+			for(var i in Game.customMinigame[objKey].getMaxBrokers) ret = Game.customMinigame[objKey].getMaxBrokers[i](ret);
+			return ret;
+		`, -1, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.getBrokerPrice
+		// functions should return an int value (Return ret for no effect)
+		if(!Game.customMinigame[objKey].getBrokerPrice) Game.customMinigame[objKey].getBrokerPrice = [];
+		CCSE.ReplaceCodeIntoFunction('M.getBrokerPrice', 'return', 'var ret = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.ReplaceCodeIntoFunction('M.getBrokerPrice', '}', `
+			// M.getBrokerPrice injection point 0
+			for(var i in Game.customMinigame[objKey].getBrokerPrice) ret = Game.customMinigame[objKey].getBrokerPrice[i](ret);
+			return ret;
+		`, -1, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.brokersTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].brokersTooltip) Game.customMinigame[objKey].brokersTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.brokersTooltip', 'return str', `
+			// M.brokersTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].brokersTooltip) str = Game.customMinigame[objKey].brokersTooltip[i](str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.loanTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].loanTooltip) Game.customMinigame[objKey].loanTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.loanTooltip', 'return str', `
+			// M.loanTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].loanTooltip) str = Game.customMinigame[objKey].loanTooltip[i](id, loan, str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.takeLoan
+		// Will be added if given a specific request
+		
+		
+		// M.getOppSlots
+		// functions should return a value to add to slots (Return 0 for no effect)
+		if(!Game.customMinigame[objKey].getOppSlots) Game.customMinigame[objKey].getOppSlots = [];
+		CCSE.ReplaceCodeIntoFunction('M.getOppSlots', 'return', `
+			// M.getOppSlots injection point 0
+			for(var i in Game.customMinigame[objKey].getOppSlots) slots += Game.customMinigame[objKey].getOppSlots[i]();`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.oppTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].oppTooltip) Game.customMinigame[objKey].oppTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.oppTooltip', 'return str', `
+			// M.oppTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].oppTooltip) str = Game.customMinigame[objKey].oppTooltip[i](str);`, -1,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.refillTooltip
+		// functions should return a string value (Return str for no effect)
+		if(!Game.customMinigame[objKey].refillTooltip) Game.customMinigame[objKey].refillTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.refillTooltip', 'return', 'var str = ', 0,
+			"var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		CCSE.SliceCodeIntoFunction('M.refillTooltip', -1, `
+			// M.refillTooltip injection point 0
+			for(var i in Game.customMinigame[objKey].refillTooltip) str = Game.customMinigame[objKey].refillTooltip[i](id, str);
+			return str;
+		`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
+		
+		
+		// M.tick
+		if(!Game.customMinigame[objKey].tick) Game.customMinigame[objKey].tick = [];
+		CCSE.SliceCodeIntoFunction('M.tick', -1, `
+		// M.tick injection point 0
+		for(var i in Game.customMinigame[objKey].tick) Game.customMinigame[objKey].tick[i]();
+	`, "var objKey = '" + objKey + "';var M = Game.Objects[objKey].minigame;");
 		
 		
 		// M.launch

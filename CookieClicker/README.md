@@ -26,6 +26,10 @@ Create an unlimited amount of fully customizable hotkeys.
 
 A helper tool for the Garden minigame.
 
+### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js)
+
+A helper tool for the Market minigame.
+
 ### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js)
 
 Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies.

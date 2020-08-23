@@ -1427,10 +1427,12 @@ q:after
 	background:url(img/prestigeBar.jpg) 0px 0px;
 	position:absolute;
 	left:0px;
-	right:100%;
+	/*right:100%;*/
+	right:0px;
 	top:0px;
 	height:100%;
-	max-width:100%;
+	/*max-width:100%;*/
+	transform:translate(0px,0px);
 }
 .meter:after
 {
@@ -1449,10 +1451,11 @@ q:after
 	right:0px;
 	bottom:4px;
 	position:absolute;
+	overflow:hidden;
 }
 #ascendMeter
 {
-	right:100px;
+	/*right:100px;*/
 }
 
 .meter.filling
@@ -2247,12 +2250,13 @@ from {background-position:0px 0px;}
 .product .content .owned
 {
 	position:absolute;
-	right:12px;
-	top:6px;
+	right:8px;
+	bottom:5px;
 	font-size:40px;
 	opacity:0.2;
 	color:#000;
 	text-shadow:0px 0px 8px #fff;
+	letter-spacing:-2.5px;
 }
 .product .icon
 {

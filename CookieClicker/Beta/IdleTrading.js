@@ -3,7 +3,7 @@ if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
 IdleTrading.version = '1.1';
-IdleTrading.GameVersion = '2.028';
+IdleTrading.GameVersion = '2.029';
 
 IdleTrading.launch = function(){
 	IdleTrading.defaultConfig = function(){

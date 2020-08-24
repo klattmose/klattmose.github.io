@@ -116,7 +116,8 @@ M.launch=function()
 				'<div class="name">'+me.name+' <span style="font-size:12px;opacity:0.8;">(from <span style="font-variant:small-caps;">'+me.company+'</span>)</span> <span class="bankSymbol">'+me.symbol+' <span class="bankSymbolNum'+(delta>=0?' bankSymbolUp':delta<0?' bankSymbolDown':'')+'">'+(delta+''+(delta==Math.floor(delta)?'.00':(delta*10)==Math.floor(delta*10)?'0':'')+'%')+'</span></span></div>'+
 				'<div class="line"></div><div class="description">'+
 					'<q>'+me.desc+'</q>'+
-					'<div class="line"></div><div style="font-size:11px;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div> '+me.name+': currently worth <b>$'+Beautify(val,2)+'</b> per unit.<br>You currently own <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div> <b>'+Beautify(me.stock)+'</b>x '+me.name+' (worth <b>$'+Beautify(val*me.stock,2)+'</b>).<br>Your warehouses can store up to <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div> <b>'+Beautify(M.getGoodMaxStock(me))+'</b>x '+me.name+'.<br>You may increase your storage space by upgrading your offices and by buying more <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-me.building.iconColumn*48)+'px '+(0*48)+'px;"></div> '+me.building.plural+'. You also get 10 extra storage space per '+me.building.single+' level (currently: <b>+'+(me.building.level*10)+'</b>).<br>The average worth of this stock and how high it can peak depends on the building it is tied to, along with the level of your <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-15*48)+'px '+(0*48)+'px;"></div> banks.</div>'+
+					'<div class="line"></div><div style="font-size:11px;">&bull; <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div> '+me.name+': currently worth <b>$'+Beautify(val,2)+'</b> per unit.<br>&bull; You currently own <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div> <b>'+Beautify(me.stock)+'</b>x '+me.name+' (worth <b>$'+Beautify(val*me.stock,2)+'</b>).<br>&bull; Your warehouses can store up to <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div> <b>'+Beautify(M.getGoodMaxStock(me))+'</b>x '+me.name+'.<br>&bull; You may increase your storage space by upgrading your offices and by buying more <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-me.building.iconColumn*48)+'px '+(0*48)+'px;"></div> '+me.building.plural+'. You also get 10 extra storage space per '+me.building.single+' level (currently: <b>+'+(me.building.level*10)+'</b>).<br>&bull; The average worth of this stock and how high it can peak depends on the building it is tied to, along with the level of your <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-15*48)+'px '+(0*48)+'px;"></div> banks.</div>'+
+					'<div style="font-size:11px;opacity:0.5;margin-top:3px;">Shift-click the hide button to toggle all other stocks.</div>'+
 				'</div></div>';
 				return str;
 			};
@@ -236,7 +237,7 @@ M.launch=function()
 		}
 		M.getRestingVal=function(id)
 		{
-			return 10+3*id+(Game.Objects['Bank'].level-1);
+			return 10+10*id+(Game.Objects['Bank'].level-1);
 		}
 		
 		M.updateGoodStyle=function(id)
@@ -751,8 +752,8 @@ M.launch=function()
 		{
 			var it=M.goodsById[i];
 			it.stock=0;
-			it.mode=choose([0,0,0,1,1,2,2,3,4,5]);
-			it.dur=Math.floor(1+Math.random()*999);
+			it.mode=choose([0,1,1,2,2,3,4,5]);
+			it.dur=Math.floor(10+Math.random()*990);
 			it.val=M.getRestingVal(it.id);
 			it.d=Math.random()*0.2-0.1;
 			it.vals=[it.val,it.val-it.d];
@@ -780,23 +781,24 @@ M.launch=function()
 			var me=M.goodsById[i];
 			me.last=0;
 			
-			me.d*=0.95;
+			me.d*=0.97;
 			
-			if (me.mode==0) {me.d*=0.8;me.d+=0.05*(Math.random()-0.5);}
-			else if (me.mode==1) {me.d*=0.95;me.d+=0.05*(Math.random()-0.1);}
-			else if (me.mode==2) {me.d*=0.95;me.d-=0.05*(Math.random()-0.1);}
+			if (me.mode==0) {me.d*=0.95;me.d+=0.05*(Math.random()-0.5);}
+			else if (me.mode==1) {me.d*=0.99;me.d+=0.05*(Math.random()-0.1);}
+			else if (me.mode==2) {me.d*=0.99;me.d-=0.05*(Math.random()-0.1);}
 			else if (me.mode==3) {me.d+=0.15*(Math.random()-0.1);me.val+=Math.random();}
 			else if (me.mode==4) {me.d-=0.15*(Math.random()-0.1);me.val-=Math.random();}
 			else if (me.mode==5) me.d+=0.3*(Math.random()-0.5);
 			
-			me.val+=(M.getRestingVal(me.id)-me.val)*0.03;
-			me.val+=(Math.random()-0.5)*0.2;
+			me.val+=(M.getRestingVal(me.id)-me.val)*0.02;
+			me.val+=(Math.random()-0.5)*0.4;
+			me.d+=0.1*(Math.random()-0.5);
 			if (Math.random()<0.1) me.val+=(Math.random()-0.5)*3;
 			if (Math.random()<0.1) me.d+=(Math.random()-0.5)*0.3;
 			if (me.mode==5)
 			{
 				if (Math.random()<0.5) me.val+=(Math.random()-0.5)*10;
-				if (Math.random()<0.2) me.d=(Math.random()-0.5)*0.5;
+				if (Math.random()<0.2) me.d=(Math.random()-0.5)*2;
 			}
 			if (me.mode==3 && Math.random()<0.3) {me.d+=(Math.random()-0.5)*0.1;me.val+=(Math.random()-0.7)*10;}
 			if (me.mode==3 && Math.random()<0.03) {me.mode=4;}
@@ -826,11 +828,13 @@ M.launch=function()
 			me.vals.unshift(me.val);
 			if (me.vals.length>65) me.vals.pop();
 			
-			if (Math.random()<1/me.dur)
+			me.dur--;
+			//if (Math.random()<1/me.dur)
+			if (me.dur<=0)
 			{
-				me.dur=Math.floor(1+Math.random()*999);
+				me.dur=Math.floor(10+Math.random()*990);
 				if (Math.random()<0.7 && (me.mode==3 || me.mode==4)) me.mode=5;
-				else me.mode=choose([0,0,0,1,1,2,2,3,4,5]);
+				else me.mode=choose([0,1,1,2,2,3,4,5]);
 			}
 		}
 		M.checkGraphScale();

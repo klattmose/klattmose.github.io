@@ -7,7 +7,7 @@ Spoilers ahead.
 http://orteil.dashnet.org
 */
 
-var VERSION=2.028;
+var VERSION=2.029;
 var BETA=0;
 
 
@@ -651,9 +651,10 @@ Game.Launch=function()
 	'<div class="listing">&bull; finalized stock market minigame beta and added it to live version</div>'+
 	'<div class="listing">&bull; dark mode added to stock market minigame</div>'+
 	'<div class="listing">&bull; can no longer select a milk before unlocking it; milk selector layout has been improved</div>'+
+	'<div class="listing">&bull; stock market goods have higher value caps and a larger spread; can also shift-click the hide buttons to hide/show all other stocks</div>'+
 	
 	'</div><div class="subsection update small">'+
-	'<div class="title">08/08/2020 - checking account</div>'+
+	'<div class="title">08/08/2020 - checking account (beta)</div>'+
 	'<div class="listing">&bull; stock market layout has been revised</div>'+
 	'<div class="listing">&bull; selling stocks no longer increases cookies baked all time</div>'+
 	'<div class="listing">&bull; stock prices are now defined by your highest raw CpS this ascension (which is now displayed in the stats screen)</div>'+
@@ -664,7 +665,7 @@ Game.Launch=function()
 	'<div class="listing">&bull; Cookie Clicker turns 7!</div>'+
 	
 	'</div><div class="subsection update">'+
-	'<div class="title">18/06/2020 - making bank</div>'+
+	'<div class="title">18/06/2020 - making bank (beta)</div>'+
 	'<div class="listing">&bull; added the stock market minigame, accessible with level 1 banks or above; buy low, sell high!</div>'+
 	'<div class="listing">&bull; (minigame subject to heavy rebalancing over the coming patches)</div>'+
 	'<div class="listing">&bull; added a couple heavenly upgrades, including one that lets you pet your dragon</div>'+
@@ -5735,7 +5736,7 @@ Game.Launch=function()
 						var milk=Game.Milks[i];
 						milkStr+='<div '+Game.getTooltip(
 						'<div class="prompt" style="text-align:center;padding-bottom:6px;white-space:nowrap;margin:0px;padding-bottom:96px;"><h3 style="margin:6px 32px 0px 32px;">'+milk.name+'</h3><div style="opacity:0.75;font-size:9px;">('+(i==0?'starter milk':('for '+Beautify(i*25)+' achievements'))+')</div><div class="line"></div><div style="width:100%;height:96px;position:absolute;left:0px;bottom:0px;background:url(img/'+milk.pic+'.png);"></div></div>'
-						,'top')+' style="background:url(img/icons.png) '+(-milk.icon[0]*48)+'px '+(-milk.icon[1]*48)+'px;margin:2px 0px;" class="trophy"></div>';
+						,'top')+' style="background:url(img/icons.png?v='+Game.version+') '+(-milk.icon[0]*48)+'px '+(-milk.icon[1]*48)+'px;margin:2px 0px;" class="trophy"></div>';
 					}
 				}
 				milkStr+='<div style="clear:both;"></div>';

@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
-IdleTrading.version = '1.1';
+IdleTrading.version = '1.2';
 IdleTrading.GameVersion = '2.029';
 
 IdleTrading.launch = function(){
@@ -18,7 +18,9 @@ IdleTrading.launch = function(){
 			conf.goods.push({
 				active: true,
 				buyThresh: -1,
-				sellThresh: -1
+				sellThresh: -1,
+				minPrice: 99999,
+				maxPrice:-99999
 			});
 		}
 		
@@ -108,6 +110,7 @@ IdleTrading.launch = function(){
 			str += '<div class="listing" style="text-align:left;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:' + (-me.icon[0] * 48) + 'px ' + (-me.icon[1] * 48) + 'px;"></div><span class="bankSymbol" style="width:30px;overflow:hidden;white-space:nowrap;">' + me.symbol + '</span>';
 			str += '<input id="IdleTrading_buyThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.buyThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 0)"></input>';
 			str += '<input id="IdleTrading_sellThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.sellThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 1)"></input>';
+			str += '<label>Historical min: <b>$' + Beautify(conf.minPrice, 2) + '</b>; Historical max: <b>$' + Beautify(conf.maxPrice, 2) + '</b></label>';
 			str += '</div>';
 		}
 		
@@ -116,7 +119,7 @@ IdleTrading.launch = function(){
 
 
 	//***********************************
-	//    Configuration
+	//    Configuration<b>$'+Beautify(val*me.stock,2)+'</b>
 	//***********************************
 	
 	IdleTrading.saveConfig = function(config){
@@ -196,13 +199,17 @@ IdleTrading.launch = function(){
 		for(var iG = 0; iG < M.goodsById.length; iG++){
 			var good = M.goodsById[iG];
 			var conf = IdleTrading.config.goods[iG];
+			var price = M.getGoodPrice(good);
 			
 			if(IdleTrading.config.autoBuy && conf.buyThresh != -1){
-				if(M.getGoodPrice(good) <= conf.buyThresh) M.buyGood(iG, 10000);
+				if(price <= conf.buyThresh) M.buyGood(iG, 10000);
 			}
 			if(IdleTrading.config.autoSell && conf.sellThresh != -1){
-				if(M.getGoodPrice(good) >= conf.sellThresh) M.sellGood(iG, 10000);
+				if(price >= conf.sellThresh) M.sellGood(iG, 10000);
 			}
+			
+			if(price < conf.minPrice) conf.minPrice = price;
+			if(price > conf.maxPrice) conf.maxPrice = price;
 		}
 	}
 	

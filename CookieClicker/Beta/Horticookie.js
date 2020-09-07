@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.8';
+Horticookie.version = '3.9';
 Horticookie.GameVersion = '2.029';
 
 //***********************************
@@ -408,9 +408,11 @@ Horticookie.launch = function(){
 		var M = Horticookie.M;
 		if(recipe.type == Horticookie.recipeCodes.NORMAL){
 			for(var i = 0; i < recipe.neighs.length; i++){
+				if(recipe.neighs[i].isMax) continue;
 				if(!M.plants[recipe.neighs[i].plant].unlocked) return false;
 			}
 			for(var i = 0; i < recipe.neighsM.length; i++){
+				if(recipe.neighsM[i].isMax) continue;
 				if(!M.plants[recipe.neighsM[i].plant].unlocked) return false;
 			}
 		}
@@ -810,9 +812,11 @@ Horticookie.launch = function(){
 			
 			if(mut.type == Horticookie.recipeCodes.NORMAL){
 				for(var j = 0; j < mut.neighsM.length; j++){
+					if(mut.neighsM[j].isMax) continue;
 					if(!M.plants[mut.neighsM[j].plant].unlocked) unlockable = false;
 				}
 				for(var j = 0; j < mut.neighs.length; j++){
+					if(mut.neighs[j].isMax) continue;
 					if(!M.plants[mut.neighs[j].plant].unlocked) unlockable = false;
 				}
 				

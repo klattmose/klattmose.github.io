@@ -184,6 +184,7 @@ FictionLiveParser.handleChatMessage = function(data, status){
 FictionLiveParser.unveilChatmessages = function(root){
 	var chatPosts = root.getElementsByClassName("chatMsg");
 	for(var i = 0; i < chatPosts.length; i++){
+		chatPosts[i].style.display = "";
 		$.get("https://fiction.live/api/node/" + chatPosts[i].attributes["data-id"].value, FictionLiveParser.handleChatMessage);
 	}
 }

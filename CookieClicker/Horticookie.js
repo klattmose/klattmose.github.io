@@ -51,7 +51,6 @@ Horticookie.launch = function(){
 		Horticookie.buildMutationMap();
 		Horticookie.buildUpgradesMap();
 		Horticookie.backupPlants();
-		Horticookie.recalcUnlockables();
 		
 		var gpl = M.plotLimits[M.plotLimits.length - 1];
 		Horticookie.maxPlotWidth = gpl[2] - gpl[0];
@@ -72,6 +71,7 @@ Horticookie.launch = function(){
 		
 		Horticookie.recalcTileStatus();
 		Horticookie.recalcPlantStatus();
+		Horticookie.recalcUnlockables();
 	}
 
 
@@ -813,11 +813,11 @@ Horticookie.launch = function(){
 			if(mut.type == Horticookie.recipeCodes.NORMAL){
 				for(var j = 0; j < mut.neighsM.length; j++){
 					if(mut.neighsM[j].isMax) continue;
-					if(!M.plants[mut.neighsM[j].plant].unlocked) unlockable = false;
+					if(Horticookie.plantStatus[mut.neighsM[j].plant < Horticookie.statusCodes.PREMATURE) unlockable = false;
 				}
 				for(var j = 0; j < mut.neighs.length; j++){
 					if(mut.neighs[j].isMax) continue;
-					if(!M.plants[mut.neighs[j].plant].unlocked) unlockable = false;
+					if(Horticookie.plantStatus[mut.neighs[j].plant < Horticookie.statusCodes.PREMATURE) unlockable = false;
 				}
 				
 				if(unlockable) Horticookie.unlockables[mut.product[0]] = true;

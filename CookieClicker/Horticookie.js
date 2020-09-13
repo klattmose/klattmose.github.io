@@ -813,11 +813,11 @@ Horticookie.launch = function(){
 			if(mut.type == Horticookie.recipeCodes.NORMAL){
 				for(var j = 0; j < mut.neighsM.length; j++){
 					if(mut.neighsM[j].isMax) continue;
-					if(Horticookie.plantStatus[mut.neighsM[j].plant] < Horticookie.statusCodes.PREMATURE) unlockable = false;
+					if(Horticookie.plantStatus[mut.neighsM[j].plant].status < Horticookie.statusCodes.PREMATURE) unlockable = false;
 				}
 				for(var j = 0; j < mut.neighs.length; j++){
 					if(mut.neighs[j].isMax) continue;
-					if(Horticookie.plantStatus[mut.neighs[j].plant] < Horticookie.statusCodes.PREMATURE) unlockable = false;
+					if(Horticookie.plantStatus[mut.neighs[j].plant].status < Horticookie.statusCodes.PREMATURE) unlockable = false;
 				}
 				
 				if(unlockable) Horticookie.unlockables[mut.product[0]] = true;
@@ -826,7 +826,7 @@ Horticookie.launch = function(){
 				Horticookie.unlockables[mut.product[0]] = true;
 			}
 			else if(mut.type == Horticookie.recipeCodes.CREATED_ON_KILL){
-				if(Horticookie.plantStatus[mut.prereq] >= Horticookie.statusCodes.PREMATURE) Horticookie.unlockables[mut.product[0]] = true;
+				if(Horticookie.plantStatus[mut.prereq].status >= Horticookie.statusCodes.PREMATURE) Horticookie.unlockables[mut.product[0]] = true;
 			}
 		}
 		

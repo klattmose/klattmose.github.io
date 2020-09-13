@@ -863,6 +863,7 @@ Horticookie.launch = function(){
 	Horticookie.computeEffs = function(){
 		Horticookie.recalcTileStatus();
 		Horticookie.recalcPlantStatus();
+		Horticookie.M.buildPanel();
 		if(!Horticookie.M.freeze) Horticookie.recalcAlerts();
 	}
 

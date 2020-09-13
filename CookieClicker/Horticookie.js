@@ -409,11 +409,11 @@ Horticookie.launch = function(){
 		if(recipe.type == Horticookie.recipeCodes.NORMAL){
 			for(var i = 0; i < recipe.neighs.length; i++){
 				if(recipe.neighs[i].isMax) continue;
-				if(Horticookie.plantStatus[mut.neighs[j].plant].status < Horticookie.statusCodes.PREMATURE) return false;
+				if(Horticookie.plantStatus[recipe.neighs[i].plant].status < Horticookie.statusCodes.PREMATURE) return false;
 			}
 			for(var i = 0; i < recipe.neighsM.length; i++){
 				if(recipe.neighsM[i].isMax) continue;
-				if(Horticookie.plantStatus[mut.neighsM[j].plant].status < Horticookie.statusCodes.MATURE) return false;
+				if(Horticookie.plantStatus[recipe.neighsM[i].plant].status < Horticookie.statusCodes.MATURE) return false;
 			}
 		}
 		

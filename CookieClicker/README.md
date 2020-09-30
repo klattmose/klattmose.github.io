@@ -56,6 +56,8 @@ The first self-loading mod!
 
 ## Offline
 
+### (Currently non-functional)
+
 For people of unfortunate circumstances that prevent them for easily accessing the game at the official site.
 
 ### [downloader.py](https://klattmose.github.io/CookieClicker/downloader.py)

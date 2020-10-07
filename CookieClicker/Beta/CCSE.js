@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.017';
+CCSE.version = '2.018';
 CCSE.GameVersion = '2.029';
 
 CCSE.launch = function(){
@@ -411,7 +411,7 @@ CCSE.launch = function(){
 		if(!Game.customReincarnate) Game.customReincarnate = [];
 		CCSE.SliceCodeIntoFunction('Game.Reincarnate', -2, `
 				// Game.Reincarnate injection point 0
-				for(var i in Game.customReincarnate) Game.customReincarnate[i]();
+				if(bypass == 1) for(var i in Game.customReincarnate) Game.customReincarnate[i]();
 			`);
 		
 		
@@ -420,7 +420,7 @@ CCSE.launch = function(){
 		if(!Game.customAscend) Game.customAscend = [];
 		CCSE.SliceCodeIntoFunction('Game.Ascend', -2, `
 				// Game.Ascend injection point 0
-				for(var i in Game.customAscend) Game.customAscend[i]();
+				if(bypass == 1) for(var i in Game.customAscend) Game.customAscend[i]();
 			`);
 		
 		

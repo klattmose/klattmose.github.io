@@ -25,11 +25,19 @@ FictionLiveParser.init = function(){
 	showHideBtn.innerHTML = '<a onclick="FictionLiveParser.toggleShowVotes()"><div id="FictionLiveParser_showHideBtn" class="btn"><span>Voters hidden</span></div></a>';
 	$("li.storyMenu.dropdown-main").parent().append(showHideBtn);
 	
+	var hidePollBtn = document.createElement("li");
+	hidePollBtn.innerHTML = '<a onclick="FictionLiveParser.toggleHidePolls()"><div id="FictionLiveParser_hidePollBtn" class="btn"><span>Polls expanded</span></div></a>';
+	$("li.storyMenu.dropdown-main").parent().append(hidePollBtn);
+	
 	var processStoryBtn = document.createElement("li");
 	processStoryBtn.id = 'FictionLiveParser_processStoryBtn';
 	processStoryBtn.innerHTML = '<a onclick="FictionLiveParser.parseThisStory()"><div class="btn"><span>Process story</span></div></a>';
 	$("li.storyMenu.dropdown-main").parent().append(processStoryBtn);
 	
+	var style = document.createElement("style");
+	style.innerHTML = ".hiddenPoll .readerPosts,.hiddenPoll .poll{display:none;} " + 
+					  ".unhiddenPoll .readerPosts,.unhiddenPoll .poll{display:block;}";
+	document.head.appendChild(style);
 }
 
 FictionLiveParser.put = function(_id, name) {
@@ -176,6 +184,7 @@ FictionLiveParser.handleChatMessage = function(data, status){
 FictionLiveParser.unveilChatmessages = function(root){
 	var chatPosts = root.getElementsByClassName("chatMsg");
 	for(var i = 0; i < chatPosts.length; i++){
+		chatPosts[i].style.display = "";
 		$.get("https://fiction.live/api/node/" + chatPosts[i].attributes["data-id"].value, FictionLiveParser.handleChatMessage);
 	}
 }
@@ -280,6 +289,22 @@ FictionLiveParser.toggleShowVotes = function(){
 	} else {
 		showHideBtn.classList.remove("active");
 		showHideBtn.innerHTML = '<span>Voters hidden</span>';
+	}
+}
+
+FictionLiveParser.toggleHidePolls = function(){
+	FictionLiveParser.CollapsePolls = !FictionLiveParser.CollapsePolls;
+	
+	
+	var hidePollBtn = document.getElementById("FictionLiveParser_hidePollBtn");
+	if(FictionLiveParser.CollapsePolls){
+		document.body.classList.add("hiddenPoll");
+		hidePollBtn.classList.add("active");
+		hidePollBtn.innerHTML = '<span>Polls collapsed</span>';
+	} else {
+		document.body.classList.remove("hiddenPoll");
+		hidePollBtn.classList.remove("active");
+		hidePollBtn.innerHTML = '<span>Polls expanded</span>';
 	}
 }
 

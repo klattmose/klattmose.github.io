@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.8';
+Horticookie.version = '3.10';
 Horticookie.GameVersion = '2.029';
 
 //***********************************
@@ -51,7 +51,6 @@ Horticookie.launch = function(){
 		Horticookie.buildMutationMap();
 		Horticookie.buildUpgradesMap();
 		Horticookie.backupPlants();
-		Horticookie.recalcUnlockables();
 		
 		var gpl = M.plotLimits[M.plotLimits.length - 1];
 		Horticookie.maxPlotWidth = gpl[2] - gpl[0];
@@ -72,6 +71,7 @@ Horticookie.launch = function(){
 		
 		Horticookie.recalcTileStatus();
 		Horticookie.recalcPlantStatus();
+		Horticookie.recalcUnlockables();
 	}
 
 
@@ -408,10 +408,12 @@ Horticookie.launch = function(){
 		var M = Horticookie.M;
 		if(recipe.type == Horticookie.recipeCodes.NORMAL){
 			for(var i = 0; i < recipe.neighs.length; i++){
-				if(!M.plants[recipe.neighs[i].plant].unlocked) return false;
+				if(recipe.neighs[i].isMax) continue;
+				if(Horticookie.plantStatus[recipe.neighs[i].plant].status < Horticookie.statusCodes.PREMATURE) return false;
 			}
 			for(var i = 0; i < recipe.neighsM.length; i++){
-				if(!M.plants[recipe.neighsM[i].plant].unlocked) return false;
+				if(recipe.neighsM[i].isMax) continue;
+				if(Horticookie.plantStatus[recipe.neighsM[i].plant].status < Horticookie.statusCodes.MATURE) return false;
 			}
 		}
 		
@@ -810,10 +812,12 @@ Horticookie.launch = function(){
 			
 			if(mut.type == Horticookie.recipeCodes.NORMAL){
 				for(var j = 0; j < mut.neighsM.length; j++){
-					if(!M.plants[mut.neighsM[j].plant].unlocked) unlockable = false;
+					if(mut.neighsM[j].isMax) continue;
+					if(Horticookie.plantStatus[mut.neighsM[j].plant].status < Horticookie.statusCodes.PREMATURE) unlockable = false;
 				}
 				for(var j = 0; j < mut.neighs.length; j++){
-					if(!M.plants[mut.neighs[j].plant].unlocked) unlockable = false;
+					if(mut.neighs[j].isMax) continue;
+					if(Horticookie.plantStatus[mut.neighs[j].plant].status < Horticookie.statusCodes.PREMATURE) unlockable = false;
 				}
 				
 				if(unlockable) Horticookie.unlockables[mut.product[0]] = true;
@@ -822,7 +826,7 @@ Horticookie.launch = function(){
 				Horticookie.unlockables[mut.product[0]] = true;
 			}
 			else if(mut.type == Horticookie.recipeCodes.CREATED_ON_KILL){
-				if(M.plants[mut.prereq].unlocked) Horticookie.unlockables[mut.product[0]] = true;
+				if(Horticookie.plantStatus[mut.prereq].status >= Horticookie.statusCodes.PREMATURE) Horticookie.unlockables[mut.product[0]] = true;
 			}
 		}
 		
@@ -859,6 +863,7 @@ Horticookie.launch = function(){
 	Horticookie.computeEffs = function(){
 		Horticookie.recalcTileStatus();
 		Horticookie.recalcPlantStatus();
+		Horticookie.M.buildPanel();
 		if(!Horticookie.M.freeze) Horticookie.recalcAlerts();
 	}
 

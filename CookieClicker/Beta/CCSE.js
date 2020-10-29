@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
 CCSE.version = '2.018';
-CCSE.GameVersion = '2.029';
+CCSE.GameVersion = '2.03';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -229,7 +229,7 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 119 + 
+		CCSE.functionsTotal = 118 + 
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +

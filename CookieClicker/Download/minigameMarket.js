@@ -100,6 +100,12 @@ M.launch=function()
 				company:'Figments Associated',
 				desc:'In a post-material world, the market of ideas is where value is created. <b>Figments Associated</b> understands that, and is the prime designer (and patenter) of baking recipes, ingredient nomenclature, custom cooking procedures, and other kitchen processes.',
 			},
+			'Idleverse':{
+				name:'Subsidiaries',
+				symbol:'SBD',
+				company:'Polyvalent Acquisitions',
+				desc:'Avoid the uncouth nastiness of mass layoffs and hostile takeovers by delegating the purchase, management, and eventual dissolution of other companies to the boys at Polyvalent Acquisitions. Let \'em deal with it!',
+			},
 		};
 		M.goodsById=[];var n=0;
 		for (var i in M.goods){var it=M.goods[i];it.id=n;it.hidden=false;it.active=false;it.last=0;it.building=Game.Objects[i];it.stock=0;it.mode=0;it.dur=0;it.val=1;it.vals=[it.val];it.d=0;M.goodsById[n]=it;it.icon=[it.building.iconColumn,33];n++;}
@@ -224,7 +230,7 @@ M.launch=function()
 				if (costInS*n>=86400) Game.Win('Make my day');
 				M.profit+=costInS*n;
 				if (M.profit>0) Game.Win('Initial public offering');
-				if (M.profit>=31536000) Game.Win('Liquid assets');
+				if (M.profit>=10512000) Game.Win('Liquid assets');
 				//Game.Earn(Game.cookiesPsRawHighest*costInS*n);
 				Game.cookies+=Game.cookiesPsRawHighest*costInS*n;
 				Game.cookiesEarned=Math.max(Game.cookies,Game.cookiesEarned);
@@ -741,8 +747,7 @@ M.launch=function()
 		M.officeLevel=0;
 		M.brokers=0;
 		
-		M.graphLines=1;
-		M.graphCols=0;M.setCols();
+		if (hard) {M.graphLines=1;M.graphCols=0;}M.setCols();
 		M.hoverOnGood=-1;
 		M.ticks=0;
 		M.lastTickDrawn=0;

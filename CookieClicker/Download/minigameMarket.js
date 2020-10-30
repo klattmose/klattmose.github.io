@@ -104,7 +104,7 @@ M.launch=function()
 				name:'Subsidiaries',
 				symbol:'SBD',
 				company:'Polyvalent Acquisitions',
-				desc:'Avoid the uncouth nastiness of mass layoffs and hostile takeovers by delegating the purchase, management, and eventual dissolution of other companies to the boys at Polyvalent Acquisitions. Let \'em deal with it!',
+				desc:'Avoid the uncouth nastiness of mass layoffs and hostile takeovers by delegating the purchase, management, and eventual dissolution of other companies to the boys at <b>Polyvalent Acquisitions</b>. Let \'em deal with it!',
 			},
 		};
 		M.goodsById=[];var n=0;
@@ -230,7 +230,8 @@ M.launch=function()
 				if (costInS*n>=86400) Game.Win('Make my day');
 				M.profit+=costInS*n;
 				if (M.profit>0) Game.Win('Initial public offering');
-				if (M.profit>=10512000) Game.Win('Liquid assets');
+				if (M.profit>=7884000) Game.Win('Liquid assets');
+				if (M.profit>=31536000) Game.Win('Gaseous assets');
 				//Game.Earn(Game.cookiesPsRawHighest*costInS*n);
 				Game.cookies+=Game.cookiesPsRawHighest*costInS*n;
 				Game.cookiesEarned=Math.max(Game.cookies,Game.cookiesEarned);

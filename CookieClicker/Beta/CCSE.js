@@ -1,7 +1,7 @@
 Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.018';
+CCSE.version = '2.019';
 CCSE.GameVersion = '2.031';
 
 CCSE.launch = function(){
@@ -81,7 +81,7 @@ CCSE.launch = function(){
 		// Load any custom save data and inject save functions
 		CCSE.LoadSave();
 		Game.customSave.push(CCSE.WriteSave);
-		Game.customLoad.push(CCSE.LoadSave);
+		Game.customLoad.push(function(){CCSE.LoadSave();});
 		//Game.customReset.push(CCSE.Reset); Nevermind
 		
 		
@@ -123,6 +123,9 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">10/30/2020</div>' + 
+			'<div class="listing">&bull; Added combined save exporting and importing, so the vanilla game save and CCSE save can be backed up as a single convenient package.</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">06/20/2020</div>' + 
 			'<div class="listing">&bull; Added hooks for the new stock market minigame</div>' +
@@ -1988,6 +1991,10 @@ CCSE.launch = function(){
 										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
 										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
+		str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
+									 '<a class="option" ' + Game.clickStr + '="CCSE.ImportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Import combined save</a>' + 
+									 '<label>Back up vanilla game save as well as data added by mods and managed by CCSE</label></div>';
+		
 		return str;
 	}
 	
@@ -3026,6 +3033,27 @@ CCSE.launch = function(){
 		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
 					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
 		l('textareaPrompt').focus();
+	}
+	
+	CCSE.ExportCombinedSave = function(){
+		var saveString = JSON.stringify({'Vanilla':Game.WriteSave(1),'CCSE':CCSE.WriteSave(1)});
+		Game.Prompt('<h3>Export combined save</h3><div class="block">This is your vanilla game save combined with your CCSE save in a single convenient location!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
+					saveString + 
+					'</textarea></div>',['All done!']);
+		l('textareaPrompt').focus();
+		l('textareaPrompt').select();
+	}
+	
+	CCSE.ImportCombinedSave = function(){
+		Game.Prompt('<h3>Import combined save</h3><div class="block">Paste your combined vanilla/CCSE save here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
+					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadCombinedSave(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+		l('textareaPrompt').focus();
+	}
+	
+	CCSE.LoadCombinedSave = function(saveStr){
+		var save = JSON.parse(saveStr);
+		Game.ImportSaveCode(save.Vanilla);
+		CCSE.LoadSave(save.CCSE);
 	}
 	
 	CCSE.ExportEditableSave = function(){

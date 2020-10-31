@@ -1,7 +1,6 @@
-Game.Win('Third-party');
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.019';
+CCSE.version = '2.020';
 CCSE.GameVersion = '2.031';
 
 CCSE.launch = function(){
@@ -79,10 +78,10 @@ CCSE.launch = function(){
 	
 	CCSE.finalize = function(){
 		// Load any custom save data and inject save functions
-		CCSE.LoadSave();
-		Game.customSave.push(CCSE.WriteSave);
-		Game.customLoad.push(function(){CCSE.LoadSave();});
-		//Game.customReset.push(CCSE.Reset); Nevermind
+		if(!Game.modSaveData[CCSE.name]) CCSE.load();
+		// Game.customSave.push(CCSE.save);
+		// Game.customLoad.push(function(){CCSE.load();});
+		// Game.customReset.push(CCSE.Reset); Nevermind
 		
 		
 		// Inject menu functions
@@ -111,6 +110,7 @@ CCSE.launch = function(){
 		CCSE.Note.life = Game.fps;
 		CCSE.isLoaded = 1;
 		CCSE.loading = 0;
+		
 		if(CCSE.postLoadHooks) for(var i in CCSE.postLoadHooks) CCSE.postLoadHooks[i]();
 	}
 	
@@ -124,8 +124,9 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">10/30/2020</div>' + 
-			'<div class="listing">&bull; Added combined save exporting and importing, so the vanilla game save and CCSE save can be backed up as a single convenient package.</div>' +
+			'</div><div class="subsection update small"><div class="title">10/31/2020</div>' + 
+			'<div class="listing">&bull; Updated to use the new modding API</div>' +
+			'<div class="listing">&bull; The CCSE.save object (where the mod save data is stored) is now named CCSE.config. The new CCSE.save is a function that will get called by Cookie Clicker when it decides it\'s time to save.</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">06/20/2020</div>' + 
 			'<div class="listing">&bull; Added hooks for the new stock market minigame</div>' +
@@ -232,7 +233,7 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 118 + 
+		CCSE.functionsTotal = 119 + 
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
@@ -1991,7 +1992,7 @@ CCSE.launch = function(){
 										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
 										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
-		str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
+		//str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
 									 '<a class="option" ' + Game.clickStr + '="CCSE.ImportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Import combined save</a>' + 
 									 '<label>Back up vanilla game save as well as data added by mods and managed by CCSE</label></div>';
 		
@@ -2837,16 +2838,16 @@ CCSE.launch = function(){
 		This is because of how the game itself keeps track of these things
 	
 	You can also use CCSE to save your mod data. 
-		Add your save data as a child of CCSE.save.OtherMods. Make sure not to step on anyone else's toes!
+		Add your save data as a child of CCSE.config.OtherMods. Make sure not to step on anyone else's toes!
 		Push your save function into CCSE.customSave, and push your load function into CCSE.customLoad
 	=======================================================================================*/
 	if(!CCSE.customSave) CCSE.customSave = [];
-	CCSE.WriteSave = function(type){
-		CCSE.save.version = CCSE.version;
+	CCSE.save = function(type){
+		CCSE.config.version = CCSE.version;
 		
-		for(var name in CCSE.save.Buildings){
+		for(var name in CCSE.config.Buildings){
 			if(Game.Objects[name]){
-				var saved = CCSE.save.Buildings[name];
+				var saved = CCSE.config.Buildings[name];
 				var me = Game.Objects[name];
 				
 				saved.amount = me.amount;
@@ -2860,21 +2861,21 @@ CCSE.launch = function(){
 			}
 		}
 		
-		for(var name in CCSE.save.Achievements){
+		for(var name in CCSE.config.Achievements){
 			if(Game.Achievements[name]){
-				CCSE.save.Achievements[name].won = Game.Achievements[name].won;
+				CCSE.config.Achievements[name].won = Game.Achievements[name].won;
 			}
 		}
 		
-		for(var name in CCSE.save.Upgrades){
+		for(var name in CCSE.config.Upgrades){
 			if(Game.Upgrades[name]){
-				CCSE.save.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
-				CCSE.save.Upgrades[name].bought = Game.Upgrades[name].bought;
+				CCSE.config.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
+				CCSE.config.Upgrades[name].bought = Game.Upgrades[name].bought;
 			}
 		}
 		
-		for(var name in CCSE.save.Buffs){
-			var buff = CCSE.save.Buffs[name];
+		for(var name in CCSE.config.Buffs){
+			var buff = CCSE.config.Buffs[name];
 			buff.time = 0;
 			if(Game.buffs[buff.name]){
 				if(Game.buffs[buff.name].time){
@@ -2887,8 +2888,8 @@ CCSE.launch = function(){
 			}
 		}
 		
-		for(var name in CCSE.save.Seasons){
-			var season = CCSE.save.Seasons[name];
+		for(var name in CCSE.config.Seasons){
+			var season = CCSE.config.Seasons[name];
 			season.lastTime = Date.now();
 			if(Game.season == name){
 				season.T = Game.seasonT;
@@ -2900,67 +2901,76 @@ CCSE.launch = function(){
 		
 		for(var i in CCSE.customSave) CCSE.customSave[i]();
 		
-		var str = JSON.stringify(CCSE.save);
+		var str = JSON.stringify(CCSE.config);
 		
 		if(type == 2){
 			return str;
 		}
 		else if(type == 3){
-			return JSON.stringify(CCSE.save, null, 2);
+			return JSON.stringify(CCSE.config, null, 2);
 		}
 		else if (type==1){
 			str = escape(utf8_to_b64(str) + '!END!');
 			return str;
 		}
 		else{
-			str = utf8_to_b64(str) + '!END!';
+			return str;
+			/*str = utf8_to_b64(str) + '!END!';
 			str = escape(str);
-			Game.localStorageSet(CCSE.name, str);
+			Game.localStorageSet(CCSE.name, str);*/
 		}
 	}
 	
 	if(!CCSE.customLoad) CCSE.customLoad = [];
-	CCSE.LoadSave = function(data, isJSON){
-		CCSE.save = null;
+	CCSE.load = function(data, isBase64){
+		CCSE.config = null;
 		var str = '';
 		
-		if(isJSON){
-			CCSE.save = JSON.parse(data);
-		} 
-		else{
+		if(isBase64){ // Getting here from import CCSE in menu
 			if(data){
 				str = unescape(data);
-			}else{
-				if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
 			}
 			
 			if(str != ''){
 				str = str.split('!END!')[0];
 				str = b64_to_utf8(str);
-				CCSE.save = JSON.parse(str);
+				CCSE.config = JSON.parse(str);
+			}
+		} 
+		else{ // Getting here from game function call
+			if(data){ // Has data in game save
+				CCSE.config = JSON.parse(data);
+			}else{ // Look for older save in local storage
+				if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
+				
+				if(str != ''){
+					str = str.split('!END!')[0];
+					str = b64_to_utf8(str);
+					CCSE.config = JSON.parse(str);
+				}
 			}
 		}
 		
 		
-		if(!CCSE.save) CCSE.save = {};
-		if(!CCSE.save.version) CCSE.save.version = 1;
-		if(!CCSE.save.Achievements) CCSE.save.Achievements = {};
-		if(!CCSE.save.Upgrades) CCSE.save.Upgrades = {};
-		if(!CCSE.save.Buildings) CCSE.save.Buildings = {};
-		if(!CCSE.save.Buffs) CCSE.save.Buffs = {};
-		if(!CCSE.save.Seasons) CCSE.save.Seasons = {};
-		if(!CCSE.save.OtherMods) CCSE.save.OtherMods = {};
+		if(!CCSE.config) CCSE.config = {};
+		if(!CCSE.config.version) CCSE.config.version = 1;
+		if(!CCSE.config.Achievements) CCSE.config.Achievements = {};
+		if(!CCSE.config.Upgrades) CCSE.config.Upgrades = {};
+		if(!CCSE.config.Buildings) CCSE.config.Buildings = {};
+		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
+		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
+		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
 		
-		if(CCSE.save.version != CCSE.version){
+		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
 			CCSE.collapseMenu['CCSEinfo'] = 0;
 		}else{
 			CCSE.collapseMenu['CCSEinfo'] = 1;
 		}
 		
-		for(var name in CCSE.save.Buildings){
+		for(var name in CCSE.config.Buildings){
 			if(Game.Objects[name]){
-				var saved = CCSE.save.Buildings[name];
+				var saved = CCSE.config.Buildings[name];
 				var me = Game.Objects[name];
 				
 				me.switchMinigame(false);
@@ -2980,36 +2990,36 @@ CCSE.launch = function(){
 			}
 		}
 		
-		for(var name in CCSE.save.Achievements){
+		for(var name in CCSE.config.Achievements){
 			if(Game.Achievements[name]){
-				Game.Achievements[name].won = CCSE.save.Achievements[name].won;
+				Game.Achievements[name].won = CCSE.config.Achievements[name].won;
 			}
 		}
 		
-		for(var name in CCSE.save.Upgrades){
+		for(var name in CCSE.config.Upgrades){
 			if(Game.Upgrades[name]){
-				Game.Upgrades[name].unlocked = CCSE.save.Upgrades[name].unlocked;
-				Game.Upgrades[name].bought = CCSE.save.Upgrades[name].bought;
+				Game.Upgrades[name].unlocked = CCSE.config.Upgrades[name].unlocked;
+				Game.Upgrades[name].bought = CCSE.config.Upgrades[name].bought;
 			}
 		}
 		
-		for(var name in CCSE.save.Buffs){
+		for(var name in CCSE.config.Buffs){
 			var found = false;
 			for(var i in Game.buffTypes) if(Game.buffTypes[i].name == name) found = true;
 			if(found){
-				if(CCSE.save.Buffs[name].time){
-					var buff = CCSE.save.Buffs[name];
+				if(CCSE.config.Buffs[name].time){
+					var buff = CCSE.config.Buffs[name];
 					Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
 				}
 			}
 		}
 		
-		for(var name in CCSE.save.Seasons){
+		for(var name in CCSE.config.Seasons){
 			if(Game.seasons[name]){
-				if(CCSE.save.Seasons[name].T > 0){
+				if(CCSE.config.Seasons[name].T > 0){
 					Game.season = name;
-					Game.seasonT = CCSE.save.Seasons[name].T;
-					var framesElapsed = Math.ceil(((Date.now() - CCSE.save.Seasons[name].lastTime) / 1000) * Game.fps);
+					Game.seasonT = CCSE.config.Seasons[name].T;
+					var framesElapsed = Math.ceil(((Date.now() - CCSE.config.Seasons[name].lastTime) / 1000) * Game.fps);
 					if(Game.seasonT > 0) Game.seasonT = Math.max(Game.seasonT - framesElapsed, 1);
 				}
 				
@@ -3021,9 +3031,10 @@ CCSE.launch = function(){
 		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
 	}
 	
+	// These two kept for people who might be blindsided by the save format change
 	CCSE.ExportSave = function(){
 		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>It contains data that other mods authors decided to allow CCSE to manage, as well as data for custom things added through CCSE (i.e. achivements, upgrades, etc)</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-					CCSE.WriteSave(1) + 
+					CCSE.save(1) + 
 					'</textarea></div>',['All done!']);
 		l('textareaPrompt').focus();
 		l('textareaPrompt').select();
@@ -3031,12 +3042,15 @@ CCSE.launch = function(){
 	
 	CCSE.ImportSave = function(){
 		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.load(l(\'textareaPrompt\').value, 1); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
 		l('textareaPrompt').focus();
 	}
 	
+	/*
+	Made obsolete by native mod save support
+	
 	CCSE.ExportCombinedSave = function(){
-		var saveString = JSON.stringify({'Vanilla':Game.WriteSave(1),'CCSE':CCSE.WriteSave(1)});
+		var saveString = JSON.stringify({'Vanilla':Game.WriteSave(1),'CCSE':CCSE.save(1)});
 		Game.Prompt('<h3>Export combined save</h3><div class="block">This is your vanilla game save combined with your CCSE save in a single convenient location!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
 					saveString + 
 					'</textarea></div>',['All done!']);
@@ -3053,12 +3067,15 @@ CCSE.launch = function(){
 	CCSE.LoadCombinedSave = function(saveStr){
 		var save = JSON.parse(saveStr);
 		Game.ImportSaveCode(save.Vanilla);
-		CCSE.LoadSave(save.CCSE);
-	}
+		CCSE.load(save.CCSE, 1);
+	}*/
+	
+	/*
+	I apparently never incorporated these anywhere. Might as well comment them out.
 	
 	CCSE.ExportEditableSave = function(){
 		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>In JSON format for people who want to edit it.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-					CCSE.WriteSave(3) + 
+					CCSE.save(3) + 
 					'</textarea></div>',['All done!']);
 		l('textareaPrompt').focus();
 		l('textareaPrompt').select();
@@ -3066,19 +3083,19 @@ CCSE.launch = function(){
 	
 	CCSE.ImportEditableSave = function(){
 		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here (in JSON format).</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.LoadSave(l(\'textareaPrompt\').value, 1); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.load(l(\'textareaPrompt\').value); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
 		l('textareaPrompt').focus();
-	}
+	}*/
 	
 	/*CCSE.Reset = function(hard){
 		if(hard){
-			for(var name in CCSE.save.Achievements){
-				CCSE.save.Achievements[name].won = 0;
+			for(var name in CCSE.config.Achievements){
+				CCSE.config.Achievements[name].won = 0;
 				if(Game.Achievements[name]) Game.Achievements[name].won = 0;
 			}
 		}
 		
-		for(var name in CCSE.save.Upgrades){
+		for(var name in CCSE.config.Upgrades){
 			if(Game.Upgrades[name]){
 				var me=Game.Upgrades[name];
 				if (hard || me.pool != 'prestige') me.bought=0;
@@ -3088,8 +3105,8 @@ CCSE.launch = function(){
 					else me.unlocked = 0;
 				}
 				
-				CCSE.save.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
-				CCSE.save.Upgrades[name].bought = Game.Upgrades[name].bought;
+				CCSE.config.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
+				CCSE.config.Upgrades[name].bought = Game.Upgrades[name].bought;
 			}
 		}
 	}*/
@@ -3102,11 +3119,11 @@ CCSE.launch = function(){
 		var me = new Game.Upgrade(name, desc, price, icon, buyFunction);
 		CCSE.ReplaceUpgrade(name);
 		
-		if(CCSE.save.Upgrades[name]){
-			me.unlocked = CCSE.save.Upgrades[name].unlocked;
-			me.bought = CCSE.save.Upgrades[name].bought;
+		if(CCSE.config.Upgrades[name]){
+			me.unlocked = CCSE.config.Upgrades[name].unlocked;
+			me.bought = CCSE.config.Upgrades[name].bought;
 		}else{
-			CCSE.save.Upgrades[name] = {
+			CCSE.config.Upgrades[name] = {
 				unlocked: 0,
 				bought: 0
 			}
@@ -3137,10 +3154,10 @@ CCSE.launch = function(){
 		var me = new Game.Achievement(name, desc, icon);
 		CCSE.ReplaceAchievement(name);
 		
-		if(CCSE.save.Achievements[name]){
-			me.won = CCSE.save.Achievements[name].won;
+		if(CCSE.config.Achievements[name]){
+			me.won = CCSE.config.Achievements[name].won;
 		}else{
-			CCSE.save.Achievements[name] = {
+			CCSE.config.Achievements[name] = {
 				won: 0
 			}
 		}
@@ -3173,8 +3190,8 @@ CCSE.launch = function(){
 		
 		
 		
-		if(CCSE.save.Buildings[name]){
-			var saved = CCSE.save.Buildings[name];
+		if(CCSE.config.Buildings[name]){
+			var saved = CCSE.config.Buildings[name];
 			me.amount = saved.amount;
 			me.bought = saved.bought;
 			me.totalCookies = saved.totalCookies;
@@ -3194,7 +3211,7 @@ CCSE.launch = function(){
 			saved.muted = 0;
 			saved.minigameSave = '';
 			
-			CCSE.save.Buildings[name] = saved;
+			CCSE.config.Buildings[name] = saved;
 		}
 		
 		
@@ -3222,14 +3239,14 @@ CCSE.launch = function(){
 	CCSE.NewBuff = function(name, func){
 		var me = new Game.buffType(name, func);
 		
-		if(CCSE.save.Buffs[name]){
-			if(CCSE.save.Buffs[name].time){
-				CCSE.save.Buffs[name].name = func().name;
-				var buff = CCSE.save.Buffs[name];
+		if(CCSE.config.Buffs[name]){
+			if(CCSE.config.Buffs[name].time){
+				CCSE.config.Buffs[name].name = func().name;
+				var buff = CCSE.config.Buffs[name];
 				Game.gainBuff(name, buff.maxTime / Game.fps, buff.arg1, buff.arg2, buff.arg3).time = buff.time;
 			}
 		}else{
-			CCSE.save.Buffs[name] = {
+			CCSE.config.Buffs[name] = {
 				name: func().name,
 				maxTime: 0,
 				time: 0,
@@ -3259,15 +3276,15 @@ CCSE.launch = function(){
 		Game.computeSeasons();
 		Game.computeSeasonPrices();
 		
-		if(CCSE.save.Seasons[name]){
-			if(CCSE.save.Seasons[name].T > 0){
-				Game.seasonT = CCSE.save.Seasons[name].T;
+		if(CCSE.config.Seasons[name]){
+			if(CCSE.config.Seasons[name].T > 0){
+				Game.seasonT = CCSE.config.Seasons[name].T;
 				Game.season = name;
-				var framesElapsed = Math.ceil(((Date.now() - CCSE.save.Seasons[name].lastTime) / 1000) * Game.fps);
+				var framesElapsed = Math.ceil(((Date.now() - CCSE.config.Seasons[name].lastTime) / 1000) * Game.fps);
 				if(Game.seasonT > 0) Game.seasonT = Math.max(Game.seasonT - framesElapsed, 1);
 			}
 		}else{
-			CCSE.save.Seasons[name] = {
+			CCSE.config.Seasons[name] = {
 				T: 0,
 				lastTime: Date.now()
 			}
@@ -3352,7 +3369,7 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Start your engines
 	=======================================================================================*/
-	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)) CCSE.init();
+	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)) Game.registerMod(CCSE.name, CCSE); // Calls CCSE.init();
 }
 
 if(!CCSE.isLoaded && !CCSE.loading) CCSE.launch();

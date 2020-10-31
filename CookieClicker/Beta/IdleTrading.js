@@ -123,12 +123,12 @@ IdleTrading.launch = function(){
 	//***********************************
 	
 	IdleTrading.saveConfig = function(config){
-		CCSE.save.OtherMods.IdleTrading = IdleTrading.config;
+		CCSE.config.OtherMods.IdleTrading = IdleTrading.config;
 	}
 
 	IdleTrading.loadConfig = function(){
-		if(CCSE.save.OtherMods.IdleTrading){
-			var conf = CCSE.save.OtherMods.IdleTrading;
+		if(CCSE.config.OtherMods.IdleTrading){
+			var conf = CCSE.config.OtherMods.IdleTrading;
 			
 			for(var pref in conf){
 				if(pref == "goods"){

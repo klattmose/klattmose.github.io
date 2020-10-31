@@ -29,7 +29,7 @@ Horticookie.launch = function(){
 		Horticookie.ReplaceNativeGarden();
 		Horticookie.ReplaceMainGame();
 		
-		Game.customDraw.push(Horticookie.draw);
+		Game.registerHook('draw', Horticookie.draw);
 		
 		
 		//***********************************
@@ -123,14 +123,14 @@ Horticookie.launch = function(){
 	}
 
 	Horticookie.saveConfig = function(config){
-		CCSE.save.OtherMods.Horticookie = Horticookie.config;
+		CCSE.config.OtherMods.Horticookie = Horticookie.config;
 	}
 
 	Horticookie.loadConfig = function(){
-		if(CCSE.save.OtherMods.Horticookie){
-			Horticookie.config.autoHarvest = CCSE.save.OtherMods.Horticookie.autoHarvest;
-			Horticookie.config.allImmortal = CCSE.save.OtherMods.Horticookie.allImmortal;
-			Horticookie.config.accelGarden = CCSE.save.OtherMods.Horticookie.accelGarden;
+		if(CCSE.config.OtherMods.Horticookie){
+			Horticookie.config.autoHarvest = CCSE.config.OtherMods.Horticookie.autoHarvest;
+			Horticookie.config.allImmortal = CCSE.config.OtherMods.Horticookie.allImmortal;
+			Horticookie.config.accelGarden = CCSE.config.OtherMods.Horticookie.accelGarden;
 		}
 	}
 

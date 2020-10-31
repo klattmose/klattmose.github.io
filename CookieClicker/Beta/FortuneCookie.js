@@ -1,4 +1,3 @@
-Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
@@ -48,12 +47,12 @@ FortuneCookie.launch = function(){
 	//    Configuration
 	//***********************************
 	FortuneCookie.saveConfig = function(config){
-		CCSE.save.OtherMods.FortuneCookie = FortuneCookie.config;
+		CCSE.config.OtherMods.FortuneCookie = FortuneCookie.config;
 	}
 
 	FortuneCookie.loadConfig = function(){
-		if(CCSE.save.OtherMods.FortuneCookie){
-			var config = CCSE.save.OtherMods.FortuneCookie;
+		if(CCSE.config.OtherMods.FortuneCookie){
+			var config = CCSE.config.OtherMods.FortuneCookie;
 			for(var pref in config){
 				FortuneCookie.config[pref] = config[pref];
 			}

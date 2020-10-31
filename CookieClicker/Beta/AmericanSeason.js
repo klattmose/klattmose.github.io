@@ -20,11 +20,11 @@ AmericanSeason.launch = function(){
 		AmericanSeason.initFireworks();
 		
 		
-		Game.customLogic.push(AmericanSeason.Logic);
-		Game.customReset.push(AmericanSeason.Reset);
+		Game.registerHook('logic', AmericanSeason.Logic);
+		Game.registerHook('reset', AmericanSeason.Reset);
 		CCSE.customLoad.push(AmericanSeason.loadConfig);
 		CCSE.customSave.push(AmericanSeason.saveConfig);
-		Game.customCpsMult.push(AmericanSeason.GetCpsMultiplier);
+		Game.registerHook('cps', AmericanSeason.GetModifiedCPS);
 		
 		Game.customStatsMenu.push(function(){
 			CCSE.AppendStatsVersionNumber(AmericanSeason.name, AmericanSeason.version);
@@ -134,21 +134,21 @@ AmericanSeason.launch = function(){
 	}
 	
 	AmericanSeason.saveConfig = function(){
-		CCSE.save.OtherMods.AmericanSeason = {
+		CCSE.config.OtherMods.AmericanSeason = {
 			config : AmericanSeason.config,
 			rocketsPopped : AmericanSeason.rocketsPopped
 		}
 	}
 	
 	AmericanSeason.loadConfig = function(){
-		if(CCSE.save.OtherMods.AmericanSeason){
-			var config = CCSE.save.OtherMods.AmericanSeason.config;
+		if(CCSE.config.OtherMods.AmericanSeason){
+			var config = CCSE.config.OtherMods.AmericanSeason.config;
 			for(var pref in config){
 				AmericanSeason.config[pref] = config[pref];
 			}
 			
-			if(CCSE.save.OtherMods.AmericanSeason.rocketsPopped !== undefined)
-				AmericanSeason.rocketsPopped = CCSE.save.OtherMods.AmericanSeason.rocketsPopped;
+			if(CCSE.config.OtherMods.AmericanSeason.rocketsPopped !== undefined)
+				AmericanSeason.rocketsPopped = CCSE.config.OtherMods.AmericanSeason.rocketsPopped;
 		}
 		
 	}
@@ -209,7 +209,7 @@ AmericanSeason.launch = function(){
 			]
 		);
 		
-		Game.customTickers.push(function(){
+		Game.registerHook('ticker, function(){
 			var list = [];
 			if(Game.season == 'american' && Game.cookiesEarned >= 1000) list.push(choose([
 				'News : flocks of eagles spotted circling over wig stores!',
@@ -427,7 +427,7 @@ AmericanSeason.launch = function(){
 		last = CCSE.NewAchievement('Full barrage', 'Unlock <b>every fireworks upgrade.</b><div class="line"></div>Owning this achievement makes fireworks upgrades drop more frequently in future playthroughs.', [0, 4, AmericanSeason.iconsURL]);
 			last.order = order; order += 0.001;
 		
-		Game.customChecks.push(function(){
+		Game.registerHook('check', function(){
 			if(AmericanSeason.rocketsPopped >= 1) Game.Win('Pyrotechnics');
 			if(AmericanSeason.rocketsPopped >= 74) Game.Win('July 4th');
 			if(AmericanSeason.rocketsPopped >= 1776) Game.Win('Pyromaniac');
@@ -766,10 +766,10 @@ AmericanSeason.launch = function(){
 		return num;
 	}
 	
-	AmericanSeason.GetCpsMultiplier = function(){
+	AmericanSeason.GetModifiedCPS = function(currentCpS){
 		var mult = 1;
 		for(var i in AmericanSeason.fireworkTypes) if(Game.Has(AmericanSeason.fireworkTypes[i])) mult *= 1.01;
-		return mult;
+		return currentCpS * mult;
 	}
 	
 	

@@ -209,7 +209,7 @@ AmericanSeason.launch = function(){
 			]
 		);
 		
-		Game.registerHook('ticker, function(){
+		Game.registerHook('ticker', function(){
 			var list = [];
 			if(Game.season == 'american' && Game.cookiesEarned >= 1000) list.push(choose([
 				'News : flocks of eagles spotted circling over wig stores!',

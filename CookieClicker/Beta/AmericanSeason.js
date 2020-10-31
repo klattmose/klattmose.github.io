@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '1.3';
+AmericanSeason.version = '1.4';
 AmericanSeason.GameVersion = '2.031';
 
 AmericanSeason.launch = function(){
@@ -9,7 +9,8 @@ AmericanSeason.launch = function(){
 		AmericanSeason.iconsURL = 'https://klattmose.github.io/CookieClicker/img/customIcons.png';
 		AmericanSeason.config = AmericanSeason.defaultConfig();
 		AmericanSeason.rocketsPopped = 0;
-		AmericanSeason.loadConfig();
+		//AmericanSeason.load();
+		if(CCSE.config.OtherMods.AmericanSeason && !Game.modSaveData[AmericanSeason.name]) Game.modSaveData[AmericanSeason.name] = JSON.stringify(CCSE.config.OtherMods.AmericanSeason);
 		
 		
 		AmericanSeason.createSeason();
@@ -22,8 +23,8 @@ AmericanSeason.launch = function(){
 		
 		Game.registerHook('logic', AmericanSeason.Logic);
 		Game.registerHook('reset', AmericanSeason.Reset);
-		CCSE.customLoad.push(AmericanSeason.loadConfig);
-		CCSE.customSave.push(AmericanSeason.saveConfig);
+		/*CCSE.customLoad.push(AmericanSeason.load);
+		CCSE.customSave.push(AmericanSeason.save);*/
 		Game.registerHook('cps', AmericanSeason.GetModifiedCPS);
 		
 		Game.customStatsMenu.push(function(){
@@ -133,23 +134,30 @@ AmericanSeason.launch = function(){
 		}
 	}
 	
-	AmericanSeason.saveConfig = function(){
-		CCSE.config.OtherMods.AmericanSeason = {
+	AmericanSeason.save = function(){
+		/*CCSE.config.OtherMods.AmericanSeason = {
 			config : AmericanSeason.config,
 			rocketsPopped : AmericanSeason.rocketsPopped
-		}
+		}*/
+		
+		if(CCSE.config.OtherMods.AmericanSeason) delete CCSE.config.OtherMods.AmericanSeason; // no need to keep this, it's now junk data
+		return JSON.stringify({
+			config : AmericanSeason.config,
+			rocketsPopped : AmericanSeason.rocketsPopped
+		});
 	}
 	
-	AmericanSeason.loadConfig = function(){
-		if(CCSE.config.OtherMods.AmericanSeason){
-			var config = CCSE.config.OtherMods.AmericanSeason.config;
+	AmericanSeason.load = function(str){
+		var obj = JSON.parse(str);
+//		if(CCSE.config.OtherMods.AmericanSeason){
+			var config = obj.config;
 			for(var pref in config){
 				AmericanSeason.config[pref] = config[pref];
 			}
 			
-			if(CCSE.config.OtherMods.AmericanSeason.rocketsPopped !== undefined)
-				AmericanSeason.rocketsPopped = CCSE.config.OtherMods.AmericanSeason.rocketsPopped;
-		}
+			if(obj.rocketsPopped !== undefined)
+				AmericanSeason.rocketsPopped = obj.rocketsPopped;
+//		}
 		
 	}
 	
@@ -776,7 +784,7 @@ AmericanSeason.launch = function(){
 	//***********************************
 	//    Start the mod
 	//***********************************
-	if(CCSE.ConfirmGameVersion(AmericanSeason.name, AmericanSeason.version, AmericanSeason.GameVersion)) AmericanSeason.init();
+	if(CCSE.ConfirmGameVersion(AmericanSeason.name, AmericanSeason.version, AmericanSeason.GameVersion)) Game.registerMod(AmericanSeason.name, AmericanSeason); // AmericanSeason.init();
 }
 
 if(!AmericanSeason.isLoaded){

@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '1.2';
+AmericanSeason.version = '1.3';
 AmericanSeason.GameVersion = '2.031';
 
 AmericanSeason.launch = function(){

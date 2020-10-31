@@ -2,6 +2,7 @@
 All this code is copyright Orteil, 2013-2020.
 	-with some help, advice and fixes by Nicholas Laux, Debugbro, Opti, and lots of people on reddit, Discord, and the DashNet forums
 	-also includes a bunch of snippets found on stackoverflow.com and others
+	-want to mod the game? scroll down to the "MODDING API" section
 Hello, and welcome to the joyous mess that is main.js. Code contained herein is not guaranteed to be good, consistent, or sane. Most of this is years old at this point and harkens back to simpler, cruder times. In particular I've tried to maintain compatibility with fairly old versions of javascript, which means luxuries such as 'let', arrow functions and string literals are unavailable. Have a nice trip.
 Spoilers ahead.
 http://orteil.dashnet.org
@@ -1410,25 +1411,40 @@ Game.Launch=function()
 		=======================================================================================*/
 		/*
 			to use:
-			-have your mod call Game.registerMod("unique name",mod object)
-			-the "unique name" value is a string the mod will use to index and retrieve its save data; special characters are ignored
-			-the "mod object" value is an object that contains your mod's function hooks, and anything else you want
-			-once your mod is declared, Cookie Clicker will call its function hooks when appropriate, if any
-			-list of function hooks:
-				.init() - called when the game starts
-				.logic() - called every logic tick
-				.draw() - called every draw tick
-				.reset(hard) - called whenever the player resets; "hard" is true if this is a hard reset, false if it's an ascension
-				.save() - called when the game is saved; should return a string; use this to store persistent data associated with your mod
-				.load(str) - called when the game is loaded
-				.ticker() - called when determining news ticker text; should return an array of possible choices to add
-				.cps(currentCpS) - called when determining the CpS
-				.cpclick(currentCpClick) - called when determining the cookies per click
-				.click() - called when the big cookie is clicked
-				.create() - called after the game declares all buildings, upgrades and achievs; use this to declare your own - note that the system for saving and loading these is not yet implemented
-				.check() - called every few seconds when we check for upgrade/achiev unlock conditions
-			-you may also add and remove functions for each of these hooks manually (except save and load); for instance "Game.modHooks['check'].push(yourFunctionHere)"
-			-function hooks are provided for convenience and more advanced mod functionality will probably require manual code injection
+			-have your mod call Game.registerMod("unique id",mod object)
+			-the "unique id" value is a string the mod will use to index and retrieve its save data; special characters are ignored
+			-the "mod object" value is an object structured like so:
+				{
+					init:function(){
+						//this function is called as soon as the mod is registered
+						//declare hooks here
+					},
+					save:function(){
+						//use this to store persistent data associated with your mod
+						return 'a string to be saved';
+					},
+					load:function(str){
+						//do stuff with the string data you saved previously
+					},
+				}
+			-the mod object may also contain any other data or functions you want, for instance to make them accessible to other mods
+			-your mod and its data can be accessed with Game.mods['mod id']
+			-hooks are functions the game calls automatically in certain circumstances, like when calculating cookies per click or when redrawing the screen
+			-to add a hook: Game.registerHook('hook id',yourFunctionHere)
+			-to remove a hook: Game.removeHook('hook id',theSameFunctionHere)
+			-some hooks are fed a parameter you can use in the function
+			-list of valid hook ids:
+				'logic' - called every logic tick
+				'draw' - called every draw tick
+				'reset' - called whenever the player resets; parameter is true if this is a hard reset, false if it's an ascension
+				'reincarnate' - called when the player has reincarnated after an ascension
+				'ticker' - called when determining news ticker text; should return an array of possible choices to add
+				'cps' - called when determining the CpS; parameter is the current CpS; should return the modified CpS
+				'cookiesPerClick' - called when determining the cookies per click; parameter is the current value; should return the modified value
+				'click' - called when the big cookie is clicked
+				'create' - called after the game declares all buildings, upgrades and achievs; use this to declare your own - note that saving/loading functionality for custom content is not explicitly implemented and may be unpredictable and broken
+				'check' - called every few seconds when we check for upgrade/achiev unlock conditions; you can also use this for other checks that you don't need happening every logic frame
+			-function hooks are provided for convenience and more advanced mod functionality will probably involve manual code injection
 			-please be mindful of the length of the data you save, as it does inflate the export-save-to-string feature
 			
 			NOTE: modding API is susceptible to change and may not always function super-well
@@ -1437,7 +1453,7 @@ Game.Launch=function()
 		Game.sortedMods=[];
 		Game.modSaveData={};
 		Game.modHooks={};
-		Game.modHooksNames=['init','logic','draw','reset','save','load','ticker','cps','cpclick','click','create','check'];
+		Game.modHooksNames=['logic','draw','reset','reincarnate','ticker','cps','cookiesPerClick','click','create','check'];
 		for (var i=0;i<Game.modHooksNames.length;i++){Game.modHooks[Game.modHooksNames[i]]=[];}
 		Game.registerMod=function(id,obj)
 		{
@@ -1448,11 +1464,18 @@ Game.Launch=function()
 			obj.id=id;
 			console.log('Mod "'+id+'" added.');
 			if (Game.Win) Game.Win('Third-party');
-			for (var i=0;i<Game.modHooksNames.length;i++)
-			{
-				if (obj[Game.modHooksNames[i]]) Game.modHooks[Game.modHooksNames[i]].push(obj[Game.modHooksNames[i]]);
-			}
+			if (obj.init) obj.init();
 			if (obj.load && Game.modSaveData[id]) obj.load(Game.modSaveData[id]);
+		}
+		Game.registerHook=function(hook,func)
+		{
+			if (typeof Game.modHooks[hook]!=='undefined') Game.modHooks[hook].push(func);
+			else console.log('Error: a mod tried to register a non-existent hook named "'+hook+'".');
+		}
+		Game.removeHook=function(hook,func)
+		{
+			if (typeof Game.modHooks[hook]!=='undefined' && Game.modHooks[hook].indexOf(func)!=-1) Game.modHooks[hook].splice(Game.modHooks[hook].indexOf(func),1);
+			else console.log('Error: a mod tried to remove a non-existent hook named "'+hook+'".');
 		}
 		Game.runModHook=function(hook,param)
 		{
@@ -1554,10 +1577,12 @@ Game.Launch=function()
 					-add a little intro text above your bakery name, and generate that intro text at random if you don't already have one
 					-save and load your intro text
 				*/
-				reset:function(){Game.mods['test mod'].addIntro();},
-				check:function(){if (!Game.playerIntro){Game.mods['test mod'].addIntro();}},
-				click:function(){Game.Notify(choose(['A good click.','A solid click.','A mediocre click.','An excellent click!']),'',0,0.5);},
-				cps:function(cps){return cps*2;},
+				init:function(){
+					Game.registerHook('reincarnate',function(){Game.mods['test mod'].addIntro();});
+					Game.registerHook('check',function(){if (!Game.playerIntro){Game.mods['test mod'].addIntro();}});
+					Game.registerHook('click',function(){Game.Notify(choose(['A good click.','A solid click.','A mediocre click.','An excellent click!']),'',0,0.5);});
+					Game.registerHook('cps',function(cps){return cps*2;});
+				},
 				save:function(){
 					//note: we use stringified JSON for ease and clarity but you could store any type of string
 					return JSON.stringify({text:Game.playerIntro})
@@ -3400,6 +3425,8 @@ Game.Launch=function()
 				Game.ReincarnateTimer=1;
 				Game.addClass('reincarnating');
 				Game.BigCookieSize=0;
+				
+				Game.runModHook('reincarnate');
 			}
 		}
 		Game.GiveUpAscend=function(bypass)
@@ -4046,7 +4073,7 @@ Game.Launch=function()
 			
 			var out=mult*Game.ComputeCps(1,Game.Has('Reinforced index finger')+Game.Has('Carpal tunnel prevention cream')+Game.Has('Ambidextrous'),add);
 			
-			out=Game.runModHookOnValue('cpclick',out);
+			out=Game.runModHookOnValue('cookiesPerClick',out);
 			
 			if (Game.hasBuff('Cursed finger')) out=Game.buffs['Cursed finger'].power;
 			return out;
@@ -13734,7 +13761,7 @@ Game.Launch=function()
 		}
 		
 		
-		Game.runModHook('init');
+		//Game.runModHook('init');
 		
 		
 		if (!Game.LoadSave())

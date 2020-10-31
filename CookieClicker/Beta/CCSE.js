@@ -233,7 +233,7 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 119 + 
+		CCSE.functionsTotal = 118 + 
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
@@ -300,12 +300,15 @@ CCSE.launch = function(){
 		`);
 		
 		
+		/*
+		Use CCSE.customLoad instead
 		// Game.LoadSave
+		if(!Game.customLoad) Game.customLoad = [];
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
 			CCSE.ReplaceCodeIntoFunction('Game.LoadSave', 'if (Game.prefs.showBackupWarning==1)', 
 					`// Game.LoadSave injection point 0
 					for(var i in Game.customLoad) Game.customLoad[i](); `, -1);
-		}
+		}*/
 		
 		
 		// Game.WriteSave
@@ -3265,7 +3268,7 @@ CCSE.launch = function(){
 		lastDay.setDate(lastDay.getDate() + 1); // lastDay is inclusive
 		if(Date.now() >= firstDay && Date.now() <= lastDay) Game.baseSeason = name;
 		
-		Game.customLoad.push(function(){
+		CCSE.customLoad.push(function(){
 			if(Game.season == name && Game.season == Game.baseSeason){
 				Game.Notify(announcement[0], announcement[1], announcement[2], 60 * 3);
 			}

@@ -35,7 +35,7 @@ TimerWidget.launch = function(){
 		
 		Game.customDrawSpecial.push(TimerWidget.Update);
 		
-		Game.customLoad.push(function(){
+		CCSE.customLoad.push(function(){
 			l('specialPopup').className='framed prompt offScreen';
 		});
 		

@@ -9,7 +9,7 @@ http://orteil.dashnet.org
 */
 
 var VERSION=2.031;
-var BETA=1;
+var BETA=0;
 
 
 /*=====================================================================================
@@ -609,15 +609,17 @@ Game.Launch=function()
 	
 	Game.baseSeason='';//halloween, christmas, valentines, fools, easter
 	//automatic season detection (might not be 100% accurate)
-	var day=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/(1000*60*60*24));
+	var year=new Date().getFullYear();
+	var leap=(((year%4==0)&&(year%100!=0))||(year%400==0))?1:0;
+	var day=Math.floor((new Date()-new Date(year,0,0))/(1000*60*60*24));
 	if (day>=41 && day<=46) Game.baseSeason='valentines';
-	else if (day>=90 && day<=92) Game.baseSeason='fools';
-	else if (day>=304-7 && day<=304) Game.baseSeason='halloween';
-	else if (day>=349 && day<=365) Game.baseSeason='christmas';
+	else if (day+leap>=90 && day<=92+leap) Game.baseSeason='fools';
+	else if (day>=304-7+leap && day<=304+leap) Game.baseSeason='halloween';
+	else if (day>=349+leap && day<=365+leap) Game.baseSeason='christmas';
 	else
 	{
 		//easter is a pain goddamn
-		var easterDay=function(Y){var C = Math.floor(Y/100);var N = Y - 19*Math.floor(Y/19);var K = Math.floor((C - 17)/25);var I = C - Math.floor(C/4) - Math.floor((C - K)/3) + 19*N + 15;I = I - 30*Math.floor((I/30));I = I - Math.floor(I/28)*(1 - Math.floor(I/28)*Math.floor(29/(I + 1))*Math.floor((21 - N)/11));var J = Y + Math.floor(Y/4) + I + 2 - C + Math.floor(C/4);J = J - 7*Math.floor(J/7);var L = I - J;var M = 3 + Math.floor((L + 40)/44);var D = L + 28 - 31*Math.floor(M/4);return new Date(Y,M-1,D);}(new Date().getFullYear());
+		var easterDay=function(Y){var C = Math.floor(Y/100);var N = Y - 19*Math.floor(Y/19);var K = Math.floor((C - 17)/25);var I = C - Math.floor(C/4) - Math.floor((C - K)/3) + 19*N + 15;I = I - 30*Math.floor((I/30));I = I - Math.floor(I/28)*(1 - Math.floor(I/28)*Math.floor(29/(I + 1))*Math.floor((21 - N)/11));var J = Y + Math.floor(Y/4) + I + 2 - C + Math.floor(C/4);J = J - 7*Math.floor(J/7);var L = I - J;var M = 3 + Math.floor((L + 40)/44);var D = L + 28 - 31*Math.floor(M/4);return new Date(Y,M-1,D);}(year);
 		easterDay=Math.floor((easterDay-new Date(easterDay.getFullYear(),0,0))/(1000*60*60*24));
 		if (day>=easterDay-7 && day<=easterDay) Game.baseSeason='easter';
 	}
@@ -644,14 +646,15 @@ Game.Launch=function()
 	'<div class="title">Version history</div>'+
 	
 	'</div><div class="subsection update">'+
-	'<div class="title">29/10/2020 - alternate reality (beta)</div>'+
+	'<div class="title">01/11/2020 - alternate reality</div>'+
 	'<div class="listing">&bull; new building</div>'+
 	'<div class="listing">&bull; new upgrade tier</div>'+
 	'<div class="listing">&bull; new achievement tier</div>'+
 	'<div class="listing">&bull; new heavenly upgrades</div>'+
-	'<div class="listing">&bull; new rebalancing</div>'+
-	'<div class="listing">&bull; new stuff</div>'+
 	'<div class="listing">&bull; new modding API</div>'+
+	'<div class="listing">&bull; new rebalancing (ascension slot prices, finger upgrades...)</div>'+
+	'<div class="listing">&bull; new fixes (leap years, ghost swaps, carryover seeds...)</div>'+
+	'<div class="listing">&bull; new stuff</div>'+
 	
 	'</div><div class="subsection update small">'+
 	'<div class="title">23/08/2020 - money me, money now</div>'+
@@ -1430,7 +1433,7 @@ Game.Launch=function()
 			-the mod object may also contain any other data or functions you want, for instance to make them accessible to other mods
 			-your mod and its data can be accessed with Game.mods['mod id']
 			-hooks are functions the game calls automatically in certain circumstances, like when calculating cookies per click or when redrawing the screen
-			-to add a hook: Game.registerHook('hook id',yourFunctionHere)
+			-to add a hook: Game.registerHook('hook id',yourFunctionHere) - note: you can also declare whole arrays of hooks, ie. Game.registerHook('hook id',[function1,function2,...])
 			-to remove a hook: Game.removeHook('hook id',theSameFunctionHere)
 			-some hooks are fed a parameter you can use in the function
 			-list of valid hook ids:
@@ -1469,11 +1472,23 @@ Game.Launch=function()
 		}
 		Game.registerHook=function(hook,func)
 		{
+			if (func.constructor===Array)
+			{
+				for (var i=0;i<func.length;i++){Game.registerHook(hook,func[i]);}
+				return;
+			}
+			if (typeof func!=='function') return;
 			if (typeof Game.modHooks[hook]!=='undefined') Game.modHooks[hook].push(func);
 			else console.log('Error: a mod tried to register a non-existent hook named "'+hook+'".');
 		}
 		Game.removeHook=function(hook,func)
 		{
+			if (func.constructor===Array)
+			{
+				for (var i=0;i<func.length;i++){Game.removeHook(hook,func[i]);}
+				return;
+			}
+			if (typeof func!=='function') return;
 			if (typeof Game.modHooks[hook]!=='undefined' && Game.modHooks[hook].indexOf(func)!=-1) Game.modHooks[hook].splice(Game.modHooks[hook].indexOf(func),1);
 			else console.log('Error: a mod tried to remove a non-existent hook named "'+hook+'".');
 		}
@@ -4012,15 +4027,16 @@ Game.Launch=function()
 		{
 			var add=0;
 			if (Game.Has('Thousand fingers')) add+=		0.1;
-			if (Game.Has('Million fingers')) add+=		0.5;
-			if (Game.Has('Billion fingers')) add+=		5;
-			if (Game.Has('Trillion fingers')) add+=		50;
-			if (Game.Has('Quadrillion fingers')) add+=	500;
-			if (Game.Has('Quintillion fingers')) add+=	5000;
-			if (Game.Has('Sextillion fingers')) add+=	50000;
-			if (Game.Has('Septillion fingers')) add+=	500000;
-			if (Game.Has('Octillion fingers')) add+=	5000000;
-			if (Game.Has('Nonillion fingers')) add+=	50000000;
+			if (Game.Has('Million fingers')) add*=		5;
+			if (Game.Has('Billion fingers')) add*=		10;
+			if (Game.Has('Trillion fingers')) add*=		20;
+			if (Game.Has('Quadrillion fingers')) add*=	20;
+			if (Game.Has('Quintillion fingers')) add*=	20;
+			if (Game.Has('Sextillion fingers')) add*=	20;
+			if (Game.Has('Septillion fingers')) add*=	20;
+			if (Game.Has('Octillion fingers')) add*=	20;
+			if (Game.Has('Nonillion fingers')) add*=	20;
+			
 			var num=0;
 			for (var i in Game.Objects) {num+=Game.Objects[i].amount;}
 			num-=Game.Objects['Cursor'].amount;
@@ -6821,6 +6837,9 @@ Game.Launch=function()
 				var digits=Math.pow(10,(Math.ceil(Math.log(Math.ceil(this.basePrice))/Math.LN10)))/100;
 				this.basePrice=Math.round(this.basePrice/digits)*digits;
 				if (this.id>=16) this.basePrice*=10;
+				if (this.id>=17) this.basePrice*=10;
+				if (this.id>=18) this.basePrice*=10;
+				if (this.id>=19) this.basePrice*=10;
 				this.price=this.basePrice;
 				this.bulkPrice=this.price;
 			}
@@ -7708,15 +7727,15 @@ Game.Launch=function()
 		new Game.Object('Cursor','cursor|cursors|clicked|[X] extra finger|[X] extra fingers','Autoclicks once every 10 seconds.',0,0,{},15,function(me){
 			var add=0;
 			if (Game.Has('Thousand fingers')) add+=		0.1;
-			if (Game.Has('Million fingers')) add+=		0.5;
-			if (Game.Has('Billion fingers')) add+=		5;
-			if (Game.Has('Trillion fingers')) add+=		50;
-			if (Game.Has('Quadrillion fingers')) add+=	500;
-			if (Game.Has('Quintillion fingers')) add+=	5000;
-			if (Game.Has('Sextillion fingers')) add+=	50000;
-			if (Game.Has('Septillion fingers')) add+=	500000;
-			if (Game.Has('Octillion fingers')) add+=	5000000;
-			if (Game.Has('Nonillion fingers')) add+=	50000000;
+			if (Game.Has('Million fingers')) add*=		5;
+			if (Game.Has('Billion fingers')) add*=		10;
+			if (Game.Has('Trillion fingers')) add*=		20;
+			if (Game.Has('Quadrillion fingers')) add*=	20;
+			if (Game.Has('Quintillion fingers')) add*=	20;
+			if (Game.Has('Sextillion fingers')) add*=	20;
+			if (Game.Has('Septillion fingers')) add*=	20;
+			if (Game.Has('Octillion fingers')) add*=	20;
+			if (Game.Has('Nonillion fingers')) add*=	20;
 			var mult=1;
 			var num=0;
 			for (var i in Game.Objects) {if (Game.Objects[i].name!='Cursor') num+=Game.Objects[i].amount;}
@@ -8598,9 +8617,9 @@ Game.Launch=function()
 		new Game.Upgrade('Carpal tunnel prevention cream','The mouse and cursors are <b>twice</b> as efficient.<q>it... it hurts to click...</q>',500,[0,1]);Game.MakeTiered(Game.last,2,0);
 		new Game.Upgrade('Ambidextrous','The mouse and cursors are <b>twice</b> as efficient.<q>Look ma, both hands!</q>',10000,[0,2]);Game.MakeTiered(Game.last,3,0);
 		new Game.Upgrade('Thousand fingers','The mouse and cursors gain <b>+0.1</b> cookies for each non-cursor object owned.<q>clickity</q>',100000,[0,13]);Game.MakeTiered(Game.last,4,0);
-		new Game.Upgrade('Million fingers','The mouse and cursors gain <b>+0.5</b> cookies for each non-cursor object owned.<q>clickityclickity</q>',10000000,[0,14]);Game.MakeTiered(Game.last,5,0);
-		new Game.Upgrade('Billion fingers','The mouse and cursors gain <b>+5</b> cookies for each non-cursor object owned.<q>clickityclickityclickity</q>',100000000,[0,15]);Game.MakeTiered(Game.last,6,0);
-		new Game.Upgrade('Trillion fingers','The mouse and cursors gain <b>+50</b> cookies for each non-cursor object owned.<q>clickityclickityclickityclickity</q>',1000000000,[0,16]);Game.MakeTiered(Game.last,7,0);
+		new Game.Upgrade('Million fingers','Multiplies the gain from Thousand fingers by <b>5</b>.<q>clickityclickity</q>',10000000,[0,14]);Game.MakeTiered(Game.last,5,0);
+		new Game.Upgrade('Billion fingers','Multiplies the gain from Thousand fingers by <b>10</b>.<q>clickityclickityclickity</q>',100000000,[0,15]);Game.MakeTiered(Game.last,6,0);
+		new Game.Upgrade('Trillion fingers','Multiplies the gain from Thousand fingers by <b>20</b>.<q>clickityclickityclickityclickity</q>',1000000000,[0,16]);Game.MakeTiered(Game.last,7,0);
 		
 		order=200;
 		new Game.TieredUpgrade('Forwards from grandma','Grandmas are <b>twice</b> as efficient.<q>RE:RE:thought you\'d get a kick out of this ;))</q>','Grandma',1);
@@ -8662,7 +8681,7 @@ Game.Launch=function()
 		Game.NewUpgradeCookie({name:'All-chocolate cookies',desc:'CHOCOVERDOSE.',icon:[9,3],power:												2,	price:	9999999999*5});
 		
 		order=100;
-		new Game.Upgrade('Quadrillion fingers','The mouse and cursors gain <b>+500</b> cookies for each non-cursor object owned.<q>clickityclickityclickityclickityclick</q>',10000000000,[0,17]);Game.MakeTiered(Game.last,8,0);
+		new Game.Upgrade('Quadrillion fingers','Multiplies the gain from Thousand fingers by <b>20</b>.<q>clickityclickityclickityclickityclick</q>',10000000000,[0,17]);Game.MakeTiered(Game.last,8,0);
 		
 		order=200;new Game.TieredUpgrade('Prune juice','Grandmas are <b>twice</b> as efficient.<q>Gets me going.</q>','Grandma',4);
 		order=300;new Game.TieredUpgrade('Genetically-modified cookies','Farms are <b>twice</b> as efficient.<q>All-natural mutations.</q>','Farm',4);
@@ -8773,7 +8792,7 @@ Game.Launch=function()
 		Game.NewUpgradeCookie({name:'Zebra cookies',desc:'...',icon:[1,4],power:									2,	price:	999999999999});
 		
 		order=100;
-		new Game.Upgrade('Quintillion fingers','The mouse and cursors gain <b>+5000</b> cookies for each non-cursor object owned.<q>man, just go click click click click click, it\'s real easy, man.</q>',10000000000000,[0,18]);Game.MakeTiered(Game.last,9,0);
+		new Game.Upgrade('Quintillion fingers','Multiplies the gain from Thousand fingers by <b>20</b>.<q>man, just go click click click click click, it\'s real easy, man.</q>',10000000000000,[0,18]);Game.MakeTiered(Game.last,9,0);
 		
 		order=40000;
 		new Game.Upgrade('Gold hoard','Golden cookies appear <b>really often</b>.<q>That\'s entirely too many.</q>',7,[10,14]);//debug purposes only
@@ -8844,7 +8863,7 @@ Game.Launch=function()
 		
 		
 		order=100;
-		new Game.Upgrade('Sextillion fingers','The mouse and cursors gain <b>+50000</b> cookies for each non-cursor object owned.<q>sometimes<br>things just<br>click</q>',10000000000000000,[0,19]);Game.MakeTiered(Game.last,10,0);
+		new Game.Upgrade('Sextillion fingers','Multiplies the gain from Thousand fingers by <b>20</b>.<q>sometimes<br>things just<br>click</q>',10000000000000000,[0,19]);Game.MakeTiered(Game.last,10,0);
 		
 		order=200;new Game.TieredUpgrade('Double-thick glasses','Grandmas are <b>twice</b> as efficient.<q>Oh... so THAT\'s what I\'ve been baking.</q>','Grandma',5);
 		order=300;new Game.TieredUpgrade('Gingerbread scarecrows','Farms are <b>twice</b> as efficient.<q>Staring at your crops with mischievous glee.</q>','Farm',5);
@@ -9016,8 +9035,8 @@ Game.Launch=function()
 		new Game.Upgrade('Kitten managers','You gain <b>more CpS</b> the more milk you have.<q>that\'s not gonna paws any problem, sir</q>',900000000000000000000,Game.GetIcon('Kitten',5));Game.last.kitten=1;Game.MakeTiered(Game.last,5,18);
 		
 		order=100;
-		new Game.Upgrade('Septillion fingers','The mouse and cursors gain <b>+500000</b> cookies for each non-cursor object owned.<q>[cursory flavor text]</q>',10000000000000000000,[12,20]);Game.MakeTiered(Game.last,11,0);
-		new Game.Upgrade('Octillion fingers','The mouse and cursors gain <b>+5000000</b> cookies for each non-cursor object owned.<q>Turns out you <b>can</b> quite put your finger on it.</q>',10000000000000000000000,[12,19]);Game.MakeTiered(Game.last,12,0);
+		new Game.Upgrade('Septillion fingers','Multiplies the gain from Thousand fingers by <b>20</b>.<q>[cursory flavor text]</q>',10000000000000000000,[12,20]);Game.MakeTiered(Game.last,11,0);
+		new Game.Upgrade('Octillion fingers','Multiplies the gain from Thousand fingers by <b>20</b>.<q>Turns out you <b>can</b> quite put your finger on it.</q>',10000000000000000000000,[12,19]);Game.MakeTiered(Game.last,12,0);
 		
 		order=150;new Game.Upgrade('Eludium mouse','Clicking gains <b>+1% of your CpS</b>.<q>I rodent do that if I were you.</q>',500000000000000,[11,15]);Game.MakeTiered(Game.last,6,11);
 		new Game.Upgrade('Wishalloy mouse','Clicking gains <b>+1% of your CpS</b>.<q>Clicking is fine and dandy, but don\'t smash your mouse over it. Get your game on. Go play.</q>',50000000000000000,[11,16]);Game.MakeTiered(Game.last,7,11);
@@ -10172,7 +10191,7 @@ Game.Launch=function()
 		order=10300;
 		Game.NewUpgradeCookie({name:'Cosmic chocolate butter biscuit',desc:'Rewarded for owning 550 of everything.<br>Through some strange trick of magic or technology, looking at this cookie is like peering into a deep ocean of ancient stars. The origins of this biscuit are unknown; its manufacture, as far as your best investigators can tell, left no paper trail. From a certain angle, if you squint hard enough, you\'ll notice that a number of stars near the center are arranged to resemble the outline of your own face.',icon:[27,32],power:	10,price: 999999999999999999999999999999999999999999999999*butterBiscuitMult,locked:1});
 		
-		order=100;new Game.Upgrade('Nonillion fingers','The mouse and cursors gain <b>+50000000</b> cookies for each non-cursor object owned.<q>Only for the freakiest handshakes.</q>',10000000000000000000000000,[12,31]);Game.MakeTiered(Game.last,13,0);
+		order=100;new Game.Upgrade('Nonillion fingers','Multiplies the gain from Thousand fingers by <b>20</b>.<q>Only for the freakiest handshakes.</q>',10000000000000000000000000,[12,31]);Game.MakeTiered(Game.last,13,0);
 		order=150;new Game.Upgrade('Miraculite mouse','Clicking gains <b>+1% of your CpS</b>.<q>Composed of a material that neither science nor philosophy are equipped to conceptualize. And boy, does it ever click.</q>',50000000000000000000000000000,[11,31]);Game.MakeTiered(Game.last,13,11);
 		order=200;new Game.TieredUpgrade('Generation degeneration','Grandmas are <b>twice</b> as efficient.<q>Genetic testing shows that most of your grandmas are infected with a strange degenerative disease that only seems to further their powers; the more time passes, the older they get. This should concern you.</q>','Grandma',12);
 		order=300;new Game.TieredUpgrade('Global seed vault','Farms are <b>twice</b> as efficient.<q>An enormous genetic repository that could outlive an apocalypse. Guarantees the survival of your empire, or at the very least its agricultural components, should civilization fall. Which should be any day now.</q>','Farm',12);
@@ -11455,7 +11474,7 @@ Game.Launch=function()
 		Game.BankAchievement('Max capacity');
 		
 		order=61616;
-		new Game.Achievement('Liquid assets','Have your stock market profits surpass <b>3 months</b> of CpS ($7,884,000).',[12,33]);
+		new Game.Achievement('Liquid assets','Have your stock market profits surpass <b>$10,000,000</b>.',[12,33]);
 		
 		//end of achievements
 		
@@ -11695,7 +11714,7 @@ Game.Launch=function()
 			var obj=Game.ObjectsById[building];
 			return {
 				name:Game.goldenCookieBuildingBuffs[obj.name][0],
-				desc:'Your '+obj.amount+' '+obj.plural+' are boosting your CpS!<br>Cookie production +'+(Math.ceil(pow*100-100))+'% for '+Game.sayTime(time*Game.fps,-1)+'!',
+				desc:'Your '+Beautify(obj.amount)+' '+obj.plural+' are boosting your CpS!<br>Cookie production +'+(Math.ceil(pow*100-100))+'% for '+Game.sayTime(time*Game.fps,-1)+'!',
 				icon:[obj.iconColumn,14],
 				time:time*Game.fps,
 				add:true,
@@ -11708,7 +11727,7 @@ Game.Launch=function()
 			var obj=Game.ObjectsById[building];
 			return {
 				name:Game.goldenCookieBuildingBuffs[obj.name][1],
-				desc:'Your '+obj.amount+' '+obj.plural+' are rusting your CpS!<br>Cookie production '+(Math.ceil(pow*100-100))+'% slower for '+Game.sayTime(time*Game.fps,-1)+'!',
+				desc:'Your '+Beautify(obj.amount)+' '+obj.plural+' are rusting your CpS!<br>Cookie production '+(Math.ceil(pow*100-100))+'% slower for '+Game.sayTime(time*Game.fps,-1)+'!',
 				icon:[obj.iconColumn,15],
 				time:time*Game.fps,
 				add:true,
@@ -14001,7 +14020,7 @@ Game.Launch=function()
 					if (fortunes>=list.length) Game.Win('O Fortuna');
 				}
 				
-				if (Game.prestige>0 && Game.ascensionMode!=1)
+				if (Game.Has('Legacy') && Game.ascensionMode!=1)
 				{
 					Game.Unlock('Heavenly chip secret');
 					if (Game.Has('Heavenly chip secret')) Game.Unlock('Heavenly cookie stand');

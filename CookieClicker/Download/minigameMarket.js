@@ -230,7 +230,7 @@ M.launch=function()
 				if (costInS*n>=86400) Game.Win('Make my day');
 				M.profit+=costInS*n;
 				if (M.profit>0) Game.Win('Initial public offering');
-				if (M.profit>=7884000) Game.Win('Liquid assets');
+				if (M.profit>=10000000) Game.Win('Liquid assets');
 				if (M.profit>=31536000) Game.Win('Gaseous assets');
 				//Game.Earn(Game.cookiesPsRawHighest*costInS*n);
 				Game.cookies+=Game.cookiesPsRawHighest*costInS*n;

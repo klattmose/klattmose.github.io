@@ -3,7 +3,7 @@ if(HurricaneSugar === undefined) var HurricaneSugar = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 HurricaneSugar.name = 'Hurricane Sugar';
 HurricaneSugar.version = '1.5';
-HurricaneSugar.GameVersion = '2.029';
+HurricaneSugar.GameVersion = '2.031';
 
 HurricaneSugar.launch = function(){
 	HurricaneSugar.init = function(){

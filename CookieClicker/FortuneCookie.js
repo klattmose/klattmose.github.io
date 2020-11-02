@@ -1,9 +1,8 @@
-Game.Win('Third-party');
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.4';
-FortuneCookie.GameVersion = '2.029';
+FortuneCookie.version = '2.6';
+FortuneCookie.GameVersion = '2.031';
 
 FortuneCookie.launch = function(){
 	FortuneCookie.init = function(){
@@ -12,9 +11,10 @@ FortuneCookie.launch = function(){
 		FortuneCookie.config = {};
 		
 		FortuneCookie.config = FortuneCookie.defaultConfig();
-		FortuneCookie.loadConfig();
-		CCSE.customLoad.push(FortuneCookie.loadConfig);
-		CCSE.customSave.push(FortuneCookie.saveConfig);
+		if(CCSE.config.OtherMods.FortuneCookie && !Game.modSaveData[FortuneCookie.name]) Game.modSaveData[FortuneCookie.name] = JSON.stringify(CCSE.config.OtherMods.FortuneCookie);
+		/*FortuneCookie.load();
+		CCSE.customLoad.push(FortuneCookie.load);
+		CCSE.customSave.push(FortuneCookie.save);*/
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.initMembraneForecast();
@@ -47,17 +47,20 @@ FortuneCookie.launch = function(){
 	//***********************************
 	//    Configuration
 	//***********************************
-	FortuneCookie.saveConfig = function(config){
-		CCSE.save.OtherMods.FortuneCookie = FortuneCookie.config;
+	FortuneCookie.save = function(){
+		//CCSE.config.OtherMods.FortuneCookie = FortuneCookie.config;
+		if(CCSE.config.OtherMods.FortuneCookie) delete CCSE.config.OtherMods.FortuneCookie; // no need to keep this, it's now junk data
+		return JSON.stringify(FortuneCookie.config);
 	}
 
-	FortuneCookie.loadConfig = function(){
-		if(CCSE.save.OtherMods.FortuneCookie){
-			var config = CCSE.save.OtherMods.FortuneCookie;
+	FortuneCookie.load = function(str){
+		var config = JSON.parse(str);
+//		if(CCSE.config.OtherMods.FortuneCookie){
+//			var config = CCSE.config.OtherMods.FortuneCookie;
 			for(var pref in config){
 				FortuneCookie.config[pref] = config[pref];
 			}
-		}
+//		}
 	}
 	
 	FortuneCookie.defaultConfig = function(){
@@ -582,7 +585,7 @@ FortuneCookie.launch = function(){
 		return KlattmoseUtilities.config.patches.gamblersFeverDreamFix == 1;
 	}
 	
-	if(CCSE.ConfirmGameVersion(FortuneCookie.name, FortuneCookie.version, FortuneCookie.GameVersion)) FortuneCookie.init();
+	if(CCSE.ConfirmGameVersion(FortuneCookie.name, FortuneCookie.version, FortuneCookie.GameVersion)) Game.registerMod(FortuneCookie.name, FortuneCookie); // FortuneCookie.init();
 }
 
 

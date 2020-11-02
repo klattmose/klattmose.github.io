@@ -1,15 +1,16 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '1.2';
-AmericanSeason.GameVersion = '2.029';
+AmericanSeason.version = '1.4';
+AmericanSeason.GameVersion = '2.031';
 
 AmericanSeason.launch = function(){
 	AmericanSeason.init = function(){
 		AmericanSeason.iconsURL = 'https://klattmose.github.io/CookieClicker/img/customIcons.png';
 		AmericanSeason.config = AmericanSeason.defaultConfig();
 		AmericanSeason.rocketsPopped = 0;
-		AmericanSeason.loadConfig();
+		//AmericanSeason.load();
+		if(CCSE.config.OtherMods.AmericanSeason && !Game.modSaveData[AmericanSeason.name]) Game.modSaveData[AmericanSeason.name] = JSON.stringify(CCSE.config.OtherMods.AmericanSeason);
 		
 		
 		AmericanSeason.createSeason();
@@ -20,11 +21,11 @@ AmericanSeason.launch = function(){
 		AmericanSeason.initFireworks();
 		
 		
-		Game.customLogic.push(AmericanSeason.Logic);
-		Game.customReset.push(AmericanSeason.Reset);
-		CCSE.customLoad.push(AmericanSeason.loadConfig);
-		CCSE.customSave.push(AmericanSeason.saveConfig);
-		Game.customCpsMult.push(AmericanSeason.GetCpsMultiplier);
+		Game.registerHook('logic', AmericanSeason.Logic);
+		Game.registerHook('reset', AmericanSeason.Reset);
+		/*CCSE.customLoad.push(AmericanSeason.load);
+		CCSE.customSave.push(AmericanSeason.save);*/
+		Game.registerHook('cps', AmericanSeason.GetModifiedCPS);
 		
 		Game.customStatsMenu.push(function(){
 			CCSE.AppendStatsVersionNumber(AmericanSeason.name, AmericanSeason.version);
@@ -133,23 +134,30 @@ AmericanSeason.launch = function(){
 		}
 	}
 	
-	AmericanSeason.saveConfig = function(){
-		CCSE.save.OtherMods.AmericanSeason = {
+	AmericanSeason.save = function(){
+		/*CCSE.config.OtherMods.AmericanSeason = {
 			config : AmericanSeason.config,
 			rocketsPopped : AmericanSeason.rocketsPopped
-		}
+		}*/
+		
+		if(CCSE.config.OtherMods.AmericanSeason) delete CCSE.config.OtherMods.AmericanSeason; // no need to keep this, it's now junk data
+		return JSON.stringify({
+			config : AmericanSeason.config,
+			rocketsPopped : AmericanSeason.rocketsPopped
+		});
 	}
 	
-	AmericanSeason.loadConfig = function(){
-		if(CCSE.save.OtherMods.AmericanSeason){
-			var config = CCSE.save.OtherMods.AmericanSeason.config;
+	AmericanSeason.load = function(str){
+		var obj = JSON.parse(str);
+//		if(CCSE.config.OtherMods.AmericanSeason){
+			var config = obj.config;
 			for(var pref in config){
 				AmericanSeason.config[pref] = config[pref];
 			}
 			
-			if(CCSE.save.OtherMods.AmericanSeason.rocketsPopped !== undefined)
-				AmericanSeason.rocketsPopped = CCSE.save.OtherMods.AmericanSeason.rocketsPopped;
-		}
+			if(obj.rocketsPopped !== undefined)
+				AmericanSeason.rocketsPopped = obj.rocketsPopped;
+//		}
 		
 	}
 	
@@ -209,7 +217,7 @@ AmericanSeason.launch = function(){
 			]
 		);
 		
-		Game.customTickers.push(function(){
+		Game.registerHook('ticker', function(){
 			var list = [];
 			if(Game.season == 'american' && Game.cookiesEarned >= 1000) list.push(choose([
 				'News : flocks of eagles spotted circling over wig stores!',
@@ -427,7 +435,7 @@ AmericanSeason.launch = function(){
 		last = CCSE.NewAchievement('Full barrage', 'Unlock <b>every fireworks upgrade.</b><div class="line"></div>Owning this achievement makes fireworks upgrades drop more frequently in future playthroughs.', [0, 4, AmericanSeason.iconsURL]);
 			last.order = order; order += 0.001;
 		
-		Game.customChecks.push(function(){
+		Game.registerHook('check', function(){
 			if(AmericanSeason.rocketsPopped >= 1) Game.Win('Pyrotechnics');
 			if(AmericanSeason.rocketsPopped >= 74) Game.Win('July 4th');
 			if(AmericanSeason.rocketsPopped >= 1776) Game.Win('Pyromaniac');
@@ -766,17 +774,17 @@ AmericanSeason.launch = function(){
 		return num;
 	}
 	
-	AmericanSeason.GetCpsMultiplier = function(){
+	AmericanSeason.GetModifiedCPS = function(currentCpS){
 		var mult = 1;
 		for(var i in AmericanSeason.fireworkTypes) if(Game.Has(AmericanSeason.fireworkTypes[i])) mult *= 1.01;
-		return mult;
+		return currentCpS * mult;
 	}
 	
 	
 	//***********************************
 	//    Start the mod
 	//***********************************
-	if(CCSE.ConfirmGameVersion(AmericanSeason.name, AmericanSeason.version, AmericanSeason.GameVersion)) AmericanSeason.init();
+	if(CCSE.ConfirmGameVersion(AmericanSeason.name, AmericanSeason.version, AmericanSeason.GameVersion)) Game.registerMod(AmericanSeason.name, AmericanSeason); // AmericanSeason.init();
 }
 
 if(!AmericanSeason.isLoaded){

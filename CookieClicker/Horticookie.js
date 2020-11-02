@@ -1,9 +1,8 @@
-Game.Win('Third-party');
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.10';
-Horticookie.GameVersion = '2.029';
+Horticookie.version = '3.12';
+Horticookie.GameVersion = '2.031';
 
 //***********************************
 //    For testing
@@ -21,15 +20,16 @@ Horticookie.launch = function(){
 		Horticookie.unlockableCount = 0;
 		
 		Horticookie.restoreDefaultConfig();
-		Horticookie.loadConfig();
-		CCSE.customLoad.push(Horticookie.loadConfig);
-		CCSE.customSave.push(Horticookie.saveConfig);
+		if(CCSE.config.OtherMods.Horticookie && !Game.modSaveData[Horticookie.name]) Game.modSaveData[Horticookie.name] = JSON.stringify(CCSE.config.OtherMods.Horticookie);
+		/*Horticookie.load();
+		CCSE.customLoad.push(Horticookie.load);
+		CCSE.customSave.push(Horticookie.save);*/
 		
 		
 		Horticookie.ReplaceNativeGarden();
 		Horticookie.ReplaceMainGame();
 		
-		Game.customDraw.push(Horticookie.draw);
+		Game.registerHook('draw', Horticookie.draw);
 		
 		
 		//***********************************
@@ -122,16 +122,19 @@ Horticookie.launch = function(){
 		}
 	}
 
-	Horticookie.saveConfig = function(config){
-		CCSE.save.OtherMods.Horticookie = Horticookie.config;
+	Horticookie.save = function(){
+		//CCSE.config.OtherMods.Horticookie = Horticookie.config;
+		if(CCSE.config.OtherMods.Horticookie) delete CCSE.config.OtherMods.Horticookie; // no need to keep this, it's now junk data
+		return JSON.stringify(Horticookie.config);
 	}
 
-	Horticookie.loadConfig = function(){
-		if(CCSE.save.OtherMods.Horticookie){
-			Horticookie.config.autoHarvest = CCSE.save.OtherMods.Horticookie.autoHarvest;
-			Horticookie.config.allImmortal = CCSE.save.OtherMods.Horticookie.allImmortal;
-			Horticookie.config.accelGarden = CCSE.save.OtherMods.Horticookie.accelGarden;
-		}
+	Horticookie.load = function(str){
+		var config = JSON.parse(str);
+//		if(CCSE.config.OtherMods.Horticookie){
+			Horticookie.config.autoHarvest = config.autoHarvest;
+			Horticookie.config.allImmortal = config.allImmortal;
+			Horticookie.config.accelGarden = config.accelGarden;
+//		}
 	}
 
 	Horticookie.restoreDefaultConfig = function(){
@@ -1096,7 +1099,7 @@ Horticookie.launch = function(){
 	}
 	
 	
-	if(CCSE.ConfirmGameVersion(Horticookie.name, Horticookie.version, Horticookie.GameVersion)) Horticookie.init();
+	if(CCSE.ConfirmGameVersion(Horticookie.name, Horticookie.version, Horticookie.GameVersion)) Game.registerMod(Horticookie.name, Horticookie); // Horticookie.init();
 }
 
 

@@ -1,21 +1,20 @@
 if(Game.Objects['Chancemaker'].minigame) throw new Error("Casino prevented from loading by already present Chancemaker minigame.");
 
-Game.Win('Third-party');
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.12';
-M.GameVersion = '2.029';
+M.version = '3.13';
+M.GameVersion = '2.031';
 
 M.launch = function(){
 	var M = this;
 	
 	M.init = function(div){
 		// It's possible that the save data might get lost if entrusted to the game's save
-		if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix); // Import old version that doesn't use CCSE if necessary
-		if(!M.parent.minigameSave && CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
+		if(localStorage.getItem(M.savePrefix) != null && !CCSE.config.OtherMods[M.name]) CCSE.config.OtherMods[M.name] = localStorage.getItem(M.savePrefix); // Import old version that doesn't use CCSE if necessary
+		if(!M.parent.minigameSave && CCSE.config.OtherMods[M.name]) M.parent.minigameSave = CCSE.config.OtherMods[M.name];
 		M.saveString = M.parent.minigameSave;
 		
 		
@@ -810,7 +809,7 @@ M.launch = function(){
 		str += ' ' + getAchievementSave();
 		str += ' ' + getUpgradeSave();
 		
-		CCSE.save.OtherMods[M.name] = str;
+		CCSE.config.OtherMods[M.name] = str;
 		M.saveString = str;
 		return ''; //str;
 	}
@@ -1064,14 +1063,14 @@ M.launcher = function(){
 	
 	
 	CCSE.customLoad.push(function(ret){
-		if(localStorage.getItem(M.savePrefix) != null && !CCSE.save.OtherMods[M.name]) CCSE.save.OtherMods[M.name] = localStorage.getItem(M.savePrefix);
-		if(CCSE.save.OtherMods[M.name]) M.parent.minigameSave = CCSE.save.OtherMods[M.name];
+		if(localStorage.getItem(M.savePrefix) != null && !CCSE.config.OtherMods[M.name]) CCSE.config.OtherMods[M.name] = localStorage.getItem(M.savePrefix);
+		if(CCSE.config.OtherMods[M.name]) M.parent.minigameSave = CCSE.config.OtherMods[M.name];
 		M.saveString = M.parent.minigameSave;
 		
 		M.load(M.saveString);
 		return ret;
 	});
-	Game.customChecks.push(function(){
+	Game.registerHook('check', function(){
 		if(M.loadedCount){
 			if(M.games.Blackjack.winsT >= 7) Game.Unlock('Raise the stakes');
 			if(Game.Has('Raise the stakes') && M.games.Blackjack.winsT >= 49) Game.Unlock('High roller!');

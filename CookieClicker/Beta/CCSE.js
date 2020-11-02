@@ -1995,9 +1995,9 @@ CCSE.launch = function(){
 										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
 										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
-		//str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
+		/*str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
 									 '<a class="option" ' + Game.clickStr + '="CCSE.ImportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Import combined save</a>' + 
-									 '<label>Back up vanilla game save as well as data added by mods and managed by CCSE</label></div>';
+									 '<label>Back up vanilla game save as well as data added by mods and managed by CCSE</label></div>';*/
 		
 		return str;
 	}

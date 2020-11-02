@@ -219,6 +219,10 @@ Any bug or suggestion should be **opened as an issue** [in the repository](https
 
 ## Version History
 
+**11/01/2020 - (2.020)**
+* Changed CCSE.save to CCSE.config
+* Incorporated new mod api from Cookie Clicker
+
 **10/22/2019 - (2.016)**
 * Added hook for the new function Game.auraMult
 

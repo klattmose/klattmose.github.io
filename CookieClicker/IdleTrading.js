@@ -1,19 +1,19 @@
 if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
-IdleTrading.version = '1.4';
+IdleTrading.version = '1.5';
 IdleTrading.GameVersion = '2.031';
 
 IdleTrading.launch = function(){
 	IdleTrading.defaultConfig = function(){
-		var M = Game.Objects['Bank'].minigame;
+		//var M = Game.Objects['Bank'].minigame;
 		var conf = {
 			goods: [],
 			autoBuy: 1,
 			autoSell: 1
 		};
 		
-		for(var iG = 0; iG < M.goodsById.length; iG++){
+		for(var iG = 2; iG < Game.ObjectsN; iG++){
 			conf.goods.push({
 				active: true,
 				buyThresh: -1,
@@ -36,7 +36,7 @@ IdleTrading.launch = function(){
 		CCSE.customSave.push(IdleTrading.save);*/
 		
 		IdleTrading.ReplaceGameMenu();
-		IdleTrading.ReplaceNativeMarket();
+		CCSE.MinigameReplacer(IdleTrading.ReplaceNativeMarket, "Bank");
 		
 		
 		//***********************************
@@ -69,52 +69,57 @@ IdleTrading.launch = function(){
 	}
 
 	IdleTrading.getMenuString = function(){
-		var M = Game.Objects['Bank'].minigame;
-		
-		var writeHeader = function(text) {
-			var div = document.createElement('div');
-			div.className = 'listing';
-			div.style.padding = '5px 16px';
-			div.style.opacity = '0.7';
-			div.style.fontSize = '17px';
-			div.style.fontFamily = '\"Kavoon\", Georgia, serif';
-			div.textContent = text;
-			return div.outerHTML;
-		}
-		
-		/*var WriteButton = function(goodID, button, on, off, callback, invert){
-			var invert = invert ? 1 : 0;
-			if (!callback) callback = '';
-			callback += 'PlaySound(\'snd/tick.mp3\');';
-			return '<a class="option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="IdleTrading.ToggleGood(' + goodID + ',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (IdleTrading.config.goods[goodID].active ? on : off) + '</a>';
-		}*/
-		
-		function ToggleButton(prefName, button, on, off, callback, invert){
-			var invert = invert ? 1 : 0;
-			if(!callback) callback = '';
-			callback += 'PlaySound(\'snd/tick.mp3\');';
-			return '<a class="option' + ((IdleTrading.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="IdleTrading.Toggle(\'' + prefName + '\', \'' + button + '\', \'' + on + '\', \'' + off + '\', \'' + invert + '\');' + callback + '">' + (IdleTrading.config[prefName] ? on : off) + '</a>';
-		}
-		
-		
-		var str = 	'<div class="listing"><a class="option" ' + Game.clickStr + '="IdleTrading.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
-					'<div class="listing">' + ToggleButton('autoBuy', 'IdleTrading_autoBuyButton', 'AutoBuy ON', 'AutoBuy OFF', "") +
-											  ToggleButton('autoSell', 'IdleTrading_autoSellButton', 'AutoSell ON', 'AutoSell OFF', "") + '</div>';
-		
-		str += writeHeader('Goods');
-		
-		for(var iG = 0; iG < M.goodsById.length; iG++){
-			var me = M.goodsById[iG];
-			var conf = IdleTrading.config.goods[iG];
+		if(Game.Objects["Bank"].minigameLoaded){
+			var M = Game.Objects['Bank'].minigame;
 			
-			str += '<div class="listing" style="text-align:left;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:' + (-me.icon[0] * 48) + 'px ' + (-me.icon[1] * 48) + 'px;"></div><span class="bankSymbol" style="width:30px;overflow:hidden;white-space:nowrap;">' + me.symbol + '</span>';
-			str += '<input id="IdleTrading_buyThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.buyThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 0)"></input>';
-			str += '<input id="IdleTrading_sellThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.sellThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 1)"></input>';
-			str += '<label>Historical min: <b>$' + Beautify(conf.minPrice, 2) + '</b>; Historical max: <b>$' + Beautify(conf.maxPrice, 2) + '</b></label>';
-			str += '</div>';
+			var writeHeader = function(text) {
+				var div = document.createElement('div');
+				div.className = 'listing';
+				div.style.padding = '5px 16px';
+				div.style.opacity = '0.7';
+				div.style.fontSize = '17px';
+				div.style.fontFamily = '\"Kavoon\", Georgia, serif';
+				div.textContent = text;
+				return div.outerHTML;
+			}
+			
+			/*var WriteButton = function(goodID, button, on, off, callback, invert){
+				var invert = invert ? 1 : 0;
+				if (!callback) callback = '';
+				callback += 'PlaySound(\'snd/tick.mp3\');';
+				return '<a class="option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="IdleTrading.ToggleGood(' + goodID + ',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (IdleTrading.config.goods[goodID].active ? on : off) + '</a>';
+			}*/
+			
+			function ToggleButton(prefName, button, on, off, callback, invert){
+				var invert = invert ? 1 : 0;
+				if(!callback) callback = '';
+				callback += 'PlaySound(\'snd/tick.mp3\');';
+				return '<a class="option' + ((IdleTrading.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="IdleTrading.Toggle(\'' + prefName + '\', \'' + button + '\', \'' + on + '\', \'' + off + '\', \'' + invert + '\');' + callback + '">' + (IdleTrading.config[prefName] ? on : off) + '</a>';
+			}
+			
+			
+			var str = 	'<div class="listing"><a class="option" ' + Game.clickStr + '="IdleTrading.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+						'<div class="listing">' + ToggleButton('autoBuy', 'IdleTrading_autoBuyButton', 'AutoBuy ON', 'AutoBuy OFF', "") +
+												  ToggleButton('autoSell', 'IdleTrading_autoSellButton', 'AutoSell ON', 'AutoSell OFF', "") + '</div>';
+			
+			str += writeHeader('Goods');
+			
+			for(var iG = 0; iG < M.goodsById.length; iG++){
+				var me = M.goodsById[iG];
+				var conf = IdleTrading.config.goods[iG];
+				
+				str += '<div class="listing" style="text-align:left;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:' + (-me.icon[0] * 48) + 'px ' + (-me.icon[1] * 48) + 'px;"></div><span class="bankSymbol" style="width:30px;overflow:hidden;white-space:nowrap;">' + me.symbol + '</span>';
+				str += '<input id="IdleTrading_buyThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.buyThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 0)"></input>';
+				str += '<input id="IdleTrading_sellThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.sellThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 1)"></input>';
+				str += '<label>Historical min: <b>$' + Beautify(conf.minPrice, 2) + '</b>; Historical max: <b>$' + Beautify(conf.maxPrice, 2) + '</b></label>';
+				str += '</div>';
+			}
+			
+			return str;
 		}
-		
-		return str;
+		else{
+			return '<div class="listing">Stock market minigame not loaded!</div>';
+		}
 	}
 
 

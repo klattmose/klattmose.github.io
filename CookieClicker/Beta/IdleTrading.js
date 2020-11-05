@@ -1,7 +1,7 @@
 if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
-IdleTrading.version = '1.5';
+IdleTrading.version = '1.6';
 IdleTrading.GameVersion = '2.031';
 
 IdleTrading.launch = function(){
@@ -109,8 +109,8 @@ IdleTrading.launch = function(){
 				var conf = IdleTrading.config.goods[iG];
 				
 				str += '<div class="listing" style="text-align:left;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:' + (-me.icon[0] * 48) + 'px ' + (-me.icon[1] * 48) + 'px;"></div><span class="bankSymbol" style="width:30px;overflow:hidden;white-space:nowrap;">' + me.symbol + '</span>';
-				str += '<input id="IdleTrading_buyThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.buyThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 0)"></input>';
-				str += '<input id="IdleTrading_sellThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.sellThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 1)"></input>';
+				str += '<label> Buy at:</label><input id="IdleTrading_buyThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.buyThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 0)"></input>';
+				str += '<label> Sell at:</label><input id="IdleTrading_sellThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.sellThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 1)"></input>';
 				str += '<label>Historical min: <b>$' + Beautify(conf.minPrice, 2) + '</b>; Historical max: <b>$' + Beautify(conf.maxPrice, 2) + '</b></label>';
 				str += '</div>';
 			}

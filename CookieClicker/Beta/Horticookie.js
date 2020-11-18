@@ -1,7 +1,7 @@
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.12';
+Horticookie.version = '3.13';
 Horticookie.GameVersion = '2.031';
 
 //***********************************
@@ -135,6 +135,8 @@ Horticookie.launch = function(){
 			Horticookie.config.allImmortal = config.allImmortal;
 			Horticookie.config.accelGarden = config.accelGarden;
 //		}
+		
+		if(Game.Objects["Farm"].minigameLoaded) for(var prefName in Horticookie.config) Horticookie.applyPref(prefName);
 	}
 
 	Horticookie.restoreDefaultConfig = function(){

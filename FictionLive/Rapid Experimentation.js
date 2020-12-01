@@ -58,3 +58,57 @@ Game.wrinklers.forEach(function(item){
     if(item.phase == 2) i++;
 });
 if(i == Game.getWrinklersMax()) Game.CollectWrinklers();
+
+
+
+
+var AntiSpam = {}
+AntiSpam.postLimit = 5;
+AntiSpam.lastPoster = {uid:'',inarow:-1};
+
+AntiSpam.handleChatMessage = function(data, status){
+	if(data.length != 0){
+		var u = data.u
+		if(u != "Anon"){
+			var userID = u[0]._id;
+			var userName = u[0].n;
+			var divs = $(".chatMsg[data-id='" + data._id + "']");
+			
+			if(AntiSpam.lastPoster.uid == userID){
+				AntiSpam.lastPoster.inarow++;
+				if(AntiSpam.lastPoster.inarow > AntiSpam.postLimit) document.delete(divs);
+			}else{
+				AntiSpam.lastPoster.uid = userID;
+				AntiSpam.lastPoster.inarow = 1;
+			}
+		}
+	}
+}
+
+AntiSpam.getPostData = function(root){
+	var chatPosts = root.getElementsByClassName("chatMsg");
+	for(var i = 0; i < chatPosts.length; i++){
+		chatPosts[i].style.display = "";
+		$.get("https://fiction.live/api/node/" + chatPosts[i].attributes["data-id"].value, FictionLiveParser.handleChatMessage);
+	}
+}
+
+AntiSpam.observer = new MutationObserver(function(mutations) {
+	mutations.forEach(function(mutation) {
+		for(var i = 0; i < mutation.addedNodes.length; i++){
+			var div = mutation.addedNodes[i];
+			if(div.nodeType == 1){
+				FictionLiveParser.getPostData(div);
+			}
+		}
+	});
+});
+
+AntiSpam.observer.observe(document.documentElement, {
+	attributes: false,
+	characterData: false,
+	childList: true,
+	subtree: true,
+	attributeOldValue: false,
+	characterDataOldValue: false
+});

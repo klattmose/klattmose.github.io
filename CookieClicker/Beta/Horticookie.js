@@ -1,7 +1,7 @@
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.13';
+Horticookie.version = '3.14';
 Horticookie.GameVersion = '2.031';
 
 //***********************************
@@ -782,7 +782,7 @@ Horticookie.launch = function(){
 					var ps = Horticookie.plantStatus[plant.key];
 					
 					if(tile[1] >= plant.mature){
-						if(Horticookie.config.autoHarvest && (!plant.unlocked || plant.key == 'queenbeetLump')){
+						if(Horticookie.config.autoHarvest && (!plant.unlocked || plant.key == 'queenbeetLump' || !Horticookie.dropUnlocked(plant))){
 							M.clickTile(x, y);
 							Horticookie.recalcTileStatus();
 						}else{
@@ -804,6 +804,21 @@ Horticookie.launch = function(){
 				Horticookie.plantStatus[key].status = Horticookie.statusCodes.UNLOCKED;
 			}
 		}
+	}
+	
+	Horticookie.dropUnlocked = function(plant){
+		if(plant.onHarvest){
+			var onHarvest = plant.onHarvest.toString();
+			if(onHarvest.indexOf('dropUpgrade') != -1){
+				var pos = onHarvest.indexOf('dropUpgrade') + "dropUpgrade('".length;
+				var len = onHarvest.indexOf("'", pos);
+				var upgrade = onHarvest.substring(pos, len);
+				
+				return Game.HasUnlocked(upgrade);
+			}
+		}
+		
+		return true; // default value: no upgrade to unlock
 	}
 
 	Horticookie.recalcUnlockables = function(){

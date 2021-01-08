@@ -50,10 +50,6 @@ Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ri
 
 Adds a new building and an appropriate amount of upgrades and achievments.
 
-### [Cookie Crumbled](https://klattmose.github.io/CookieClicker/CookieCrumbled.js)
-
-The first self-loading mod!
-
 ## Offline
 
 ### (Currently non-functional)

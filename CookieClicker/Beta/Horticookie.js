@@ -1,7 +1,7 @@
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.14';
+Horticookie.version = '3.15';
 Horticookie.GameVersion = '2.031';
 
 //***********************************
@@ -172,7 +172,7 @@ Horticookie.launch = function(){
 		str += writeHeader("Helpers");
 		str += '<div class="listing">' + WriteButton('autoHarvest', 'autoHarvestButton', 'Autoharvest ON', 'Autoharvest OFF', '') + '<label>Automatically harvests mature interesting plants.</label></div>';
 		str += '<div class="listing">' + WriteButton('allImmortal', 'allImmortalButton', 'Immortalize ON', 'Immortalize OFF', '') + '<label>All plants are immortal.</label></div>';
-		str += '<div class="listing">' + WriteButton('accelGarden', 'accelGardenButton', 'Accelerated Garden ON', 'Accelerated Garden OFF', '') + '<label>Long-lived plants age faster.</label></div>';
+		str += '<div class="listing">' + WriteButton('accelGarden', 'accelGardenButton', 'Accelerated Garden ON', 'Accelerated Garden OFF', '') + '<label>Alters the randomFloor function to always give the higher result. Practical effect is no plant will take longer than 100 ticks to mature.</label></div>';
 		str += '<div class="listing"><small>A plant is considered Interesting if you lack its seed, if it\'s mature and you lack its upgrade, or if it\'s a Juicy Queenbeet. Danger is a chance of death or contamination.</small></div>';
 		
 		return str;

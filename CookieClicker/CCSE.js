@@ -1,6 +1,6 @@
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.021';
+CCSE.version = '2.023';
 CCSE.GameVersion = '2.031';
 
 CCSE.launch = function(){
@@ -124,6 +124,11 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
+			'</div><div class="subsection update small"><div class="title">02/06/2021</div>' + 
+			'<div class="listing">&bull; Halved the loading time with this one weird trick!</div>' +
+			'<div class="listing">&bull; The trick is called optimization</div>' +
+			'<div class="listing">&bull; And learning about prototype functions</div>' +
+			
 			'</div><div class="subsection update small"><div class="title">10/31/2020</div>' + 
 			'<div class="listing">&bull; Updated to use the new modding API</div>' +
 			'<div class="listing">&bull; The CCSE.save object (where the mod save data is stored) is now named CCSE.config. The new CCSE.save is a function that will get called by Cookie Clicker when it decides it\'s time to save.</div>' +
@@ -239,7 +244,7 @@ CCSE.launch = function(){
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
 							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
-							Game.UpgradesN * 9 + 
+							Game.UpgradesN * 1 + 8 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
@@ -1637,6 +1642,53 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplaceUpgradesFinish = function(){
+		// this.getPrice
+		// Functions should return a value to multiply the price by (Return 1 to have no effect)
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.getPrice", 'return Math', `
+			// Game.Upgrade.prototype.getPrice injection point 0
+			for(var i in Game.customUpgrades[this.name].getPrice) price *= Game.customUpgrades[this.name].getPrice[i](this);`, -1);
+		
+		// this.click
+		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.click", -1, `
+				// Game.Upgrade.prototype.click injection point 0
+				for(var i in Game.customUpgrades[this.name].click) Game.customUpgrades[this.name].click[i](this, e);
+			`);
+		
+		// this.buy
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.buy", 'return success', `
+			// Game.Upgrade.prototype.buy injection point 0
+			for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);`, -1);
+		
+		// this.earn 
+		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.earn", -1, `
+				// Game.Upgrade.prototype.earn injection point 0
+				for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this);
+			`);
+		
+		// this.unearn
+		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.unearn", -1, `
+				// Game.Upgrade.prototype.unearn injection point 0
+				for(var i in Game.customUpgrades[this.name].unearn) Game.customUpgrades[this.name].unearn[i](this);
+			`);
+		
+		// this.unlock
+		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.unlock", -1, `
+				// Game.Upgrade.prototype.unlock injection point 0
+				for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
+			`);
+		
+		// this.lose
+		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.lose", -1, `
+				// Game.Upgrade.prototype.lose injection point 0
+				for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this);
+			`);
+		
+		// this.toggle
+		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.toggle", -1, `
+				// Game.Upgrade.prototype.toggle injection point 0
+				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
+			`);
+		
 		// Correct these descFuncs
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
@@ -1664,71 +1716,41 @@ CCSE.launch = function(){
 		// Functions should return a value to multiply the price by (Return 1 to have no effect)
 		if(!Game.customUpgrades[key].getPrice) Game.customUpgrades[key].getPrice = []; 
 		Game.customUpgrades[key].getPrice.push(CCSE.customUpgradesAllgetPrice);
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['" + escKey + "'].getPrice", 'return Math', `
-			// Game.Upgrades['` + escKey + `'].getPrice injection point 0
-			for(var i in Game.customUpgrades[this.name].getPrice) price *= Game.customUpgrades[this.name].getPrice[i](this);`, -1);
 		
 		
 		// this.click
 		if(!Game.customUpgrades[key].click) Game.customUpgrades[key].click = [];
 		Game.customUpgrades[key].click.push(CCSE.customUpgradesAllclick);
-		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].click", -1, `
-				// Game.Upgrades['` + escKey + `'].click injection point 0
-				for(var i in Game.customUpgrades[this.name].click) Game.customUpgrades[this.name].click[i](this, e);
-			`);
 		
 		
 		// this.buy
 		if(!Game.customUpgrades[key].buy) Game.customUpgrades[key].buy = []; 
 		Game.customUpgrades[key].buy.push(CCSE.customUpgradesAllbuy);
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buy", 'return success', `
-			// Game.Upgrades['` + escKey + `'].buy injection point 0
-			for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);`, -1);
 		
 		
 		// this.earn 
 		if(!Game.customUpgrades[key].earn) Game.customUpgrades[key].earn = [];
 		Game.customUpgrades[key].earn.push(CCSE.customUpgradesAllearn);
-		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].earn", -1, `
-				// Game.Upgrades['` + escKey + `'].earn injection point 0
-				for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this);
-			`);
 		
 		
 		// this.unearn
 		if(!Game.customUpgrades[key].unearn) Game.customUpgrades[key].unearn = [];
 		Game.customUpgrades[key].unearn.push(CCSE.customUpgradesAllunearn);
-		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].unearn", -1, `
-				// Game.Upgrades['` + escKey + `'].unearn injection point 0
-				for(var i in Game.customUpgrades[this.name].unearn) Game.customUpgrades[this.name].unearn[i](this);
-			`);
 		
 		
 		// this.unlock
 		if(!Game.customUpgrades[key].unlock) Game.customUpgrades[key].unlock = [];
 		Game.customUpgrades[key].unlock.push(CCSE.customUpgradesAllunlock);
-		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].unlock", -1, `
-				// Game.Upgrades['` + escKey + `'].unlock injection point 0
-				for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
-			`);
 		
 		
 		// this.lose
 		if(!Game.customUpgrades[key].lose) Game.customUpgrades[key].lose = [];
 		Game.customUpgrades[key].lose.push(CCSE.customUpgradesAlllose);
-		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].lose", -1, `
-				// Game.Upgrades['` + escKey + `'].lose injection point 0
-				for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this);
-			`);
 		
 		
 		// this.toggle
 		if(!Game.customUpgrades[key].toggle) Game.customUpgrades[key].toggle = [];
 		Game.customUpgrades[key].toggle.push(CCSE.customUpgradesAlltoggle);
-		CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].toggle", -1, `
-				// Game.Upgrades['` + escKey + `'].toggle injection point 0
-				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
-			`);
 		
 		
 		// this.buyFunction

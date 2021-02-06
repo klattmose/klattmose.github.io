@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '1.4';
+AmericanSeason.version = '1.5';
 AmericanSeason.GameVersion = '2.031';
 
 AmericanSeason.launch = function(){
@@ -314,7 +314,7 @@ AmericanSeason.launch = function(){
 				me.l.style.opacity = '0';
 				me.l.style.display = 'block';
 				
-				var dur = 2; // Base time in seconds to travel across the screen
+				var dur = 2.5; // Base time in seconds to travel across the screen
 				if(Game.Has('Slow burn')) dur *= 2;
 				//dur *= Game.eff('reindeerDur');
 				me.dur = dur;

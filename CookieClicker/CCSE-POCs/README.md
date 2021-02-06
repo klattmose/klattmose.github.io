@@ -219,6 +219,10 @@ Any bug or suggestion should be **opened as an issue** [in the repository](https
 
 ## Version History
 
+**02/06/2021 - (2.023)**
+* Optimized the initialization code
+* Will now load in roughly a quarter of the time
+
 **11/01/2020 - (2.020)**
 * Changed CCSE.save to CCSE.config
 * Incorporated new mod api from Cookie Clicker
@@ -250,3 +254,5 @@ Anyone who gives a suggestion or bugfix, especially code that gets implemented i
 	* Writing this thing
 * [Or0b0ur0s](https://www.reddit.com/user/Or0b0ur0s)
 	* Assisting in making CCSE less strenuous on computers with fewer resources
+* [G lander](https://www.reddit.com/user/G-lander)
+	* Suggested using the prototype functions for upgrades instead of the individual functions

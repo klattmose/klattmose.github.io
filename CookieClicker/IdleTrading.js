@@ -1,7 +1,7 @@
 if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
-IdleTrading.version = '1.6';
+IdleTrading.version = '1.7';
 IdleTrading.GameVersion = '2.031';
 
 IdleTrading.launch = function(){
@@ -98,7 +98,9 @@ IdleTrading.launch = function(){
 			}
 			
 			
-			var str = 	'<div class="listing"><a class="option" ' + Game.clickStr + '="IdleTrading.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a></div>' + 
+			var str = 	'<div class="listing"><a class="option" ' + Game.clickStr + '="IdleTrading.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a>' +  
+						(typeof InsugarTrading == 'undefined' ? '' : '<a class="option" ' + Game.clickStr + '="IdleTrading.importInsugarTrading(); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Import from Insugar Trading</a>') + 
+						'</div>' + 
 						'<div class="listing">' + ToggleButton('autoBuy', 'IdleTrading_autoBuyButton', 'AutoBuy ON', 'AutoBuy OFF', "") +
 												  ToggleButton('autoSell', 'IdleTrading_autoSellButton', 'AutoSell ON', 'AutoSell OFF', "") + '</div>';
 			
@@ -192,7 +194,25 @@ IdleTrading.launch = function(){
 		Game.UpdateMenu();
 	}
 	
-
+	IdleTrading.importInsugarTrading = function(){
+		var config = IdleTrading.config;
+		var quant = InsugarTrading.settings.quantilesToDisplay;
+		var bankLevel = Game.Objects["Bank"].level;
+		var sellThresh = -1;
+		var buyThresh = 2;
+		
+		for(var i = 0; i < quant.length; i++){
+			if(quant[i] < buyThresh) buyThresh = quant[i];
+			if(quant[i] > sellThresh) sellThresh = quant[i];
+		}
+		
+		for(var iG = 0; iG < config.goods.length; iG++){
+			config.goods[iG]['buyThresh'] = Math.round(100 * InsugarTrading.quantile(bankLevel, iG, buyThresh)) / 100;
+			config.goods[iG]['sellThresh'] = Math.round(100 * InsugarTrading.quantile(bankLevel, iG, sellThresh)) / 100;
+		}
+	}
+	
+	
 	//***********************************
 	//    Functionality
 	//***********************************

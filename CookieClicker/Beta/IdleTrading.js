@@ -207,8 +207,8 @@ IdleTrading.launch = function(){
 		}
 		
 		for(var iG = 0; iG < config.goods.length; iG++){
-			config.goods[iG]['buyThresh'] = InsugarTrading.quantile(bankLevel, iG, buyThresh);
-			config.goods[iG]['sellThresh'] = InsugarTrading.quantile(bankLevel, iG, sellThresh);;
+			config.goods[iG]['buyThresh'] = Math.round(100 * InsugarTrading.quantile(bankLevel, iG, buyThresh)) / 100;
+			config.goods[iG]['sellThresh'] = Math.round(100 * InsugarTrading.quantile(bankLevel, iG, sellThresh)) / 100;
 		}
 	}
 	

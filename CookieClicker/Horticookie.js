@@ -1,7 +1,7 @@
 if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.15';
+Horticookie.version = '3.16';
 Horticookie.GameVersion = '2.031';
 
 //***********************************
@@ -108,8 +108,10 @@ Horticookie.launch = function(){
 					if(Horticookie.Backup.plants[key].immortal){} // Do nothing
 					else{
 						if(Horticookie.config[prefName]){
-							M.plants[key].immortal = 1;
-							M.plants[key].detailsStr = (M.plants[key].detailsStr ? M.plants[key].detailsStr + ', i' : 'I') + 'mmortal';
+							if(!M.plants[key].immortal){
+								M.plants[key].immortal = 1;
+								M.plants[key].detailsStr = (M.plants[key].detailsStr ? M.plants[key].detailsStr + ', i' : 'I') + 'mmortal';
+							}
 						}
 						else{
 							M.plants[key].detailsStr = Horticookie.Backup.plants[key].detailsStr;

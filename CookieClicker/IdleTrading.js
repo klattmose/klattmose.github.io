@@ -227,7 +227,7 @@ IdleTrading.launch = function(){
 		for(var iG = 0; iG < M.goodsById.length; iG++){
 			var good = M.goodsById[iG];
 			var conf = IdleTrading.config.goods[iG];
-			var price = M.getGoodPrice(good);
+			var price = Math.round(100 * M.getGoodPrice(good)) / 100;
 			
 			if(IdleTrading.config.autoBuy && conf.buyThresh != -1){
 				if(price <= conf.buyThresh) M.buyGood(iG, 10000);

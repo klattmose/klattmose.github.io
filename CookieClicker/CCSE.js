@@ -3313,7 +3313,7 @@ CCSE.launch = function(){
 		// drawFunc        a function that recieves and returns an HTML string.
 		
 		Game.customSpecialTabs.push(function(){
-			if(conditionFunc()) Game.specialTabs.push('timer');
+			if(conditionFunc()) Game.specialTabs.push(name);
 		});
 		
 		Game.customDrawSpecialPic.push(function(picframe, tab){

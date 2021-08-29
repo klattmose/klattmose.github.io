@@ -3,7 +3,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.12';
+KlattmoseUtilities.version = '2.13';
 KlattmoseUtilities.GameVersion = '2.031';
 
 KlattmoseUtilities.launch = function(){
@@ -116,8 +116,8 @@ KlattmoseUtilities.launch = function(){
 			  "ctrl": false,
 			  "shift": false,
 			  "alt": false,
-			  "script": "if(typeof CM == 'undefined' || typeof CM.Cache == 'undefined'){}\nelse{\n\tvar waitForUpgrade = false;\n\tfor (var i in CM.Cache['Upgrades']) {\n\t\tvar obj = Game.Upgrades[i];\n\t\tif((CM.Cache['Upgrades'][i].color == 'Green' || CM.Cache['Upgrades'][i].color == 'Blue') && obj.pool != \"toggle\"){\n\t\t\tif(obj.getPrice() < Game.cookies) {\n\t\t\t\tobj.buy();\n\t\t\t\tGame.Notify('Bought ' + obj.name, '', '', 1, 1);\n\t\t\t\twaitForUpgrade = false;\n\t\t\t}else{\n\t\t\t\twaitForUpgrade = true;\n\t\t\t}\n\t\t}\n\t}\n\tif(!waitForUpgrade){\n\t\tfor (var i in CM.Cache['Objects']) {\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(CM.Cache['Objects'][i].color == 'Green' && obj.price < Game.cookies){\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
-			  "period": "1000"
+			  "script": "if(typeof CookieMonsterData == 'undefined'){}\nelse{\n\tvar waitForUpgrade = false;\n\tfor (var i in CookieMonsterData['Upgrades']) {\n\t\tvar obj = Game.Upgrades[i];\n\t\tif((CookieMonsterData['Upgrades'][i].colour == 'Green' || CookieMonsterData['Upgrades'][i].colour == 'Blue') && obj.pool != \"toggle\" && !obj.isVaulted()){\n\t\t\tif(obj.getPrice() < Game.cookies) {\n\t\t\t\tobj.buy();\n\t\t\t\tGame.Notify('Bought ' + obj.name, '', '', 1, 1);\n\t\t\t\twaitForUpgrade = false;\n\t\t\t}else{\n\t\t\t\twaitForUpgrade = true;\n\t\t\t}\n\t\t}\n\t}\n\tif(!waitForUpgrade){\n\t\tfor (var i in CookieMonsterData['Objects1']) {\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(CookieMonsterData['Objects1'][i].colour == 'Green' && obj.price < Game.cookies){\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
+			  "period": "100"
 			},
 			{
 			  "keyCode": 102,

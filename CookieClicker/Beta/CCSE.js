@@ -124,6 +124,9 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
+			'</div><div class="subsection update small"><div class="title">08/31/2021</div>' + 
+			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
+			
 			'</div><div class="subsection update small"><div class="title">02/06/2021</div>' + 
 			'<div class="listing">&bull; Halved the loading time with this one weird trick!</div>' +
 			'<div class="listing">&bull; The trick is called optimization</div>' +
@@ -244,7 +247,7 @@ CCSE.launch = function(){
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
 							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
-							Game.UpgradesN * 1 + 8 + 
+							Game.UpgradesN * 1 + 11 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
@@ -1689,6 +1692,23 @@ CCSE.launch = function(){
 				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
 			`);
 		
+		// this.isVaulted
+		CCSE.SpliceCodeIntoFunction("Game.Upgrade.prototype.isVaulted", 2, `
+				// Game.Upgrade.prototype.isVaulted injection point 0
+				if (CCSE.config.vault.indexOf(this.name)!=-1) return true;
+			`);
+		
+		// this.vault
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.vault", 'Game.vault', `
+				if(this.CCSE) CCSE.config.vault.push(this.name);
+                else `, -1);
+		
+		// this.unvault
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.unvault", 'Game.vault', `
+				if(this.CCSE) CCSE.config.vault.splice(CCSE.config.vault.indexOf(this.name),1);
+                else `, -1);
+		
+		
 		// Correct these descFuncs
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
@@ -2907,7 +2927,7 @@ CCSE.launch = function(){
 		for(var i in CCSE.customSave) CCSE.customSave[i]();
 		
 		var str = JSON.stringify(CCSE.config);
-		str = CCSE.LZString.compressToUTF16(str);
+		//str = CCSE.LZString.compressToUTF16(str);
 		
 		if(type == 2){
 			return str;
@@ -2978,6 +2998,7 @@ CCSE.launch = function(){
 		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
 		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
 		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
+		if(!CCSE.config.vault) CCSE.config.vault = [];
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3146,6 +3167,8 @@ CCSE.launch = function(){
 				bought: 0
 			}
 		}
+		
+		me.CCSE = 1;
 		
 		return me;
 	}

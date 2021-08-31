@@ -126,6 +126,7 @@ CCSE.launch = function(){
 			
 			'</div><div class="subsection update small"><div class="title">08/31/2021</div>' + 
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
+			'<div class="listing">&bull; Setting custom upgrades as Permanent will no longer break the game if the Stats menu is opened without the mod loaded</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">02/06/2021</div>' + 
 			'<div class="listing">&bull; Halved the loading time with this one weird trick!</div>' +
@@ -241,7 +242,7 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 118 + 
+		CCSE.functionsTotal = 127 + 
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
@@ -830,8 +831,24 @@ CCSE.launch = function(){
 			for(var i in Game.customDropEgg) failRate *= Game.customDropEgg[i]();`);
 		
 		
+		// Game.PermanentSlotIcon
+		// Functions should return an upgrade id. Return id for no effect.
+		if(!Game.customPermanentUpgradeId) Game.customPermanentUpgradeId = [];
+		Game.customPermanentUpgradeId.push(CCSE.GetPermanentUpgrade);
+		CCSE.SpliceCodeIntoFunction('Game.PermanentSlotIcon', 2, 
+			`// Game.PermanentSlotIcon injection point 0
+			var id = Game.permanentUpgrades[slot];
+			for(var i in Game.customPermanentUpgradeId) id = Game.customPermanentUpgradeId[i](slot, id);`,
+			'Game.PermanentSlotIcon=' + Game.PermanentSlotIcon.toString().replaceAll('Game.permanentUpgrades[slot]','id'));
+		
+		
 		// Game.AssignPermanentSlot
-		// Don't know where to put the hook. If you have a good idea, let me know.
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'if (!fail)', 
+			'for (var ii in CCSE.config.permanentUpgrades) {if (CCSE.config.permanentUpgrades[ii]==me.name) fail=1;}', -1);
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'var upgrade=Game.permanentUpgrades[slot];', 
+			'for(var i in Game.customPermanentUpgradeId) upgrade = Game.customPermanentUpgradeId[i](slot, upgrade);', 1);
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'Game.BuildAscendTree();', 
+			'CCSE.RectifyPermanentUpgrades();Game.BuildAscendTree();', 0);
 		
 		
 		// Game.PutUpgradeInPermanentSlot
@@ -1709,15 +1726,15 @@ CCSE.launch = function(){
                 else `, -1);
 		
 		
-		// Correct these descFuncs
+		// Permanent upgrades are tricky
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
 		{
-			Game.Upgrades[slots[i]].olddescFunc=function(i){return function(){
-				if (Game.permanentUpgrades[i]==-1) return Game.Upgrades[slots[i]].desc;
-				var upgrade=Game.UpgradesById[Game.permanentUpgrades[i]];
-				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
-			};}(i);
+			CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + slots[i] + "'].olddescFunc", 1, 
+				`// ` + slots[i] + ` olddescFunc injection point 0
+				var id = Game.permanentUpgrades[` + i + `];
+				for(var i in Game.customPermanentUpgradeId) id = Game.customPermanentUpgradeId[i](` + i + `, id);`,
+				'Game.Upgrades["' + slots[i] + '"].olddescFunc=' + Game.Upgrades[slots[i]].olddescFunc.toString().replaceAll('Game.permanentUpgrades[i]','id'));
 		}
 	}
 	
@@ -1795,7 +1812,8 @@ CCSE.launch = function(){
 		if(!Game.customUpgrades[key].descFunc) Game.customUpgrades[key].descFunc = [];
 		Game.customUpgrades[key].descFunc.push(CCSE.customUpgradesAlldescFunc);
 		if(upgrade.descFunc){
-			eval('upgrade.olddescFunc = ' + upgrade.descFunc.toString());
+			//eval('upgrade.olddescFunc = ' + upgrade.descFunc.toString());
+			upgrade.olddescFunc = upgrade.descFunc;
 			upgrade.descFunc = function(){
 				var desc = this.olddescFunc();
 				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
@@ -2999,6 +3017,7 @@ CCSE.launch = function(){
 		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
 		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
 		if(!CCSE.config.vault) CCSE.config.vault = [];
+		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3126,29 +3145,18 @@ CCSE.launch = function(){
 		l('textareaPrompt').focus();
 	}*/
 	
-	/*CCSE.Reset = function(hard){
+	CCSE.reset = function(hard){
 		if(hard){
-			for(var name in CCSE.config.Achievements){
-				CCSE.config.Achievements[name].won = 0;
-				if(Game.Achievements[name]) Game.Achievements[name].won = 0;
+			CCSE.config.vault = [];
+			CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+		} else {
+			for(var i in CCSE.config.permanentUpgrades){
+				if(CCSE.config.permanentUpgrades[i] != -1)
+					if(Game.Upgrades[CCSE.config.permanentUpgrades[i]])
+						Game.Upgrades[CCSE.config.permanentUpgrades[i]].earn();
 			}
 		}
-		
-		for(var name in CCSE.config.Upgrades){
-			if(Game.Upgrades[name]){
-				var me=Game.Upgrades[name];
-				if (hard || me.pool != 'prestige') me.bought=0;
-				if (hard || (me.pool != 'prestige' && !me.lasting))
-				{
-					if (!hard && Game.Has('Keepsakes') && Game.seasonDrops.indexOf(me.name) != -1 && Math.random() < 1 / 5){}
-					else me.unlocked = 0;
-				}
-				
-				CCSE.config.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
-				CCSE.config.Upgrades[name].bought = Game.Upgrades[name].bought;
-			}
-		}
-	}*/
+	}
 	
 	
 	/*=====================================================================================
@@ -3370,6 +3378,25 @@ CCSE.launch = function(){
 	CCSE.SetSpecialMenuImage = function(str, pic, frame){
 		return str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
 						   'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
+	}
+	
+	CCSE.GetPermanentUpgrade = function(slot, id){
+		if(CCSE.config.permanentUpgrades[slot] == -1) return id;
+		return (Game.Upgrades[CCSE.config.permanentUpgrades[slot]] ? Game.Upgrades[CCSE.config.permanentUpgrades[slot]].id : -1);
+	}
+	
+	CCSE.RectifyPermanentUpgrades = function(){
+		for(var i in Game.permanentUpgrades){
+			if(Game.permanentUpgrades[i] != -1){
+				var upgrade = Game.UpgradesById[Game.permanentUpgrades[i]];
+				if(upgrade.CCSE){
+					Game.permanentUpgrades[i] = -1;
+					CCSE.config.permanentUpgrades[i] = upgrade.name;
+				}else{
+					CCSE.config.permanentUpgrades[i] = -1;
+				}
+			}
+		}
 	}
 	
 	

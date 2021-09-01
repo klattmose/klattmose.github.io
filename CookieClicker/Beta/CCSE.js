@@ -2051,8 +2051,8 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.GetMenuString = function(){
-		var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportSave(); PlaySound(\'snd/tick.mp3\');">Export custom save</a>' +
-										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
+		var str =	'<div class="listing">' + CCSE.MenuHelper.ActionButton("CCSE.ExportSave();", 'Export custom save') +
+										 CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') + 
 										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
 		/*str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
@@ -2108,6 +2108,30 @@ CCSE.launch = function(){
 				menu.childNodes[1].insertBefore(div, about);
 			}
 		}
+	}
+	
+	CCSE.MenuHelper = {
+		// If I was smart the previous functions would be in here
+		// Too late now unless I want to ruin backwards compatibility
+		
+		ActionButton: (action, text) => '<a class="option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
+		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
+		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
+		Slider: (slider, leftText, rightText, startValueFunction, callback, min, max, step) => {
+			if (!callback) callback = '';
+			if (!min) min = 0;
+			if (!max) max = 100;
+			if (!step) step = 1;
+			return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
+		},
+		ToggleButton: (config, prefName, button, on, off, callback, invert) => {
+			var invert = invert ? 1 : 0;
+			if(!callback) callback = '';
+			else callback += "('" + prefName + "', '" + button + "', '" + on.replace("'","\\'") + "', '" + off.replace("'","\\'") + "', '" + invert + "');";
+			callback += "PlaySound('snd/tick.mp3');";
+			return '<a class="option' + ((config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="' + callback + '">' + (config[prefName] ? on : off) + '</a>';
+		}
+		
 	}
 	
 	

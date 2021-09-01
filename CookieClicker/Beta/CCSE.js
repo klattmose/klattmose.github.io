@@ -97,6 +97,8 @@ CCSE.launch = function(){
 			CCSE.PrependCollapsibleInfoMenu(CCSE.name, CCSE.updateLog);
 		});
 		
+		Game.registerHook('reset', CCSE.reset);
+		
 		//l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
 		var versionDiv = document.createElement('p');
 		versionDiv.innerHTML = 'CCSE v. ' + CCSE.version;

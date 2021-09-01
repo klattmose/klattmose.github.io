@@ -1,5 +1,5 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
 AmericanSeason.version = '1.6';
 AmericanSeason.GameVersion = '2.031';
@@ -48,25 +48,27 @@ AmericanSeason.launch = function(){
 	//    Menu/config
 	//***********************************
 	AmericanSeason.getMenuString = function(){
+		let m = CCSE.MenuHelper;
+		
 		function inputBoxListing(prefName, prefDisplayName, desc){
 			var listing = '<div class="listing">';
-			listing += CCSE.MenuHelper.InputBox('AS_' + prefName, 65, AmericanSeason.config[prefName], "AmericanSeason.UpdatePref('" + prefName + "', this.value)")
+			listing += m.InputBox('AS_' + prefName, 65, AmericanSeason.config[prefName], "AmericanSeason.UpdatePref('" + prefName + "', this.value)")
 			listing += '<label>' + prefDisplayName + (desc ? ' : ' + desc : '') + '</label>';
 			listing += '</div>';
 			return listing;
 		}
 		
-		var str = '<div class="listing">' + CCSE.MenuHelper.ActionButton("AmericanSeason.config = AmericanSeason.defaultConfig(); Game.UpdateMenu();", 'Restore Default') + '</div>';
-		str += '<div class="listing">' + CCSE.MenuHelper.ToggleButton(AmericanSeason.config, 'SHOW_CANVAS', 'SHOW_CANVASButton', 'Canvas ON', 'Canvas OFF', 'AmericanSeason.Toggle') + '<label>Display fireworks in the left panel. Inhibits clicking wrinklers.</label></div>';
+		var str = '<div class="listing">' + m.ActionButton("AmericanSeason.config = AmericanSeason.defaultConfig(); Game.UpdateMenu();", 'Restore Default') + '</div>';
+		str += '<div class="listing">' + m.ToggleButton(AmericanSeason.config, 'SHOW_CANVAS', 'SHOW_CANVASButton', 'Canvas ON', 'Canvas OFF', 'AmericanSeason.Toggle') + '<label>Display fireworks in the left panel. Inhibits clicking wrinklers.</label></div>';
 		
-		str += CCSE.MenuHelper.Header('Projectiles');
+		str += m.Header('Projectiles');
 		str += inputBoxListing('FIREWORK_ACCELERATION', 'Base firework acceleration', '1.0 causes fireworks to travel at a constant speed');
 		str += inputBoxListing('FIREWORK_BRIGHTNESS_MIN', 'Minimum firework brightness');
 		str += inputBoxListing('FIREWORK_BRIGHTNESS_MAX', 'Maximum firework brightness');
 		str += inputBoxListing('FIREWORK_SPEED', 'Base speed of fireworks');
 		str += inputBoxListing('FIREWORK_TRAIL_LENGTH', 'Base length of firework trails');
 		
-		str += CCSE.MenuHelper.Header('Stars');
+		str += m.Header('Stars');
 		str += '<div class="listing"><label>The pretty lights that explode out of a firework are called stars</label></div>';
 		str += inputBoxListing('STAR_BRIGHTNESS_MIN', 'Minimum star brightness');
 		str += inputBoxListing('STAR_BRIGHTNESS_MAX', 'Maximum star brightness');
@@ -81,7 +83,7 @@ AmericanSeason.launch = function(){
 		str += inputBoxListing('STAR_SPEED_MAX', 'Maximum star speed');
 		str += inputBoxListing('STAR_TRAIL_LENGTH', 'Base length of explosion star trails');
 		
-		str += CCSE.MenuHelper.Header('Other');
+		str += m.Header('Other');
 		str += inputBoxListing('CANVAS_CLEANUP_ALPHA', 'Cleanup rate', 'Lower value increases trail duration');
 		str += inputBoxListing('HUE_STEP_INCREASE', 'Hue change per loop', 'Used to rotate through different firework colors');
 		str += inputBoxListing('STROKE_WIDTH', 'Line width for canvas strokes');

@@ -1,5 +1,5 @@
 if(FortuneCookie === undefined) var FortuneCookie = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
 FortuneCookie.version = '2.7';
 FortuneCookie.GameVersion = '2.031';
@@ -107,37 +107,39 @@ FortuneCookie.launch = function(){
 	//    Replacement
 	//***********************************
 	FortuneCookie.getMenuString = function(){
+		let m = CCSE.MenuHelper;
+		
 		var str = '<div class="listing">' +
-					CCSE.MenuHelper.Slider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.UpdatePref('spellForecastLength', Math.round(l('spellForecastSlider').value)); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>' +
+					m.Slider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.UpdatePref('spellForecastLength', Math.round(l('spellForecastSlider').value)); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>' +
 				'</div>';
 		
-		str += CCSE.MenuHelper.Header('Force the Hand of Fate') + 
+		str += m.Header('Force the Hand of Fate') + 
 				'<div class="listing">This spell\'s outcome changes based on the season, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
 				'<div class="listing">Column 1 : The season is <b>neither</b> Easter nor Valentine\'s.</div>' + 
 				'<div class="listing">Column 2 : The season is <b>either</b> Easter or Valentine\'s.</div>' + 
 				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
 				'<div class="listing">' +
-					CCSE.MenuHelper.Slider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
+					m.Slider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
 				'</div>';
 		
-		str += CCSE.MenuHelper.Header('Color Override') +
+		str += m.Header('Color Override') +
 				'<div class="listing">Set the color coding of the Force the Hand of Fate outcomes.</div>' +
 				'<div class="listing">Default is <span class="green">green for success</span>, and <span class="red">red for backfire</span>.</div>';
-		str += '<div class="listing">' + CCSE.MenuHelper.ActionButton("FortuneCookie.AddColorOverride();",'Add') + '</div>';
+		str += '<div class="listing">' + m.ActionButton("FortuneCookie.AddColorOverride();",'Add') + '</div>';
 		
 		for(var color in FortuneCookie.config.colorOverride){
 			var style = 'width:65px;' +
 						'background-color:'  + FortuneCookie.config.colorOverride[color] + ';';
 			
 			str += '<div class="listing">' +
-				CCSE.MenuHelper.ActionButton("delete FortuneCookie.config.colorOverride['" + color + "']; Game.UpdateMenu();",'Remove') +
+				m.ActionButton("delete FortuneCookie.config.colorOverride['" + color + "']; Game.UpdateMenu();",'Remove') +
 				'<input id="FortuneCookieColorOverride' + color + '" class="option" style="' + style + '" value="' + FortuneCookie.config.colorOverride[color] + '" onChange="FortuneCookie.SetOverrideColor(\'' + color + '\', l(\'FortuneCookieColorOverride' + color + '\').value)">' +
 				'<label>' + color + '</label>' +
 				'</div>';
 		}
 		
-		str += CCSE.MenuHelper.Header('Dragon Drop forecast') + 
-				'<div class="listing">' + CCSE.MenuHelper.ToggleButton(FortuneCookie.config, 'forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', "FortuneCookie.Toggle") + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
+		str += m.Header('Dragon Drop forecast') + 
+				'<div class="listing">' + m.ToggleButton(FortuneCookie.config, 'forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', "FortuneCookie.Toggle") + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
 		
 		return str;
 	}

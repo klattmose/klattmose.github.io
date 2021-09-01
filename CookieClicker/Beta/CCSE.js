@@ -124,9 +124,10 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">08/31/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
 			'<div class="listing">&bull; Setting custom upgrades as Permanent will no longer break the game if the Stats menu is opened without the mod loaded</div>' +
+			'<div class="listing">&bull; Added some functions for commonly used menu items</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">02/06/2021</div>' + 
 			'<div class="listing">&bull; Halved the loading time with this one weird trick!</div>' +

@@ -1,5 +1,5 @@
 if(IdleTrading === undefined) var IdleTrading = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
 IdleTrading.version = '1.8';
 IdleTrading.GameVersion = '2.031';
@@ -70,23 +70,24 @@ IdleTrading.launch = function(){
 
 	IdleTrading.getMenuString = function(){
 		if(Game.Objects["Bank"].minigameLoaded){
+			let m = CCSE.MenuHelper;
 			var M = Game.Objects['Bank'].minigame;
 			
-			var str = 	'<div class="listing">' + CCSE.MenuHelper.ActionButton("IdleTrading.restoreDefaultConfig(2); Game.UpdateMenu();", 'Restore Default') +  
-						(typeof InsugarTrading == 'undefined' ? '' : CCSE.MenuHelper.ActionButton("IdleTrading.importInsugarTrading(); Game.UpdateMenu();", 'Import from Insugar Trading')) + 
+			var str = 	'<div class="listing">' + m.ActionButton("IdleTrading.restoreDefaultConfig(2); Game.UpdateMenu();", 'Restore Default') +  
+						(typeof InsugarTrading == 'undefined' ? '' : m.ActionButton("IdleTrading.importInsugarTrading(); Game.UpdateMenu();", 'Import from Insugar Trading')) + 
 						'</div>' + 
-						'<div class="listing">' + CCSE.MenuHelper.ToggleButton(IdleTrading.config, 'autoBuy', 'IdleTrading_autoBuyButton', 'AutoBuy ON', 'AutoBuy OFF', "IdleTrading.Toggle") +
-												  CCSE.MenuHelper.ToggleButton(IdleTrading.config, 'autoSell', 'IdleTrading_autoSellButton', 'AutoSell ON', 'AutoSell OFF', "IdleTrading.Toggle") + '</div>';
+						'<div class="listing">' + m.ToggleButton(IdleTrading.config, 'autoBuy', 'IdleTrading_autoBuyButton', 'AutoBuy ON', 'AutoBuy OFF', "IdleTrading.Toggle") +
+												  m.ToggleButton(IdleTrading.config, 'autoSell', 'IdleTrading_autoSellButton', 'AutoSell ON', 'AutoSell OFF', "IdleTrading.Toggle") + '</div>';
 			
-			str += CCSE.MenuHelper.Header('Goods');
+			str += m.Header('Goods');
 			
 			for(var iG = 0; iG < M.goodsById.length; iG++){
 				var me = M.goodsById[iG];
 				var conf = IdleTrading.config.goods[iG];
 				
 				str += '<div class="listing" style="text-align:left;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:' + (-me.icon[0] * 48) + 'px ' + (-me.icon[1] * 48) + 'px;"></div><span class="bankSymbol" style="width:30px;overflow:hidden;white-space:nowrap;">' + me.symbol + '</span>';
-				str += '<label> Buy at:</label>' + CCSE.MenuHelper.InputBox('IdleTrading_buyThresh_' + iG, 65, conf.buyThresh, 'IdleTrading.UpdatePref(' + iG + ', this.value, 0)');
-				str += '<label> Sell at:</label>' + CCSE.MenuHelper.InputBox('IdleTrading_sellThresh_' + iG, 65, conf.sellThresh, 'IdleTrading.UpdatePref(' + iG + ', this.value, 1)');
+				str += '<label> Buy at:</label>' + m.InputBox('IdleTrading_buyThresh_' + iG, 65, conf.buyThresh, 'IdleTrading.UpdatePref(' + iG + ', this.value, 0)');
+				str += '<label> Sell at:</label>' + m.InputBox('IdleTrading_sellThresh_' + iG, 65, conf.sellThresh, 'IdleTrading.UpdatePref(' + iG + ', this.value, 1)');
 				str += '<label>Historical min: <b>$' + Beautify(conf.minPrice, 2) + '</b>; Historical max: <b>$' + Beautify(conf.maxPrice, 2) + '</b></label>';
 				str += '</div>';
 			}

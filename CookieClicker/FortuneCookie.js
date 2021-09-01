@@ -1,7 +1,7 @@
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.6';
+FortuneCookie.version = '2.7';
 FortuneCookie.GameVersion = '2.031';
 
 FortuneCookie.launch = function(){
@@ -107,66 +107,39 @@ FortuneCookie.launch = function(){
 	//    Replacement
 	//***********************************
 	FortuneCookie.getMenuString = function(){
-		function WriteSlider(slider, leftText, rightText, startValueFunction, callback, min, max, step){
-			if (!callback) callback = '';
-			if (!min) min = 0;
-			if (!max) max = 100;
-			if (!step) step = 1;
-			return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
-		}
-		
-		function WriteHeader(text){
-			return '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>';
-		}
-		
-		function ToggleButton(prefName, button, on, off, callback, invert){
-			var invert = invert ? 1 : 0;
-			if(!callback) callback = '';
-			callback += 'PlaySound(\'snd/tick.mp3\');';
-			return '<a class="option' + ((FortuneCookie.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="FortuneCookie.Toggle(\'' + prefName + '\', \'' + button + '\', \'' + on + '\', \'' + off + '\', \'' + invert + '\');' + callback + '">' + (FortuneCookie.config[prefName] ? on : off) + '</a>';
-		}
+		let m = CCSE.MenuHelper;
 		
 		var str = '<div class="listing">' +
-					WriteSlider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.UpdatePref('spellForecastLength', Math.round(l('spellForecastSlider').value)); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>'+
+					m.Slider('spellForecastSlider', 'Forecast Length', '[$]', function(){return FortuneCookie.config.spellForecastLength;}, "FortuneCookie.UpdatePref('spellForecastLength', Math.round(l('spellForecastSlider').value)); l('spellForecastSliderRightText').innerHTML = FortuneCookie.config.spellForecastLength;", 0, 100, 1) + '<br>' +
 				'</div>';
 		
-		// Changed functionality of FtHoF spell
-		/*str += WriteHeader('Force the Hand of Fate') + 
-				'<div class="listing">This spell\'s outcome changes based on the season, if the Golden cookie sound selector is on, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
-				'<div class="listing">Column 1 : Golden cookie sound selector is Off <b>AND</b> the season is neither Easter nor Valentine\'s.</div>' + 
-				'<div class="listing">Column 2 : Golden cookie sound selector is On <b>OR</b> the season is either Easter or Valentine\'s.</div>' + 
-				'<div class="listing">Column 3 : Golden cookie sound selector is On <b>AND</b> the season is either Easter or Valentine\'s.</div>' +
-				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
-				'<div class="listing">' +
-					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
-				'</div>';*/
-		str += WriteHeader('Force the Hand of Fate') + 
+		str += m.Header('Force the Hand of Fate') + 
 				'<div class="listing">This spell\'s outcome changes based on the season, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
 				'<div class="listing">Column 1 : The season is <b>neither</b> Easter nor Valentine\'s.</div>' + 
 				'<div class="listing">Column 2 : The season is <b>either</b> Easter or Valentine\'s.</div>' + 
 				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
 				'<div class="listing">' +
-					WriteSlider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
+					m.Slider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
 				'</div>';
 		
-		str += WriteHeader('Color Override') +
+		str += m.Header('Color Override') +
 				'<div class="listing">Set the color coding of the Force the Hand of Fate outcomes.</div>' +
 				'<div class="listing">Default is <span class="green">green for success</span>, and <span class="red">red for backfire</span>.</div>';
-		str += '<div class="listing"><a class="option" ' + Game.clickStr + '="FortuneCookie.AddColorOverride(); PlaySound(\'snd/tick.mp3\');">Add</a></div>'
+		str += '<div class="listing">' + m.ActionButton("FortuneCookie.AddColorOverride();",'Add') + '</div>';
 		
 		for(var color in FortuneCookie.config.colorOverride){
 			var style = 'width:65px;' +
 						'background-color:'  + FortuneCookie.config.colorOverride[color] + ';';
 			
 			str += '<div class="listing">' +
-				'<a class="option" ' + Game.clickStr + '="delete FortuneCookie.config.colorOverride[\'' + color + '\']; PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Remove</a>' +
+				m.ActionButton("delete FortuneCookie.config.colorOverride['" + color + "']; Game.UpdateMenu();",'Remove') +
 				'<input id="FortuneCookieColorOverride' + color + '" class="option" style="' + style + '" value="' + FortuneCookie.config.colorOverride[color] + '" onChange="FortuneCookie.SetOverrideColor(\'' + color + '\', l(\'FortuneCookieColorOverride' + color + '\').value)">' +
 				'<label>' + color + '</label>' +
 				'</div>';
 		}
 		
-		str += WriteHeader('Dragon Drop forecast') + 
-				'<div class="listing">' + ToggleButton('forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', "if(Game.specialTab=='dragon')Game.ToggleSpecialMenu(1);") + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
+		str += m.Header('Dragon Drop forecast') + 
+				'<div class="listing">' + m.ToggleButton(FortuneCookie.config, 'forecastDragonDrop', 'forecastDragonDropButton', 'Tooltip ON', 'Tooltip OFF', "FortuneCookie.Toggle") + '<label>Show/Hide the tooltip that displays the available drops for petting the dragon.</label></div>';
 		
 		return str;
 	}
@@ -181,6 +154,8 @@ FortuneCookie.launch = function(){
 			FortuneCookie.config[prefName] = 1;
 		}
 		l(button).className = 'option' + ((FortuneCookie.config[prefName] ^ invert) ? '' : ' off');
+		
+		if(Game.specialTab=='dragon') Game.ToggleSpecialMenu(1);
 	}
 
 	FortuneCookie.ReplaceNativeGrimoire = function() {

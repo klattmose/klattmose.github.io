@@ -1,6 +1,6 @@
 # Cookie Clicker Script Extender (CCSE)
 
-*Current version : 2.016*
+*Current version : 2.025*
 
 **CCSE** is a modding framework for the game <code>https://orteil.dashnet.org/cookieclicker/</code>. On its own, it makes no changes to the game. Instead, it makes modding the game much easier.
 
@@ -218,6 +218,11 @@ CCSE sinks its grabby hooks into a huge number of the game's functions. I haven'
 Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
 
 ## Version History
+
+**09/01/2021 - (2.025)**
+* Vaulting for custom upgrades no longer depends on mod load order
+* Setting custom upgrades as Permanent will no longer break the game if the Stats menu is opened without the mod loaded
+* Added some functions for commonly used menu items
 
 **02/06/2021 - (2.023)**
 * Optimized the initialization code

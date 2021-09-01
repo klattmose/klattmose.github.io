@@ -1,6 +1,6 @@
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.023';
+CCSE.version = '2.025';
 CCSE.GameVersion = '2.031';
 
 CCSE.launch = function(){
@@ -124,6 +124,11 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
+			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
+			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
+			'<div class="listing">&bull; Setting custom upgrades as Permanent will no longer break the game if the Stats menu is opened without the mod loaded</div>' +
+			'<div class="listing">&bull; Added some functions for commonly used menu items</div>' +
+			
 			'</div><div class="subsection update small"><div class="title">02/06/2021</div>' + 
 			'<div class="listing">&bull; Halved the loading time with this one weird trick!</div>' +
 			'<div class="listing">&bull; The trick is called optimization</div>' +
@@ -238,13 +243,13 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 118 + 
+		CCSE.functionsTotal = 127 + 
 							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
 							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
-							Game.UpgradesN * 1 + 8 + 
+							Game.UpgradesN * 1 + 11 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
@@ -827,8 +832,24 @@ CCSE.launch = function(){
 			for(var i in Game.customDropEgg) failRate *= Game.customDropEgg[i]();`);
 		
 		
+		// Game.PermanentSlotIcon
+		// Functions should return an upgrade id. Return id for no effect.
+		if(!Game.customPermanentUpgradeId) Game.customPermanentUpgradeId = [];
+		Game.customPermanentUpgradeId.push(CCSE.GetPermanentUpgrade);
+		CCSE.SpliceCodeIntoFunction('Game.PermanentSlotIcon', 2, 
+			`// Game.PermanentSlotIcon injection point 0
+			var id = Game.permanentUpgrades[slot];
+			for(var i in Game.customPermanentUpgradeId) id = Game.customPermanentUpgradeId[i](slot, id);`,
+			'Game.PermanentSlotIcon=' + Game.PermanentSlotIcon.toString().replaceAll('Game.permanentUpgrades[slot]','id'));
+		
+		
 		// Game.AssignPermanentSlot
-		// Don't know where to put the hook. If you have a good idea, let me know.
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'if (!fail)', 
+			'for (var ii in CCSE.config.permanentUpgrades) {if (CCSE.config.permanentUpgrades[ii]==me.name) fail=1;}', -1);
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'var upgrade=Game.permanentUpgrades[slot];', 
+			'for(var i in Game.customPermanentUpgradeId) upgrade = Game.customPermanentUpgradeId[i](slot, upgrade);', 1);
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'Game.BuildAscendTree();', 
+			'CCSE.RectifyPermanentUpgrades();Game.BuildAscendTree();', 0);
 		
 		
 		// Game.PutUpgradeInPermanentSlot
@@ -1689,15 +1710,32 @@ CCSE.launch = function(){
 				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
 			`);
 		
-		// Correct these descFuncs
+		// this.isVaulted
+		CCSE.SpliceCodeIntoFunction("Game.Upgrade.prototype.isVaulted", 2, `
+				// Game.Upgrade.prototype.isVaulted injection point 0
+				if (CCSE.config.vault.indexOf(this.name)!=-1) return true;
+			`);
+		
+		// this.vault
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.vault", 'Game.vault', `
+				if(this.CCSE) CCSE.config.vault.push(this.name);
+                else `, -1);
+		
+		// this.unvault
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.unvault", 'Game.vault', `
+				if(this.CCSE) CCSE.config.vault.splice(CCSE.config.vault.indexOf(this.name),1);
+                else `, -1);
+		
+		
+		// Permanent upgrades are tricky
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
 		{
-			Game.Upgrades[slots[i]].olddescFunc=function(i){return function(){
-				if (Game.permanentUpgrades[i]==-1) return Game.Upgrades[slots[i]].desc;
-				var upgrade=Game.UpgradesById[Game.permanentUpgrades[i]];
-				return '<div style="text-align:center;">'+'Current : <div class="icon" style="vertical-align:middle;display:inline-block;'+(upgrade.icon[2]?'background-image:url('+upgrade.icon[2]+');':'')+'background-position:'+(-upgrade.icon[0]*48)+'px '+(-upgrade.icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div> <b>'+upgrade.name+'</b><div class="line"></div></div>'+Game.Upgrades[slots[i]].desc;
-			};}(i);
+			CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + slots[i] + "'].olddescFunc", 1, 
+				`// ` + slots[i] + ` olddescFunc injection point 0
+				var id = Game.permanentUpgrades[` + i + `];
+				for(var i in Game.customPermanentUpgradeId) id = Game.customPermanentUpgradeId[i](` + i + `, id);`,
+				'Game.Upgrades["' + slots[i] + '"].olddescFunc=' + Game.Upgrades[slots[i]].olddescFunc.toString().replaceAll('Game.permanentUpgrades[i]','id'));
 		}
 	}
 	
@@ -1775,7 +1813,8 @@ CCSE.launch = function(){
 		if(!Game.customUpgrades[key].descFunc) Game.customUpgrades[key].descFunc = [];
 		Game.customUpgrades[key].descFunc.push(CCSE.customUpgradesAlldescFunc);
 		if(upgrade.descFunc){
-			eval('upgrade.olddescFunc = ' + upgrade.descFunc.toString());
+			//eval('upgrade.olddescFunc = ' + upgrade.descFunc.toString());
+			upgrade.olddescFunc = upgrade.descFunc;
 			upgrade.descFunc = function(){
 				var desc = this.olddescFunc();
 				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
@@ -2013,8 +2052,8 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.GetMenuString = function(){
-		var str =	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportSave(); PlaySound(\'snd/tick.mp3\');">Export custom save</a>' +
-										 '<a class="option" ' + Game.clickStr + '="CCSE.ImportSave(); PlaySound(\'snd/tick.mp3\');">Import custom save</a>' + 
+		var str =	'<div class="listing">' + CCSE.MenuHelper.ActionButton("CCSE.ExportSave();", 'Export custom save') +
+										 CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') + 
 										 '<label>Back up data added by mods and managed by CCSE</label></div>';
 		
 		/*str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
@@ -2070,6 +2109,28 @@ CCSE.launch = function(){
 				menu.childNodes[1].insertBefore(div, about);
 			}
 		}
+	}
+	
+	CCSE.MenuHelper = {
+		
+		ActionButton: (action, text) => '<a class="option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
+		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
+		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
+		Slider: (slider, leftText, rightText, startValueFunction, callback, min, max, step) => {
+			if (!callback) callback = '';
+			if (!min) min = 0;
+			if (!max) max = 100;
+			if (!step) step = 1;
+			return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
+		},
+		ToggleButton: (config, prefName, button, on, off, callback, invert) => {
+			var invert = invert ? 1 : 0;
+			if(!callback) callback = '';
+			else callback += "('" + prefName + "', '" + button + "', '" + on.replace("'","\\'") + "', '" + off.replace("'","\\'") + "', '" + invert + "');";
+			callback += "PlaySound('snd/tick.mp3');";
+			return '<a class="option' + ((config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="' + callback + '">' + (config[prefName] ? on : off) + '</a>';
+		}
+		
 	}
 	
 	
@@ -2842,6 +2903,10 @@ CCSE.launch = function(){
 		Add your save data as a child of CCSE.config.OtherMods. Make sure not to step on anyone else's toes!
 		Push your save function into CCSE.customSave, and push your load function into CCSE.customLoad
 	=======================================================================================*/
+	
+	// The following code copied from https://github.com/pieroxy/lz-string/
+	CCSE.LZString = function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},i={compressToBase64:function(o){if(null==o)return"";var r=i._compress(o,6,function(o){return n.charAt(o)});switch(r.length%4){default:case 0:return r;case 1:return r+"===";case 2:return r+"==";case 3:return r+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(e){return o(n,r.charAt(e))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(o){return null==o?"":""==o?null:i._decompress(o.length,16384,function(r){return o.charCodeAt(r)-32})},compressToUint8Array:function(o){for(var r=i.compress(o),n=new Uint8Array(2*r.length),e=0,t=r.length;t>e;e++){var s=r.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null===o||void 0===o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;t>e;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(o){return null==o?"":i._compress(o,6,function(o){return e.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(n){return o(e,r.charAt(n))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(o,r,n){if(null==o)return"";var e,t,i,s={},p={},u="",c="",a="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<o.length;i+=1)if(u=o.charAt(i),Object.prototype.hasOwnProperty.call(s,u)||(s[u]=f++,p[u]=!0),c=a+u,Object.prototype.hasOwnProperty.call(s,c))a=c;else{if(Object.prototype.hasOwnProperty.call(p,a)){if(a.charCodeAt(0)<256){for(e=0;h>e;e++)m<<=1,v==r-1?(v=0,d.push(n(m)),m=0):v++;for(t=a.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;h>e;e++)m=m<<1|t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=a.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete p[a]}else for(t=s[a],e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++),s[c]=f++,a=String(u)}if(""!==a){if(Object.prototype.hasOwnProperty.call(p,a)){if(a.charCodeAt(0)<256){for(e=0;h>e;e++)m<<=1,v==r-1?(v=0,d.push(n(m)),m=0):v++;for(t=a.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;h>e;e++)m=m<<1|t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=a.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete p[a]}else for(t=s[a],e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==r-1){d.push(n(m));break}v++}return d.join("")},decompress:function(o){return null==o?"":""==o?null:i._decompress(o.length,32768,function(r){return o.charCodeAt(r)})},_decompress:function(o,n,e){var t,i,s,p,u,c,a,l,f=[],h=4,d=4,m=3,v="",w=[],A={val:e(0),position:n,index:1};for(i=0;3>i;i+=1)f[i]=i;for(p=0,c=Math.pow(2,2),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;switch(t=p){case 0:for(p=0,c=Math.pow(2,8),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;l=r(p);break;case 1:for(p=0,c=Math.pow(2,16),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;l=r(p);break;case 2:return""}for(f[3]=l,s=l,w.push(l);;){if(A.index>o)return"";for(p=0,c=Math.pow(2,m),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;switch(l=p){case 0:for(p=0,c=Math.pow(2,8),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;f[d++]=r(p),l=d-1,h--;break;case 1:for(p=0,c=Math.pow(2,16),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;f[d++]=r(p),l=d-1,h--;break;case 2:return w.join("")}if(0==h&&(h=Math.pow(2,m),m++),f[l])v=f[l];else{if(l!==d)return null;v=s+s.charAt(0)}w.push(v),f[d++]=s+v.charAt(0),h--,s=v,0==h&&(h=Math.pow(2,m),m++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module&&(module.exports=LZString);
+	
 	if(!CCSE.customSave) CCSE.customSave = [];
 	CCSE.save = function(type){
 		CCSE.config.version = CCSE.version;
@@ -2903,6 +2968,7 @@ CCSE.launch = function(){
 		for(var i in CCSE.customSave) CCSE.customSave[i]();
 		
 		var str = JSON.stringify(CCSE.config);
+		//str = CCSE.LZString.compressToUTF16(str);
 		
 		if(type == 2){
 			return str;
@@ -2927,6 +2993,18 @@ CCSE.launch = function(){
 		CCSE.config = null;
 		var str = '';
 		
+		var cautiousDecompress = function(data){
+			var ret = null;
+			try{
+				ret = JSON.parse(data);
+			}catch{
+				ret = CCSE.LZString.decompressFromUTF16(data);
+				ret = JSON.parse(ret);
+			}
+			
+			return ret;
+		}
+		
 		if(isBase64){ // Getting here from import CCSE in menu
 			if(data){
 				str = unescape(data);
@@ -2935,19 +3013,19 @@ CCSE.launch = function(){
 			if(str != ''){
 				str = str.split('!END!')[0];
 				str = b64_to_utf8(str);
-				CCSE.config = JSON.parse(str);
+				CCSE.config = cautiousDecompress(str);
 			}
 		} 
 		else{ // Getting here from game function call
 			if(data){ // Has data in game save
-				CCSE.config = JSON.parse(data);
+				CCSE.config = cautiousDecompress(data);
 			}else{ // Look for older save in local storage
 				if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
 				
 				if(str != ''){
 					str = str.split('!END!')[0];
 					str = b64_to_utf8(str);
-					CCSE.config = JSON.parse(str);
+					CCSE.config = cautiousDecompress(str);
 				}
 			}
 		}
@@ -2961,6 +3039,8 @@ CCSE.launch = function(){
 		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
 		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
 		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
+		if(!CCSE.config.vault) CCSE.config.vault = [];
+		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3088,29 +3168,18 @@ CCSE.launch = function(){
 		l('textareaPrompt').focus();
 	}*/
 	
-	/*CCSE.Reset = function(hard){
+	CCSE.reset = function(hard){
 		if(hard){
-			for(var name in CCSE.config.Achievements){
-				CCSE.config.Achievements[name].won = 0;
-				if(Game.Achievements[name]) Game.Achievements[name].won = 0;
+			CCSE.config.vault = [];
+			CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+		} else {
+			for(var i in CCSE.config.permanentUpgrades){
+				if(CCSE.config.permanentUpgrades[i] != -1)
+					if(Game.Upgrades[CCSE.config.permanentUpgrades[i]])
+						Game.Upgrades[CCSE.config.permanentUpgrades[i]].earn();
 			}
 		}
-		
-		for(var name in CCSE.config.Upgrades){
-			if(Game.Upgrades[name]){
-				var me=Game.Upgrades[name];
-				if (hard || me.pool != 'prestige') me.bought=0;
-				if (hard || (me.pool != 'prestige' && !me.lasting))
-				{
-					if (!hard && Game.Has('Keepsakes') && Game.seasonDrops.indexOf(me.name) != -1 && Math.random() < 1 / 5){}
-					else me.unlocked = 0;
-				}
-				
-				CCSE.config.Upgrades[name].unlocked = Game.Upgrades[name].unlocked;
-				CCSE.config.Upgrades[name].bought = Game.Upgrades[name].bought;
-			}
-		}
-	}*/
+	}
 	
 	
 	/*=====================================================================================
@@ -3129,6 +3198,8 @@ CCSE.launch = function(){
 				bought: 0
 			}
 		}
+		
+		me.CCSE = 1;
 		
 		return me;
 	}
@@ -3330,6 +3401,25 @@ CCSE.launch = function(){
 	CCSE.SetSpecialMenuImage = function(str, pic, frame){
 		return str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
 						   'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
+	}
+	
+	CCSE.GetPermanentUpgrade = function(slot, id){
+		if(CCSE.config.permanentUpgrades[slot] == -1) return id;
+		return (Game.Upgrades[CCSE.config.permanentUpgrades[slot]] ? Game.Upgrades[CCSE.config.permanentUpgrades[slot]].id : -1);
+	}
+	
+	CCSE.RectifyPermanentUpgrades = function(){
+		for(var i in Game.permanentUpgrades){
+			if(Game.permanentUpgrades[i] != -1){
+				var upgrade = Game.UpgradesById[Game.permanentUpgrades[i]];
+				if(upgrade.CCSE){
+					Game.permanentUpgrades[i] = -1;
+					CCSE.config.permanentUpgrades[i] = upgrade.name;
+				}else{
+					CCSE.config.permanentUpgrades[i] = -1;
+				}
+			}
+		}
 	}
 	
 	

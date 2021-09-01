@@ -1,7 +1,7 @@
 if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
-IdleTrading.version = '1.7';
+IdleTrading.version = '1.8';
 IdleTrading.GameVersion = '2.031';
 
 IdleTrading.launch = function(){
@@ -70,49 +70,24 @@ IdleTrading.launch = function(){
 
 	IdleTrading.getMenuString = function(){
 		if(Game.Objects["Bank"].minigameLoaded){
+			let m = CCSE.MenuHelper;
 			var M = Game.Objects['Bank'].minigame;
 			
-			var writeHeader = function(text) {
-				var div = document.createElement('div');
-				div.className = 'listing';
-				div.style.padding = '5px 16px';
-				div.style.opacity = '0.7';
-				div.style.fontSize = '17px';
-				div.style.fontFamily = '\"Kavoon\", Georgia, serif';
-				div.textContent = text;
-				return div.outerHTML;
-			}
-			
-			/*var WriteButton = function(goodID, button, on, off, callback, invert){
-				var invert = invert ? 1 : 0;
-				if (!callback) callback = '';
-				callback += 'PlaySound(\'snd/tick.mp3\');';
-				return '<a class="option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="IdleTrading.ToggleGood(' + goodID + ',\'' + button + '\',\'' + on.replace("'","\\'") + '\',\'' + off.replace("'","\\'") + '\',\'' + invert + '\');' + callback + '">' + (IdleTrading.config.goods[goodID].active ? on : off) + '</a>';
-			}*/
-			
-			function ToggleButton(prefName, button, on, off, callback, invert){
-				var invert = invert ? 1 : 0;
-				if(!callback) callback = '';
-				callback += 'PlaySound(\'snd/tick.mp3\');';
-				return '<a class="option' + ((IdleTrading.config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="IdleTrading.Toggle(\'' + prefName + '\', \'' + button + '\', \'' + on + '\', \'' + off + '\', \'' + invert + '\');' + callback + '">' + (IdleTrading.config[prefName] ? on : off) + '</a>';
-			}
-			
-			
-			var str = 	'<div class="listing"><a class="option" ' + Game.clickStr + '="IdleTrading.restoreDefaultConfig(2); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Restore Default</a>' +  
-						(typeof InsugarTrading == 'undefined' ? '' : '<a class="option" ' + Game.clickStr + '="IdleTrading.importInsugarTrading(); PlaySound(\'snd/tick.mp3\'); Game.UpdateMenu();">Import from Insugar Trading</a>') + 
+			var str = 	'<div class="listing">' + m.ActionButton("IdleTrading.restoreDefaultConfig(2); Game.UpdateMenu();", 'Restore Default') +  
+						(typeof InsugarTrading == 'undefined' ? '' : m.ActionButton("IdleTrading.importInsugarTrading(); Game.UpdateMenu();", 'Import from Insugar Trading')) + 
 						'</div>' + 
-						'<div class="listing">' + ToggleButton('autoBuy', 'IdleTrading_autoBuyButton', 'AutoBuy ON', 'AutoBuy OFF', "") +
-												  ToggleButton('autoSell', 'IdleTrading_autoSellButton', 'AutoSell ON', 'AutoSell OFF', "") + '</div>';
+						'<div class="listing">' + m.ToggleButton(IdleTrading.config, 'autoBuy', 'IdleTrading_autoBuyButton', 'AutoBuy ON', 'AutoBuy OFF', "IdleTrading.Toggle") +
+												  m.ToggleButton(IdleTrading.config, 'autoSell', 'IdleTrading_autoSellButton', 'AutoSell ON', 'AutoSell OFF', "IdleTrading.Toggle") + '</div>';
 			
-			str += writeHeader('Goods');
+			str += m.Header('Goods');
 			
 			for(var iG = 0; iG < M.goodsById.length; iG++){
 				var me = M.goodsById[iG];
 				var conf = IdleTrading.config.goods[iG];
 				
 				str += '<div class="listing" style="text-align:left;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:' + (-me.icon[0] * 48) + 'px ' + (-me.icon[1] * 48) + 'px;"></div><span class="bankSymbol" style="width:30px;overflow:hidden;white-space:nowrap;">' + me.symbol + '</span>';
-				str += '<label> Buy at:</label><input id="IdleTrading_buyThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.buyThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 0)"></input>';
-				str += '<label> Sell at:</label><input id="IdleTrading_sellThresh_' + iG + '" class="option" style="width:65px;" value="' + conf.sellThresh + '" onChange="IdleTrading.UpdatePref(' + iG + ', this.value, 1)"></input>';
+				str += '<label> Buy at:</label>' + m.InputBox('IdleTrading_buyThresh_' + iG, 65, conf.buyThresh, 'IdleTrading.UpdatePref(' + iG + ', this.value, 0)');
+				str += '<label> Sell at:</label>' + m.InputBox('IdleTrading_sellThresh_' + iG, 65, conf.sellThresh, 'IdleTrading.UpdatePref(' + iG + ', this.value, 1)');
 				str += '<label>Historical min: <b>$' + Beautify(conf.minPrice, 2) + '</b>; Historical max: <b>$' + Beautify(conf.maxPrice, 2) + '</b></label>';
 				str += '</div>';
 			}

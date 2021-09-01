@@ -2112,8 +2112,6 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.MenuHelper = {
-		// If I was smart the previous functions would be in here
-		// Too late now unless I want to ruin backwards compatibility
 		
 		ActionButton: (action, text) => '<a class="option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
 		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',

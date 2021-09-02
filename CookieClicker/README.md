@@ -58,7 +58,7 @@ Disables Steam achievements.
 ### Steam Achievement Enabler  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/SteamAchievementEnabler.zip))
 
 For cheating cheaters who cheat.\
-**Enables** Steam achievements.
+**Enables** Steam achievements. Regardless of other mods.
 
 ## Offline
 

@@ -1981,7 +1981,7 @@ CCSE.launch = function(){
 		var subsections = l('menu').getElementsByClassName('subsection');
 		
 		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('General')){
 				general = subsections[i];
 				break;
 			}
@@ -2008,7 +2008,7 @@ CCSE.launch = function(){
 		var subsections = l('menu').getElementsByClassName('subsection');
 		
 		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'Special'){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('Special')){
 				special = subsections[i];
 				break;
 			}
@@ -2019,7 +2019,7 @@ CCSE.launch = function(){
 			subsections = l('menu').getElementsByClassName('subsection');
 			
 			for(var i in subsections){
-				if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+				if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('General')){
 					general = subsections[i];
 					break;
 				}
@@ -2045,7 +2045,7 @@ CCSE.launch = function(){
 		
 		var subsections = l('menu').getElementsByClassName('subsection');
 		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('General')){
 				general = subsections[i];
 				break;
 			}

@@ -2033,7 +2033,7 @@ CCSE.launch = function(){
 			}
 		}
 		
-		special.appendChild(div);
+		if(special) special.appendChild(div);
 	}
 	
 	CCSE.AppendStatsVersionNumber = function(modName, versionString){

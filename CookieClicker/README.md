@@ -10,45 +10,50 @@ A comprehensive list of the mods I have made for this game.
 
 A browser extension to manage and automatically load javascript mods and add-ons for this game.
 
-### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js)
+### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/CCSE.zip))
 
 A modding framework that other mods can use to simplify the modding process. [Documentation](https://klattmose.github.io/CookieClicker/CCSE-POCs/)
 
-### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js)
+### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/FortuneCookie.zip))
 
 Predicts the outcomes of the Grimoire minigame spells.
 
-### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js)
+### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/KlattmoseUtilities.zip))
 
 Create an unlimited amount of fully customizable hotkeys.
+Disables Steam achievements.
 
-### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js)
+### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Horticookie.zip))
 
 A helper tool for the Garden minigame.
 
-### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js)
+### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/IdleTrading.zip))
 
 A helper tool for the Market minigame.
 
-### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js)
+### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Casino.zip))
 
 Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies.
+Disables Steam achievements.
 
-### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js)
+### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/AmericanSeason.zip))
 
 Adds a firework themed season to the game.
+Disables Steam achievements.
 
-### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js)
+### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip))
 
 Adds a special object in the lower left (near Krumblor and Santa) that displays a countdown for buffs and shimmers.
 
-### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js)
+### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/HurricaneSugar.zip))
 
 Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ripen to 1 second.
+Disables Steam achievements.
 
-### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js)
+### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip))
 
 Adds a new building and an appropriate amount of upgrades and achievments.
+Disables Steam achievements.
 
 ## Offline
 

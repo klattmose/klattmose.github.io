@@ -6,6 +6,7 @@
 	"ModVersion": 1.8,
 	"GameVersion": 2.04,
 	"Date": "1/09/2021",
+	"LanguagePacks": ["lang.js"],
 	"Dependencies": ["CCSE"],
 	"Disabled": 1
 }

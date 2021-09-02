@@ -263,7 +263,7 @@ CCSE.launch = function(){
 	
 	CCSE.UpdateNote = function(){
 		CCSE.Note.life = 600000;
-		var progress = Math.floor(CCSE.functionsAltered / CCSE.functionsTotal * 100);
+		var progress = Math.min(Math.floor(CCSE.functionsAltered / CCSE.functionsTotal * 100), 100);
 		if(progress != CCSE.progress){
 			CCSE.progress = progress;
 			CCSE.Note.desc = '<div style="text-align: center;font-weight: bold;color: #ffffff;">' + CCSE.progress + '%</div>';

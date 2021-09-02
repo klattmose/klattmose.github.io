@@ -1,0 +1,12 @@
+{
+	"Name": "CCSE",
+	"ID": "CCSE",
+	"Author": "klattmose",
+	"Description": "A modding framework.",
+	"ModVersion": 2.025,
+	"GameVersion": 2.04,
+	"Date": "1/09/2021",
+	"Dependencies": [],
+	"Disabled": 1,
+	"AllowSteamAchievs": 1
+}

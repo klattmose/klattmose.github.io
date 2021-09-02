@@ -1,0 +1,12 @@
+{
+	"Name": "Timer Widget",
+	"ID": "Timer Widget",
+	"Author": "klattmose",
+	"Description": "A widget in the bottom left that shows the time remaining on buffs and eta on the next Golden Cookie",
+	"ModVersion": 1.6,
+	"GameVersion": 2.04,
+	"Date": "1/09/2021",
+	"Dependencies": ["CCSE"],
+	"Disabled": 1,
+	"AllowSteamAchievs": 1
+}

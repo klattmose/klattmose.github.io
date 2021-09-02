@@ -1,0 +1,12 @@
+{
+	"Name": "Horticookie",
+	"ID": "Horticookie",
+	"Author": "klattmose",
+	"Description": "Shows what seeds you can get based on what you already have, and shows the likelyhood of mutation for each empty plot.",
+	"ModVersion": 3.17,
+	"GameVersion": 2.04,
+	"Date": "1/09/2021",
+	"Dependencies": ["CCSE"],
+	"Disabled": 1,
+	"AllowSteamAchievs": 1
+}

@@ -1,0 +1,11 @@
+{
+	"Name": "American Season",
+	"ID": "American Season",
+	"Author": "klattmose",
+	"Description": "Brings the Fourth of July into the game. Disables Steam achievements.",
+	"ModVersion": 1.6,
+	"GameVersion": 2.04,
+	"Date": "1/09/2021",
+	"Dependencies": ["CCSE"],
+	"Disabled": 1
+}

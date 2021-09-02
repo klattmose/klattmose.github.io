@@ -1,0 +1,11 @@
+{
+	"Name": "Black Hole Inverter",
+	"ID": "Black Hole Inverter",
+	"Author": "klattmose",
+	"Description": "Adds a new building and an appropriate amount of upgrades and achievments. Disables Steam achievements.",
+	"ModVersion": 1.8,
+	"GameVersion": 2.04,
+	"Date": "1/09/2021",
+	"Dependencies": ["CCSE"],
+	"Disabled": 1
+}

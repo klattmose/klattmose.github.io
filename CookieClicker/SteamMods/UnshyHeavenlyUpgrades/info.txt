@@ -1,6 +1,6 @@
 {
-	"Name": "Unshy Prestige Upgrades",
-	"ID": "Unshy Prestige Upgrades",
+	"Name": "Unshy Heavenly Upgrades",
+	"ID": "Unshy Heavenly Upgrades",
 	"Author": "klattmose",
 	"Description": "Heavenly upgrades that normally require your prestige level to end in a certain number now act like normal heavenly upgrades.",
 	"ModVersion": 1,

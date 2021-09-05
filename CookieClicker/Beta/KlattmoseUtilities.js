@@ -35,7 +35,7 @@ KlattmoseUtilities.launch = function(){
 			  "script": "Game.ShowMenu('log');"
 			},
 			{
-			  "keyCode": 120,
+			  "keyCode": 49,
 			  "nickname": "Quickload",
 			  "ctrl": false,
 			  "shift": false,
@@ -48,7 +48,7 @@ KlattmoseUtilities.launch = function(){
 			  "ctrl": false,
 			  "shift": false,
 			  "alt": false,
-			  "script": "Game.Objects[\"Mine\"].sell(400); Game.Objects[\"Mine\"].buy(400);"
+			  "script": "var amt = Game.Objects[\"Mine\"].amount;\nGame.Objects[\"Mine\"].sell(amt); \nGame.Objects[\"Mine\"].buy(amt);"
 			},
 			{
 			  "keyCode": 51,
@@ -81,7 +81,7 @@ KlattmoseUtilities.launch = function(){
 			  "shift": false,
 			  "alt": false,
 			  "period": "10",
-			  "script": "Game.ClickCookie();"
+			  "script": "Game.lastClick=0;\nGame.ClickCookie({detail:1,preventDefault:()=>{}});"
 			},
 			{
 			  "keyCode": 98,
@@ -134,12 +134,7 @@ KlattmoseUtilities.launch = function(){
 			"slotGodFix": 0,
 			"gamblersFeverDreamFix": 0
 		  },
-		  "onLoadFunctions": [
-			{
-				"nickname": "Load Fortune Cookie",
-				"script": "Game.LoadMod('https://klattmose.github.io/CookieClicker/FortuneCookie.js');"
-			}
-		  ]
+		  "onLoadFunctions": []
 		}
 	}
 

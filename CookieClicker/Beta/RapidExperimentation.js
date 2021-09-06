@@ -176,3 +176,88 @@ Game.customReset=[];//add to the reset calls
 // Game.customMouseCpsMult=[];//add to the cookies earned per click multiplicative computation (functions should return something to multiply by the multiplier ie. 1.05 for a 5% increase of the multiplier)
 // Game.customCookieClicks=[];//add to the cookie click calls
 // Game.customCreate=[];//create your new upgrades and achievements in there
+
+
+
+
+// Loads the mods in order
+Steam.loadMods=function(callback)
+{
+	console.log('loading mods...');
+	
+	Game.mods={};
+	Game.sortedMods=[];
+	Game.modSaveData={};
+	Game.modHooks={};
+	for (var i=0;i<Game.modHooksNames.length;i++){Game.modHooks[Game.modHooksNames[i]]=[];}
+	
+	send('load mods',async (mods)=>{
+		
+		//sort mod order
+		//annoying that we have to get the save data just for this, but ehh
+		Steam.modList=await new Promise((resolve,reject)=>{
+			Steam.getMostRecentSave((data)=>{resolve(analyzeSaveData(data).modMeta);});
+		});
+		if (!Steam.modList) Steam.modList=[];
+		
+		for (let i=0;i<mods.length;i++)
+		{
+			let mod=mods[i];
+			if (Steam.modList.includes('*'+mod.id)) {mod.disabled=true;Steam.modList.splice(Steam.modList.indexOf('*'+mod.id),1,mod.id);}
+			else if (Steam.modList.includes(mod.id)) {mod.disabled=false;}
+			else Steam.modList.push(mod.id);//new mods get pushed to the bottom
+		}
+		
+		mods.sort(function(a,b){  
+			return Steam.modList.indexOf(a.id)-Steam.modList.indexOf(b.id);
+		});
+		
+		let promises=[];
+		let loadedMods=[];
+		for (let i=0;i<mods.length;i++)
+		{
+			let mod=mods[i];
+			Steam.mods[mod.id]=mod;
+			if (!mod.dependencies.every(v=>loadedMods.includes(v))) mod.disabled=true;
+			if (mod.disabled) continue;
+			let file=mod.jsFile;
+			if (file)
+			{
+				promises.push(/*new Promise(*/(resolve,reject)=>{
+					Game.LoadMod(file,resolve,()=>{console.log(`Failed to load mod file:`,file);resolve();});
+				})/*)*/;
+				if (!mod.info.AllowSteamAchievs) Steam.allowSteamAchievs=false;
+			}
+			if (mod.info.LanguagePacks)
+			{
+				for (let ii in mod.info.LanguagePacks)
+				{
+					let file=mod.dir+'/'+mod.info.LanguagePacks[ii];
+					promises.push(/*new Promise(*/(resolve,reject)=>{
+						LoadLang(file,resolve,()=>{console.log(`Failed to load mod language file:`,file);resolve();});
+					})/*)*/;
+				}
+			}
+			loadedMods.push(mod.id);
+			
+		}
+		
+		let recursion = (i)=>{
+			if(i < promises.length){
+				let promise = new Promise((resolve,reject)=>{
+					promises[i](()=>{resolve(i+1)},reject);
+				});
+				promise.then(recursion);
+			}else{
+				console.log('loaded mods:',loadedMods.join(',')||'(none)');
+				callback();
+			}
+		}
+		recursion(0);
+		/*Promise.all(promises)
+		.then(()=>{
+			console.log('loaded mods:',loadedMods.join(',')||'(none)');
+			callback();
+		});*/
+	});
+}

@@ -160,6 +160,76 @@ CCSE.NewPlant('test',seed);
 
 
 
+calculateOne = function(spellCount, idx, backfire){
+	var FTHOFcookie = '';
+	Math.seedrandom(Game.seed + '/' + spellCount);
+	roll = Math.random();
+	
+	if(roll < (1 - backfire)){
+		/* Random is called a few times in setting up the golden cookie */
+		if (idx > 0) Math.random();
+		if (idx > 1) Math.random();
+		Math.random();
+		Math.random();
+		
+		var choices = [];
+		choices.push('Frenzy','Lucky');
+		if (!Game.hasBuff('Dragonflight')) choices.push('Click Frenzy');
+		if (Math.random() < 0.1) choices.push('Cookie Storm','Cookie Storm','Blab');
+		if (Game.BuildingsOwned >= 10 && Math.random() < 0.25) choices.push('Building Special');
+		if (Math.random() < 0.15) choices = ['Cookie Storm Drop'];
+		if (Math.random() < 0.0001) choices.push('Free Sugar Lump');
+		
+		FTHOFcookie = choose(choices);
+		
+	} else {
+		/* Random is called a few times in setting up the golden cookie */
+		if (idx > 0) Math.random();
+		if (idx > 1) Math.random();
+		Math.random();
+		Math.random();
+		
+		var choices = [];
+		choices.push('Clot','Ruin');
+		if (Math.random() < 0.1) choices.push('Cursed Finger','Elder Frenzy');
+		if (Math.random() < 0.003) choices.push('Free Sugar Lump');
+		if (Math.random() < 0.1) choices=['Blab'];
+		
+		FTHOFcookie = choose(choices);
+		
+	}
+	
+	return FTHOFcookie;
+}
+
+calculateAll = function(spellForecastLength, simulatedGCs){
+	var res = [];
+	
+	if(spellForecastLength == 0) return res;
+	var M = Game.Objects["Wizard tower"].minigame;
+	var backfire = M.getFailChance('Force the Hand of Fate');
+	var spellsCast = M.spellsCastTotal;
+	var target = spellsCast + spellForecastLength;
+	var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0);
+	
+	backfire += 0.15 * simulatedGCs;
+	
+	while(spellsCast < target){
+		var spellOutcome = [];
+		
+		for(var i = 0; i < 2; i++)
+			spellOutcome[i] = calculateOne(spellsCast, i, backfire);
+		
+		res.push(spellOutcome);
+		spellsCast += 1;
+		Math.seedrandom();
+	}
+	
+	return res;
+}
+
+
+
 
 // Old obsolete mod hooks
 // Game.customChecks=[];//push functions into this to add them to the "check for upgrade/achievement conditions" that happens every few seconds

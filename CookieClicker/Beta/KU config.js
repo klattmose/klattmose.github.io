@@ -113,7 +113,7 @@
       "ctrl": false,
       "shift": false,
       "alt": false,
-      "script": "var M = Game.Objects[\"Wizard tower\"].minigame;\nif(M.magic == M.magicM) M.castSpell(M.spells[\"haggler's charm\"]);",
+      "script": "var M = Game.Objects[\"Wizard tower\"].minigame;\nif(M && M.magic == M.magicM) M.castSpell(M.spells[\"haggler's charm\"]);",
       "period": "1000"
     },
     {

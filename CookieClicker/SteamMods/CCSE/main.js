@@ -2119,6 +2119,7 @@ CCSE.launch = function(){
 		ActionButton: (action, text) => '<a class="option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
 		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
 		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
+		TinyIcon: (icon) => '<div class="icon" style="vertical-align:middle;display:inline-block;' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0]*48) + 'px ' + (-icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div>',
 		Slider: (slider, leftText, rightText, startValueFunction, callback, min, max, step) => {
 			if (!callback) callback = '';
 			if (!min) min = 0;

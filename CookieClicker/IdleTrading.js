@@ -118,8 +118,10 @@ IdleTrading.launch = function(){
 			for(var pref in config){
 				if(pref == "goods"){
 					for(var iG = 0; iG < config.goods.length; iG++){
-						for(var pref2 in config.goods[iG]){
-							if(IdleTrading.config.goods) IdleTrading.config.goods[iG][pref2] = config.goods[iG][pref2];
+						if(IdleTrading.config.goods[iG]){
+							for(var pref2 in config.goods[iG]){
+								IdleTrading.config.goods[iG][pref2] = config.goods[iG][pref2];
+							}
 						}
 					}
 				}

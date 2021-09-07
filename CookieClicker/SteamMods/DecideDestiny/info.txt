@@ -1,0 +1,11 @@
+{
+	"Name": "Decide Your Destiny",
+	"ID": "Decide Your Destiny",
+	"Author": "klattmose",
+	"Description": "Spend sugar lumps to choose the outcome of the next natural golden cookie. Disables Steam achievements.",
+	"ModVersion": 1.0,
+	"GameVersion": 2.04,
+	"Date": "6/09/2021",
+	"Dependencies": ["CCSE"],
+	"Disabled": 1
+}

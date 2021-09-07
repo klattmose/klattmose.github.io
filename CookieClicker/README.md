@@ -41,6 +41,11 @@ Disables Steam achievements.
 Adds a firework themed season to the game.\
 Disables Steam achievements.
 
+### [Decide Your Destiny](https://klattmose.github.io/CookieClicker/DecideDestiny.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/DecideDestiny.zip))
+
+Take the reins of destiny into your own hands. Spend sugar lumps to choose the outcome of the next natural golden cookie.\
+Disables Steam achievements.
+
 ### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip))
 
 Adds a special object in the lower left (near Krumblor and Santa) that displays a countdown for buffs and shimmers.

@@ -10,60 +10,72 @@ A comprehensive list of the mods I have made for this game.
 
 A browser extension to manage and automatically load javascript mods and add-ons for this game.
 
-### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/CCSE.zip))
+### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js?v=2.026)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/CCSE.zip?v=2.026))
 
-A modding framework that other mods can use to simplify the modding process. [Documentation](https://klattmose.github.io/CookieClicker/CCSE-POCs/)
+A modding framework that other mods can use to simplify the modding process. [Documentation](https://klattmose.github.io/CookieClicker/CCSE-POCs/)\
+Current version: 2.026
 
-### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/FortuneCookie.zip))
+### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js?v=2.8)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/FortuneCookie.zip?v=2.8))
 
-Predicts the outcomes of the Grimoire minigame spells.
+Predicts the outcomes of the Grimoire minigame spells.\
+Current version: 2.8
 
-### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/KlattmoseUtilities.zip))
+### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js?v=2.15)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/KlattmoseUtilities.zip?v=2.15))
 
 Create an unlimited amount of fully customizable hotkeys.\
-Disables Steam achievements.
+Disables Steam achievements.\
+Current version: 2.15
 
-### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Horticookie.zip))
+### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js?v=3.18)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Horticookie.zip?v=3.18))
 
-A helper tool for the Garden minigame.
+A helper tool for the Garden minigame.\
+Current version: 3.18
 
-### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/IdleTrading.zip))
+### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js?v=1.9)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/IdleTrading.zip?v=1.9))
 
-A helper tool for the Market minigame.
+A helper tool for the Market minigame.\
+Current version: 1.9
 
-### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Casino.zip))
+### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js?v=3.15)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Casino.zip?v=3.15))
 
 Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies.\
-Disables Steam achievements.
+Disables Steam achievements.\
+Current version: 3.15
 
-### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/AmericanSeason.zip))
+### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/AmericanSeason.zip?v=1.7))
 
 Adds a firework themed season to the game.\
-Disables Steam achievements.
+Disables Steam achievements.\
+Current version: 1.7
 
-### [Decide Your Destiny](https://klattmose.github.io/CookieClicker/DecideDestiny.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/DecideDestiny.zip))
+### [Decide Your Destiny](https://klattmose.github.io/CookieClicker/DecideDestiny.js?v=1.1)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/DecideDestiny.zip?v=1.1))
 
 Take the reins of destiny into your own hands. Spend sugar lumps to choose the outcome of the next natural golden cookie.\
-Disables Steam achievements.
+Disables Steam achievements.\
+Current version: 1.1
 
-### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip))
+### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip?v=1.7))
 
-Adds a special object in the lower left (near Krumblor and Santa) that displays a countdown for buffs and shimmers.
+Adds a special object in the lower left (near Krumblor and Santa) that displays a countdown for buffs and shimmers.\
+Current version: 1.7
 
-### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/HurricaneSugar.zip))
+### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js?v=1.6)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/HurricaneSugar.zip?v=1.6))
 
 Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ripen to 1 second.\
-Disables Steam achievements.
+Disables Steam achievements.\
+Current version: 1.6
 
-### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip))
+### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.9)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip?v=1.9))
 
 Adds a new building and an appropriate amount of upgrades and achievments.\
-Disables Steam achievements.
+Disables Steam achievements.\
+Current version: 1.9
 
-### Steam Achievement Enabler  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/SteamAchievementEnabler.zip))
+### Steam Achievement Enabler  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/SteamAchievementEnabler.zip?v=1.1))
 
 For cheating cheaters who cheat.\
-**Enables** Steam achievements. Regardless of other mods.
+**Enables** Steam achievements. Regardless of other mods.\
+Current version: 1.1
 
 ## Offline
 

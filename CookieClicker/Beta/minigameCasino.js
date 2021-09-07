@@ -5,7 +5,7 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.14';
+M.version = '3.15';
 M.GameVersion = '2.031';
 
 M.launch = function(){

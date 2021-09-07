@@ -1,8 +1,8 @@
 if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 KlattmoseUtilities.name = 'Klattmose Utilities';
-KlattmoseUtilities.version = '2.14';
-KlattmoseUtilities.GameVersion = '2.04';
+KlattmoseUtilities.version = '2.15';
+KlattmoseUtilities.GameVersion = '2.042';
 
 KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.defaultConfig = function(){
@@ -79,7 +79,7 @@ KlattmoseUtilities.launch = function(){
 			  "shift": false,
 			  "alt": false,
 			  "period": "10",
-			  "script": "Game.lastClick=0;\nGame.ClickCookie({detail:1,preventDefault:()=>{}});"
+			  "script": "Game.lastClick=0;\nGame.ClickCookie();"
 			},
 			{
 			  "keyCode": 98,

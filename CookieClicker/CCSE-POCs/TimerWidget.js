@@ -3,7 +3,7 @@ if(TimerWidget === undefined) var TimerWidget = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/img/timer.png';
 TimerWidget.name = 'Timer Widget';
-TimerWidget.version = '1.6';
+TimerWidget.version = '1.7';
 TimerWidget.GameVersion = '2.031';
 
 TimerWidget.launch = function(){

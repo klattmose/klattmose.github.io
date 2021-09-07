@@ -1,7 +1,7 @@
 if(DecideDestiny === undefined) var DecideDestiny = {};
 DecideDestiny.name = 'Decide Your Destiny';
-DecideDestiny.version = '1.0';
-DecideDestiny.GameVersion = '2.04';
+DecideDestiny.version = '1.1';
+DecideDestiny.GameVersion = '2.042';
 
 
 //***********************************

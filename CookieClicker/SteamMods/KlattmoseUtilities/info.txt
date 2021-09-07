@@ -3,8 +3,8 @@
 	"ID": "Klattmose Utilities",
 	"Author": "klattmose",
 	"Description": "Create an unlimited amount of fully customizable hotkeys. Disables Steam achievements.",
-	"ModVersion": 2.14,
-	"GameVersion": 2.04,
+	"ModVersion": 2.15,
+	"GameVersion": 2.042,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1

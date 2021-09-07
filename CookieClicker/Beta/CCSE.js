@@ -1,6 +1,6 @@
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.025';
+CCSE.version = '2.026';
 CCSE.GameVersion = '2.031';
 
 CCSE.launch = function(){

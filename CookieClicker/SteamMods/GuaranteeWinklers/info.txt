@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Guarantees Winklers.",
 	"ModVersion": 1,
-	"GameVersion": 2.04,
+	"GameVersion": 2.042,
 	"Date": "3/09/2021",
 	"Dependencies": [],
 	"Disabled": 1,

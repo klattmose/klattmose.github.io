@@ -1,7 +1,7 @@
 if(FortuneCookie === undefined) var FortuneCookie = {};
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.7';
-FortuneCookie.GameVersion = '2.04';
+FortuneCookie.version = '2.8';
+FortuneCookie.GameVersion = '2.042';
 
 FortuneCookie.launch = function(){
 	FortuneCookie.init = function(){

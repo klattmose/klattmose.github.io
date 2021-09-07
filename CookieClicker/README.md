@@ -23,36 +23,36 @@ Current version: 2.8
 ### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js?v=2.15)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/KlattmoseUtilities.zip?v=2.15))
 
 Create an unlimited amount of fully customizable hotkeys.\
-Disables Steam achievements.\
-Current version: 2.15
+Current version: 2.15\
+Disables Steam achievements.
 
 ### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js?v=3.18)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Horticookie.zip?v=3.18))
 
 A helper tool for the Garden minigame.\
 Current version: 3.18
 
-### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js?v=1.9)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/IdleTrading.zip?v=1.9))
+### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js?v=1.10)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/IdleTrading.zip?v=1.10))
 
 A helper tool for the Market minigame.\
-Current version: 1.9
+Current version: 1.10
 
 ### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js?v=3.15)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Casino.zip?v=3.15))
 
 Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies.\
-Disables Steam achievements.\
-Current version: 3.15
+Current version: 3.15\
+Disables Steam achievements.
 
 ### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/AmericanSeason.zip?v=1.7))
 
 Adds a firework themed season to the game.\
-Disables Steam achievements.\
-Current version: 1.7
+Current version: 1.7\
+Disables Steam achievements.
 
 ### [Decide Your Destiny](https://klattmose.github.io/CookieClicker/DecideDestiny.js?v=1.1)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/DecideDestiny.zip?v=1.1))
 
 Take the reins of destiny into your own hands. Spend sugar lumps to choose the outcome of the next natural golden cookie.\
-Disables Steam achievements.\
-Current version: 1.1
+Current version: 1.1\
+Disables Steam achievements.
 
 ### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip?v=1.7))
 
@@ -62,20 +62,20 @@ Current version: 1.7
 ### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js?v=1.6)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/HurricaneSugar.zip?v=1.6))
 
 Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ripen to 1 second.\
-Disables Steam achievements.\
-Current version: 1.6
+Current version: 1.6\
+Disables Steam achievements.
 
 ### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.9)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip?v=1.9))
 
 Adds a new building and an appropriate amount of upgrades and achievments.\
-Disables Steam achievements.\
-Current version: 1.9
+Current version: 1.9\
+Disables Steam achievements.
 
 ### Steam Achievement Enabler  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/SteamAchievementEnabler.zip?v=1.1))
 
 For cheating cheaters who cheat.\
-**Enables** Steam achievements. Regardless of other mods.\
-Current version: 1.1
+Current version: 1.1\
+**Enables** Steam achievements. Regardless of other mods.
 
 ## Offline
 

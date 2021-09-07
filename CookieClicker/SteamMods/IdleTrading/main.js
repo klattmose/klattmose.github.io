@@ -1,6 +1,6 @@
 if(IdleTrading === undefined) var IdleTrading = {};
 IdleTrading.name = 'Idle Trading';
-IdleTrading.version = '1.9';
+IdleTrading.version = '1.10';
 IdleTrading.GameVersion = '2.042';
 
 IdleTrading.launch = function(){
@@ -110,7 +110,7 @@ IdleTrading.launch = function(){
 			if(pref == "goods"){
 				for(var iG = 0; iG < config.goods.length; iG++){
 					for(var pref2 in config.goods[iG]){
-						IdleTrading.config.goods[iG][pref2] = config.goods[iG][pref2];
+						if(IdleTrading.config.goods) IdleTrading.config.goods[iG][pref2] = config.goods[iG][pref2];
 					}
 				}
 			}

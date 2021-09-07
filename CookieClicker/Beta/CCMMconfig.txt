@@ -1,0 +1,77 @@
+﻿{
+  "enabled": true,
+  "mods": [
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "CCSE",
+      "url": "https://klattmose.github.io/CookieClicker/Beta/CCSE.js",
+      "waitForScriptLoad": 1
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "CookieMonster",
+      "url": "https://cookiemonsterteam.github.io/CookieMonster/dist/CookieMonster.js",
+      "waitForScriptLoad": 1
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "Fortune Cookie",
+      "url": "https://klattmose.github.io/CookieClicker/Beta/FortuneCookie.js",
+      "waitForScriptLoad": 0
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "Klattmose Utilities",
+      "url": "https://klattmose.github.io/CookieClicker/Beta/KlattmoseUtilities.js",
+      "waitForScriptLoad": 0
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "Horticookie",
+      "url": "https://klattmose.github.io/CookieClicker/Beta/Horticookie.js",
+      "waitForScriptLoad": 0
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "Casino",
+      "url": "https://klattmose.github.io/CookieClicker/Beta/minigameCasino.js",
+      "waitForScriptLoad": 0
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "American Season",
+      "url": "https://klattmose.github.io/CookieClicker/Beta/AmericanSeason.js",
+      "waitForScriptLoad": 0
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "Idle Trading",
+      "url": "https://klattmose.github.io/CookieClicker/Beta/IdleTrading.js",
+      "waitForScriptLoad": 0
+    },
+    {
+      "enabled": 1,
+      "extraDelay": 0,
+      "isLoaded": 0,
+      "name": "Insugar Trading",
+      "url": "https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js",
+      "waitForScriptLoad": 0
+    }
+  ]
+}

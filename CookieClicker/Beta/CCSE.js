@@ -3214,6 +3214,7 @@ CCSE.launch = function(){
 		me.pool = 'prestige';
 		me.posX = posX;
 		me.posY = posY;
+		me.order = me.id;
 		
 		me.parents = parents;
 		if(me.parents.length == 0) me.parents = ['Legacy'];

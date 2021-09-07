@@ -3209,6 +3209,7 @@ CCSE.launch = function(){
 		me.pool = 'prestige';
 		me.posX = posX;
 		me.posY = posY;
+		me.order = me.id;
 		
 		me.parents = parents;
 		if(me.parents.length == 0) me.parents = ['Legacy'];
@@ -3454,6 +3455,12 @@ CCSE.launch = function(){
 		}
 		return proceed;
 	}
+	
+	/*  Doesn't work until the mods actually get loaded in order
+	CCSE.LaunchCCSEMod = function(func){
+		if(CCSE.isLoaded) func();
+		else CCSE.postLoadHooks.push(func);
+	}*/
 	
 	CCSE.GetModPath = (modName) => {
 		var mod = App.mods[modName];

@@ -1,77 +1,70 @@
 ﻿{
+  "async": false,
+  "cache": false,
   "enabled": true,
   "mods": [
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "CCSE",
-      "url": "https://klattmose.github.io/CookieClicker/Beta/CCSE.js",
-      "waitForScriptLoad": 1
+      "url": "https://klattmose.github.io/CookieClicker/Beta/CCSE.js"
     },
     {
-      "enabled": 1,
+      "enabled": 0,
       "extraDelay": 0,
       "isLoaded": 0,
       "name": "CookieMonster",
-      "url": "https://cookiemonsterteam.github.io/CookieMonster/dist/CookieMonster.js",
-      "waitForScriptLoad": 1
+      "url": "https://cookiemonsterteam.github.io/CookieMonster/dist/CookieMonster.js"
     },
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "Fortune Cookie",
-      "url": "https://klattmose.github.io/CookieClicker/Beta/FortuneCookie.js",
-      "waitForScriptLoad": 0
+      "url": "https://klattmose.github.io/CookieClicker/Beta/FortuneCookie.js"
     },
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "Klattmose Utilities",
-      "url": "https://klattmose.github.io/CookieClicker/Beta/KlattmoseUtilities.js",
-      "waitForScriptLoad": 0
+      "url": "https://klattmose.github.io/CookieClicker/Beta/KlattmoseUtilities.js"
     },
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "Horticookie",
-      "url": "https://klattmose.github.io/CookieClicker/Beta/Horticookie.js",
-      "waitForScriptLoad": 0
+      "url": "https://klattmose.github.io/CookieClicker/Beta/Horticookie.js"
     },
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "Casino",
-      "url": "https://klattmose.github.io/CookieClicker/Beta/minigameCasino.js",
-      "waitForScriptLoad": 0
+      "url": "https://klattmose.github.io/CookieClicker/Beta/minigameCasino.js"
     },
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "American Season",
-      "url": "https://klattmose.github.io/CookieClicker/Beta/AmericanSeason.js",
-      "waitForScriptLoad": 0
+      "url": "https://klattmose.github.io/CookieClicker/Beta/AmericanSeason.js"
     },
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "Idle Trading",
-      "url": "https://klattmose.github.io/CookieClicker/Beta/IdleTrading.js",
-      "waitForScriptLoad": 0
+      "url": "https://klattmose.github.io/CookieClicker/Beta/IdleTrading.js"
     },
     {
       "enabled": 1,
       "extraDelay": 0,
-      "isLoaded": 0,
+      "isLoaded": 1,
       "name": "Insugar Trading",
-      "url": "https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js",
-      "waitForScriptLoad": 0
+      "url": "https://staticvariablejames.github.io/InsugarTrading/InsugarTrading.js"
     }
   ]
 }

@@ -20,10 +20,10 @@ Current version: 2.026
 Predicts the outcomes of the Grimoire minigame spells.\
 Current version: 2.8
 
-### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js?v=2.15)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/KlattmoseUtilities.zip?v=2.15))
+### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js?v=2.16)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/KlattmoseUtilities.zip?v=2.16))
 
 Create an unlimited amount of fully customizable hotkeys.\
-Current version: 2.15\
+Current version: 2.16\
 Disables Steam achievements.
 
 ### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js?v=3.18)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Horticookie.zip?v=3.18))

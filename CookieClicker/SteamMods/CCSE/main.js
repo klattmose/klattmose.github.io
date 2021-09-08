@@ -1,6 +1,6 @@
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.026';
+CCSE.version = '2.027';
 CCSE.GameVersion = '2.042';
 
 CCSE.launch = function(){
@@ -126,6 +126,9 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
+			'</div><div class="subsection update small"><div class="title">09/08/2021</div>' + 
+			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
+			
 			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
 			'<div class="listing">&bull; Setting custom upgrades as Permanent will no longer break the game if the Stats menu is opened without the mod loaded</div>' +
@@ -246,8 +249,8 @@ CCSE.launch = function(){
 	CCSE.InitNote = function(){
 		CCSE.iconURL = CCSE.GetModPath('CCSE') + '/CCSEicon.png';
 		CCSE.functionsTotal = 127 + 
-							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
-							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
+							(Game.Objects['Wizard tower'].minigameLoaded ? 11 : 0) +
+							(Game.Objects['Temple'].minigameLoaded ? 12 : 0) +
 							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
 							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
@@ -2195,6 +2198,7 @@ CCSE.launch = function(){
 		// M.spellTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].spellTooltip) Game.customMinigame[objKey].spellTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.spellTooltip', 'background-position', `' + (me.icon[2]?'background-image:url('+me.icon[2]+');':'') + 'background-position`, 0, preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.spellTooltip', 'return str', `
 			// M.spellTooltip injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].spellTooltip) str = Game.customMinigame['` + objKey + `'].spellTooltip[i](id, str);`, -1,
@@ -2445,6 +2449,7 @@ CCSE.launch = function(){
 		// M.godTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].godTooltip) Game.customMinigame[objKey].godTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.godTooltip', 'background-position', `' + (me.icon[2]?'background-image:url('+me.icon[2]+');':'') + 'background-position`, 0, preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.godTooltip', 'return str', `
 			// M.godTooltip injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].godTooltip) str = Game.customMinigame['` + objKey + `'].godTooltip[i](id, str);`, -1,
@@ -2454,6 +2459,7 @@ CCSE.launch = function(){
 		// M.slotTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].slotTooltip) Game.customMinigame[objKey].slotTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.slotTooltip', 'background-position', `' + (me.icon[2]?'background-image:url('+me.icon[2]+');':'') + 'background-position`, 0, preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.slotTooltip', 'return str', `
 			// M.slotTooltip injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].slotTooltip) str = Game.customMinigame['` + objKey + `'].slotTooltip[i](id, str);`, -1,
@@ -2780,7 +2786,7 @@ CCSE.launch = function(){
 		for(var i in M.spells){
 			var me = M.spells[i];
 			var icon = me.icon || [28,12];
-			str += '<div class="grimoireSpell titleFont" id="grimoireSpell' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.spellTooltip(' + me.id + ')','this') + '><div class="usesIcon shadowFilter grimoireIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="grimoirePrice" id="grimoirePrice' + me.id + '">-</div></div>';
+			str += '<div class="grimoireSpell titleFont" id="grimoireSpell' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.spellTooltip(' + me.id + ')','this') + '><div class="usesIcon shadowFilter grimoireIcon" style="' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="grimoirePrice" id="grimoirePrice' + me.id + '">-</div></div>';
 		}
 		
 		l('grimoireSpells').innerHTML = str;
@@ -2832,7 +2838,7 @@ CCSE.launch = function(){
 		for(var i in M.gods){
 			var me = M.gods[i];
 			var icon = me.icon || [0,0];
-			str += '<div class="ready templeGod templeGod' + (me.id % 4) + ' titleFont" id="templeGod' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.godTooltip(' + me.id + ')', 'this') + '><div class="usesIcon shadowFilter templeIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="templeSlotDrag" id="templeGodDrag' + me.id + '"></div></div>';
+			str += '<div class="ready templeGod templeGod' + (me.id % 4) + ' titleFont" id="templeGod' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.godTooltip(' + me.id + ')', 'this') + '><div class="usesIcon shadowFilter templeIcon" style="' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="templeSlotDrag" id="templeGodDrag' + me.id + '"></div></div>';
 			str += '<div class="templeGodPlaceholder" id="templeGodPlaceholder' + me.id + '"></div>';
 		}
 		l('templeGods').innerHTML = str;

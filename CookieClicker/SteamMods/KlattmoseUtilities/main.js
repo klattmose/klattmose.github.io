@@ -164,8 +164,6 @@ KlattmoseUtilities.launch = function(){
 		}
 		
 		
-		
-		
 		if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');
 		else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
 	}

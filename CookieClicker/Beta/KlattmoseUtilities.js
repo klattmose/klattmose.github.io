@@ -145,9 +145,10 @@ KlattmoseUtilities.launch = function(){
 		KlattmoseUtilities.RepeaterFlags = {};
 		KlattmoseUtilities.ConfigPrefix = "KlattmoseUtilities";
 		KlattmoseUtilities.waitingForInput = 0;
+		KlattmoseUtilities.OnloadFunctionsRan = 0;
 		
 		KlattmoseUtilities.restoreDefaultConfig(1);
-		KlattmoseUtilities.loadConfig();
+		if(localStorage[KlattmoseUtilities.ConfigPrefix] && !Game.modSaveData[KlattmoseUtilities.name]) KlattmoseUtilities.TransferSave();
 		
 		
 		KlattmoseUtilities.ReplaceNativeGarden();
@@ -173,13 +174,6 @@ KlattmoseUtilities.launch = function(){
 			}
 		}
 		
-		
-		//***********************************
-		//    On-Load Functions run now
-		//***********************************
-		for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-			KlattmoseUtilities.config.onLoadFunctions[i].function();
-		}
 		
 		if (Game.prefs.popups) Game.Popup('Klattmose Utilities loaded!');
 		else Game.Notify('Klattmose Utilities loaded!', '', '', 1, 1);
@@ -216,13 +210,13 @@ KlattmoseUtilities.launch = function(){
 			if(hotkey.period === undefined){
 				str += '<div class="listing">' + 
 					m.ActionButton("KlattmoseUtilities.EditHotkey(" + i + ");", 'Edit') + 
-					m.ActionButton("KlattmoseUtilities.config.hotkeys.splice(" + i + ", 1); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();", 'Remove') + 
+					m.ActionButton("KlattmoseUtilities.config.hotkeys.splice(" + i + ", 1); Game.UpdateMenu();", 'Remove') + 
 					'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
 					'</div>';
 			} else {
 				repStr += '<div class="listing">' + 
 					m.ActionButton("KlattmoseUtilities.EditHotkey(" + i + ");", 'Edit') + 
-					m.ActionButton("KlattmoseUtilities.config.hotkeys.splice(" + i + ", 1); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();", 'Remove') + 
+					m.ActionButton("KlattmoseUtilities.config.hotkeys.splice(" + i + ", 1); Game.UpdateMenu();", 'Remove') + 
 					'<label>(' + KlattmoseUtilities.getKeybindString(hotkey) + ')    ' + (((hotkey.nickname === undefined) || (hotkey.nickname.length == 0)) ? ('Hotkey ' + i) : hotkey.nickname) + '</label>' + 
 					'</div>';
 			}
@@ -236,7 +230,7 @@ KlattmoseUtilities.launch = function(){
 			
 			str += '<div class="listing">' + 
 				m.ActionButton("KlattmoseUtilities.EditOnLoadFunction(" + i + ");", 'Edit') + 
-				m.ActionButton("KlattmoseUtilities.config.onLoadFunctions.splice(" + i + ", 1); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();", 'Remove') + 
+				m.ActionButton("KlattmoseUtilities.config.onLoadFunctions.splice(" + i + ", 1); Game.UpdateMenu();", 'Remove') + 
 				'<label>' + (((onLoadFunction.nickname === undefined) || (onLoadFunction.nickname.length == 0)) ? ('On-Load Function ' + i) : onLoadFunction.nickname) + '</label>' + 
 				'</div>';
 		}
@@ -256,23 +250,36 @@ KlattmoseUtilities.launch = function(){
 	//***********************************
 	//    Configuration
 	//***********************************
-	KlattmoseUtilities.saveConfig = function(config){
-		localStorage.setItem(KlattmoseUtilities.ConfigPrefix, JSON.stringify(config));
+	KlattmoseUtilities.save = function(){
 		KlattmoseUtilities.functionalize();
+		return JSON.stringify(KlattmoseUtilities.config);
 	}
-
-	KlattmoseUtilities.loadConfig = function(){
-		if (localStorage.getItem(KlattmoseUtilities.ConfigPrefix) != null) {
-			KlattmoseUtilities.config = JSON.parse(localStorage.getItem(KlattmoseUtilities.ConfigPrefix));
-			KlattmoseUtilities.functionalize();
+	
+	KlattmoseUtilities.load = function(data){
+		KlattmoseUtilities.config = JSON.parse(data);
+		KlattmoseUtilities.functionalize();
+		
+		if(!KlattmoseUtilities.OnloadFunctionsRan){
+			//***********************************
+			//    On-Load Functions run now
+			//***********************************
+			for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
+				KlattmoseUtilities.config.onLoadFunctions[i].function();
+			}
+			
+			KlattmoseUtilities.OnloadFunctionsRan = 1;
 		}
 	}
 
 	KlattmoseUtilities.restoreDefaultConfig = function(mode){
 		KlattmoseUtilities.config = KlattmoseUtilities.defaultConfig();
-		if(mode == 2) KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
-		
 		KlattmoseUtilities.functionalize();
+		if(mode == 2) Game.WriteSave();
+	}
+	
+	KlattmoseUtilities.TransferSave = function(){
+		Game.modSaveData[KlattmoseUtilities.name] = localStorage.getItem(KlattmoseUtilities.ConfigPrefix);
+		localStorage.removeItem(KlattmoseUtilities.ConfigPrefix);
 	}
 
 	KlattmoseUtilities.exportConfig = function(){
@@ -285,7 +292,7 @@ KlattmoseUtilities.launch = function(){
 
 	KlattmoseUtilities.importConfig = function(){
 		Game.Prompt('<h3>Import config</h3><div class="block">Paste your configuration string here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-					[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); KlattmoseUtilities.saveConfig(KlattmoseUtilities.config); Game.UpdateMenu();}'], 'Nevermind']);
+					[['Load','if (l(\'textareaPrompt\').value.length > 0) {KlattmoseUtilities.config = JSON.parse(l(\'textareaPrompt\').value); Game.ClosePrompt(); KlattmoseUtilities.functionalize(); Game.UpdateMenu();}'], 'Nevermind']);
 		l('textareaPrompt').focus();
 	}
 
@@ -296,10 +303,21 @@ KlattmoseUtilities.launch = function(){
 		if(KlattmoseUtilities.config.onLoadFunctions === undefined) KlattmoseUtilities.config.onLoadFunctions = {};
 		
 		for(var i = 0; i < KlattmoseUtilities.config.hotkeys.length; i++){
-			eval("KlattmoseUtilities.config.hotkeys[" + i + "].function = function(){\n" + KlattmoseUtilities.config.hotkeys[i].script + "\n}");
+			try{
+				eval("KlattmoseUtilities.config.hotkeys[" + i + "].function = function(){\n" + KlattmoseUtilities.config.hotkeys[i].script + "\n}");
+			}catch{
+				console.log('Failed to create function for ' + KlattmoseUtilities.config.hotkeys[i].nickname);
+				KlattmoseUtilities.config.hotkeys[i].script = '';
+			}
+			
 		}
 		for(var i = 0; i < KlattmoseUtilities.config.onLoadFunctions.length; i++){
-			eval("KlattmoseUtilities.config.onLoadFunctions[" + i + "].function = function(){\n" + KlattmoseUtilities.config.onLoadFunctions[i].script + "\n}");
+			try{
+				eval("KlattmoseUtilities.config.onLoadFunctions[" + i + "].function = function(){\n" + KlattmoseUtilities.config.onLoadFunctions[i].script + "\n}");
+			}catch{
+				console.log('Failed to create function for ' + KlattmoseUtilities.config.onLoadFunctions[i].nickname);
+				KlattmoseUtilities.config.onLoadFunctions[i].script = '';
+			}
 		}
 	}
 
@@ -332,8 +350,8 @@ KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.saveNewOnLoadFunction = function(i){
 		KlattmoseUtilities.tempOnLoadFunction.nickname = l('nicknameEditor').value;
 		KlattmoseUtilities.tempOnLoadFunction.script = l('textareaPrompt').value;
-		KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction;
-		KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+		KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction
+		KlattmoseUtilities.functionalize();
 	}
 
 
@@ -379,7 +397,7 @@ KlattmoseUtilities.launch = function(){
 		if(isNaN(KlattmoseUtilities.tempHotkey.period) || KlattmoseUtilities.tempHotkey.period.length == 0) delete KlattmoseUtilities.tempHotkey.period;
 		KlattmoseUtilities.tempHotkey.script = l('textareaPrompt').value;
 		KlattmoseUtilities.config.hotkeys[i] = KlattmoseUtilities.tempHotkey;
-		KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
+		KlattmoseUtilities.functionalize();
 	}
 
 	KlattmoseUtilities.getKeybindString = function(hotkey){
@@ -470,7 +488,6 @@ KlattmoseUtilities.launch = function(){
 		}
 		
 		l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
-		KlattmoseUtilities.saveConfig(KlattmoseUtilities.config);
 	}
 
 
@@ -951,7 +968,7 @@ KlattmoseUtilities.launch = function(){
 		
 	}
 	
-	if(CCSE.ConfirmGameVersion(KlattmoseUtilities.name, KlattmoseUtilities.version, KlattmoseUtilities.GameVersion)) KlattmoseUtilities.init();
+	if(CCSE.ConfirmGameVersion(KlattmoseUtilities.name, KlattmoseUtilities.version, KlattmoseUtilities.GameVersion)) Game.registerMod(KlattmoseUtilities.name, KlattmoseUtilities); // KlattmoseUtilities.init();
 }
 
 if(!KlattmoseUtilities.isLoaded){

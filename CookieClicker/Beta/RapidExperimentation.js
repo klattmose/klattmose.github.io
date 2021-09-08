@@ -14,6 +14,10 @@ CCSE: addLumpType
 **/
 
 
+var M = Game.Objects['Temple'].minigame;
+M.gods["decadence"].icon = [1,3,'https://klattmose.github.io/CookieClicker/img/customIcons.png'];
+CCSE.RedrawGods();
+
 
 if(Date.now() >= new Date(new Date().getFullYear(), 7 - 1, 1) && Date.now() <= new Date(new Date().getFullYear(), 7 - 1, 7)){
 	Game.baseSeason = 'american';

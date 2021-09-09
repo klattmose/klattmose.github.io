@@ -9,6 +9,7 @@ CCSE.launch = function(){
 	
 	CCSE.init = function(){
 		CCSE.InitNote();
+		CCSE.InitializeConfig();
 		
 		// Define more parts of CCSE
 		CCSE.Backup = {};
@@ -132,6 +133,7 @@ CCSE.launch = function(){
 			'<div class="listing">&bull; Added hooks for Steam.modsPopup</div>' +
 			'<div class="listing">&bull; Added support for custom Golden cookie sound selector options</div>' +
 			'<div class="listing">&bull; Added support for custom Milk selector options</div>' +
+			'<div class="listing">&bull; Added support for custom Background selector options</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
@@ -252,10 +254,10 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 131 + 
+		CCSE.functionsTotal = 128 + 
 							(CCSE.Steam ? 4 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
-							Game.UpgradesN * 1 + 20 + 
+							Game.UpgradesN * 1 + 26 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
@@ -1212,12 +1214,32 @@ CCSE.launch = function(){
 		// Setup for custom Milk Selector options
 		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
 		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
-															'if (Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
+															'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 		if(!Game.AllMilks){ // Browser compatibility
 			Game.AllMilks = [];
 			for(var i in Game.MilksByChoice) Game.AllMilks.push(Game.MilksByChoice[i]);
 		}  
 		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
+		
+		// Setup for custom Background Selector options
+		temp = Game.DrawBackground.toString();
+		temp = temp.replace("Game.bg+'.jpg'", 'Game.bg');
+		temp = temp.replace("Game.bgFade+'.jpg'", 'Game.bgFade');
+		temp = temp.replace("Game.BGsByChoice[Game.bgType]", 'choice');
+		temp = temp.replace("if (Game.bgType!=0 && Game.ascensionMode!=1)", 
+						`if (Game.ascensionMode!=1)
+						{
+							let choice = CCSE.GetSelectedBackground();
+							if(choice.name != 'Automatic')`);
+		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)", 
+							`else {
+								Game.bg += '.jpg';
+								Game.bgFade += '.jpg';
+							}
+						}
+						Game.Background.fillPattern(Pic(Game.bg)`);
+		eval('Game.DrawBackground = ' + temp);
+		for(var i in Game.BGsByChoice) Game.BGsByChoice[i].pic += '.jpg';
 		
 		
 		// -----     Debug block     ----- //
@@ -1812,6 +1834,20 @@ CCSE.launch = function(){
 		
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesPick", "Game.milkType=id;", 
 			'CCSE.SetSelectedMilk(id);', 0);
+		
+		
+		// Background selector custom options
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].olddescFunc", "this.choicesFunction()[Game.bgType]", "CCSE.GetSelectedBackground()", 0);
+		
+		// Game.Upgrades['Background selector'].choicesFunction
+		if(!Game.customUpgrades['Background selector'].choicesFunction) Game.customUpgrades['Background selector'].choicesFunction = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesFunction", "return choices;", 
+			`// Game.customUpgrades['Background selector'].choicesFunction injection point 0
+			for(var i in Game.customUpgrades['Background selector'].choicesFunction) Game.customUpgrades['Background selector'].choicesFunction[i](choices);
+			CCSE.OverrideBackgroundSelector(choices);`, -1);
+		
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesPick", "Game.bgType=id;", 
+			'CCSE.SetSelectedBackground(id);', 0);
 		
 		
 		// Permanent upgrades are tricky
@@ -3126,19 +3162,7 @@ CCSE.launch = function(){
 		}
 		
 		
-		if(!CCSE.config) CCSE.config = {};
-		if(!CCSE.config.version) CCSE.config.version = 1;
-		if(!CCSE.config.Achievements) CCSE.config.Achievements = {};
-		if(!CCSE.config.Upgrades) CCSE.config.Upgrades = {};
-		if(!CCSE.config.Buildings) CCSE.config.Buildings = {};
-		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
-		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
-		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
-		if(!CCSE.config.vault) CCSE.config.vault = [];
-		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
-		if(!CCSE.config.chimeType) CCSE.config.chimeType = 'No sound';
-		if(!CCSE.config.milkType) CCSE.config.milkType = 'Automatic';
-		if(!CCSE.config.bgType) CCSE.config.bgType = 'Automatic';
+		CCSE.InitializeConfig();
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3208,6 +3232,22 @@ CCSE.launch = function(){
 		
 		Game.upgradesToRebuild = 1;
 		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
+	}
+	
+	CCSE.InitializeConfig = function(){
+		if(!CCSE.config) CCSE.config = {};
+		if(!CCSE.config.version) CCSE.config.version = 1;
+		if(!CCSE.config.Achievements) CCSE.config.Achievements = {};
+		if(!CCSE.config.Upgrades) CCSE.config.Upgrades = {};
+		if(!CCSE.config.Buildings) CCSE.config.Buildings = {};
+		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
+		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
+		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
+		if(!CCSE.config.vault) CCSE.config.vault = [];
+		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+		if(!CCSE.config.chimeType) CCSE.config.chimeType = 'No sound';
+		if(!CCSE.config.milkType) CCSE.config.milkType = 'Automatic';
+		if(!CCSE.config.bgType) CCSE.config.bgType = 'Automatic';
 	}
 	
 	// These two kept for people who might be blindsided by the save format change
@@ -3493,6 +3533,17 @@ CCSE.launch = function(){
 		});
 	}
 	
+	CCSE.NewBackgroundSelection = function(name, icon, pic){
+		// name		What the game will display in the selector
+		// icon		An array [x, y, (optional)url] See how upgrades handle icons to get an idea
+		// pic		Url to your picture
+		
+		let bg = {name:name, icon:icon, pic:pic};
+		Game.customUpgrades['Background selector'].choicesFunction.push(function(choices){
+			choices.push(bg);
+		});
+	}
+	
 	
 	/*=====================================================================================
 	Custom Selector helper functions
@@ -3540,7 +3591,7 @@ CCSE.launch = function(){
 			else choice.selected = false;
 		}
 		
-		// If the selected sound is from an unloaded mod, default to Automatic
+		// If the selected milk is from an unloaded mod, default to Automatic
 		if(!found) choices[0].selected = 1;
 	}
 	
@@ -3554,6 +3605,33 @@ CCSE.launch = function(){
 	CCSE.SetSelectedMilk = function(id){
 		Game.milkType = (id<Game.AllMilks.length ? id : 0); // Vanilla value defaults to 0 (Automatic)
 		CCSE.config.milkType = Game.Upgrades['Milk selector'].choicesFunction()[id].name;
+	}
+	
+	CCSE.OverrideBackgroundSelector = function(choices){
+		let found = false; 
+		for(var i in choices){
+			let choice = choices[i];
+			if(choice.name == CCSE.config.bgType){choice.selected = 1;found = true}
+			else choice.selected = false;
+		}
+		
+		// If the selected bg is from an unloaded mod, default to Automatic
+		if(!found) choices[0].selected = 1;
+	}
+	
+	CCSE.GetSelectedBackground = function(){
+		let choices = Game.Upgrades['Background selector'].choicesFunction();
+		let choice = choices[0];
+		for(var i in choices) if(choices[i].selected){
+			choice = choices[i];
+			if(Game.BGsByChoice[i]) choice.pic = Game.BGsByChoice[i].pic;
+		}
+		return choice;
+	}
+	
+	CCSE.SetSelectedBackground = function(id){
+		Game.bgType = (Game.BGsByChoice[id] ? id : 0); // Vanilla value defaults to 0 (Automatic)
+		CCSE.config.bgType = Game.Upgrades['Background selector'].choicesFunction()[id].name;
 	}
 	
 	

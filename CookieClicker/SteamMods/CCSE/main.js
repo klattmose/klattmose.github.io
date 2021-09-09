@@ -1801,6 +1801,10 @@ CCSE.launch = function(){
 			for(var i in Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction[i](choices);
 			CCSE.OverrideMilkSelector(choices);`, -1);
 		
+		Game.customUpgrades['Milk selector'].choicesFunction.push(function(choices){
+			choices[0].milk = Game.Milk;
+		});
+		
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesPick", "Game.milkType=id;", 
 			'CCSE.SetSelectedMilk(id);', 0);
 		

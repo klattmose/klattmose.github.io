@@ -2875,7 +2875,7 @@ CCSE.launch = function(){
 		
 		for(var i in CCSE.customRedrawSpells) CCSE.customRedrawSpells[i]();
 	}
-	// Cookie Monster compatability because it was here first
+	// Cookie Monster compatibility because it was here first
 	CCSE.customRedrawSpells.push(function(){if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();});
 	
 	if(!CCSE.customNewSpell) CCSE.customNewSpell = [];

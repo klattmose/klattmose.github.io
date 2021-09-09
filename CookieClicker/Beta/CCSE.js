@@ -252,7 +252,7 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 126 + 
+		CCSE.functionsTotal = 131 + 
 							(CCSE.Steam ? 4 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 20 + 
@@ -1211,8 +1211,12 @@ CCSE.launch = function(){
 		
 		// Setup for custom Milk Selector options
 		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
-		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;", 
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
 															'if (Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
+		if(!Game.AllMilks){ // Browser compatibility
+			Game.AllMilks = [];
+			for(var i in Game.MilksByChoice) Game.AllMilks.push(Game.MilksByChoice[i]);
+		}  
 		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
 		
 		
@@ -1800,6 +1804,11 @@ CCSE.launch = function(){
 			`// Game.customUpgrades['Milk selector'].choicesFunction injection point 0
 			for(var i in Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction[i](choices);
 			CCSE.OverrideMilkSelector(choices);`, -1);
+		
+		Game.customUpgrades['Milk selector'].choicesFunction.push(function(choices){
+			for(var i in choices) choices[i].milk = Game.AllMilks[i];
+			choices[0].milk = Game.Milk;
+		});
 		
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesPick", "Game.milkType=id;", 
 			'CCSE.SetSelectedMilk(id);', 0);
@@ -2874,7 +2883,7 @@ CCSE.launch = function(){
 		
 		for(var i in CCSE.customRedrawSpells) CCSE.customRedrawSpells[i]();
 	}
-	// Cookie Monster compatability because it was here first
+	// Cookie Monster compatibility because it was here first
 	CCSE.customRedrawSpells.push(function(){if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();});
 	
 	if(!CCSE.customNewSpell) CCSE.customNewSpell = [];

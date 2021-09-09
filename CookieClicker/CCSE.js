@@ -1,13 +1,15 @@
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.026';
+CCSE.version = '2.027';
 CCSE.GameVersion = '2.031';
+CCSE.Steam = (typeof Steam !== 'undefined');
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
 	
 	CCSE.init = function(){
 		CCSE.InitNote();
+		CCSE.InitializeConfig();
 		
 		// Define more parts of CCSE
 		CCSE.Backup = {};
@@ -125,6 +127,13 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">09/09/2021</div>' + 
+			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
+			'<div class="listing">&bull; Added hooks for Steam.modsPopup</div>' +
+			'<div class="listing">&bull; Added support for custom Golden cookie sound selector options</div>' +
+			'<div class="listing">&bull; Added support for custom Milk selector options</div>' +
+			'<div class="listing">&bull; Added support for custom Background selector options</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
@@ -245,13 +254,10 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 127 + 
-							(Game.Objects['Wizard tower'].minigameLoaded ? 10 : 0) +
-							(Game.Objects['Temple'].minigameLoaded ? 10 : 0) +
-							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
-							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
+		CCSE.functionsTotal = 128 + 
+							(CCSE.Steam ? 4 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
-							Game.UpgradesN * 1 + 11 + 
+							Game.UpgradesN * 1 + 26 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
@@ -312,8 +318,36 @@ CCSE.launch = function(){
 		`);
 		
 		
+		// Code specific to the Steam version
+		// Might move to their own function maybe
+		if(CCSE.Steam){
+			// Steam.modsPopup
+			// This function has several functions defined within it
+			if(!Game.customModsPopup) Game.customModsPopup = [];
+			if(!Game.customModsPopupCheckModDependencies) Game.customModsPopupCheckModDependencies = []; // Return okay to have no effect
+			if(!Game.customModsPopupUpdateModList) Game.customModsPopupUpdateModList = [];
+			if(!Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions = [];
+			CCSE.SliceCodeIntoFunction('Steam.modsPopup', -1, `
+				// Steam.modsPopup injection point 0
+				for(var i in Game.customModsPopup) Game.customModsPopup[i](selectedMod);
+			`);
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "return okay;", 
+				`// Steam.modsPopup injection point 1
+				for(var i in Game.customModsPopupCheckModDependencies) okay = Game.customModsPopupCheckModDependencies[i](okay, mod, loadedMods, selectedMod);
+				`, -1);
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "updateModOptions();", 
+				`// Steam.modsPopup injection point 2
+				for(var i in Game.customModsPopupUpdateModList) Game.customModsPopupUpdateModList[i](selectedMod);
+				`, -1);
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");', 
+				`// Steam.modsPopup injection point 3
+				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod);
+				`, 1);
+		}
+		
+		
 		/*
-		Use CCSE.customLoad instead
+		New modding api works
 		// Game.LoadSave
 		if(!Game.customLoad) Game.customLoad = [];
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
@@ -648,6 +682,9 @@ CCSE.launch = function(){
 		for(var key in Game.shimmerTypes){
 			CCSE.ReplaceShimmerType(key);
 		}
+		
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].initFunc", "PlaySound('snd/chime.mp3')", "CCSE.PlayShimmerSpawnSound('golden')", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].initFunc", "PlaySound('snd/jingle.mp3')", "CCSE.PlayShimmerSpawnSound('reindeer')", 0);
 		
 		
 		// Game.shimmerTypes['golden'].popFunc
@@ -1174,6 +1211,36 @@ CCSE.launch = function(){
 			`// Game.DrawBackground injection point 0
 			for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();`, -1);
 		
+		// Setup for custom Milk Selector options
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
+															'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
+		if(!Game.AllMilks){ // Browser compatibility
+			Game.AllMilks = [];
+			for(var i in Game.MilksByChoice) Game.AllMilks.push(Game.MilksByChoice[i]);
+		}  
+		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
+		
+		// Setup for custom Background Selector options
+		temp = Game.DrawBackground.toString();
+		temp = temp.replace("Game.bg+'.jpg'", 'Game.bg');
+		temp = temp.replace("Game.bgFade+'.jpg'", 'Game.bgFade');
+		temp = temp.replace("Game.BGsByChoice[Game.bgType]", 'choice');
+		temp = temp.replace("if (Game.bgType!=0 && Game.ascensionMode!=1)", 
+						`if (Game.ascensionMode!=1)
+						{
+							let choice = CCSE.GetSelectedBackground();
+							if(choice.name != 'Automatic')`);
+		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)", 
+							`else {
+								Game.bg += '.jpg';
+								Game.bgFade += '.jpg';
+							}
+						}
+						Game.Background.fillPattern(Pic(Game.bg)`);
+		eval('Game.DrawBackground = ' + temp);
+		for(var i in Game.BGsByChoice) Game.BGsByChoice[i].pic += '.jpg';
+		
 		
 		// -----     Debug block     ----- //
 		
@@ -1211,6 +1278,7 @@ CCSE.launch = function(){
 					// Game.shimmerTypes['` + escKey + `'].initFunc injection point 1
 					for(var i in Game.customShimmerTypes['` + escKey + `'].initFunc) Game.customShimmerTypes['` + escKey + `'].initFunc[i]();
 				`);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", 'Game.chimeType==1 && ', '', 0);
 		
 		
 		// Game.shimmerTypes[key].updateFunc
@@ -1729,6 +1797,59 @@ CCSE.launch = function(){
                 else `, -1);
 		
 		
+		// Golden cookie sound selector custom options
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "this.choicesFunction()[Game.chimeType]", "CCSE.GetSelectedShimmerSound()", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "'+icon[2]+'", "'+choice.icon[2]+'", 0);
+		
+		// Game.Upgrades['Golden cookie sound selector'].choicesFunction
+		if(!Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesFunction", "return choices;", 
+			`// Game.customUpgrades['Golden cookie sound selector'].choicesFunction injection point 0
+			for(var i in Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction[i](choices);
+			CCSE.OverrideShimmerSoundSelector(choices);`, -1);
+		
+		Game.customUpgrades['Golden cookie sound selector'].choicesFunction.push(function(choices){
+			choices[1].default = 'snd/chime.mp3';
+			choices[1].shimmerTypes = {golden:'snd/chime.mp3', reindeer:'snd/jingle.mp3'};
+		});
+		
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesPick", "Game.chimeType=id;", 
+			'CCSE.SetSelectedShimmerSound(id);', 0);
+		
+		
+		// Milk selector custom options
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].olddescFunc", "this.choicesFunction()[Game.milkType]", "CCSE.GetSelectedMilk()", 0);
+		
+		// Game.Upgrades['Milk selector'].choicesFunction
+		if(!Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesFunction", "return choices;", 
+			`// Game.customUpgrades['Milk selector'].choicesFunction injection point 0
+			for(var i in Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction[i](choices);
+			CCSE.OverrideMilkSelector(choices);`, -1);
+		
+		Game.customUpgrades['Milk selector'].choicesFunction.push(function(choices){
+			for(var i in choices) choices[i].milk = Game.AllMilks[i];
+			choices[0].milk = Game.Milk;
+		});
+		
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesPick", "Game.milkType=id;", 
+			'CCSE.SetSelectedMilk(id);', 0);
+		
+		
+		// Background selector custom options
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].olddescFunc", "this.choicesFunction()[Game.bgType]", "CCSE.GetSelectedBackground()", 0);
+		
+		// Game.Upgrades['Background selector'].choicesFunction
+		if(!Game.customUpgrades['Background selector'].choicesFunction) Game.customUpgrades['Background selector'].choicesFunction = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesFunction", "return choices;", 
+			`// Game.customUpgrades['Background selector'].choicesFunction injection point 0
+			for(var i in Game.customUpgrades['Background selector'].choicesFunction) Game.customUpgrades['Background selector'].choicesFunction[i](choices);
+			CCSE.OverrideBackgroundSelector(choices);`, -1);
+		
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesPick", "Game.bgType=id;", 
+			'CCSE.SetSelectedBackground(id);', 0);
+		
+		
 		// Permanent upgrades are tricky
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
@@ -2147,6 +2268,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplaceGrimoire = function(){
+		CCSE.functionsTotal += 11;
 		var objKey = "Wizard tower";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -2194,6 +2316,7 @@ CCSE.launch = function(){
 		// M.spellTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].spellTooltip) Game.customMinigame[objKey].spellTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.spellTooltip', 'background-position', `' + (me.icon[2]?'background-image:url('+me.icon[2]+');':'') + 'background-position`, 0, preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.spellTooltip', 'return str', `
 			// M.spellTooltip injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].spellTooltip) str = Game.customMinigame['` + objKey + `'].spellTooltip[i](id, str);`, -1,
@@ -2240,6 +2363,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplaceMarket = function(){
+		CCSE.functionsTotal += 24;
 		var objKey = "Bank";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -2436,6 +2560,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplacePantheon = function(){
+		CCSE.functionsTotal += 12;
 		var objKey = "Temple";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -2444,6 +2569,7 @@ CCSE.launch = function(){
 		// M.godTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].godTooltip) Game.customMinigame[objKey].godTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.godTooltip', 'background-position', `' + (me.icon[2]?'background-image:url('+me.icon[2]+');':'') + 'background-position`, 0, preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.godTooltip', 'return str', `
 			// M.godTooltip injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].godTooltip) str = Game.customMinigame['` + objKey + `'].godTooltip[i](id, str);`, -1,
@@ -2453,6 +2579,7 @@ CCSE.launch = function(){
 		// M.slotTooltip
 		// functions should return a string value (Return str for no effect)
 		if(!Game.customMinigame[objKey].slotTooltip) Game.customMinigame[objKey].slotTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('M.slotTooltip', 'background-position', `' + (me.icon[2]?'background-image:url('+me.icon[2]+');':'') + 'background-position`, 0, preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.slotTooltip', 'return str', `
 			// M.slotTooltip injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].slotTooltip) str = Game.customMinigame['` + objKey + `'].slotTooltip[i](id, str);`, -1,
@@ -2525,6 +2652,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplaceGarden = function(){
+		CCSE.functionsTotal += 33;
 		var objKey = "Farm";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -2779,7 +2907,7 @@ CCSE.launch = function(){
 		for(var i in M.spells){
 			var me = M.spells[i];
 			var icon = me.icon || [28,12];
-			str += '<div class="grimoireSpell titleFont" id="grimoireSpell' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.spellTooltip(' + me.id + ')','this') + '><div class="usesIcon shadowFilter grimoireIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="grimoirePrice" id="grimoirePrice' + me.id + '">-</div></div>';
+			str += '<div class="grimoireSpell titleFont" id="grimoireSpell' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.spellTooltip(' + me.id + ')','this') + '><div class="usesIcon shadowFilter grimoireIcon" style="' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="grimoirePrice" id="grimoirePrice' + me.id + '">-</div></div>';
 		}
 		
 		l('grimoireSpells').innerHTML = str;
@@ -2791,7 +2919,7 @@ CCSE.launch = function(){
 		
 		for(var i in CCSE.customRedrawSpells) CCSE.customRedrawSpells[i]();
 	}
-	// Cookie Monster compatability because it was here first
+	// Cookie Monster compatibility because it was here first
 	CCSE.customRedrawSpells.push(function(){if(typeof CM != 'undefined') CM.Disp.AddTooltipGrimoire();});
 	
 	if(!CCSE.customNewSpell) CCSE.customNewSpell = [];
@@ -2831,7 +2959,7 @@ CCSE.launch = function(){
 		for(var i in M.gods){
 			var me = M.gods[i];
 			var icon = me.icon || [0,0];
-			str += '<div class="ready templeGod templeGod' + (me.id % 4) + ' titleFont" id="templeGod' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.godTooltip(' + me.id + ')', 'this') + '><div class="usesIcon shadowFilter templeIcon" style="background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="templeSlotDrag" id="templeGodDrag' + me.id + '"></div></div>';
+			str += '<div class="ready templeGod templeGod' + (me.id % 4) + ' titleFont" id="templeGod' + me.id + '" ' + Game.getDynamicTooltip('Game.ObjectsById[' + M.parent.id + '].minigame.godTooltip(' + me.id + ')', 'this') + '><div class="usesIcon shadowFilter templeIcon" style="' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0] * 48) + 'px ' + (-icon[1] * 48) + 'px;"></div><div class="templeSlotDrag" id="templeGodDrag' + me.id + '"></div></div>';
 			str += '<div class="templeGodPlaceholder" id="templeGodPlaceholder' + me.id + '"></div>';
 		}
 		l('templeGods').innerHTML = str;
@@ -3034,16 +3162,7 @@ CCSE.launch = function(){
 		}
 		
 		
-		if(!CCSE.config) CCSE.config = {};
-		if(!CCSE.config.version) CCSE.config.version = 1;
-		if(!CCSE.config.Achievements) CCSE.config.Achievements = {};
-		if(!CCSE.config.Upgrades) CCSE.config.Upgrades = {};
-		if(!CCSE.config.Buildings) CCSE.config.Buildings = {};
-		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
-		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
-		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
-		if(!CCSE.config.vault) CCSE.config.vault = [];
-		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+		CCSE.InitializeConfig();
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3115,6 +3234,22 @@ CCSE.launch = function(){
 		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
 	}
 	
+	CCSE.InitializeConfig = function(){
+		if(!CCSE.config) CCSE.config = {};
+		if(!CCSE.config.version) CCSE.config.version = 1;
+		if(!CCSE.config.Achievements) CCSE.config.Achievements = {};
+		if(!CCSE.config.Upgrades) CCSE.config.Upgrades = {};
+		if(!CCSE.config.Buildings) CCSE.config.Buildings = {};
+		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
+		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
+		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
+		if(!CCSE.config.vault) CCSE.config.vault = [];
+		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+		if(!CCSE.config.chimeType) CCSE.config.chimeType = 'No sound';
+		if(!CCSE.config.milkType) CCSE.config.milkType = 'Automatic';
+		if(!CCSE.config.bgType) CCSE.config.bgType = 'Automatic';
+	}
+	
 	// These two kept for people who might be blindsided by the save format change
 	CCSE.ExportSave = function(){
 		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>It contains data that other mods authors decided to allow CCSE to manage, as well as data for custom things added through CCSE (i.e. achivements, upgrades, etc)</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
@@ -3175,6 +3310,9 @@ CCSE.launch = function(){
 		if(hard){
 			CCSE.config.vault = [];
 			CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+			CCSE.config.chimeType = 'No sound';
+			CCSE.config.milkType = 'Automatic';
+			CCSE.config.bgType = 'Automatic';
 		} else {
 			for(var i in CCSE.config.permanentUpgrades){
 				if(CCSE.config.permanentUpgrades[i] != -1)
@@ -3370,6 +3508,132 @@ CCSE.launch = function(){
 		Game.upgradesToRebuild = 1;
 	}
 	
+	CCSE.NewShimmerSoundSelection = function(name, icon, defaultSound, shimmerTypes){
+		// name				What the game will display in the selector
+		// icon				An array [x, y, (optional)url] See how upgrades handle icons to get an idea
+		// defaultSound		The default sound to play for a shimmer spawn
+		// shimmerTypes		For different sounds for each shimmer type {golden:'soundUrl',reindeer:'differentSoundUrl'}
+		let sound = {name:name, icon:icon};
+		if(defaultSound) sound.default = defaultSound;
+		if(shimmerTypes) sound.shimmerTypes = shimmerTypes;
+		
+		Game.customUpgrades['Golden cookie sound selector'].choicesFunction.push(function(choices){
+			choices.push(sound);
+		});
+	}
+	
+	CCSE.NewMilkSelection = function(name, icon, pic){
+		// name		What the game will display in the selector
+		// icon		An array [x, y, (optional)url] See how upgrades handle icons to get an idea
+		// pic		Url to your picture
+		
+		let milk = {name:name, icon:icon, milk:{pic:pic}, order:Game.AllMilks.length};
+		Game.customUpgrades['Milk selector'].choicesFunction.push(function(choices){
+			choices.push(milk);
+		});
+	}
+	
+	CCSE.NewBackgroundSelection = function(name, icon, pic){
+		// name		What the game will display in the selector
+		// icon		An array [x, y, (optional)url] See how upgrades handle icons to get an idea
+		// pic		Url to your picture
+		
+		let bg = {name:name, icon:icon, pic:pic};
+		Game.customUpgrades['Background selector'].choicesFunction.push(function(choices){
+			choices.push(bg);
+		});
+	}
+	
+	
+	/*=====================================================================================
+	Custom Selector helper functions
+	=======================================================================================*/
+	CCSE.OverrideShimmerSoundSelector = function(choices){
+		let found = false; 
+		for(var i in choices){
+			let choice = choices[i];
+			if(choice.name == CCSE.config.chimeType){choice.selected = 1;found = true}
+			else choice.selected = false;
+		}
+		
+		// If the selected sound is from an unloaded mod, default to Chime
+		if(!found) choices[1].selected = 1;
+	}
+	
+	CCSE.GetSelectedShimmerSound = function(){
+		let choices = Game.Upgrades['Golden cookie sound selector'].choicesFunction();
+		let choice = choices[1];
+		for(var i in choices) if(choices[i].selected) choice = choices[i];
+		return choice;
+	}
+	
+	CCSE.SetSelectedShimmerSound = function(id){
+		Game.chimeType = (id ? 1 : 0); // Vanilla value will stay either 0 or 1
+		CCSE.config.chimeType = Game.Upgrades['Golden cookie sound selector'].choicesFunction()[id].name;
+	}
+	
+	CCSE.PlayShimmerSpawnSound = function(shimmerType){
+		if(Game.chimeType){ // Game.chimeType is 0 for No sound
+			let choice = CCSE.GetSelectedShimmerSound();
+			let sfx = '';
+			if(choice.shimmerTypes && choice.shimmerTypes[shimmerType] !== undefined) sfx = choice.shimmerTypes[shimmerType];
+			else if(choice.default) sfx = choice.default;
+			
+			PlaySound(sfx);
+		}
+	}
+	
+	CCSE.OverrideMilkSelector = function(choices){
+		let found = false; 
+		for(var i in choices){
+			let choice = choices[i];
+			if(choice.name == CCSE.config.milkType){choice.selected = 1;found = true}
+			else choice.selected = false;
+		}
+		
+		// If the selected milk is from an unloaded mod, default to Automatic
+		if(!found) choices[0].selected = 1;
+	}
+	
+	CCSE.GetSelectedMilk = function(){
+		let choices = Game.Upgrades['Milk selector'].choicesFunction();
+		let choice = {milk:Game.Milk};
+		for(var i in choices) if(choices[i].selected) choice = choices[i];
+		return choice;
+	}
+	
+	CCSE.SetSelectedMilk = function(id){
+		Game.milkType = (id<Game.AllMilks.length ? id : 0); // Vanilla value defaults to 0 (Automatic)
+		CCSE.config.milkType = Game.Upgrades['Milk selector'].choicesFunction()[id].name;
+	}
+	
+	CCSE.OverrideBackgroundSelector = function(choices){
+		let found = false; 
+		for(var i in choices){
+			let choice = choices[i];
+			if(choice.name == CCSE.config.bgType){choice.selected = 1;found = true}
+			else choice.selected = false;
+		}
+		
+		// If the selected bg is from an unloaded mod, default to Automatic
+		if(!found) choices[0].selected = 1;
+	}
+	
+	CCSE.GetSelectedBackground = function(){
+		let choices = Game.Upgrades['Background selector'].choicesFunction();
+		let choice = choices[0];
+		for(var i in choices) if(choices[i].selected){
+			choice = choices[i];
+			if(Game.BGsByChoice[i]) choice.pic = Game.BGsByChoice[i].pic;
+		}
+		return choice;
+	}
+	
+	CCSE.SetSelectedBackground = function(id){
+		Game.bgType = (Game.BGsByChoice[id] ? id : 0); // Vanilla value defaults to 0 (Automatic)
+		CCSE.config.bgType = Game.Upgrades['Background selector'].choicesFunction()[id].name;
+	}
+	
 	
 	/*=====================================================================================
 	Other
@@ -3458,6 +3722,21 @@ CCSE.launch = function(){
 			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
 		}
 		return proceed;
+	}
+	
+	/*  Doesn't work until the mods actually get loaded in order
+	CCSE.LaunchCCSEMod = function(func){
+		if(CCSE.isLoaded) func();
+		else CCSE.postLoadHooks.push(func);
+	}*/
+	
+	if(CCSE.Steam){
+		CCSE.GetModPath = (modName) => {
+			var mod = App.mods[modName];
+			return '../mods/' + (mod.local ? 'local' : 'workshop') + '/' + mod.path;
+		}
+		
+		CCSE.GetModFolder = (modName) => App.mods[modName].path;
 	}
 	
 	

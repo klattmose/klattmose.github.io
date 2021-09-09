@@ -2,6 +2,7 @@ if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
 CCSE.version = '2.027';
 CCSE.GameVersion = '2.031';
+CCSE.Steam = (typeof Steam !== 'undefined');
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -128,6 +129,7 @@ CCSE.launch = function(){
 			
 			'</div><div class="subsection update small"><div class="title">09/08/2021</div>' + 
 			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
+			'<div class="listing">&bull; Added hooks for Steam.modsPopup</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
@@ -248,13 +250,10 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 127 + 
-							(Game.Objects['Wizard tower'].minigameLoaded ? 11 : 0) +
-							(Game.Objects['Temple'].minigameLoaded ? 12 : 0) +
-							(Game.Objects['Farm'].minigameLoaded ? 33 : 0) +
-							(Game.Objects['Bank'].minigameLoaded ? 24 : 0) +
+		CCSE.functionsTotal = 126 + 
+							(CCSE.Steam ? 4 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
-							Game.UpgradesN * 1 + 11 + 
+							Game.UpgradesN * 1 + 20 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
@@ -315,8 +314,36 @@ CCSE.launch = function(){
 		`);
 		
 		
+		// Code specific to the Steam version
+		// Might move to their own function maybe
+		if(CCSE.Steam){
+			// Steam.modsPopup
+			// This function has several functions defined within it
+			if(!Game.customModsPopup) Game.customModsPopup = [];
+			if(!Game.customModsPopupCheckModDependencies) Game.customModsPopupCheckModDependencies = []; // Return okay to have no effect
+			if(!Game.customModsPopupUpdateModList) Game.customModsPopupUpdateModList = [];
+			if(!Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions = [];
+			CCSE.SliceCodeIntoFunction('Steam.modsPopup', -1, `
+				// Steam.modsPopup injection point 0
+				for(var i in Game.customModsPopup) Game.customModsPopup[i](selectedMod);
+			`);
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "return okay;", 
+				`// Steam.modsPopup injection point 1
+				for(var i in Game.customModsPopupCheckModDependencies) okay = Game.customModsPopupCheckModDependencies[i](okay, mod, loadedMods, selectedMod);
+				`, -1);
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "updateModOptions();", 
+				`// Steam.modsPopup injection point 2
+				for(var i in Game.customModsPopupUpdateModList) Game.customModsPopupUpdateModList[i](selectedMod);
+				`, -1);
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");', 
+				`// Steam.modsPopup injection point 3
+				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod);
+				`, 1);
+		}
+		
+		
 		/*
-		Use CCSE.customLoad instead
+		New modding api works
 		// Game.LoadSave
 		if(!Game.customLoad) Game.customLoad = [];
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
@@ -651,6 +678,9 @@ CCSE.launch = function(){
 		for(var key in Game.shimmerTypes){
 			CCSE.ReplaceShimmerType(key);
 		}
+		
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].initFunc", "PlaySound('snd/chime.mp3')", "CCSE.PlayShimmerSpawnSound('golden')", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].initFunc", "PlaySound('snd/jingle.mp3')", "CCSE.PlayShimmerSpawnSound('reindeer')", 0);
 		
 		
 		// Game.shimmerTypes['golden'].popFunc
@@ -1214,6 +1244,7 @@ CCSE.launch = function(){
 					// Game.shimmerTypes['` + escKey + `'].initFunc injection point 1
 					for(var i in Game.customShimmerTypes['` + escKey + `'].initFunc) Game.customShimmerTypes['` + escKey + `'].initFunc[i]();
 				`);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", 'Game.chimeType==1 && ', '', 0);
 		
 		
 		// Game.shimmerTypes[key].updateFunc
@@ -1732,6 +1763,26 @@ CCSE.launch = function(){
                 else `, -1);
 		
 		
+		// Golden cookie sound selector descFunc has a typo
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "this.choicesFunction()[Game.chimeType]", "CCSE.GetSelectedShimmerSound()", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "'+icon[2]+'", "'+choice.icon[2]+'", 0);
+		
+		// Game.Upgrades['Golden cookie sound selector'].choicesFunction
+		if(!Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesFunction", "return choices;", 
+			`// Game.customUpgrades['Golden cookie sound selector'].choicesFunction injection point 0
+			for(var i in Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction[i](choices);
+			CCSE.OverrideShimmerSoundSelector(choices);`, -1);
+		
+		Game.customUpgrades['Golden cookie sound selector'].choicesFunction.push(function(choices){
+			choices[1].default = 'snd/chime.mp3';
+			choices[1].shimmerTypes = {golden:'snd/chime.mp3', reindeer:'snd/jingle.mp3'};
+		});
+		
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesPick", "Game.chimeType=id;", 
+			'CCSE.SetSelectedShimmerSound(id);', 0);
+		
+		
 		// Permanent upgrades are tricky
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
@@ -2150,6 +2201,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplaceGrimoire = function(){
+		CCSE.functionsTotal += 11;
 		var objKey = "Wizard tower";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -2244,6 +2296,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplaceMarket = function(){
+		CCSE.functionsTotal += 24;
 		var objKey = "Bank";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -2440,6 +2493,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplacePantheon = function(){
+		CCSE.functionsTotal += 12;
 		var objKey = "Temple";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -2531,6 +2585,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.ReplaceGarden = function(){
+		CCSE.functionsTotal += 33;
 		var objKey = "Farm";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
@@ -3050,6 +3105,7 @@ CCSE.launch = function(){
 		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
 		if(!CCSE.config.vault) CCSE.config.vault = [];
 		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+		if(!CCSE.config.chimeType) CCSE.config.chimeType = 'No sound';
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3181,6 +3237,7 @@ CCSE.launch = function(){
 		if(hard){
 			CCSE.config.vault = [];
 			CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+			CCSE.config.chimeType = 'No sound';
 		} else {
 			for(var i in CCSE.config.permanentUpgrades){
 				if(CCSE.config.permanentUpgrades[i] != -1)
@@ -3376,6 +3433,20 @@ CCSE.launch = function(){
 		Game.upgradesToRebuild = 1;
 	}
 	
+	CCSE.NewShimmerSoundSelection = function(name, icon, defaultSound, shimmerTypes){
+		// name				What the game will display in the selector
+		// icon				An array [x, y, (optional)url] See how upgrades handle icons to get an idea
+		// defaultSound		The default sound to play for a shimmer spawn
+		// shimmerTypes		For different sounds for each shimmer type {golden:'soundUrl',reindeer:'differentSoundUrl'}
+		let sound = {name:name, icon:icon};
+		if(defaultSound) sound.default = defaultSound;
+		if(shimmerTypes) sound.shimmerTypes = shimmerTypes;
+		
+		Game.customUpgrades['Golden cookie sound selector'].choicesFunction.push(function(choices){
+			choices.push(sound);
+		});
+	}
+	
 	
 	/*=====================================================================================
 	Other
@@ -3432,6 +3503,41 @@ CCSE.launch = function(){
 		}
 	}
 	
+	CCSE.OverrideShimmerSoundSelector = function(choices){
+		let found = false; 
+		for(var i in choices){
+			let choice = choices[i];
+			if(choice.name == CCSE.config.chimeType){choice.selected = 1;found = true}
+			else choice.selected = false;
+		}
+		
+		// If the selected sound is from an unloaded mod, default to Chime
+		if(!found) choices[1].selected = 1;
+	}
+	
+	CCSE.GetSelectedShimmerSound = function(){
+		let choices = Game.Upgrades['Golden cookie sound selector'].choicesFunction();
+		let choice = choices[1];
+		for(var i in choices) if(choices[i].selected) choice = choices[i];
+		return choice;
+	}
+	
+	CCSE.SetSelectedShimmerSound = function(id){
+		Game.chimeType = (id ? 1 : 0); // Vanilla value will stay either 0 or 1
+		CCSE.config.chimeType = Game.Upgrades['Golden cookie sound selector'].choicesFunction()[id].name;
+	}
+	
+	CCSE.PlayShimmerSpawnSound = function(shimmerType){
+		if(Game.chimeType){ // Game.chimeType is 0 for No sound
+			let choice = CCSE.GetSelectedShimmerSound();
+			let sfx = '';
+			if(choice.shimmerTypes && choice.shimmerTypes[shimmerType] !== undefined) sfx = choice.shimmerTypes[shimmerType];
+			else if(choice.default) sfx = choice.default;
+			
+			PlaySound(sfx);
+		}
+	}
+	
 	
 	/*=====================================================================================
 	Confirmation Prompts
@@ -3464,6 +3570,21 @@ CCSE.launch = function(){
 			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
 		}
 		return proceed;
+	}
+	
+	/*  Doesn't work until the mods actually get loaded in order
+	CCSE.LaunchCCSEMod = function(func){
+		if(CCSE.isLoaded) func();
+		else CCSE.postLoadHooks.push(func);
+	}*/
+	
+	if(CCSE.Steam){
+		CCSE.GetModPath = (modName) => {
+			var mod = App.mods[modName];
+			return '../mods/' + (mod.local ? 'local' : 'workshop') + '/' + mod.path;
+		}
+		
+		CCSE.GetModFolder = (modName) => App.mods[modName].path;
 	}
 	
 	

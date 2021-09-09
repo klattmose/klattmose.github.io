@@ -127,9 +127,11 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">09/08/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">09/09/2021</div>' + 
 			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
 			'<div class="listing">&bull; Added hooks for Steam.modsPopup</div>' +
+			'<div class="listing">&bull; Added support for custom Golden cookie sound selector options</div>' +
+			'<div class="listing">&bull; Added support for custom Milk selector options</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
@@ -1207,6 +1209,12 @@ CCSE.launch = function(){
 			`// Game.DrawBackground injection point 0
 			for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();`, -1);
 		
+		// Setup for custom Milk Selector options
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;", 
+															'if (Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
+		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
+		
 		
 		// -----     Debug block     ----- //
 		
@@ -1763,7 +1771,7 @@ CCSE.launch = function(){
                 else `, -1);
 		
 		
-		// Golden cookie sound selector descFunc has a typo
+		// Golden cookie sound selector custom options
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "this.choicesFunction()[Game.chimeType]", "CCSE.GetSelectedShimmerSound()", 0);
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "'+icon[2]+'", "'+choice.icon[2]+'", 0);
 		
@@ -1781,6 +1789,20 @@ CCSE.launch = function(){
 		
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesPick", "Game.chimeType=id;", 
 			'CCSE.SetSelectedShimmerSound(id);', 0);
+		
+		
+		// Milk selector custom options
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].olddescFunc", "this.choicesFunction()[Game.milkType]", "CCSE.GetSelectedMilk()", 0);
+		
+		// Game.Upgrades['Milk selector'].choicesFunction
+		if(!Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesFunction", "return choices;", 
+			`// Game.customUpgrades['Milk selector'].choicesFunction injection point 0
+			for(var i in Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction[i](choices);
+			CCSE.OverrideMilkSelector(choices);`, -1);
+		
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesPick", "Game.milkType=id;", 
+			'CCSE.SetSelectedMilk(id);', 0);
 		
 		
 		// Permanent upgrades are tricky
@@ -3106,6 +3128,8 @@ CCSE.launch = function(){
 		if(!CCSE.config.vault) CCSE.config.vault = [];
 		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
 		if(!CCSE.config.chimeType) CCSE.config.chimeType = 'No sound';
+		if(!CCSE.config.milkType) CCSE.config.milkType = 'Automatic';
+		if(!CCSE.config.bgType) CCSE.config.bgType = 'Automatic';
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3238,6 +3262,8 @@ CCSE.launch = function(){
 			CCSE.config.vault = [];
 			CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
 			CCSE.config.chimeType = 'No sound';
+			CCSE.config.milkType = 'Automatic';
+			CCSE.config.bgType = 'Automatic';
 		} else {
 			for(var i in CCSE.config.permanentUpgrades){
 				if(CCSE.config.permanentUpgrades[i] != -1)
@@ -3447,6 +3473,80 @@ CCSE.launch = function(){
 		});
 	}
 	
+	CCSE.NewMilkSelection = function(name, icon, pic){
+		// name		What the game will display in the selector
+		// icon		An array [x, y, (optional)url] See how upgrades handle icons to get an idea
+		// pic		Url to your picture
+		
+		let milk = {name:name, icon:icon, milk:{pic:pic}, order:Game.AllMilks.length};
+		Game.customUpgrades['Milk selector'].choicesFunction.push(function(choices){
+			choices.push(milk);
+		});
+	}
+	
+	
+	/*=====================================================================================
+	Custom Selector helper functions
+	=======================================================================================*/
+	CCSE.OverrideShimmerSoundSelector = function(choices){
+		let found = false; 
+		for(var i in choices){
+			let choice = choices[i];
+			if(choice.name == CCSE.config.chimeType){choice.selected = 1;found = true}
+			else choice.selected = false;
+		}
+		
+		// If the selected sound is from an unloaded mod, default to Chime
+		if(!found) choices[1].selected = 1;
+	}
+	
+	CCSE.GetSelectedShimmerSound = function(){
+		let choices = Game.Upgrades['Golden cookie sound selector'].choicesFunction();
+		let choice = choices[1];
+		for(var i in choices) if(choices[i].selected) choice = choices[i];
+		return choice;
+	}
+	
+	CCSE.SetSelectedShimmerSound = function(id){
+		Game.chimeType = (id ? 1 : 0); // Vanilla value will stay either 0 or 1
+		CCSE.config.chimeType = Game.Upgrades['Golden cookie sound selector'].choicesFunction()[id].name;
+	}
+	
+	CCSE.PlayShimmerSpawnSound = function(shimmerType){
+		if(Game.chimeType){ // Game.chimeType is 0 for No sound
+			let choice = CCSE.GetSelectedShimmerSound();
+			let sfx = '';
+			if(choice.shimmerTypes && choice.shimmerTypes[shimmerType] !== undefined) sfx = choice.shimmerTypes[shimmerType];
+			else if(choice.default) sfx = choice.default;
+			
+			PlaySound(sfx);
+		}
+	}
+	
+	CCSE.OverrideMilkSelector = function(choices){
+		let found = false; 
+		for(var i in choices){
+			let choice = choices[i];
+			if(choice.name == CCSE.config.milkType){choice.selected = 1;found = true}
+			else choice.selected = false;
+		}
+		
+		// If the selected sound is from an unloaded mod, default to Automatic
+		if(!found) choices[0].selected = 1;
+	}
+	
+	CCSE.GetSelectedMilk = function(){
+		let choices = Game.Upgrades['Milk selector'].choicesFunction();
+		let choice = {milk:Game.Milk};
+		for(var i in choices) if(choices[i].selected) choice = choices[i];
+		return choice;
+	}
+	
+	CCSE.SetSelectedMilk = function(id){
+		Game.milkType = (id<Game.AllMilks.length ? id : 0); // Vanilla value defaults to 0 (Automatic)
+		CCSE.config.milkType = Game.Upgrades['Milk selector'].choicesFunction()[id].name;
+	}
+	
 	
 	/*=====================================================================================
 	Other
@@ -3500,41 +3600,6 @@ CCSE.launch = function(){
 					CCSE.config.permanentUpgrades[i] = -1;
 				}
 			}
-		}
-	}
-	
-	CCSE.OverrideShimmerSoundSelector = function(choices){
-		let found = false; 
-		for(var i in choices){
-			let choice = choices[i];
-			if(choice.name == CCSE.config.chimeType){choice.selected = 1;found = true}
-			else choice.selected = false;
-		}
-		
-		// If the selected sound is from an unloaded mod, default to Chime
-		if(!found) choices[1].selected = 1;
-	}
-	
-	CCSE.GetSelectedShimmerSound = function(){
-		let choices = Game.Upgrades['Golden cookie sound selector'].choicesFunction();
-		let choice = choices[1];
-		for(var i in choices) if(choices[i].selected) choice = choices[i];
-		return choice;
-	}
-	
-	CCSE.SetSelectedShimmerSound = function(id){
-		Game.chimeType = (id ? 1 : 0); // Vanilla value will stay either 0 or 1
-		CCSE.config.chimeType = Game.Upgrades['Golden cookie sound selector'].choicesFunction()[id].name;
-	}
-	
-	CCSE.PlayShimmerSpawnSound = function(shimmerType){
-		if(Game.chimeType){ // Game.chimeType is 0 for No sound
-			let choice = CCSE.GetSelectedShimmerSound();
-			let sfx = '';
-			if(choice.shimmerTypes && choice.shimmerTypes[shimmerType] !== undefined) sfx = choice.shimmerTypes[shimmerType];
-			else if(choice.default) sfx = choice.default;
-			
-			PlaySound(sfx);
 		}
 	}
 	

@@ -65,6 +65,11 @@ CCSE.launch = function(){
 		
 		
 		CCSE.playlist.push(function(){
+			CCSE.ReplaceGoldenCookieSound();
+			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
+		});
+		
+		CCSE.playlist.push(function(){
 			CCSE.ReplaceAchievementsStart();
 			requestAnimationFrame(CCSE.playlist[CCSE.track++]);
 		});
@@ -244,6 +249,17 @@ CCSE.launch = function(){
 		CCSE.functionsAltered++;
 		if(!CCSE.isLoaded) CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
+	}
+
+	CCSE.FindCodeInFunction = function(functionName, targetString, preEvalScript){
+		// preEvalScript is to set variables that are used in the function but aren't declared in the function
+		if(preEvalScript) eval(preEvalScript);
+		
+		var temp = eval(functionName + ".toString()");
+		
+		if (targetString instanceof RegExp){
+			return targetString.exec(temp);
+		}
 	}
 	
 	CCSE.InitNote = function(){
@@ -1835,6 +1851,55 @@ CCSE.launch = function(){
 		}
 		
 		for(var i in CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade[i](key, upgrade);
+	}
+
+	if(!CCSE.customGoldenCookieSounds) CCSE.customGoldenCookieSounds = [];
+	CCSE.ReplaceGoldenCookieSound = function(){
+		let customGoldenCookieFunction = `Game.Upgrades["Golden cookie sound selector"].choicesFunction`;
+		let customGoldenCookieRegex = /var choices=\[\];\r\n(.*)for/gs;
+		var temp = CCSE.FindCodeInFunction(customGoldenCookieFunction, customGoldenCookieRegex);
+		var temp = temp[1].split("\r\n");
+		for(var i=0;i<temp.length;i++){
+			let outer=((new RegExp(/.*choices\[(\d)\]=(.*);/gm)).exec(temp[i]));
+			if (outer) {
+				CCSE.customGoldenCookieSounds.push(eval("temp1="+outer[2]));
+			}
+		}
+
+		CCSE.PlaySoundForGoldenCookie = function(me) {
+			let snd = CCSE.customGoldenCookieSounds[Game.chimeType];
+			let sfx = null;
+			if(!sfx && snd.sfx && snd.sfx[me.type]) sfx = snd.sfx[me.type];
+			if(!sfx && snd.default) sfx = snd.default;
+			if(sfx) {
+				PlaySound(sfx);
+			}
+		}
+
+		CCSE.ReplaceCodeIntoFunction(customGoldenCookieFunction, customGoldenCookieRegex, "var choices=CCSE.customGoldenCookieSounds.map(a => Object.assign({}, a));\r\n\t\t\tfor", 0);
+		CCSE.ReplaceCodeIntoFunction(`Game.Upgrades["Golden cookie sound selector"].olddescFunc`, `url('+icon[2]+')`, `url('+choice.icon[2]+')`, 0);
+
+		let customGoldenCookieSoundRegex = /PlaySound\(['"](.*)['"]\)/;
+		for(var shimmerName in Game.shimmerTypes){
+			let method = `Game.shimmerTypes['${shimmerName}'].initFunc`;
+			CCSE.ReplaceCodeIntoFunction(method, " && Game.chimeType==1", "", 0);
+			let sfx = CCSE.FindCodeInFunction(method, customGoldenCookieSoundRegex);
+			if (sfx) {
+				sfx = sfx[1];
+				for (var i in CCSE.customGoldenCookieSounds) { 
+					let snd = CCSE.customGoldenCookieSounds[i];
+					if (snd.name == "Chime") {
+						if(!snd.sfx) snd.sfx = {};
+						snd.sfx[shimmerName] = sfx;
+					}
+				}
+			}
+			CCSE.ReplaceCodeIntoFunction(method, customGoldenCookieSoundRegex, "CCSE.PlaySoundForGoldenCookie(me)", 0);
+		}
+
+		CCSE.NewGoldenCookieSound = function(sound){
+			CCSE.customGoldenCookieSounds.push(sound);
+		}
 	}
 	
 	if(!CCSE.customReplaceAchievement) CCSE.customReplaceAchievement = [];

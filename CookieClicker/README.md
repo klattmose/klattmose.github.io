@@ -59,10 +59,10 @@ Disables Steam achievements.
 Adds a special object in the lower left (near Krumblor and Santa) that displays a countdown for buffs and shimmers.\
 Current version: 1.7
 
-### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js?v=1.6)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/HurricaneSugar.zip?v=1.6))
+### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/HurricaneSugar.zip?v=1.7))
 
 Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ripen to 1 second.\
-Current version: 1.6\
+Current version: 1.7\
 Disables Steam achievements.
 
 ### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.9)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip?v=1.9))

@@ -132,6 +132,7 @@ CCSE.launch = function(){
 			'</div><div class="subsection update small"><div class="title">09/10/2021</div>' + 
 			'<div class="listing">&bull; Added PasswordBox and CheckBox to MenuHelper</div>' +
 			'<div class="listing">&bull; Added function to append custom CSS styles</div>' +
+			'<div class="listing">&bull; Fixed bug in custom Background selector</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/09/2021</div>' + 
 			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
@@ -1228,16 +1229,15 @@ CCSE.launch = function(){
 		temp = temp.replace("Game.bgFade+'.jpg'", 'Game.bgFade');
 		temp = temp.replace("Game.BGsByChoice[Game.bgType]", 'choice');
 		temp = temp.replace("if (Game.bgType!=0 && Game.ascensionMode!=1)", 
-						`if (Game.ascensionMode!=1)
+						`Game.bg += '.jpg';
+						Game.bgFade += '.jpg';
+						
+						if (Game.ascensionMode!=1)
 						{
 							let choice = CCSE.GetSelectedBackground();
 							if(choice.name != 'Automatic')`);
 		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)", 
-							`else {
-								Game.bg += '.jpg';
-								Game.bgFade += '.jpg';
-							}
-						}
+							`}
 						Game.Background.fillPattern(Pic(Game.bg)`);
 		eval('Game.DrawBackground = ' + temp);
 		for(var i in Game.BGsByChoice) Game.BGsByChoice[i].pic += '.jpg';

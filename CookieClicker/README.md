@@ -48,10 +48,10 @@ Adds a firework themed season to the game.\
 Current version: 1.7\
 Disables Steam achievements.
 
-### [Decide Your Destiny](https://klattmose.github.io/CookieClicker/DecideDestiny.js?v=1.1)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/DecideDestiny.zip?v=1.1))
+### [Decide Your Destiny](https://klattmose.github.io/CookieClicker/DecideDestiny.js?v=1.2)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/DecideDestiny.zip?v=1.2))
 
 Take the reins of destiny into your own hands. Spend sugar lumps to choose the outcome of the next natural golden cookie.\
-Current version: 1.1\
+Current version: 1.2\
 Disables Steam achievements.
 
 ### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip?v=1.7))

@@ -1,6 +1,6 @@
 if(DecideDestiny === undefined) var DecideDestiny = {};
 DecideDestiny.name = 'Decide Your Destiny';
-DecideDestiny.version = '1.1';
+DecideDestiny.version = '1.2';
 DecideDestiny.GameVersion = '2.042';
 
 
@@ -29,24 +29,37 @@ DecideDestiny.init = function(){
 }
 
 DecideDestiny.save = function(){
-	let str = DecideDestiny.decidedDestiny;
+	let str = DecideDestiny.version;
+	str += ';' + DecideDestiny.decidedDestiny;
 	str += ',' + DecideDestiny.timesDecided;
 	
 	return str;
 }
 
 DecideDestiny.load = function(str){
-	console.log(str);
-	var spl = str.split(',');
+	var spl = str.split(';');
 	
-	DecideDestiny.decidedDestiny = parseInt(spl[0]||0);
-	DecideDestiny.timesDecided = parseInt(spl[1]||0);
+	if(spl.length == 1){ // Old save format
+		spl = str.split(',');
+		DecideDestiny.decidedDestiny = parseInt(spl[0]||0);
+		DecideDestiny.timesDecided = parseInt(spl[1]||0);
+		
+		if(DecideDestiny.decidedDestiny >= DecideDestiny.AllDestinies.length) DecideDestiny.decidedDestiny = 0;
+		DecideDestiny.decidedDestiny = DecideDestiny.AllDestinies[DecideDestiny.decidedDestiny].name;
+	} else {
+		str = spl;
+		let saveVersion = parseFloat(str[0]||0);
+		
+		spl = str[1].split(',');
+		DecideDestiny.decidedDestiny = (spl[0] ? spl[0] : DecideDestiny.AllDestinies[0].name);
+		DecideDestiny.timesDecided = parseInt(spl[1]||0);
+	}
 	
 	Game.Upgrades["Destiny decider"].priceLumps = DecideDestiny.calcCost();
 }
 
 DecideDestiny.reset = function(hard){
-	DecideDestiny.decidedDestiny = 0;
+	DecideDestiny.Undecide();
 	DecideDestiny.timesDecided = 0;
 	
 	Game.Upgrades["Destiny decider"].priceLumps = DecideDestiny.calcCost();
@@ -63,16 +76,17 @@ DecideDestiny.check = function(){
 
 DecideDestiny.InjectIntoGoldenCookie = function(){
 	Game.customShimmerTypes['golden'].customListPush.push(function(me, list){
-		if(DecideDestiny.decidedDestiny && !me.force && !Game.shimmerTypes['golden'].chain){
-			me.force = DecideDestiny.AllDestinies[DecideDestiny.decidedDestiny].effect;
+		if(DecideDestiny.decided() && !me.force && !Game.shimmerTypes['golden'].chain){
+			me.force = DecideDestiny.AllDestiniesByName[DecideDestiny.decidedDestiny].effect;
 			me.wrath = 0;
-			DecideDestiny.decidedDestiny = 0;
+			DecideDestiny.Undecide();
 			
 			DecideDestiny.hideSelectorBox();
 		}
 	});
 }
 
+DecideDestiny.AllDestiniesByName = {};
 DecideDestiny.AllDestinies = [
 	{name:'Undecided',        icon:[ 0, 7], effect:''},
 	{name:'Frenzy',           icon:[10,14], effect:'frenzy'},
@@ -89,6 +103,12 @@ DecideDestiny.AllDestinies = [
 	{name:'Elder frenzy',     icon:[29, 6], effect:'blood frenzy',     prereq:'Destiny: Apocalypse',     an:1},
 	{name:'Blab',             icon:[29, 8], effect:'blab',             prereq:'Destiny: Whimsy'}
 ];
+for(var i = 0; i < DecideDestiny.AllDestinies.length; i++){
+	let dest = DecideDestiny.AllDestinies[i];
+	dest.id = i;
+	DecideDestiny.AllDestiniesByName[dest.name] = dest;
+}
+
 
 DecideDestiny.CreateUpgrades = function(){
 	if(!loc) var loc = (str)=>str;
@@ -100,7 +120,7 @@ DecideDestiny.CreateUpgrades = function(){
 	upgrade.priceLumps = DecideDestiny.calcCost();
 	
 	upgrade.descFunc = function(){
-		var choice = DecideDestiny.AllDestinies[DecideDestiny.decidedDestiny];
+		var choice = DecideDestiny.AllDestiniesByName[DecideDestiny.RectifyDecision()];
 		return '<div style="text-align:center;">' + 
 			   loc("Current:") + ' ' + CCSE.MenuHelper.TinyIcon(choice.icon) + ' <b>' + choice.name + '</b>' + 
 			   '</div><div class="line"></div>' + 
@@ -117,11 +137,11 @@ DecideDestiny.CreateUpgrades = function(){
 				choices[i] = {name:temp.name, icon:temp.icon};
 				var neg = DecideDestiny.AllDestinies[i].negative?true:false;
 				
-				if(i == DecideDestiny.decidedDestiny){
+				if(temp.name == DecideDestiny.RectifyDecision()){
 					choices[i].selected = 1;
 					if(i) choices[i].name = 'Destiny Decided: ' + choices[i].name;
 				} else {
-					if(DecideDestiny.decidedDestiny) choices[i] = 0;
+					if(DecideDestiny.decided()) choices[i] = 0;
 					else{
 						choices[i].selected = 0;
 						choices[i].name += ' - ' + (neg?'gains ':'costs ') + '<span class="price lump' + ((neg||this.priceLumps<=Game.lumps) ? '' : ' disabled') + '">' + Beautify(Math.round((neg?1:this.priceLumps))) + '</span>';
@@ -138,19 +158,19 @@ DecideDestiny.CreateUpgrades = function(){
 	
 	upgrade.choicesPick = function(id){
 		// Don't do things for Undecided of if already decided
-		if(id > 0 && !DecideDestiny.decidedDestiny){
+		if(id > 0 && !DecideDestiny.decided()){
 			var choice = DecideDestiny.AllDestinies[id];
 			
 			if(choice.negative){
 				Game.gainLumps(1);
-				DecideDestiny.decidedDestiny = id;
+				DecideDestiny.decidedDestiny = choice.name;
 				
 				Game.Win('Tradeoff');
 				
 				DecideDestiny.hideSelectorBox();
 			} else {
 				Game.spendLump(DecideDestiny.calcCost(), 'decide your destiny will be a' + (choice.an?'n':'') + ' ' + choice.name, function(){
-					DecideDestiny.decidedDestiny = id;
+					DecideDestiny.decidedDestiny = choice.name;
 					DecideDestiny.timesDecided++;
 					upgrade.priceLumps = DecideDestiny.calcCost();
 					
@@ -193,8 +213,11 @@ DecideDestiny.CreateAchievements = function(){
 }
 
 DecideDestiny.isNegative = function(){
-	return DecideDestiny.AllDestinies[DecideDestiny.decidedDestiny].negative == 1;
+	return DecideDestiny.AllDestiniesByName[DecideDestiny.decidedDestiny].negative == 1;
 }
+
+DecideDestiny.decided = () => DecideDestiny.RectifyDecision() !== DecideDestiny.AllDestinies[0].name;
+DecideDestiny.Undecide = () => DecideDestiny.decidedDestiny = DecideDestiny.AllDestinies[0].name;
 
 DecideDestiny.calcCost = function(){
 	return Math.pow(2, DecideDestiny.timesDecided);
@@ -206,6 +229,31 @@ DecideDestiny.hideSelectorBox = function(){
 
 DecideDestiny.debugSpawn = function(){
 	Game.shimmerTypes["golden"].time = 100000;
+}
+
+
+//***********************************
+//    RECURSIVE MODDING?!
+//***********************************
+DecideDestiny.RectifyDecision = function(){
+	if(DecideDestiny.AllDestiniesByName[DecideDestiny.decidedDestiny]) return DecideDestiny.decidedDestiny;
+	else return DecideDestiny.AllDestinies[0].name;
+}
+
+DecideDestiny.NewDestiny = function(name, icon, effect, other){
+	// name, icon, and effect are required
+	// See DecideDestiny.AllDestinies for the other possible properties
+	if(!name || !icon || !effect) return;
+	
+	var dest = {name:name, icon:icon, effect:effect, id:DecideDestiny.AllDestinies.length};
+	
+	if(other){
+		for(var i in other) dest[i] = other[i];
+	}
+	
+	DecideDestiny.AllDestinies.push(dest);
+	DecideDestiny.AllDestiniesByName[name] = dest;
+	
 }
 
 

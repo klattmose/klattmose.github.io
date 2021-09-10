@@ -268,3 +268,5 @@ Anyone who gives a suggestion or bugfix, especially code that gets implemented i
 	* Assisting in making CCSE less strenuous on computers with fewer resources
 * [G lander](https://www.reddit.com/user/G-lander)
 	* Suggested using the prototype functions for upgrades instead of the individual functions
+* [EntranceJew](https://github.com/EntranceJew)
+	* Multiple code suggestions

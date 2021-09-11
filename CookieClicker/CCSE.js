@@ -260,7 +260,7 @@ CCSE.launch = function(){
 	
 	CCSE.InitNote = function(){
 		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 128 + 
+		CCSE.functionsTotal = 129 + 
 							(CCSE.Steam ? 4 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 26 + 
@@ -304,6 +304,7 @@ CCSE.launch = function(){
 		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		if(!Game.customInfoMenu) Game.customInfoMenu = [];
+		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "url(img/'+milk.pic+'.png)", "url(img/'+milk.pic+')", 0);
 		CCSE.SliceCodeIntoFunction('Game.UpdateMenu', -1, `
 			if(Game.onMenu == 'prefs'){
 				// Game.UpdateMenu injection point 0

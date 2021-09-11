@@ -13,6 +13,7 @@ CCSE: addLumpType
 
 **/
 
+CCSE.NewBackgroundSelection('Transcendant',[15,7],'starbg.jpg')
 
 var M = Game.Objects['Temple'].minigame;
 M.gods["decadence"].icon = [1,3,'https://klattmose.github.io/CookieClicker/img/customIcons.png'];

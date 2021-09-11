@@ -1,6 +1,6 @@
 # Cookie Clicker Script Extender (CCSE)
 
-*Current version : 2.027*
+*Current version : 2.028*
 
 **CCSE** is a modding framework for the game <code>https://orteil.dashnet.org/cookieclicker/</code>. On its own, it makes no changes to the game. Instead, it makes modding the game much easier.
 
@@ -218,6 +218,11 @@ CCSE sinks its grabby hooks into a huge number of the game's functions. I haven'
 Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
 
 ## Version History
+
+**09/11/2021 - (2.028)**
+* Added PasswordBox and CheckBox to MenuHelper
+* Added function to append custom CSS styles
+* Fixed bug in custom Background selector
 
 **09/09/2021 - (2.027)**
 * Added support for custom images for the Pantheon and Grimoire

@@ -1,6 +1,6 @@
 if(CCSE === undefined) var CCSE = {};
 CCSE.name = 'CCSE';
-CCSE.version = '2.027';
+CCSE.version = '2.028';
 CCSE.GameVersion = '2.031';
 CCSE.Steam = (typeof Steam !== 'undefined');
 
@@ -10,6 +10,7 @@ CCSE.launch = function(){
 	CCSE.init = function(){
 		CCSE.InitNote();
 		CCSE.InitializeConfig();
+		CCSE.AddCCSEStyles();
 		
 		// Define more parts of CCSE
 		CCSE.Backup = {};
@@ -127,6 +128,11 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">09/10/2021</div>' + 
+			'<div class="listing">&bull; Added PasswordBox and CheckBox to MenuHelper</div>' +
+			'<div class="listing">&bull; Added function to append custom CSS styles</div>' +
+			'<div class="listing">&bull; Fixed bug in custom Background selector</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/09/2021</div>' + 
 			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
@@ -1227,16 +1233,15 @@ CCSE.launch = function(){
 		temp = temp.replace("Game.bgFade+'.jpg'", 'Game.bgFade');
 		temp = temp.replace("Game.BGsByChoice[Game.bgType]", 'choice');
 		temp = temp.replace("if (Game.bgType!=0 && Game.ascensionMode!=1)", 
-						`if (Game.ascensionMode!=1)
+						`Game.bg += '.jpg';
+						Game.bgFade += '.jpg';
+						
+						if (Game.ascensionMode!=1)
 						{
 							let choice = CCSE.GetSelectedBackground();
 							if(choice.name != 'Automatic')`);
 		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)", 
-							`else {
-								Game.bg += '.jpg';
-								Game.bgFade += '.jpg';
-							}
-						}
+							`}
 						Game.Background.fillPattern(Pic(Game.bg)`);
 		eval('Game.DrawBackground = ' + temp);
 		for(var i in Game.BGsByChoice) Game.BGsByChoice[i].pic += '.jpg';
@@ -2007,6 +2012,48 @@ CCSE.launch = function(){
 		for(var i in CCSE.customReplaceAchievement) CCSE.customReplaceAchievement[i](key, achievement);
 	}
 	
+	CCSE.AddCCSEStyles = function(){
+		CCSE.AddStyles(`input.checkbox {
+		  margin: 4px;
+		  border: 3px solid transparent;
+		  border-image: url(img/frameBorder.png) 3 round;
+		  border-radius: 2px;
+		  box-shadow: 0px 0px 1px 2px rgba(0,0,0,0.5), 0px 2px 4px rgba(0,0,0,0.25), 0px 0px 6px 1px rgba(0,0,0,0.5) inset;
+		  transition: opacity 0.1s ease-out;
+		  vertical-align: middle;
+		  min-width: 2rem;
+		  min-height: 2rem;
+		  text-align: center;
+
+		  background: #000 url(img/darkNoise.jpg);
+		  background-image: url(img/shadedBordersSoft.png),url(img/darkNoise.jpg);
+		  background-size: 100% 100%,auto;
+		  background-color: #000;
+
+		  text-shadow: 0px 1px 1px #000;
+		  color: #ccc;
+		  line-height: 100%;
+
+		  display: inline-block;
+		  font-size: 12px;
+		  text-decoration: none;
+		  -webkit-appearance: none;
+
+		  position: relative;
+		}
+
+		input.checkbox:checked:after {
+		  content: '\\01F36A';
+		  font-size: 1.25rem;
+		  margin: auto;
+		  position: absolute;
+		  top: 50%;
+		  left: 50%;
+		  transform: translate(-50%,-50%);
+		  text-align: center;
+		}`);
+	}
+	
 	
 	/*=====================================================================================
 	Menu functions
@@ -2239,6 +2286,7 @@ CCSE.launch = function(){
 		ActionButton: (action, text) => '<a class="option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
 		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
 		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
+		PasswordBox: (id, width, value, onChange) => '<input type="password" id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
 		TinyIcon: (icon) => '<div class="icon" style="vertical-align:middle;display:inline-block;' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0]*48) + 'px ' + (-icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div>',
 		Slider: (slider, leftText, rightText, startValueFunction, callback, min, max, step) => {
 			if (!callback) callback = '';
@@ -2253,6 +2301,13 @@ CCSE.launch = function(){
 			else callback += "('" + prefName + "', '" + button + "', '" + on.replace("'","\\'") + "', '" + off.replace("'","\\'") + "', '" + invert + "');";
 			callback += "PlaySound('snd/tick.mp3');";
 			return '<a class="option' + ((config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="' + callback + '">' + (config[prefName] ? on : off) + '</a>';
+		},
+		CheckBox: (config, prefName, button, on, off, callback, invert) => {
+			var invert = invert ? 1 : 0;
+			if(!callback) callback = '';
+			else callback += "('" + prefName + "', '" + button + "', '" + on.replace("'","\\'") + "', '" + off.replace("'","\\'") + "', '" + invert + "');";
+			callback += "PlaySound('snd/tick.mp3');";
+			return '<input class="checkbox checkbox' + ((config[prefName]^invert) ? 'on' : ' off') + '" ' + (config[prefName] ? 'checked="checked"' : '') + ' type="checkbox" id="' + button + '" ' + Game.clickStr + '="' + callback + '"><label id="'+button+'_label" for="' + button + '">' + (config[prefName] ? on : off) + '</label>';
 		}
 		
 	}
@@ -3688,6 +3743,13 @@ CCSE.launch = function(){
 				}
 			}
 		}
+	}
+	
+	CCSE.AddStyles = function(content){
+		var style = document.createElement('style');
+		style.setAttribute('type', 'text/css');
+		style.innerHTML = content;
+		document.getElementsByTagName('head')[0].appendChild(style);
 	}
 	
 	

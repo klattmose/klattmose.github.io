@@ -3786,8 +3786,10 @@ CCSE.launch = function(){
 	
 	if(CCSE.Steam){
 		CCSE.GetModPath = (modName) => {
-			var mod = App.mods[modName];
-			return '../mods/' + (mod.local ? 'local' : 'workshop') + '/' + mod.path;
+			let mod = App.mods[modName];
+			let pos = mod.dir.lastIndexOf('\\');
+			if(pos == -1) return '../mods/' + (mod.local ? 'local' : 'workshop') + '/' + mod.path;
+			else return '../mods/' + mod.dir.substring(pos + 1);
 		}
 		
 		CCSE.GetModFolder = (modName) => App.mods[modName].path;

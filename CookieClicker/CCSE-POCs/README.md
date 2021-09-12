@@ -96,10 +96,10 @@ If your mod or add-on has configuration choices or other data you'd like to pers
 
 ```javascript
 CCSE.customSave.push(function(){
-	CCSE.save.OtherMods.MyMod = MyMod.config;
+	CCSE.config.OtherMods.MyMod = MyMod.config;
 });
 CCSE.customLoad.push(function(){
-	if(CCSE.save.OtherMods.MyMod) MyMod.config = CCSE.save.OtherMods.MyMod; else MyMod.config = {};
+	if(CCSE.config.OtherMods.MyMod) MyMod.config = CCSE.config.OtherMods.MyMod; else MyMod.config = {};
 	// Do other things if you want
 });
 ```

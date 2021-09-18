@@ -1,0 +1,11 @@
+{
+	"Name": "Predictable Plant Growth",
+	"ID": "Predictable Plant Growth",
+	"Author": "klattmose",
+	"Description": "Removes the random aspect of plant aging. Some plants will age faster than vanilla.",
+	"ModVersion": 1,
+	"GameVersion": 2.042,
+	"Date": "16/09/2021",
+	"Dependencies": ["CCSE"],
+	"Disabled": 1
+}

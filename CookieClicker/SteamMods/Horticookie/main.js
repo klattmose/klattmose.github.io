@@ -1,6 +1,6 @@
 if(Horticookie === undefined) var Horticookie = {};
 Horticookie.name = 'Horticookie';
-Horticookie.version = '3.18';
+Horticookie.version = '4.0';
 Horticookie.GameVersion = '2.042';
 
 Horticookie.launch = function(){
@@ -70,24 +70,25 @@ Horticookie.launch = function(){
 	//***********************************
 	Horticookie.defaultConfig = function(){
 		return {
-			autoHarvest:0,
-			allImmortal:0,
-			accelGarden:0
+			ahNew:0,
+			ahJuicy:0,
+			ahUpgrade:0
 		}
 	}
-
+	
 	Horticookie.togglePref = function(prefName, button, on, off, invert){
 		if (Horticookie.config[prefName]){
-			l(button).innerHTML = off;
+			l(button).removeAttribute('checked');
+			l(button + '_label').innerHTML = off;
 			Horticookie.config[prefName] = 0;
 		}else{
-			l(button).innerHTML = on;
+			l(button).setAttribute('checked','checked')
+			l(button + '_label').innerHTML = on;
 			Horticookie.config[prefName] = 1;
 		}
 		
 		if(Game.Objects['Farm'].minigameLoaded) Horticookie.applyPref(prefName);
 		
-		l(button).className = 'option' + ((Horticookie.config[prefName]^invert) ? '' : ' off');
 	}
 
 	Horticookie.applyPref = function(prefName){
@@ -120,9 +121,9 @@ Horticookie.launch = function(){
 
 	Horticookie.load = function(str){
 		var config = JSON.parse(str);
-		Horticookie.config.autoHarvest = config.autoHarvest;
-		Horticookie.config.allImmortal = config.allImmortal;
-		Horticookie.config.accelGarden = config.accelGarden;
+		Horticookie.config.ahNew = config.ahNew ? 1 : 0;
+		Horticookie.config.ahJuicy = config.ahJuicy ? 1 : 0;
+		Horticookie.config.ahUpgrade = config.ahUpgrade ? 1 : 0;
 		
 		if(Game.Objects["Farm"].minigameLoaded) for(var prefName in Horticookie.config) Horticookie.applyPref(prefName);
 	}
@@ -137,12 +138,14 @@ Horticookie.launch = function(){
 	//***********************************
 	Horticookie.getMenuString = function(){
 		let m = CCSE.MenuHelper;
+		let baseDir = 'https://klattmose.github.io/CookieClicker/';
 		
-		var str = m.Header("Helpers");
-		str += '<div class="listing">' + m.ToggleButton(Horticookie.config, 'autoHarvest', 'autoHarvestButton', 'Autoharvest ON', 'Autoharvest OFF', 'Horticookie.togglePref') + '<label>Automatically harvests mature interesting plants.</label></div>';
-		str += '<div class="listing">' + m.ToggleButton(Horticookie.config, 'allImmortal', 'allImmortalButton', 'Immortalize ON', 'Immortalize OFF', 'Horticookie.togglePref') + '<label>All plants are immortal.</label></div>';
-		str += '<div class="listing">' + m.ToggleButton(Horticookie.config, 'accelGarden', 'accelGardenButton', 'Accelerated Garden ON', 'Accelerated Garden OFF', 'Horticookie.togglePref') + '<label>Alters the randomFloor function to always give the higher result. Practical effect is no plant will take longer than 100 ticks to mature.</label></div>';
-		str += '<div class="listing"><small>A plant is considered Interesting if you lack its seed, if it\'s mature and you lack its upgrade, or if it\'s a Juicy Queenbeet. Danger is a chance of death or contamination.</small></div>';
+		var str = m.Header("Autoharvest");
+		str += '<div class="listing">' + m.CheckBox(Horticookie.config, 'ahNew', 'ahNewButton', '', '', 'Horticookie.togglePref') + '<label>Autoharvest mature plants that you don\'t have the seeds for.</label></div>';
+		str += '<div class="listing">' + m.CheckBox(Horticookie.config, 'ahJuicy', 'ahJuicyButton', '', '', 'Horticookie.togglePref') + '<label>Autoharvest mature Juicy Queenbeets.</label></div>';
+		str += '<div class="listing">' + m.CheckBox(Horticookie.config, 'ahUpgrade', 'ahUpgradeButton', '', '', 'Horticookie.togglePref') + '<label>Autoharvest plants that may unlock an upgrade.</label></div>';
+		str += '<div class="listing"><small>The Immortalize option has been split off into its own mod: <a href="' + baseDir + 'ImmortalGarden.js" target="_blank">Immortal Garden</a> (<a href="' + baseDir + 'SteamMods/ImmortalGarden.zip" target="_blank">Steam</a>).</small></div>';
+		str += '<div class="listing"><small>The Accelerated Garden option has been split off into its own mod: <a href="' + baseDir + 'PredictablePlantGrowth.js" target="_blank">Predictable Plant Growth</a> (<a href="' + baseDir + 'SteamMods/PredictablePlantGrowth.zip" target="_blank">Steam</a>).</small></div>';
 		
 		return str;
 	}
@@ -751,9 +754,11 @@ Horticookie.launch = function(){
 					var ps = Horticookie.plantStatus[plant.key];
 					
 					if(tile[1] >= plant.mature){
-						if(Horticookie.config.autoHarvest && (!plant.unlocked || plant.key == 'queenbeetLump' || !Horticookie.dropUnlocked(plant))){
-							M.clickTile(x, y);
-							Horticookie.recalcTileStatus();
+						if((Horticookie.config.ahNew && !plant.unlocked) || 
+						   (Horticookie.config.ahJuicy && plant.key == 'queenbeetLump') || 
+						   (Horticookie.config.ahUpgrade && !Horticookie.dropUnlocked(plant))){
+								M.clickTile(x, y);
+								Horticookie.recalcTileStatus();
 						}else{
 							ps.status = Math.max(ps.status, Horticookie.statusCodes.MATURE);
 						}
@@ -1032,10 +1037,10 @@ Horticookie.launch = function(){
 		});
 		
 		// Set up for Accelerated Garden
-		Game.customRandomFloor.push(function(x, ret){
+		/*Game.customRandomFloor.push(function(x, ret){
 			if(Horticookie.config.accelGarden) return Math.ceil(x);
 			else return ret;
-		});
+		});*/
 			
 	}
 

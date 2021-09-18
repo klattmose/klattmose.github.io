@@ -1,0 +1,11 @@
+{
+	"Name": "Immortal Garden",
+	"ID": "Immortal Garden",
+	"Author": "klattmose",
+	"Description": "Makes all plants immortal.",
+	"ModVersion": 1,
+	"GameVersion": 2.042,
+	"Date": "16/09/2021",
+	"Dependencies": ["CCSE"],
+	"Disabled": 1
+}

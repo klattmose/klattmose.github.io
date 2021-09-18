@@ -71,6 +71,18 @@ Adds a new building and an appropriate amount of upgrades and achievments.\
 Current version: 1.10\
 Disables Steam achievements.
 
+### [Immortal Garden](https://klattmose.github.io/CookieClicker/ImmortalGarden.js?v=1)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/ImmortalGarden.zip?v=1))
+
+Makes all Garden plants immortal.\
+Current version: 1\
+Disables Steam achievements.
+
+### [Predictable Plant Growth](https://klattmose.github.io/CookieClicker/PredictablePlantGrowth.js?v=1)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/PredictablePlantGrowth.zip?v=1))
+
+Removes the random aspect of Garden plant growth.\
+Current version: 1\
+Disables Steam achievements.
+
 ### Steam Achievement Enabler  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/SteamAchievementEnabler.zip?v=1.1))
 
 For cheating cheaters who cheat.\

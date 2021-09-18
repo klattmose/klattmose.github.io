@@ -132,7 +132,7 @@ CCSE.launch = function(){
 			
 			'</div><div class="subsection update small"><div class="title">09/18/2021</div>' + 
 			'<div class="listing">&bull; Fixed some upgrade descriptions breaking in localization</div>' +
-			'<div class="listing">&bull; Added hooks for Game.crate and Game.createTooltip</div>' +
+			'<div class="listing">&bull; Added hooks for Game.crate and Game.crateTooltip</div>' +
 			'<div class="listing">&bull; Custom links in the menu will now open in a browser rather than Steam</div>' +
 			'<div class="listing">&bull; Changed Game.Loader.Load injection to detect \'/\' instead of \'http\'</div>' +
 			

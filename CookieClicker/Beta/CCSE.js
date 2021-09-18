@@ -1,8 +1,9 @@
 if(CCSE === undefined) var CCSE = {};
+if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.028';
-CCSE.GameVersion = '2.031';
+CCSE.version = '2.029';
 CCSE.Steam = (typeof Steam !== 'undefined');
+CCSE.GameVersion = CCSE.Steam ? '2.042' : '2.031';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -128,6 +129,12 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">09/18/2021</div>' + 
+			'<div class="listing">&bull; Fixed some upgrade descriptions breaking in localization</div>' +
+			'<div class="listing">&bull; Added hooks for Game.crate and Game.createTooltip</div>' +
+			'<div class="listing">&bull; Custom links in the menu will now open in a browser rather than Steam</div>' +
+			'<div class="listing">&bull; Changed Game.Loader.Load injection to detect \'/\' instead of \'http\'</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/10/2021</div>' + 
 			'<div class="listing">&bull; Added PasswordBox and CheckBox to MenuHelper</div>' +
@@ -259,8 +266,10 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.InitNote = function(){
-		CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
-		CCSE.functionsTotal = 129 + 
+		if(CCSE.Steam) CCSE.iconURL = CCSE.GetModPath('CCSE') + '/CCSEicon.png';
+		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
+		
+		CCSE.functionsTotal = 133 + 
 							(CCSE.Steam ? 4 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 26 + 
@@ -305,7 +314,7 @@ CCSE.launch = function(){
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		if(!Game.customInfoMenu) Game.customInfoMenu = [];
 		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "url(img/'+milk.pic+'.png)", "url(img/'+milk.pic+')", 0);
-		CCSE.SliceCodeIntoFunction('Game.UpdateMenu', -1, `
+		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "l('menu').innerHTML=str;", `
 			if(Game.onMenu == 'prefs'){
 				// Game.UpdateMenu injection point 0
 				for(var i in Game.customOptionsMenu) Game.customOptionsMenu[i]();
@@ -322,7 +331,7 @@ CCSE.launch = function(){
 			// Any that don't want to fit into a label
 			// Game.UpdateMenu injection point 3
 			for(var i in Game.customMenu) Game.customMenu[i]();
-		`);
+		`, 1);
 		
 		
 		// Code specific to the Steam version
@@ -405,7 +414,7 @@ CCSE.launch = function(){
 		
 		// Game.Loader.Load
 		// To allow for images from outside the dashnet domain
-		CCSE.ReplaceCodeIntoFunction('Game.Loader.Load', 'img.src=this.domain', "img.src=(assets[i].indexOf('http')>=0?'':this.domain)", 0);
+		CCSE.ReplaceCodeIntoFunction('Game.Loader.Load', 'img.src=this.domain', "img.src=(assets[i].indexOf('/')>=0?'':this.domain)", 0);
 		
 		
 		// -----     Tooltips block     ----- //
@@ -424,6 +433,28 @@ CCSE.launch = function(){
 			// Game.tooltip.update injection point 0
 			for(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();
 			`);
+		
+		
+		// Game.crate
+		// Return ret to have no effect
+		if(!Game.customCrate) Game.customCrate = [];
+		CCSE.ReplaceCodeIntoFunction('Game.crate', 'return (Game', "var ret = (Game", 0);
+		CCSE.SliceCodeIntoFunction('Game.crate', -1, `
+			// Game.crate injection point 0
+			for(var i in Game.customCrate) ret = Game.customCrate[i](me, context, forceClickStr, id, ret);
+			return ret;
+		`);
+		
+		
+		// Game.crateTooltip
+		// Return ret to have no effect
+		if(!Game.customCrateTooltip) Game.customCrateTooltip = [];
+		CCSE.ReplaceCodeIntoFunction('Game.crateTooltip', 'return', "var ret = ", 0);
+		CCSE.SliceCodeIntoFunction('Game.crateTooltip', -1, `
+			// Game.crateTooltip injection point 0
+			for(var i in Game.customCrateTooltip) ret = Game.customCrateTooltip[i](me, context, ret);
+			return ret;
+		`);
 		
 		
 		// -----     Ascension block     ----- //
@@ -1220,12 +1251,15 @@ CCSE.launch = function(){
 		
 		// Setup for custom Milk Selector options
 		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
-		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
-															'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 		if(!Game.AllMilks){ // Browser compatibility
+			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
+																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 			Game.AllMilks = [];
 			for(var i in Game.MilksByChoice) Game.AllMilks.push(Game.MilksByChoice[i]);
-		}  
+		} else {
+			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;", 
+																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
+		}
 		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
 		
 		// Setup for custom Background Selector options
@@ -1834,7 +1868,7 @@ CCSE.launch = function(){
 			CCSE.OverrideMilkSelector(choices);`, -1);
 		
 		Game.customUpgrades['Milk selector'].choicesFunction.push(function(choices){
-			for(var i in choices) choices[i].milk = Game.AllMilks[i];
+			if(!CCSE.Steam) for(var i in choices) choices[i].milk = Game.AllMilks[i];
 			choices[0].milk = Game.Milk;
 		});
 		
@@ -1951,7 +1985,7 @@ CCSE.launch = function(){
 			}
 		}else{
 			upgrade.descFunc = function(){
-				var desc = this.desc;
+				var desc = this.ddesc ? this.ddesc : this.desc;
 				// Game.Upgrades['` + escKey + `'].descFunc injection point 0
 				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
 				return desc;
@@ -2196,7 +2230,7 @@ CCSE.launch = function(){
 			if(general){
 				special = document.createElement('div');
 				special.className = 'subsection';
-				special.innerHTML = '<div class="title">Special</div>';
+				special.innerHTML = '<div class="title">' + 'Special' + '</div>';
 				l('menu').insertBefore(special, subsections[1]);
 			}
 		}
@@ -2206,7 +2240,7 @@ CCSE.launch = function(){
 	
 	CCSE.AppendStatsVersionNumber = function(modName, versionString){
 		var general;
-		var str = '<b>' + modName + ' version :</b> ' + versionString;
+		var str = '<b>' + modName + ':</b> ' + versionString;
 		var div = document.createElement('div');
 		div.className = 'listing';
 		div.innerHTML = str;
@@ -2318,6 +2352,9 @@ CCSE.launch = function(){
 	Minigames
 	=======================================================================================*/
 	CCSE.MinigameReplacer = function(func, objKey){
+		if(!Game.customMinigameOnLoad) Game.customMinigameOnLoad = {};
+		if(!Game.customMinigameOnLoad[objKey]) Game.customMinigameOnLoad[objKey] = [];
+		
 		var me = Game.Objects[objKey];
 		if(me.minigameLoaded) func(me, 'minigameScript-' + me.id);
 		Game.customMinigameOnLoad[objKey].push(func);
@@ -3206,14 +3243,6 @@ CCSE.launch = function(){
 		else{ // Getting here from game function call
 			if(data){ // Has data in game save
 				CCSE.config = cautiousDecompress(data);
-			}else{ // Look for older save in local storage
-				if(Game.localStorageGet(CCSE.name)) str = unescape(Game.localStorageGet(CCSE.name));
-				
-				if(str != ''){
-					str = str.split('!END!')[0];
-					str = b64_to_utf8(str);
-					CCSE.config = cautiousDecompress(str);
-				}
 			}
 		}
 		
@@ -3288,6 +3317,8 @@ CCSE.launch = function(){
 		
 		Game.upgradesToRebuild = 1;
 		for(var i in CCSE.customLoad) CCSE.customLoad[i]();
+		
+		Game.Win('Third-party');
 	}
 	
 	CCSE.InitializeConfig = function(){
@@ -3398,6 +3429,7 @@ CCSE.launch = function(){
 		
 		me.CCSE = 1;
 		
+		if(typeof LocalizeUpgradesAndAchievs !== 'undefined') LocalizeUpgradesAndAchievs();
 		return me;
 	}
 	
@@ -3432,6 +3464,7 @@ CCSE.launch = function(){
 			}
 		}
 		
+		if(typeof LocalizeUpgradesAndAchievs !== 'undefined') LocalizeUpgradesAndAchievs();
 		return me;
 	}
 	
@@ -3802,6 +3835,18 @@ CCSE.launch = function(){
 		}
 		
 		CCSE.GetModFolder = (modName) => App.mods[modName].path;
+		
+		CCSE.MenuHelper.AutoVersion = (mod) => {
+			let func = function(){
+				let modInfo = Steam.mods[mod.id].info;
+				Game.customStatsMenu.push(function(){
+					CCSE.AppendStatsVersionNumber(modInfo.Name, modInfo.ModVersion);
+				});
+			}
+			
+			if(CCSE.isLoaded) func();
+			else CCSE.postLoadHooks.push(func);
+		}
 	}
 	
 	

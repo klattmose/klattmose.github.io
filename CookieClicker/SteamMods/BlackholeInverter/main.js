@@ -1,6 +1,6 @@
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.9';
+BlackholeInverter.version = '1.10';
 BlackholeInverter.GameVersion = '2.042';
 
 BlackholeInverter.launch = function(){
@@ -14,7 +14,7 @@ BlackholeInverter.launch = function(){
 			1,
 			1,
 			{
-				base:'../' + modDir + '/blackholeinverter',
+				base: modDir + '/blackholeinverter',
 				xV:8,
 				yV:32,
 				w:128,

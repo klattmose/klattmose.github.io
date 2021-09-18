@@ -1,7 +1,7 @@
 if(TimerWidget === undefined) var TimerWidget = {};
 TimerWidget.name = 'Timer Widget';
 TimerWidget.pic = '/timer.png';
-TimerWidget.version = '1.7';
+TimerWidget.version = '1.8';
 TimerWidget.GameVersion = '2.042';
 
 TimerWidget.launch = function(){
@@ -27,7 +27,7 @@ TimerWidget.launch = function(){
 		CCSE.CreateSpecialObject('timer', 
 			function(){return true;}, 
 			function(picframe){
-				picframe.pic = '../' + TimerWidget.pic;
+				picframe.pic = TimerWidget.pic;
 				picframe.frame = 0;
 			}, 
 			TimerWidget.ToggleSpecialMenu

@@ -3,7 +3,7 @@
 	"ID": "Timer Widget",
 	"Author": "klattmose",
 	"Description": "A widget in the bottom left that shows the time remaining on buffs and eta on the next Golden Cookie",
-	"ModVersion": 1.7,
+	"ModVersion": 1.8,
 	"GameVersion": 2.042,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],

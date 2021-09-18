@@ -10,10 +10,10 @@ A comprehensive list of the mods I have made for this game.
 
 A browser extension to manage and automatically load javascript mods and add-ons for this game.
 
-### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js?v=2.028)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/CCSE.zip?v=2.028))
+### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js?v=2.029)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/CCSE.zip?v=2.029))
 
 A modding framework that other mods can use to simplify the modding process. [Documentation](https://klattmose.github.io/CookieClicker/CCSE-POCs/)\
-Current version: 2.028
+Current version: 2.029
 
 ### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js?v=2.8)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/FortuneCookie.zip?v=2.8))
 
@@ -54,10 +54,10 @@ Take the reins of destiny into your own hands. Spend sugar lumps to choose the o
 Current version: 1.2\
 Disables Steam achievements.
 
-### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip?v=1.7))
+### [Timer Widget](https://klattmose.github.io/CookieClicker/CCSE-POCs/TimerWidget.js?v=1.8)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/TimerWidget.zip?v=1.8))
 
 Adds a special object in the lower left (near Krumblor and Santa) that displays a countdown for buffs and shimmers.\
-Current version: 1.7
+Current version: 1.8
 
 ### [Hurricane Sugar](https://klattmose.github.io/CookieClicker/CCSE-POCs/HurricaneSugar.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/HurricaneSugar.zip?v=1.7))
 
@@ -65,10 +65,10 @@ Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ri
 Current version: 1.7\
 Disables Steam achievements.
 
-### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.9)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip?v=1.9))
+### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.10)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip?v=1.10))
 
 Adds a new building and an appropriate amount of upgrades and achievments.\
-Current version: 1.9\
+Current version: 1.10\
 Disables Steam achievements.
 
 ### Steam Achievement Enabler  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/SteamAchievementEnabler.zip?v=1.1))

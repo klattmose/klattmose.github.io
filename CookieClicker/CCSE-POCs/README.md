@@ -221,7 +221,7 @@ Any bug or suggestion should be **opened as an issue** [in the repository](https
 
 **09/18/2021 - (2.029)**
 * Fixed upgrade descriptions breaking in localization
-* Added hooks for Game.crate and Game.createTooltip
+* Added hooks for Game.crate and Game.crateTooltip
 * Custom links in the menu will now open in a browser rather than Steam
 * Changed Game.Loader.Load injection to detect '/' instead of 'http'
 

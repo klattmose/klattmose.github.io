@@ -90,7 +90,7 @@ KlattmoseUtilities.launch = function(){
 			  "shift": false,
 			  "alt": false,
 			  "period": "500",
-			  "script": "Game.shimmers.forEach(function(shimmer) { if (shimmer.type == \"golden\" || shimmer.type == \"reindeer\") { shimmer.pop() } })"
+			  "script": "Game.shimmers.forEach(function(shimmer){shimmer.pop()})"
 			},
 			{
 			  "keyCode": 99,

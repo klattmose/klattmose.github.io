@@ -26,10 +26,10 @@ Create an unlimited amount of fully customizable hotkeys.\
 Current version: 2.16\
 Disables Steam achievements.
 
-### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js?v=3.18)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Horticookie.zip?v=3.18))
+### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js?v=4.0)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Horticookie.zip?v=4.0))
 
 A helper tool for the Garden minigame.\
-Current version: 3.18
+Current version: 4.0
 
 ### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js?v=1.10)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/IdleTrading.zip?v=1.10))
 

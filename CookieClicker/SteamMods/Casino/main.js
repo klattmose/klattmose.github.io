@@ -7,7 +7,7 @@ Casino.launcher = function(){
 	M.parent = Game.Objects['Chancemaker'];
 	M.parent.minigame = M;
 	M.loadedCount = 0;
-	M.version = '3.15';
+	M.version = '3.16';
 	M.GameVersion = '2.042';
 	
 	
@@ -1062,10 +1062,12 @@ Casino.launcher = function(){
 	});
 	
 	M.LoadSave = function(){
-		if(CCSE.config.OtherMods[M.name]) M.parent.minigameSave = CCSE.config.OtherMods[M.name];
-		M.saveString = M.parent.minigameSave;
-		
-		M.load(M.saveString);
+		if(M.load){
+			if(CCSE.config.OtherMods[M.name]) M.parent.minigameSave = CCSE.config.OtherMods[M.name];
+			M.saveString = M.parent.minigameSave;
+			
+			M.load(M.saveString);
+		}
 	}
 	
 	

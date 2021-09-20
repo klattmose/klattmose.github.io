@@ -36,10 +36,10 @@ Current version: 4.0
 A helper tool for the Market minigame.\
 Current version: 1.10
 
-### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js?v=3.15)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Casino.zip?v=3.15))
+### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js?v=3.16)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/Casino.zip?v=3.16))
 
 Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies.\
-Current version: 3.15\
+Current version: 3.16\
 Disables Steam achievements.
 
 ### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js?v=1.7)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/AmericanSeason.zip?v=1.7))

@@ -3,7 +3,7 @@
 	"ID": "Casino",
 	"Author": "klattmose",
 	"Description": "Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies. Disables Steam achievements.",
-	"ModVersion": 3.15,
+	"ModVersion": 3.16,
 	"GameVersion": 2.042,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],

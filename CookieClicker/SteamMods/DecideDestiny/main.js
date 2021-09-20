@@ -1,6 +1,6 @@
 if(DecideDestiny === undefined) var DecideDestiny = {};
 DecideDestiny.name = 'Decide Your Destiny';
-DecideDestiny.version = '1.2';
+DecideDestiny.version = '1.3';
 DecideDestiny.GameVersion = '2.042';
 
 
@@ -59,7 +59,7 @@ DecideDestiny.load = function(str){
 }
 
 DecideDestiny.reset = function(hard){
-	DecideDestiny.Undecide();
+	if(hard) DecideDestiny.Undecide();
 	DecideDestiny.timesDecided = 0;
 	
 	Game.Upgrades["Destiny decider"].priceLumps = DecideDestiny.calcCost();

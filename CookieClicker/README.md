@@ -65,10 +65,10 @@ Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ri
 Current version: 1.7\
 Disables Steam achievements.
 
-### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.10)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip?v=1.10))
+### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.11)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/BlackholeInverter.zip?v=1.11))
 
 Adds a new building and an appropriate amount of upgrades and achievments.\
-Current version: 1.10\
+Current version: 1.11\
 Disables Steam achievements.
 
 ### [Immortal Garden](https://klattmose.github.io/CookieClicker/ImmortalGarden.js?v=1)  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/ImmortalGarden.zip?v=1))

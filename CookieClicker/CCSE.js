@@ -1,7 +1,7 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.029';
+CCSE.version = '2.030';
 CCSE.Steam = (typeof Steam !== 'undefined');
 CCSE.GameVersion = CCSE.Steam ? '2.042' : '2.031';
 
@@ -9,6 +9,7 @@ CCSE.launch = function(){
 	CCSE.loading = 1;
 	
 	CCSE.init = function(){
+		CCSE.init = 0;
 		CCSE.InitNote();
 		CCSE.InitializeConfig();
 		CCSE.AddCCSEStyles();
@@ -83,9 +84,6 @@ CCSE.launch = function(){
 	CCSE.finalize = function(){
 		// Load any custom save data and inject save functions
 		if(!Game.modSaveData[CCSE.name]) CCSE.load();
-		// Game.customSave.push(CCSE.save);
-		// Game.customLoad.push(function(){CCSE.load();});
-		// Game.customReset.push(CCSE.Reset); Nevermind
 		
 		
 		// Inject menu functions
@@ -118,6 +116,11 @@ CCSE.launch = function(){
 		CCSE.loading = 0;
 		
 		if(CCSE.postLoadHooks) for(var i in CCSE.postLoadHooks) CCSE.postLoadHooks[i]();
+		if(CCSE.Steam){
+			Game.loadModData = CCSE.GameLoadModData;
+			CCSE.LaunchOtherMods();
+			if(CCSE.gameHasLoadedSave) Game.loadModData();
+		}
 	}
 	
 	
@@ -130,10 +133,16 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
+			'</div><div class="subsection update small"><div class="title">09/26/2021</div>' + 
+			'<div class="listing">&bull; Steam version: Will now initialize before other mods</div>' +
+			'<div class="listing">&bull; Fixed getting permanent upgrades on a Born Again ascension</div>' +
+			'<div class="listing">&bull; Fixed breaking Game.NewUpgradeCookie</div>' +
+			'<div class="listing">&bull; Reset custom upgrades, achievements, etc. managed by CCSE on game reset even if the mod generating them isn\'t loaded</div>' +
+			
 			'</div><div class="subsection update small"><div class="title">09/18/2021</div>' + 
+			'<div class="listing">&bull; Steam version: Custom links in the menu will now open in a browser rather than Steam</div>' +
 			'<div class="listing">&bull; Fixed some upgrade descriptions breaking in localization</div>' +
 			'<div class="listing">&bull; Added hooks for Game.crate and Game.crateTooltip</div>' +
-			'<div class="listing">&bull; Custom links in the menu will now open in a browser rather than Steam</div>' +
 			'<div class="listing">&bull; Changed Game.Loader.Load injection to detect \'/\' instead of \'http\'</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/10/2021</div>' + 
@@ -142,8 +151,8 @@ CCSE.launch = function(){
 			'<div class="listing">&bull; Fixed bug in custom Background selector</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/09/2021</div>' + 
+			'<div class="listing">&bull; Steam version: Added hooks for Steam.modsPopup</div>' +
 			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
-			'<div class="listing">&bull; Added hooks for Steam.modsPopup</div>' +
 			'<div class="listing">&bull; Added support for custom Golden cookie sound selector options</div>' +
 			'<div class="listing">&bull; Added support for custom Milk selector options</div>' +
 			'<div class="listing">&bull; Added support for custom Background selector options</div>' +
@@ -269,7 +278,7 @@ CCSE.launch = function(){
 		if(CCSE.Steam) CCSE.iconURL = CCSE.GetModPath('CCSE') + '/CCSEicon.png';
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
-		CCSE.functionsTotal = 133 + 
+		CCSE.functionsTotal = 134 + 
 							(CCSE.Steam ? 4 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 26 + 
@@ -965,7 +974,14 @@ CCSE.launch = function(){
 		
 		
 		// Game.NewUpgradeCookie
-		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0);
+		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0, CCSE.Steam ? 
+			`var strCookieProductionMultiplierPlus=loc("Cookie production multiplier <b>+%1%</b>.",'[x]');
+			var getStrCookieProductionMultiplierPlus=function(x)
+			{return strCookieProductionMultiplierPlus.replace('[x]',x);}` : 0);
+		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'return upgrade;', 'Game.cookieUpgrades.push(upgrade);', -1, CCSE.Steam ? 
+			`var strCookieProductionMultiplierPlus=loc("Cookie production multiplier <b>+%1%</b>.",'[x]');
+			var getStrCookieProductionMultiplierPlus=function(x)
+			{return strCookieProductionMultiplierPlus.replace('[x]',x);}` : 0);
 		
 		
 		// -----     Seasons block     ----- //
@@ -2108,7 +2124,7 @@ CCSE.launch = function(){
 		if(menu){
 			menu = menu.getElementsByClassName('subsection')[0];
 			if(menu){
-				var padding = menu.getElementsByTagName('div');
+				var padding = menu.childNodes;
 				padding = padding[padding.length - 1];
 				if(padding){
 					menu.insertBefore(div, padding);
@@ -2311,7 +2327,7 @@ CCSE.launch = function(){
 		if(menu){
 			var about = menu.getElementsByClassName('subsection')[0];
 			if(about){
-				menu.childNodes[1].insertBefore(div, about);
+				about.parentNode.insertBefore(div, about);
 			}
 		}
 	}
@@ -3145,6 +3161,7 @@ CCSE.launch = function(){
 				saved.totalCookies = me.totalCookies;
 				saved.level = me.level;
 				saved.muted = me.muted;
+				saved.highest = me.highest;
 				saved.free = me.free;
 				
 				if(Game.isMinigameReady(me)) saved.minigameSave = me.minigame.save(); else saved.minigameSave = '';
@@ -3269,6 +3286,7 @@ CCSE.launch = function(){
 				me.totalCookies = saved.totalCookies;
 				me.level = saved.level;
 				me.muted = saved.muted;
+				me.highest = saved.highest ? saved.highest : 0; // Left this out earlier, can't expect it to be there
 				me.free = saved.free ? saved.free : 0; // Left this out earlier, can't expect it to be there
 				
 				me.minigameSave = saved.minigameSave;
@@ -3394,6 +3412,40 @@ CCSE.launch = function(){
 	}*/
 	
 	CCSE.reset = function(hard){
+		for(var name in CCSE.config.Buildings){
+			var me = CCSE.config.Buildings[name];
+			me.amount=0;me.bought=0;me.highest=0;me.free=0;me.totalCookies=0;
+			me.onMinigame = false;
+			if(hard) me.muted=0;
+			me.pics=[];
+		}
+		
+		for(var name in CCSE.config.Achievements){
+			if(hard) CCSE.config.Achievements[name].won = 0;
+		}
+		
+		for(var name in CCSE.config.Upgrades){
+			var me = CCSE.config.Upgrades[name];
+			me.bought = 0;
+			me.unlocked = 0;
+		}
+		
+		for(var name in CCSE.config.Buffs){
+			var buff = CCSE.config.Buffs[name];
+			buff.time = 0;
+			buff.maxTime = 0;
+			buff.arg1 = 0;
+			buff.arg2 = 0;
+			buff.arg3 = 0;
+		}
+		
+		for(var name in CCSE.config.Seasons){
+			var season = CCSE.config.Seasons[name];
+			season.lastTime = Date.now();
+			season.T = 0;
+		}
+		
+		
 		if(hard){
 			CCSE.config.vault = [];
 			CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
@@ -3401,12 +3453,14 @@ CCSE.launch = function(){
 			CCSE.config.milkType = 'Automatic';
 			CCSE.config.bgType = 'Automatic';
 		} else {
+			if(Game.ascensionMode != 1){
 			for(var i in CCSE.config.permanentUpgrades){
 				if(CCSE.config.permanentUpgrades[i] != -1)
 					if(Game.Upgrades[CCSE.config.permanentUpgrades[i]])
 						Game.Upgrades[CCSE.config.permanentUpgrades[i]].earn();
 			}
 		}
+	}
 	}
 	
 	
@@ -3500,6 +3554,7 @@ CCSE.launch = function(){
 			me.totalCookies = saved.totalCookies;
 			me.level = saved.level;
 			me.muted = saved.muted;
+			me.highest = saved.highest ? saved.highest : 0; // Left this out earlier, can't expect it to be there
 			me.free = saved.free ? saved.free : 0; // Left this out earlier, can't expect it to be there
 			me.minigameSave = saved.minigameSave;
 			
@@ -3512,6 +3567,8 @@ CCSE.launch = function(){
 			saved.totalCookies = 0;
 			saved.level = 0;
 			saved.muted = 0;
+			saved.free = 0;
+			saved.highest = 0;
 			saved.minigameSave = '';
 			
 			CCSE.config.Buildings[name] = saved;
@@ -3853,7 +3910,17 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Start your engines
 	=======================================================================================*/
-	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)) Game.registerMod(CCSE.name, CCSE); // Calls CCSE.init();
+	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)){
+		Game.registerMod(CCSE.name, CCSE);
+		
+		if(CCSE.Steam){
+			CCSE.LaunchOtherMods = Game.launchMods;
+			Game.launchMods = CCSE.init;
+			
+			CCSE.GameLoadModData = Game.loadModData;
+			Game.loadModData = function(){CCSE.gameHasLoadedSave=1;}
+		}
+	} 
 }
 
 if(!CCSE.isLoaded && !CCSE.loading) CCSE.launch();

@@ -1,6 +1,6 @@
 # Cookie Clicker Script Extender (CCSE)
 
-*Current version : 2.029*
+*Current version : 2.030*
 
 **CCSE** is a modding framework for the game <code>https://orteil.dashnet.org/cookieclicker/</code>. On its own, it makes no changes to the game. Instead, it makes modding the game much easier.
 
@@ -218,6 +218,12 @@ CCSE sinks its grabby hooks into a huge number of the game's functions. I haven'
 Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
 
 ## Version History
+
+**09/26/2021 - (2.030)**
+* Steam version: Will now initialize before other mods
+* Fixed getting permanent upgrades on a Born Again ascension
+* Fixed breaking Game.NewUpgradeCookie
+* Reset custom upgrades, achievements, etc. managed by CCSE on game reset even if the mod generating them isn't loaded
 
 **09/18/2021 - (2.029)**
 * Fixed upgrade descriptions breaking in localization

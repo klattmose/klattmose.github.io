@@ -3,7 +3,7 @@
 	"ID": "CCSE",
 	"Author": "klattmose",
 	"Description": "A modding framework.",
-	"ModVersion": 2.029,
+	"ModVersion": 2.030,
 	"GameVersion": 2.042,
 	"Date": "1/09/2021",
 	"Dependencies": [],

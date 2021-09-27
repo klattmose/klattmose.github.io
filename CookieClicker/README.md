@@ -83,6 +83,11 @@ Removes the random aspect of Garden plant growth.\
 Current version: 1\
 Disables Steam achievements.
 
+### Mod Menu Tweaks  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/ModMenuTweaks.zip?v=1.0))
+
+Double-click to enable/disable mods. Drag-and-drop reordering. Dynamic height resizing based on mod list length.\
+Current version: 1.0
+
 ### Steam Achievement Enabler  ([Steam](https://klattmose.github.io/CookieClicker/SteamMods/SteamAchievementEnabler.zip?v=1.1))
 
 For cheating cheaters who cheat.\

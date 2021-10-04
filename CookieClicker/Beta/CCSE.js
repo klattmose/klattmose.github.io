@@ -134,7 +134,7 @@ CCSE.launch = function(){
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">10/04/2021</div>' + 
-			'<div class="listing">&bull; Fixed bug that was preventing custom buildings, upgrades, and achievements from being saved</div>' +
+			'<div class="listing">&bull; Fixed bug that was preventing custom buildings, upgrades, and achievements from being saved in some circumstances</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/26/2021</div>' + 
 			'<div class="listing">&bull; Steam version: Will now initialize before other mods</div>' +

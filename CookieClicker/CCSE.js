@@ -1,7 +1,7 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.030';
+CCSE.version = '2.031';
 CCSE.Steam = (typeof Steam !== 'undefined');
 CCSE.GameVersion = CCSE.Steam ? '2.042' : '2.031';
 
@@ -132,6 +132,9 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">10/04/2021</div>' + 
+			'<div class="listing">&bull; Fixed bug that was preventing custom buildings, upgrades, and achievements from being saved in some circumstances</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">09/26/2021</div>' + 
 			'<div class="listing">&bull; Steam version: Will now initialize before other mods</div>' +
@@ -354,19 +357,19 @@ CCSE.launch = function(){
 			if(!Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions = [];
 			CCSE.SliceCodeIntoFunction('Steam.modsPopup', -1, `
 				// Steam.modsPopup injection point 0
-				for(var i in Game.customModsPopup) Game.customModsPopup[i](selectedMod);
+				for(var i in Game.customModsPopup) Game.customModsPopup[i](selectedMod, mods);
 			`);
 			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "return okay;", 
 				`// Steam.modsPopup injection point 1
-				for(var i in Game.customModsPopupCheckModDependencies) okay = Game.customModsPopupCheckModDependencies[i](okay, mod, loadedMods, selectedMod);
+				for(var i in Game.customModsPopupCheckModDependencies) okay = Game.customModsPopupCheckModDependencies[i](okay, mod, loadedMods, selectedMod, mods);
 				`, -1);
 			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "updateModOptions();", 
 				`// Steam.modsPopup injection point 2
-				for(var i in Game.customModsPopupUpdateModList) Game.customModsPopupUpdateModList[i](selectedMod);
+				for(var i in Game.customModsPopupUpdateModList) Game.customModsPopupUpdateModList[i](selectedMod, mods);
 				`, -1);
 			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");', 
 				`// Steam.modsPopup injection point 3
-				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod);
+				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod, mods);
 				`, 1);
 		}
 		
@@ -3231,7 +3234,7 @@ CCSE.launch = function(){
 	
 	if(!CCSE.customLoad) CCSE.customLoad = [];
 	CCSE.load = function(data, isBase64){
-		CCSE.config = null;
+		var config;
 		var str = '';
 		
 		var cautiousDecompress = function(data){
@@ -3254,17 +3257,18 @@ CCSE.launch = function(){
 			if(str != ''){
 				str = str.split('!END!')[0];
 				str = b64_to_utf8(str);
-				CCSE.config = cautiousDecompress(str);
+				config = cautiousDecompress(str);
 			}
 		} 
 		else{ // Getting here from game function call
 			if(data){ // Has data in game save
-				CCSE.config = cautiousDecompress(data);
+				config = cautiousDecompress(data);
 			}
 		}
 		
 		
-		CCSE.InitializeConfig();
+		CCSE.InitializeConfig(config);
+		
 		
 		if(CCSE.config.version != CCSE.version){
 			//l('logButton').classList.add('hasUpdate');
@@ -3339,7 +3343,7 @@ CCSE.launch = function(){
 		Game.Win('Third-party');
 	}
 	
-	CCSE.InitializeConfig = function(){
+	CCSE.InitializeConfig = function(config){
 		if(!CCSE.config) CCSE.config = {};
 		if(!CCSE.config.version) CCSE.config.version = 1;
 		if(!CCSE.config.Achievements) CCSE.config.Achievements = {};
@@ -3353,6 +3357,21 @@ CCSE.launch = function(){
 		if(!CCSE.config.chimeType) CCSE.config.chimeType = 'No sound';
 		if(!CCSE.config.milkType) CCSE.config.milkType = 'Automatic';
 		if(!CCSE.config.bgType) CCSE.config.bgType = 'Automatic';
+		
+		if(config){
+			if(config.version) CCSE.config.version = config.version;
+			if(config.Achievements)		 for(var i in config.Achievements)		CCSE.config.Achievements[i] = config.Achievements[i];
+			if(config.Upgrades)			 for(var i in config.Upgrades)			CCSE.config.Upgrades[i] = config.Upgrades[i];
+			if(config.Buildings)		 for(var i in config.Buildings)			CCSE.config.Buildings[i] = config.Buildings[i];
+			if(config.Buffs)			 for(var i in config.Buffs)				CCSE.config.Buffs[i] = config.Buffs[i];
+			if(config.Seasons)			 for(var i in config.Seasons)			CCSE.config.Seasons[i] = config.Seasons[i];
+			if(config.OtherMods)		 for(var i in config.OtherMods)			CCSE.config.OtherMods[i] = config.OtherMods[i];
+			if(config.vault)			 for(var i in config.vault)				CCSE.config.vault[i] = config.vault[i];
+			if(config.permanentUpgrades) for(var i in config.permanentUpgrades) CCSE.config.permanentUpgrades[i] = config.permanentUpgrades[i];
+			if(config.chimeType) CCSE.config.chimeType = config.chimeType;
+			if(config.milkType)  CCSE.config.milkType = config.milkType;
+			if(config.bgType)    CCSE.config.bgType = config.bgType;
+		}
 	}
 	
 	// These two kept for people who might be blindsided by the save format change

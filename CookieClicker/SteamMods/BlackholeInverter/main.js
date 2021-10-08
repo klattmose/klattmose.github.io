@@ -1,6 +1,6 @@
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.11';
+BlackholeInverter.version = '1.12';
 BlackholeInverter.GameVersion = '2.042';
 
 BlackholeInverter.launch = function(){
@@ -47,7 +47,7 @@ BlackholeInverter.launch = function(){
 		
 		
 		// Upgrades
-		var last; var order = 1400; var i = 0;
+		var last; var i = 0; var order = BlackholeInverter.getTieredUpgradeOrder();
 		Game.TieredUpgrade('Blacker holes', '<q>Bigger and blacker.</q>', 'Black hole inverter', 1); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Blackest holes', '<q>The biggest and blackest.</q>', 'Black hole inverter', 2); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Vantablack holes', '<q>The universe doesn\'t care about some idiot\'s copyright.</q>', 'Black hole inverter', 3); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
@@ -60,16 +60,16 @@ BlackholeInverter.launch = function(){
 		Game.TieredUpgrade('Accretion disco', '<q>Everybody dance now!</q>', 'Black hole inverter', 10); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Gravitational waves', '<q>What\'s better that one black hole? Two of them put together!</q>', 'Black hole inverter', 11); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
-		order = 256;
+		order = BlackholeInverter.getGrandmaUpgradeOrder();
 		last = Game.GrandmaSynergy('Heavy grandmas', 'A dense grandma to accrete more cookies.', 'Black hole inverter'); last.order = order;
 		
-		order = 5001
+		order = BlackholeInverter.getSynergyUpgradeOrder();
 		last = Game.SynergyUpgrade('Daring pilots', "<q>You've never heard of the Millennium Falcon? It's the ship that made the Kessel Run in less than twelve parsecs.</q>", 'Black hole inverter', 'Shipment', 'synergy1'); last.icon[2] = iconsURL; last.order = order;
 		last = Game.SynergyUpgrade('General relativity', '<q>Space is time. Time is space</q>', 'Black hole inverter', 'Time machine', 'synergy2'); last.icon[2] = iconsURL; last.order = order + 0.01;
 		
 		
 		// Achievements
-		order = 2400; i = 0;
+		order = BlackholeInverter.getAchievementOrder(); i = 0;
 		last = Game.TieredAchievement('Single singularity', '', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Penrose diagram', '', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Schwarzschild', '', 'Black hole inverter', 3); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
@@ -82,7 +82,6 @@ BlackholeInverter.launch = function(){
 		last = Game.TieredAchievement('Sagittarius A*', '', 'Black hole inverter', 10); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Hey now, you\'re a dead star', '', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
-		//order = 2420; i = 0;
 		last = Game.ProductionAchievement('Relativistic jets', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.ProductionAchievement('Primordial black holes', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.ProductionAchievement('Naked singularity', 'Black hole inverter', 3); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
@@ -104,6 +103,63 @@ BlackholeInverter.launch = function(){
 		
 		if (Game.prefs.popups) Game.Popup(BlackholeInverter.name + ' loaded!');
 		else Game.Notify(BlackholeInverter.name + ' loaded!', '', '', 1, 1);
+	}
+	
+	
+	BlackholeInverter.getTieredUpgradeOrder = function(){
+		function isNumber(n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+		
+		var res = 0;
+		for(var i = 0; i < Game.ObjectsN; i++){
+			var me = Game.ObjectsById[i];
+			for(var ii in me.tieredUpgrades){
+				if(isNumber(ii)) res = Math.max(me.tieredUpgrades[ii].order, res);
+			}
+		}
+		
+		return res + 0.01;
+	}
+	
+	BlackholeInverter.getGrandmaUpgradeOrder = function(){
+		var res = 0;
+		for(var i in Game.GrandmaSynergies){
+			res = Math.max(Game.Upgrades[Game.GrandmaSynergies[i]].order, res);
+		}
+		
+		return res + 0.01;
+	}
+	
+	BlackholeInverter.getSynergyUpgradeOrder = function(){
+		var res = 0;
+		for(var i = 0; i < Game.ObjectsN; i++){
+			var me = Game.ObjectsById[i];
+			for(var ii in me.synergies){
+				res = Math.max(me.synergies[ii].order, res);
+			}
+		}
+		
+		return res + 0.01;
+	}
+	
+	BlackholeInverter.getAchievementOrder = function(){
+		var res = 0;
+		for(var i = 0; i < Game.ObjectsN-1; i++){
+			var me = Game.ObjectsById[i];
+			
+			for(var ii in me.tieredAchievs){
+				res = Math.max(me.tieredAchievs[ii].order, res);
+			}
+			
+			for(var ii in me.productionAchievs){
+				res = Math.max(me.productionAchievs[ii].achiev.order, res);
+			}
+			
+			if(me.levelAchiev10) res = Math.max(me.levelAchiev10.order, res);
+		}
+		
+		return res + 0.01;
 	}
 	
 	

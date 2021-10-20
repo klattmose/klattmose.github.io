@@ -1332,10 +1332,10 @@ CCSE.launch = function(){
 		Game.customShimmerTypes[key].durationMult.push(CCSE.customShimmerTypesAlldurationMult);
 		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", 'me.dur=dur;', 
 					`// Game.shimmerTypes['` + escKey + `'].initFunc injection point 0
-					for(var i in Game.customShimmerTypes['` + escKey + `'].durationMult) dur *= Game.customShimmerTypes['` + escKey + `'].durationMult[i]();`, -1);
+					for(var i in Game.customShimmerTypes['` + escKey + `'].durationMult) dur *= Game.customShimmerTypes['` + escKey + `'].durationMult[i](me);`, -1);
 		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", -1, `
 					// Game.shimmerTypes['` + escKey + `'].initFunc injection point 1
-					for(var i in Game.customShimmerTypes['` + escKey + `'].initFunc) Game.customShimmerTypes['` + escKey + `'].initFunc[i]();
+					for(var i in Game.customShimmerTypes['` + escKey + `'].initFunc) Game.customShimmerTypes['` + escKey + `'].initFunc[i](me);
 				`);
 		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", 'Game.chimeType==1 && ', '', 0);
 		
@@ -1345,7 +1345,7 @@ CCSE.launch = function(){
 		Game.customShimmerTypes[key].updateFunc.push(CCSE.customShimmerTypesAllupdateFunc);
 		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].updateFunc", -1, `
 					// Game.shimmerTypes['` + escKey + `'].updateFunc injection point 0
-					for(var i in Game.customShimmerTypes['` + escKey + `'].updateFunc) Game.customShimmerTypes['` + escKey + `'].updateFunc[i]();
+					for(var i in Game.customShimmerTypes['` + escKey + `'].updateFunc) Game.customShimmerTypes['` + escKey + `'].updateFunc[i](me);
 				`);
 		
 		
@@ -1354,7 +1354,7 @@ CCSE.launch = function(){
 		Game.customShimmerTypes[key].popFunc.push(CCSE.customShimmerTypesAllpopFunc);
 		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].popFunc", -1, `
 					// Game.shimmerTypes['` + escKey + `'].popFunc injection point 0
-					for(var i in Game.customShimmerTypes['` + escKey + `'].popFunc) Game.customShimmerTypes['` + escKey + `'].popFunc[i]();
+					for(var i in Game.customShimmerTypes['` + escKey + `'].popFunc) Game.customShimmerTypes['` + escKey + `'].popFunc[i](me);
 				`);
 		
 		

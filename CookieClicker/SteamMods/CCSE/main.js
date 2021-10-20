@@ -690,25 +690,25 @@ CCSE.launch = function(){
 		if(!Game.customShimmerTypesAll) Game.customShimmerTypesAll = {};
 		
 		if(!Game.customShimmerTypesAll.initFunc) Game.customShimmerTypesAll.initFunc = [];
-		CCSE.customShimmerTypesAllinitFunc = function(){
-			for(var i in Game.customShimmerTypesAll.initFunc) Game.customShimmerTypesAll.initFunc[i]();
+		CCSE.customShimmerTypesAllinitFunc = function(me){
+			for(var i in Game.customShimmerTypesAll.initFunc) Game.customShimmerTypesAll.initFunc[i](me);
 		}
 		
 		if(!Game.customShimmerTypesAll.durationMult) Game.customShimmerTypesAll.durationMult = [];
-		CCSE.customShimmerTypesAlldurationMult = function(){
+		CCSE.customShimmerTypesAlldurationMult = function(me){
 			var dur = 1;
-			for(var i in Game.customShimmerTypesAll.durationMult) dur *= Game.customShimmerTypesAll.durationMult[i]();
+			for(var i in Game.customShimmerTypesAll.durationMult) dur *= Game.customShimmerTypesAll.durationMult[i](me);
 			return dur;
 		}
 		
 		if(!Game.customShimmerTypesAll.updateFunc) Game.customShimmerTypesAll.updateFunc = [];
-		CCSE.customShimmerTypesAllupdateFunc = function(){
-			for(var i in Game.customShimmerTypesAll.updateFunc) Game.customShimmerTypesAll.updateFunc[i]();
+		CCSE.customShimmerTypesAllupdateFunc = function(me){
+			for(var i in Game.customShimmerTypesAll.updateFunc) Game.customShimmerTypesAll.updateFunc[i](me);
 		}
 		
 		if(!Game.customShimmerTypesAll.popFunc) Game.customShimmerTypesAll.popFunc = [];
-		CCSE.customShimmerTypesAllpopFunc = function(){
-			for(var i in Game.customShimmerTypesAll.popFunc) Game.customShimmerTypesAll.popFunc[i]();
+		CCSE.customShimmerTypesAllpopFunc = function(me){
+			for(var i in Game.customShimmerTypesAll.popFunc) Game.customShimmerTypesAll.popFunc[i](me);
 		}
 		
 		if(!Game.customShimmerTypesAll.spawnConditions) Game.customShimmerTypesAll.spawnConditions = [];

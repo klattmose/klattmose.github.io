@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Adds a new building and an appropriate amount of upgrades and achievments. Disables Steam achievements.",
 	"ModVersion": 1.12,
-	"GameVersion": 2.042,
+	"GameVersion": 2.043,
 	"Date": "1/09/2021",
 	"LanguagePacks": ["lang.js"],
 	"Dependencies": ["CCSE"],

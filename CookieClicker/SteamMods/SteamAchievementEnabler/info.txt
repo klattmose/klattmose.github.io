@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Enables Steam achievements.",
 	"ModVersion": 1.1,
-	"GameVersion": 2.042,
+	"GameVersion": 2.043,
 	"Date": "2/09/2021",
 	"Dependencies": [],
 	"Disabled": 1

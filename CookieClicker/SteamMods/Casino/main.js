@@ -8,7 +8,7 @@ Casino.launcher = function(){
 	M.parent.minigame = M;
 	M.loadedCount = 0;
 	M.version = '3.16';
-	M.GameVersion = '2.042';
+	M.GameVersion = '2.043';
 	
 	
 	M.launch = function(){

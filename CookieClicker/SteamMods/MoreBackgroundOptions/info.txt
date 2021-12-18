@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Adds more options to the Background selector.",
 	"ModVersion": 1,
-	"GameVersion": 2.042,
+	"GameVersion": 2.043,
 	"Date": "11/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1,

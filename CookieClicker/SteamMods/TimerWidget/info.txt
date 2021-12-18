@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "A widget in the bottom left that shows the time remaining on buffs and eta on the next Golden Cookie",
 	"ModVersion": 1.8,
-	"GameVersion": 2.042,
+	"GameVersion": 2.043,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1,

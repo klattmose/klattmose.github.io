@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Spend sugar lumps to choose the outcome of the next natural golden cookie. Disables Steam achievements.",
 	"ModVersion": 1.3,
-	"GameVersion": 2.042,
+	"GameVersion": 2.043,
 	"Date": "6/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1

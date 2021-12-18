@@ -3,7 +3,7 @@ if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
 CCSE.version = '2.031';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.042' : '2.031';
+CCSE.GameVersion = CCSE.Steam ? '2.043' : '2.031';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -282,7 +282,7 @@ CCSE.launch = function(){
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
 		CCSE.functionsTotal = 134 + 
-							(CCSE.Steam ? 4 : 0) +
+							(CCSE.Steam ? (4 - 2) : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 26 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
@@ -325,7 +325,8 @@ CCSE.launch = function(){
 		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		if(!Game.customInfoMenu) Game.customInfoMenu = [];
-		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "url(img/'+milk.pic+'.png)", "url(img/'+milk.pic+')", 0);
+		
+		if(!CCSE.Steam) CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "url(img/'+milk.pic+'.png)", "url(img/'+milk.pic+')", 0);
 		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "l('menu').innerHTML=str;", `
 			if(Game.onMenu == 'prefs'){
 				// Game.UpdateMenu injection point 0
@@ -1269,7 +1270,7 @@ CCSE.launch = function(){
 			for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();`, -1);
 		
 		// Setup for custom Milk Selector options
-		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
+		if(!CCSE.Steam) CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
 		if(!Game.AllMilks){ // Browser compatibility
 			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
 																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
@@ -1279,7 +1280,7 @@ CCSE.launch = function(){
 			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;", 
 																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 		}
-		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
+		if(!CCSE.Steam)  for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
 		
 		// Setup for custom Background Selector options
 		temp = Game.DrawBackground.toString();
@@ -2342,7 +2343,7 @@ CCSE.launch = function(){
 		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
 		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
 		PasswordBox: (id, width, value, onChange) => '<input type="password" id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
-		TinyIcon: (icon) => '<div class="icon" style="vertical-align:middle;display:inline-block;' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0]*48) + 'px ' + (-icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div>',
+		TinyIcon: (icon) => '<div class="icon" style="vertical-align:middle;display:inline-block;' + writeIcon(icon) + ';transform:scale(0.5);margin:-16px;"></div>',
 		Slider: (slider, leftText, rightText, startValueFunction, callback, min, max, step) => {
 			if (!callback) callback = '';
 			if (!min) min = 0;

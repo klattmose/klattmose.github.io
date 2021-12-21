@@ -1,6 +1,6 @@
 if(FortuneCookie === undefined) var FortuneCookie = {};
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.8';
+FortuneCookie.version = '2.10';
 FortuneCookie.GameVersion = '2.043';
 
 FortuneCookie.launch = function(){
@@ -195,7 +195,7 @@ FortuneCookie.launch = function(){
 
 	FortuneCookie.forecastMembrane = function(context, offset){
 		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + Game.reindeerClicked + offset));
-		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + Game.reindeerClicked + offset));
+		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
 		
 		if (Math.random() < 0.1){
 			return true;
@@ -409,7 +409,7 @@ FortuneCookie.launch = function(){
 		var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0); // + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
 		
 		switch(spell.name){
-			case "Force the Hand of Fate":
+			case loc("Force the Hand of Fate"):
 				backfire += 0.15 * FortuneCookie.getSimGCs();
 			
 				spellOutcome = spellOutcome.replace('<br/>', '<span style="color:yellow;">This spell is a bit complicated. See the Options menu for an explanation.</span><br/>') + 
@@ -430,7 +430,7 @@ FortuneCookie.launch = function(){
 				spellOutcome += '</table></div>';
 				break;
 			
-			case "Spontaneous Edifice":
+			case loc("Spontaneous Edifice"):
 				while(spellsCast < target){
 					Math.seedrandom(Game.seed + '/' + spellsCast);
 					if(Math.random() < (1 - backfire)){
@@ -451,7 +451,7 @@ FortuneCookie.launch = function(){
 							spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No buildings to improve!</span><br/>';
 						}else{
 							var building = choose(buildings);
-							spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
+							spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + loc(building.name) + '</span><br/>';
 						}
 					}else{
 						if (Game.BuildingsOwned == 0){
@@ -463,7 +463,7 @@ FortuneCookie.launch = function(){
 									buildings.push(Game.Objects[i]);
 							}
 							var building=choose(buildings);
-							spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
+							spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + loc(building.name) + '</span><br/>';
 						}
 					}
 					spellsCast += 1;
@@ -471,7 +471,7 @@ FortuneCookie.launch = function(){
 				}
 				break;
 				
-			case "Gambler's Fever Dream":
+			case loc("Gambler's Fever Dream"):
 				while(spellsCast < target){
 					Math.seedrandom(Game.seed + '/' + spellsCast);
 					
@@ -493,13 +493,13 @@ FortuneCookie.launch = function(){
 						Math.seedrandom(Game.seed + '/' + (spellsCast + 1));
 						if(Math.random() < (1 - gfdBackfire)){
 							spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
-							if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, true) + ')';
-							if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, true) + ')';
+							if(gfdSpell.name == loc("Force the Hand of Fate")) spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, true) + ')';
+							if(gfdSpell.name == loc("Spontaneous Edifice")) spellOutcome += ' (' + loc(FortuneCookie.gamblerEdificeChecker(spellsCast + 1, true)) + ')';
 							spellOutcome += '</span><br/>';
 						}else{
 							spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
-							if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, false) + ')';
-							if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, false) + ')';
+							if(gfdSpell.name == loc("Force the Hand of Fate")) spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, false) + ')';
+							if(gfdSpell.name == loc("Spontaneous Edifice")) spellOutcome += ' (' + loc(FortuneCookie.gamblerEdificeChecker(spellsCast + 1, false)) + ')';
 							spellOutcome += '</span><br/>';
 						}
 					}
@@ -509,7 +509,7 @@ FortuneCookie.launch = function(){
 				}
 				break;
 				
-			case "Conjure Baked Goods":
+			case loc("Conjure Baked Goods"):
 				while(spellsCast < target){
 					Math.seedrandom(Game.seed + '/' + spellsCast);
 					if(Math.random() < (1 - backfire)){

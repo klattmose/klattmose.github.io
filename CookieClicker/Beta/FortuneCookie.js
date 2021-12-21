@@ -204,7 +204,7 @@ FortuneCookie.launch = function(){
 
 	FortuneCookie.forecastMembrane = function(context, offset){
 		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + Game.reindeerClicked + offset));
-		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + Game.reindeerClicked + offset));
+		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
 		
 		if (Math.random() < 0.1){
 			return true;

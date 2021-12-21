@@ -3,7 +3,7 @@
 	"ID": "Fortune Cookie",
 	"Author": "klattmose",
 	"Description": "Predict the outcome of any spell in the Grimoire.",
-	"ModVersion": 2.8,
+	"ModVersion": 2.10,
 	"GameVersion": 2.043,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],

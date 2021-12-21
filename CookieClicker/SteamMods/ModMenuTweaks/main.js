@@ -67,6 +67,37 @@ MMT.init = function(){
 		Game.UpdatePrompt();
 	});
 	
+	Game.customWorkshopPopupUpdatePublishedModsPopup.push(function(response){
+		if(response && response.list){
+			let updatePromptHeight = function(){
+				
+				// Get the game scale
+				var w = window.innerWidth;
+				var h = window.innerHeight;
+				var scale = Math.min(
+					w / Math.max(800, w), 
+					h / Math.max(200, h),
+				);
+				
+				// Get the height of the other elements of the prompt besides the modDisplay
+				let otherPromptHeight = l('prompt').scrollHeight - l('modDisplay').parentNode.scrollHeight;
+				otherPromptHeight *= scale;
+				
+				let modListHeight = response.list.length * l('modDisplay').childNodes[0].scrollHeight;
+				modListHeight = Math.min(modListHeight, (window.innerHeight - otherPromptHeight - 200) / scale);
+				modListHeight = Math.max(modListHeight, 0);
+				
+				l('modDisplay').style.height = modListHeight + "px";
+			}
+			
+			if(Game.promptUpdateFunc) updatePromptHeight();
+			else Game.promptUpdateFunc = updatePromptHeight;
+			
+			Game.UpdatePrompt();
+		}
+		
+	});
+	
 	// Too many locally defined functions to do this easily any other way
 	CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "Game.Prompt", 
 			`MMT.mods = mods;

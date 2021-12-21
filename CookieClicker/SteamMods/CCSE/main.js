@@ -1,7 +1,7 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.031';
+CCSE.version = '2.032';
 CCSE.Steam = (typeof Steam !== 'undefined');
 CCSE.GameVersion = CCSE.Steam ? '2.043' : '2.031';
 
@@ -282,7 +282,7 @@ CCSE.launch = function(){
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
 		CCSE.functionsTotal = 134 + 
-							(CCSE.Steam ? (4 - 2) : 0) +
+							(CCSE.Steam ? (7 - 2) : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 26 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
@@ -371,6 +371,23 @@ CCSE.launch = function(){
 			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");', 
 				`// Steam.modsPopup injection point 3
 				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod, mods);
+				`, 1);
+			
+			// Steam.workshopPopup
+			if(!Game.customWorkshopPopup) Game.customWorkshopPopup = [];
+			if(!Game.customWorkshopPopupUpdateModDisplay) Game.customWorkshopPopupUpdateModDisplay = [];
+			if(!Game.customWorkshopPopupUpdatePublishedModsPopup) Game.customWorkshopPopupUpdatePublishedModsPopup = [];
+			CCSE.SliceCodeIntoFunction('Steam.workshopPopup', -1, `
+				// Steam.customWorkshopPopup injection point 0
+				for(var i in Game.customWorkshopPopup) Game.customWorkshopPopup[i](selectedMod, selectedModPath);
+			`);
+			CCSE.ReplaceCodeIntoFunction('Steam.workshopPopup', "Game.UpdatePrompt();", 
+				`// Steam.customWorkshopPopup injection point 1
+				for(var i in Game.customWorkshopPopupUpdateModDisplay) Game.customWorkshopPopupUpdateModDisplay[i](selectedMod, el);
+				`, 1);
+			CCSE.ReplaceCodeIntoFunction('Steam.workshopPopup', "else l('modDisplay').innerHTML=`<div style=\"font-size:11px;margin:8px;\">(${loc(\"none\")})</div>`;", 
+				`// Steam.customWorkshopPopup injection point 2
+				for(var i in Game.customWorkshopPopupUpdatePublishedModsPopup) Game.customWorkshopPopupUpdatePublishedModsPopup[i](response);
 				`, 1);
 		}
 		

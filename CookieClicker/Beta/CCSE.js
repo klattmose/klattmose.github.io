@@ -1,9 +1,9 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.031';
+CCSE.version = '2.032';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.042' : '2.031';
+CCSE.GameVersion = CCSE.Steam ? '2.043' : '2.044';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -281,8 +281,8 @@ CCSE.launch = function(){
 		if(CCSE.Steam) CCSE.iconURL = CCSE.GetModPath('CCSE') + '/CCSEicon.png';
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
-		CCSE.functionsTotal = 134 + 
-							(CCSE.Steam ? 4 : 0) +
+		CCSE.functionsTotal = 132 + 
+							(CCSE.Steam ? 7 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 26 + 
 							Game.AchievementsN * 1; // Needs to be manually updated
@@ -325,7 +325,7 @@ CCSE.launch = function(){
 		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		if(!Game.customInfoMenu) Game.customInfoMenu = [];
-		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "url(img/'+milk.pic+'.png)", "url(img/'+milk.pic+')", 0);
+		
 		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "l('menu').innerHTML=str;", `
 			if(Game.onMenu == 'prefs'){
 				// Game.UpdateMenu injection point 0
@@ -370,6 +370,23 @@ CCSE.launch = function(){
 			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");', 
 				`// Steam.modsPopup injection point 3
 				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod, mods);
+				`, 1);
+			
+			// Steam.workshopPopup
+			if(!Game.customWorkshopPopup) Game.customWorkshopPopup = [];
+			if(!Game.customWorkshopPopupUpdateModDisplay) Game.customWorkshopPopupUpdateModDisplay = [];
+			if(!Game.customWorkshopPopupUpdatePublishedModsPopup) Game.customWorkshopPopupUpdatePublishedModsPopup = [];
+			CCSE.SliceCodeIntoFunction('Steam.workshopPopup', -1, `
+				// Steam.customWorkshopPopup injection point 0
+				for(var i in Game.customWorkshopPopup) Game.customWorkshopPopup[i](selectedMod, selectedModPath);
+			`);
+			CCSE.ReplaceCodeIntoFunction('Steam.workshopPopup', "Game.UpdatePrompt();", 
+				`// Steam.customWorkshopPopup injection point 1
+				for(var i in Game.customWorkshopPopupUpdateModDisplay) Game.customWorkshopPopupUpdateModDisplay[i](selectedMod, el);
+				`, 1);
+			CCSE.ReplaceCodeIntoFunction('Steam.workshopPopup', "else l('modDisplay').innerHTML=`<div style=\"font-size:11px;margin:8px;\">(${loc(\"none\")})</div>`;", 
+				`// Steam.customWorkshopPopup injection point 2
+				for(var i in Game.customWorkshopPopupUpdatePublishedModsPopup) Game.customWorkshopPopupUpdatePublishedModsPopup[i](response);
 				`, 1);
 		}
 		
@@ -978,9 +995,9 @@ CCSE.launch = function(){
 		
 		// Game.NewUpgradeCookie
 		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0, CCSE.Steam ? 
-			`var strCookieProductionMultiplierPlus=loc("Cookie production multiplier <b>+%1%</b>.",'[x]');
-			var getStrCookieProductionMultiplierPlus=function(x)
-			{return strCookieProductionMultiplierPlus.replace('[x]',x);}` : 0);
+		`var strCookieProductionMultiplierPlus=loc("Cookie production multiplier <b>+%1%</b>.",'[x]');
+		var getStrCookieProductionMultiplierPlus=function(x)
+		{return strCookieProductionMultiplierPlus.replace('[x]',x);}` : 0);
 		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'return upgrade;', 'Game.cookieUpgrades.push(upgrade);', -1, CCSE.Steam ? 
 			`var strCookieProductionMultiplierPlus=loc("Cookie production multiplier <b>+%1%</b>.",'[x]');
 			var getStrCookieProductionMultiplierPlus=function(x)
@@ -1269,17 +1286,8 @@ CCSE.launch = function(){
 			for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();`, -1);
 		
 		// Setup for custom Milk Selector options
-		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
-		if(!Game.AllMilks){ // Browser compatibility
-			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
-																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
-			Game.AllMilks = [];
-			for(var i in Game.MilksByChoice) Game.AllMilks.push(Game.MilksByChoice[i]);
-		} else {
-			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;", 
-																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
-		}
-		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;", 
+															'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 		
 		// Setup for custom Background Selector options
 		temp = Game.DrawBackground.toString();
@@ -2114,26 +2122,27 @@ CCSE.launch = function(){
 	=======================================================================================*/
 	CCSE.AppendOptionsMenu = function(inp){
 		// Accepts inputs of either string or div
-		var div;
+		var div = document.createElement('div');
+		div.className = "framed";
+		div.style= "margin:4px 48px;";
+		div.innerHTML = '<div class="block" style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
+		var div2 = div.children[0].children[0];
+		
 		if(typeof inp == 'string'){
-			div = document.createElement('div');
-			div.innerHTML = inp;
+			div2.innerHTML = inp;
 		}
 		else{
-			div = inp;
+			div2.appendChild(inp);
 		}
 		
 		var menu = l('menu');
 		if(menu){
-			menu = menu.getElementsByClassName('subsection')[0];
-			if(menu){
-				var padding = menu.childNodes;
-				padding = padding[padding.length - 1];
-				if(padding){
-					menu.insertBefore(div, padding);
-				} else {
-					menu.appendChild(div);
-				}
+			var padding = menu.childNodes;
+			padding = padding[padding.length - 1];
+			if(padding){
+				menu.insertBefore(div, padding);
+			} else {
+				menu.appendChild(div);
 			}
 		}
 	}
@@ -2202,7 +2211,7 @@ CCSE.launch = function(){
 		var subsections = l('menu').getElementsByClassName('subsection');
 		
 		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('General')){
 				general = subsections[i];
 				break;
 			}
@@ -2229,7 +2238,7 @@ CCSE.launch = function(){
 		var subsections = l('menu').getElementsByClassName('subsection');
 		
 		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'Special'){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('Special')){
 				special = subsections[i];
 				break;
 			}
@@ -2240,7 +2249,7 @@ CCSE.launch = function(){
 			subsections = l('menu').getElementsByClassName('subsection');
 			
 			for(var i in subsections){
-				if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+				if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('General')){
 					general = subsections[i];
 					break;
 				}
@@ -2249,7 +2258,7 @@ CCSE.launch = function(){
 			if(general){
 				special = document.createElement('div');
 				special.className = 'subsection';
-				special.innerHTML = '<div class="title">' + 'Special' + '</div>';
+				special.innerHTML = '<div class="title">' + loc('Special') + '</div>';
 				l('menu').insertBefore(special, subsections[1]);
 			}
 		}
@@ -2266,7 +2275,7 @@ CCSE.launch = function(){
 		
 		var subsections = l('menu').getElementsByClassName('subsection');
 		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
+			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == loc('General')){
 				general = subsections[i];
 				break;
 			}
@@ -2341,7 +2350,7 @@ CCSE.launch = function(){
 		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
 		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
 		PasswordBox: (id, width, value, onChange) => '<input type="password" id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
-		TinyIcon: (icon) => '<div class="icon" style="vertical-align:middle;display:inline-block;' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0]*48) + 'px ' + (-icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div>',
+		TinyIcon: (icon) => '<div class="icon" style="vertical-align:middle;display:inline-block;' + writeIcon(icon) + ';transform:scale(0.5);margin:-16px;"></div>',
 		Slider: (slider, leftText, rightText, startValueFunction, callback, min, max, step) => {
 			if (!callback) callback = '';
 			if (!min) min = 0;
@@ -3473,13 +3482,13 @@ CCSE.launch = function(){
 			CCSE.config.bgType = 'Automatic';
 		} else {
 			if(Game.ascensionMode != 1){
-			for(var i in CCSE.config.permanentUpgrades){
-				if(CCSE.config.permanentUpgrades[i] != -1)
-					if(Game.Upgrades[CCSE.config.permanentUpgrades[i]])
-						Game.Upgrades[CCSE.config.permanentUpgrades[i]].earn();
+				for(var i in CCSE.config.permanentUpgrades){
+					if(CCSE.config.permanentUpgrades[i] != -1)
+						if(Game.Upgrades[CCSE.config.permanentUpgrades[i]])
+							Game.Upgrades[CCSE.config.permanentUpgrades[i]].earn();
+				}
 			}
 		}
-	}
 	}
 	
 	

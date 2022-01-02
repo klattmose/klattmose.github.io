@@ -784,6 +784,13 @@ CCSE.launch = function(){
 		
 		
 		// -----     Particles block       ----- //
+		// Game.particleAdd
+		temp = Game.particleAdd.toString();
+		temp = temp.replaceAll("pic='icons.png';", `if (me.picPos.length == 3) {pic=me.picPos[2];me.picId = 0;}
+						else pic='icons.png';`)
+		eval('Game.particleAdd=' + temp);
+		
+		
 		// -----     Notifications block   ----- //
 		// -----     Prompts block         ----- //
 		// -----     Menu block            ----- //

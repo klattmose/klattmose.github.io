@@ -1,4 +1,4 @@
-ModLanguage('EN',{
+ModLanguage('*',{
 	
 	"%1 black hole inverter": [
 		"%1 black hole inverter",

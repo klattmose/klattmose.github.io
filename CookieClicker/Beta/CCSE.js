@@ -795,11 +795,13 @@ CCSE.launch = function(){
 		
 		// Game.Object
 		// Alter this function so creating new buildings doesn't break the minigames
-		CCSE.ReplaceCodeIntoFunction('Game.Object', `var str='<div class="row" id="row'+this.id+'">`, 
-				`var div = document.createElement('div');
-				div.id = 'row'+this.id;
-				div.classList.add('row');
-				var str='`, 0);
+		CCSE.ReplaceCodeIntoFunction('Game.Object', `str+='<div class="row" id="row'+this.id+'"><div class="separatorBottom"></div>';`, 
+				`{
+					var div = document.createElement('div');
+					div.id = 'row'+this.id;
+					div.classList.add('row');
+					str += '<div class="separatorBottom"></div>';
+				}`, 0);
 		CCSE.ReplaceCodeIntoFunction('Game.Object', `str+='<div class="rowSpecial" id="rowSpecial'+this.id+'"></div>';`, 
 				`div.innerHTML = str;`, 1);
 		CCSE.ReplaceCodeIntoFunction('Game.Object', `l('rows').innerHTML=l('rows').innerHTML+str;`, 

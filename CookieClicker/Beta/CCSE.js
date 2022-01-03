@@ -1994,17 +1994,19 @@ CCSE.launch = function(){
 		if(!Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction = [];
 		Game.customUpgrades[key].buyFunction.push(CCSE.customUpgradesAllbuyFunction);
 		if(upgrade.buyFunction){
-			CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buyFunction", -1, `
+			upgrade.oldbuyFunction = upgrade.buyFunction;
+			upgrade.buyFunction = function(){
+				upgrade.oldbuyFunction();
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
 				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
-			`);
+			}
 		}else{
 			upgrade.buyFunction = function(){
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
 				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
 			}
-			CCSE.functionsAltered++;
 		}
+		CCSE.functionsAltered++;
 		
 		
 		// this.descFunc

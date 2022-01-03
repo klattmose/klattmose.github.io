@@ -1016,7 +1016,7 @@ CCSE.launch = function(){
 		// -----     Seasons block     ----- //
 		
 		// Game.computeSeasons
-		CCSE.ReplaceCodeIntoFunction('Game.computeSeasons', "else Game.Notify(str,'',this.icon,4);", `
+		CCSE.ReplaceCodeIntoFunction('Game.computeSeasons', "Game.Notify(Game.seasons[this.season].start+'<div class=\"line\"></div>','',this.icon,4);", `
 					// Game.computeSeasons injection point 0
 					for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);`, 1);
 		

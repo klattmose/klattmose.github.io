@@ -60,8 +60,8 @@ BlackholeInverter.launch = function(){
 		last = Game.TieredUpgrade('Micro black holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Fun sized</q>', 'Black hole inverter', 9); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredUpgrade('Accretion disco', 'Black hole inverters are <b>twice</b> as efficient.<q>Everybody dance now!</q>', 'Black hole inverter', 10); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredUpgrade('Gravitational waves', 'Black hole inverters are <b>twice</b> as efficient.<q>What\'s better that one black hole? Two of them put together!</q>', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('White holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Don\'t tan well, huh?</q>', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Holes', 'Black hole inverters are <b>twice</b> as efficient.<q>It\'s also a book</q>', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredUpgrade('White holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Don\'t tan well, huh?</q>', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredUpgrade('Holes', 'Black hole inverters are <b>twice</b> as efficient.<q>It\'s also a book</q>', 'Black hole inverter', 13); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		order = BlackholeInverter.getGrandmaUpgradeOrder();
 		last = Game.GrandmaSynergy('Heavy grandmas', 'A dense grandma to accrete more cookies.', 'Black hole inverter'); last.order = order;

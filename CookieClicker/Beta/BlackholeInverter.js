@@ -13,7 +13,7 @@ BlackholeInverter.launch = function(){
 			'black hole inverter|black hole inverters|extracted|[X]% larger event horizon|[X]% larger event horizon',
 			'Inverts the flow of gravity to get the infinitely delicious cookies from an infinitely dense singularity.',
 			1,
-			1,
+			2,
 			{
 				base:'https://klattmose.github.io/CookieClicker/img/blackholeinverter',
 				xV:8,

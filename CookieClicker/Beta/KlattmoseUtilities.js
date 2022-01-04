@@ -506,9 +506,12 @@ KlattmoseUtilities.launch = function(){
 						M.computeMatures();
 						
 						var weedMult=M.soilsById[M.soil].weedMult;
+				
+						var dragonBoost=1+0.05*Game.auraMult('Supreme Intellect');
 						
 						var loops=1;
 						if (M.soilsById[M.soil].key=='woodchips') loops=3;
+						loops=randomFloor(loops*dragonBoost);
 						loops*=M.loopsMult;
 						M.loopsMult=1;
 						
@@ -523,7 +526,7 @@ KlattmoseUtilities.launch = function(){
 									if (tile[0]>0)
 									{
 										//age
-										tile[1]+=randomFloor((me.ageTick+me.ageTickR*Math.random())*M.plotBoost[y][x][0]);
+										tile[1]+=randomFloor((me.ageTick+me.ageTickR*Math.random())*M.plotBoost[y][x][0]*dragonBoost);
 										tile[1]=Math.max(tile[1],0);
 										if (me.immortal) tile[1]=Math.min(me.mature+1,tile[1]);
 										else if (tile[1]>=100)
@@ -533,7 +536,7 @@ KlattmoseUtilities.launch = function(){
 											if (me.onDie) me.onDie(x,y);
 											if (M.soilsById[M.soil].key=='pebbles' && Math.random()<0.35)
 											{
-												if (M.unlockSeed(me)) Game.Popup('Unlocked '+me.name+' seed.',Game.mouseX,Game.mouseY);
+												if (M.unlockSeed(me)) Game.Popup(loc("Unlocked %1 seed.",me.name),Game.mouseX,Game.mouseY);
 											}
 										}
 										else if (!me.noContam)

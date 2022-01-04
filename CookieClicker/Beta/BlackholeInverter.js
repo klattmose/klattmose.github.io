@@ -2,7 +2,7 @@ Game.Win('Third-party');
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.12';
+BlackholeInverter.version = '1.13';
 BlackholeInverter.GameVersion = '2.044';
 
 BlackholeInverter.launch = function(){
@@ -62,6 +62,7 @@ BlackholeInverter.launch = function(){
 		Game.TieredUpgrade('Gravitational waves', '<q>What\'s better that one black hole? Two of them put together!</q>', 'Black hole inverter', 11); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('White holes', "<q>Don't tan well, huh?</q>", 'Black hole inverter', 12); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Holes', "<q>It's also a book</q>", 'Black hole inverter', 13); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('It has pockets!', "<q>Also known as a pants hole</q>", 'Black hole inverter', 14); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		order = BlackholeInverter.getGrandmaUpgradeOrder();
 		last = Game.GrandmaSynergy('Heavy grandmas', 'A dense grandma to accrete more cookies.', 'Black hole inverter'); last.order = order;
@@ -86,6 +87,7 @@ BlackholeInverter.launch = function(){
 		last = Game.TieredAchievement('Hey now, you\'re a dead star', '', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Incredibly dense', '', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Infinitely dense', '', 'Black hole inverter', 13); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Bottomless pit', '', 'Black hole inverter', 14); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		last = Game.ProductionAchievement('Relativistic jets', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.ProductionAchievement('Primordial black holes', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;

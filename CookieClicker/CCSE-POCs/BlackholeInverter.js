@@ -60,6 +60,8 @@ BlackholeInverter.launch = function(){
 		last = Game.TieredUpgrade('Micro black holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Fun sized</q>', 'Black hole inverter', 9); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredUpgrade('Accretion disco', 'Black hole inverters are <b>twice</b> as efficient.<q>Everybody dance now!</q>', 'Black hole inverter', 10); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredUpgrade('Gravitational waves', 'Black hole inverters are <b>twice</b> as efficient.<q>What\'s better that one black hole? Two of them put together!</q>', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredUpgrade('White holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Don\'t tan well, huh?</q>', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredUpgrade('Holes', 'Black hole inverters are <b>twice</b> as efficient.<q>It\'s also a book</q>', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		order = BlackholeInverter.getGrandmaUpgradeOrder();
 		last = Game.GrandmaSynergy('Heavy grandmas', 'A dense grandma to accrete more cookies.', 'Black hole inverter'); last.order = order;
@@ -74,7 +76,7 @@ BlackholeInverter.launch = function(){
 		last = Game.TieredAchievement('Single singularity', 'Have <b>1</b> black hole inverter.', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Penrose diagram', 'Have <b>50</b> black hole inverters.', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Schwarzschild', 'Have <b>100</b> black hole inverters.', 'Black hole inverter', 3); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Primordial black holes', 'Have <b>150</b> black hole inverters.', 'Black hole inverter', 4); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Holes in holes', 'Have <b>150</b> black hole inverters.', 'Black hole inverter', 4); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('No-hair theorem', 'Have <b>200</b> black hole inverters.', 'Black hole inverter', 5); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Photon sphere', 'Have <b>250</b> black hole inverters.', 'Black hole inverter', 6); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Information paradox', 'Have <b>300</b> black hole inverters.', 'Black hole inverter', 7); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
@@ -82,6 +84,8 @@ BlackholeInverter.launch = function(){
 		last = Game.TieredAchievement('Galactic nuclei', 'Have <b>400</b> black hole inverters.', 'Black hole inverter', 9); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Sagittarius A*', 'Have <b>450</b> black hole inverters.', 'Black hole inverter', 10); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Hey now, you\'re a dead star', 'Have <b>500</b> black hole inverters.', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Incredibly dense', 'Have <b>550</b> black hole inverters.', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Infinitely dense', 'Have <b>600</b> black hole inverters.', 'Black hole inverter', 13); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		last = Game.ProductionAchievement('Relativistic jets', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.ProductionAchievement('Primordial black holes', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;

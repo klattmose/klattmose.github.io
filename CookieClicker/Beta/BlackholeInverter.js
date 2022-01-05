@@ -49,19 +49,19 @@ BlackholeInverter.launch = function(){
 		
 		// Upgrades
 		var last; var i = 0; var order = BlackholeInverter.getTieredUpgradeOrder();
-		Game.TieredUpgrade('Blacker holes', '<q>Bigger and blacker.</q>', 'Black hole inverter', 1); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Blackest holes', '<q>The biggest and blackest.</q>', 'Black hole inverter', 2); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Vantablack holes', '<q>The universe doesn\'t care about some idiot\'s copyright.</q>', 'Black hole inverter', 3); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('African-American holes', '<q>Some people take political correctness a little too far.</q>', 'Black hole inverter', 4); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Event Horizon Comics', '<q>dot com</q>', 'Black hole inverter', 5); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Large Hadron Collider', '<q>Smashing things together has never been so well funded!</q>', 'Black hole inverter', 6); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Superconducting Super Collider', '<q>In the land of what might have been.</q>', 'Black hole inverter', 7); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Hawking radiators', '<q>14 March 2018.</q>', 'Black hole inverter', 8); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Micro black holes', '<q>Fun sized</q>', 'Black hole inverter', 9); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Accretion disco', '<q>Everybody dance now!</q>', 'Black hole inverter', 10); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Gravitational waves', '<q>What\'s better that one black hole? Two of them put together!</q>', 'Black hole inverter', 11); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('White holes', "<q>Don't tan well, huh?</q>", 'Black hole inverter', 12); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Holes', "<q>It's also a book</q>", 'Black hole inverter', 13); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Blacker holes', '<q>Blacker than black!</q>', 'Black hole inverter', 1); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('More Mass', '<q>Big holes.</q>', 'Black hole inverter', 2); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Stronger Pull', '<q>No escape.</q>', 'Black hole inverter', 3); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Dead Space', '<q>You stare into the abyss and the abyss stares back at you.</q>', 'Black hole inverter', 4); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Cookiefication', '<q>Yum!</q>', 'Black hole inverter', 5); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('White Hole Inverters', '<q>How does this one even make sense?</q>', 'Black hole inverter', 6); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Merging', '<q>Combine!</q>', 'Black hole inverter', 7); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Wormholes', '<q>You go in one end, you come out the other. Easy as that.</q>', 'Black hole inverter', 8); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Micro black holes', '<q>Tiny, but deadly.</q>', 'Black hole inverter', 9); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Radio-Rings', '<q>Insanely radioactive, and extremely deadly!</q>', 'Black hole inverter', 10); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Reality-Bending Holes', '<q>Now you can see how close you are to certain doom! Two of them put together!</q>', 'Black hole inverter', 11); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Moving Black Holes', "<q>They can move now.</q>", 'Black hole inverter', 12); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Permanent Holes', "<q>They'll never disappear!</q>", 'Black hole inverter', 13); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('It has pockets!', "<q>Also known as a pants hole</q>", 'Black hole inverter', 14); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		order = BlackholeInverter.getGrandmaUpgradeOrder();

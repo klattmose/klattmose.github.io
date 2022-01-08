@@ -1,7 +1,7 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.032';
+CCSE.version = '2.033';
 CCSE.Steam = (typeof Steam !== 'undefined');
 CCSE.GameVersion = CCSE.Steam ? '2.043' : '2.044';
 
@@ -132,6 +132,10 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">01/07/2022</div>' + 
+			'<div class="listing">&bull; Added hook for Game.resize</div>' +
+			'<div class="listing">&bull; Added hook for Garden.logic (for plant aging)</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">10/04/2021</div>' + 
 			'<div class="listing">&bull; Fixed bug that was preventing custom buildings, upgrades, and achievements from being saved in some circumstances</div>' +
@@ -281,7 +285,7 @@ CCSE.launch = function(){
 		if(CCSE.Steam) CCSE.iconURL = CCSE.GetModPath('CCSE') + '/CCSEicon.png';
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
-		CCSE.functionsTotal = 132 + 
+		CCSE.functionsTotal = 133 + 
 							(CCSE.Steam ? 7 : 0) +
 							Game.ObjectsN * 18 - 1 + 3 + 
 							Game.UpgradesN * 1 + 26 + 
@@ -444,6 +448,14 @@ CCSE.launch = function(){
 		// Game.Loader.Load
 		// To allow for images from outside the dashnet domain
 		CCSE.ReplaceCodeIntoFunction('Game.Loader.Load', 'img.src=this.domain', "img.src=(assets[i].indexOf('/')>=0?'':this.domain)", 0);
+		
+		
+		// Game.resize
+		if(!Game.customResize) Game.customResize = [];
+		CCSE.SliceCodeIntoFunction('Game.resize', -1, `
+			// Game.resize injection point 0
+			for(var i in Game.customResize) Game.customResize[i]();
+		`);
 		
 		
 		// -----     Tooltips block     ----- //
@@ -2788,6 +2800,20 @@ CCSE.launch = function(){
 		var objKey = "Farm";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
+		var temp = '';
+		
+		
+		// M.logic (plantAging)
+		// return age to have no effect
+		if(!Game.customMinigame[objKey].plantAging) Game.customMinigame[objKey].plantAging = [];
+		temp = M.logic.toString();
+		temp = temp.replace('tile[1]+=', 'var age = ');
+		temp = temp.replace('tile[1]=Math.max(tile[1],0);', 
+								`// M.logic injection point 0
+								for(var i in Game.customMinigame['` + objKey + `'].plantAging) age = Game.customMinigame['` + objKey + `'].plantAging[i](age, tile, x, y);
+								tile[1] = age;
+								tile[1]=Math.max(tile[1],0);`);
+		eval('M.logic=' + temp);
 		
 		
 		// M.getUnlockedN

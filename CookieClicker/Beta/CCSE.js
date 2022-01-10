@@ -2369,7 +2369,7 @@ CCSE.launch = function(){
 	
 	CCSE.MenuHelper = {
 		
-		ActionButton: (action, text) => '<a class="option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
+		ActionButton: (action, text) => '<a class="smallFancyButton option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
 		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
 		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
 		PasswordBox: (id, width, value, onChange) => '<input type="password" id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
@@ -2386,7 +2386,7 @@ CCSE.launch = function(){
 			if(!callback) callback = '';
 			else callback += "('" + prefName + "', '" + button + "', '" + on.replace("'","\\'") + "', '" + off.replace("'","\\'") + "', '" + invert + "');";
 			callback += "PlaySound('snd/tick.mp3');";
-			return '<a class="option' + ((config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="' + callback + '">' + (config[prefName] ? on : off) + '</a>';
+			return '<a class="smallFancyButton option' + ((config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="' + callback + '">' + (config[prefName] ? on : off) + '</a>';
 		},
 		CheckBox: (config, prefName, button, on, off, callback, invert) => {
 			var invert = invert ? 1 : 0;

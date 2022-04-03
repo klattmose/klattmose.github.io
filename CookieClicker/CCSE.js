@@ -102,12 +102,13 @@ CCSE.launch = function(){
 		Game.registerHook('reset', CCSE.reset);
 		
 		//l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
+		var versionNumber = l('versionNumber');
 		var versionDiv = document.createElement('p');
 		versionDiv.innerHTML = 'CCSE v. ' + CCSE.version;
-		var textDiv = document.createElement('text');
+		var textDiv = document.createElement('span');
 		textDiv.innerHTML = 'Game ';
-		l('versionNumber').appendChild(versionDiv);
-		l('versionNumber').insertBefore(textDiv, l('versionNumber').firstChild);
+		versionNumber.appendChild(versionDiv);
+		versionNumber.insertBefore(textDiv, versionNumber.firstChild);
 		
 		// Announce completion, set the isLoaded flag, and run any functions that were waiting for this to load
 		CCSE.Note.title = 'CCSE loaded!';
@@ -133,60 +134,60 @@ CCSE.launch = function(){
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">10/04/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">10/04/2021</div>' +
 			'<div class="listing">&bull; Fixed bug that was preventing custom buildings, upgrades, and achievements from being saved in some circumstances</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">09/26/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">09/26/2021</div>' +
 			'<div class="listing">&bull; Steam version: Will now initialize before other mods</div>' +
 			'<div class="listing">&bull; Fixed getting permanent upgrades on a Born Again ascension</div>' +
 			'<div class="listing">&bull; Fixed breaking Game.NewUpgradeCookie</div>' +
 			'<div class="listing">&bull; Reset custom upgrades, achievements, etc. managed by CCSE on game reset even if the mod generating them isn\'t loaded</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">09/18/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">09/18/2021</div>' +
 			'<div class="listing">&bull; Steam version: Custom links in the menu will now open in a browser rather than Steam</div>' +
 			'<div class="listing">&bull; Fixed some upgrade descriptions breaking in localization</div>' +
 			'<div class="listing">&bull; Added hooks for Game.crate and Game.crateTooltip</div>' +
 			'<div class="listing">&bull; Changed Game.Loader.Load injection to detect \'/\' instead of \'http\'</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">09/10/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">09/10/2021</div>' +
 			'<div class="listing">&bull; Added PasswordBox and CheckBox to MenuHelper</div>' +
 			'<div class="listing">&bull; Added function to append custom CSS styles</div>' +
 			'<div class="listing">&bull; Fixed bug in custom Background selector</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">09/09/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">09/09/2021</div>' +
 			'<div class="listing">&bull; Steam version: Added hooks for Steam.modsPopup</div>' +
 			'<div class="listing">&bull; Added support for custom images for the Pantheon and Grimoire</div>' +
 			'<div class="listing">&bull; Added support for custom Golden cookie sound selector options</div>' +
 			'<div class="listing">&bull; Added support for custom Milk selector options</div>' +
 			'<div class="listing">&bull; Added support for custom Background selector options</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">09/01/2021</div>' +
 			'<div class="listing">&bull; Vaulting for custom upgrades no longer depends on mod load order</div>' +
 			'<div class="listing">&bull; Setting custom upgrades as Permanent will no longer break the game if the Stats menu is opened without the mod loaded</div>' +
 			'<div class="listing">&bull; Added some functions for commonly used menu items</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">02/06/2021</div>' + 
+			'</div><div class="subsection update small"><div class="title">02/06/2021</div>' +
 			'<div class="listing">&bull; Halved the loading time with this one weird trick!</div>' +
 			'<div class="listing">&bull; The trick is called optimization</div>' +
 			'<div class="listing">&bull; And learning about prototype functions</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">10/31/2020</div>' + 
+			'</div><div class="subsection update small"><div class="title">10/31/2020</div>' +
 			'<div class="listing">&bull; Updated to use the new modding API</div>' +
 			'<div class="listing">&bull; The CCSE.save object (where the mod save data is stored) is now named CCSE.config. The new CCSE.save is a function that will get called by Cookie Clicker when it decides it\'s time to save.</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">06/20/2020</div>' + 
+			'</div><div class="subsection update small"><div class="title">06/20/2020</div>' +
 			'<div class="listing">&bull; Added hooks for the new stock market minigame</div>' +
 			'<div class="listing">&bull; Added hook for the new function Game.ClickSpecialPic</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">10/22/2019</div>' + 
+			'</div><div class="subsection update small"><div class="title">10/22/2019</div>' +
 			'<div class="listing">&bull; Added hook for the new function Game.auraMult</div>' +
 			
-			'</div><div class="subsection update small"><div class="title">05/14/2019 - parallel processing</div>' + 
+			'</div><div class="subsection update small"><div class="title">05/14/2019 - parallel processing</div>' +
 			'<div class="listing">&bull; Won\'t freeze the game while CCSE is loading</div>' +
-			'<div class="listing">&bull; Also has a progress meter for feedback</div>' + 
-			'<div class="listing">&bull; Bug fixes</div>' + 
+			'<div class="listing">&bull; Also has a progress meter for feedback</div>' +
+			'<div class="listing">&bull; Bug fixes</div>' +
 			
-			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' + 
+			'</div><div class="subsection update"><div class="title">05/11/2019 - take two</div>' +
 			'<div class="listing">&bull; You know that moment where you do something and then immediately realize a better way to do it?</div>' +
 			'<div class="listing">&bull; Changed the method for injecting code to standardized functions rather than calling "eval" willy-nilly</div>' +
 			'<div class="listing">&bull; Added function for creating seasons</div>' +
@@ -205,91 +206,83 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	The heart of the mod. Functions to inject code into functions.
 	=======================================================================================*/
-	CCSE.SliceCodeIntoFunction = function(functionName, pos, code, preEvalScript, hasPrototype){
+	CCSE.InjectCodeIntoFunction = function(functionName, alterFunctionCode, code, preEvalScript, hasPrototype){
 		// preEvalScript is to set variables that are used in the function but aren't declared in the function
 		if(preEvalScript) eval(preEvalScript);
 		
-		var proto;
-		if(hasPrototype) proto = eval(functionName + ".prototype");
-		
-		var temp = eval(functionName + ".toString()");
-		temp = temp.slice(0, pos) + code + temp.slice(pos);
+		var originalFunction = eval(functionName);
+		if (originalFunction === null) {
+			console.warn(`CCSE: ${ functionName } is not found. Could not inject ${ code }`);
+			return;
+		} else if (typeof originalFunction !== "function") {
+			console.warn(`CCSE: ${ functionName } is not a function. Could not inject ${ code }`);
+			return;
+		}
 		
 		//console.log(functionName);
-		eval(functionName + " = " + temp);
-		if(hasPrototype) eval(functionName + ".prototype = proto");
+		eval(functionName + " = " + alterFunctionCode(originalFunction.toString()));
+		if(hasPrototype) {
+			var alteredFunction = eval(functionName);
+			alteredFunction.prototype = originalFunction.prototype;
+		}
 		
 		CCSE.functionsAltered++;
 		if(!CCSE.isLoaded) CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+	}
+	
+	CCSE.SliceCodeIntoFunction = function(functionName, pos, code, preEvalScript, hasPrototype){
+		var alterFunctionCode = function(temp){
+			return temp.slice(0, pos) + code + temp.slice(pos);
+		}
+		CCSE.InjectCodeIntoFunction(functionName, alterFunctionCode, code, preEvalScript, hasPrototype);
 	}
 	
 	CCSE.SpliceCodeIntoFunction = function(functionName, row, code, preEvalScript, hasPrototype){
-		// preEvalScript is to set variables that are used in the function but aren't declared in the function
-		if(preEvalScript) eval(preEvalScript);
-		
-		var proto;
-		if(hasPrototype) proto = eval(functionName + ".prototype");
-		var i = Math.floor(row);
-		if(i == 0) throw new Error("row cannot be zero");
-		
-		var temp = eval(functionName + ".toString()").split("\n");
-		
-		i = row < 0 ? temp.length + row : row;
-		temp.splice(i, 0, code);
-		
-		//console.log(functionName);
-		eval(functionName + " = " + temp.join("\n"));
-		if(hasPrototype) eval(functionName + ".prototype = proto");
-		
-		CCSE.functionsAltered++;
-		if(!CCSE.isLoaded) CCSE.UpdateNote();
-		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+		var alterFunctionCode = function(temp){
+			temp = temp.split("\n");
+			i = row < 0 ? temp.length + row : row;
+			temp.splice(i, 0, code);
+			return temp.join("\n");
+		}
+		CCSE.InjectCodeIntoFunction(functionName, alterFunctionCode, code, preEvalScript, hasPrototype);
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript, hasPrototype){
-		// preEvalScript is to set variables that are used in the function but aren't declared in the function
-		if(preEvalScript) eval(preEvalScript);
-		
-		var proto;
-		if(hasPrototype) proto = eval(functionName + ".prototype");
-		var temp = eval(functionName + ".toString()");
-		
-		switch(mode){
-			case -1: // Insert before targetString
-				temp = temp.replace(targetString, code + "\n" + targetString);
-				break;
-			case 0: // Replace targetString. Regex should work
-				temp = temp.replace(targetString, code);
-				break;
-			case 1: // Insert after targetString
-				temp = temp.replace(targetString, targetString + "\n" + code);
-				break;
-			default:
-				throw new Error("mode must be either, -1, 0, or 1");
+		var alterFunctionCode = function(temp){
+			switch(mode){
+				case -1: // Insert before targetString
+					return temp.replace(targetString, code + "\n" + targetString);
+				case 0: // Replace targetString. Regex will work
+					return temp.replace(targetString, code);
+				case 1: // Insert after targetString
+					return temp.replace(targetString, targetString + "\n" + code);
+				default:
+					throw new Error("mode must be either, -1, 0, or 1");
+			}
 		}
-		
-		eval(functionName + " = " + temp);
-		if(hasPrototype) eval(functionName + ".prototype = proto");
-		
-		CCSE.functionsAltered++;
-		if(!CCSE.isLoaded) CCSE.UpdateNote();
-		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
+		CCSE.InjectCodeIntoFunction(functionName, alterFunctionCode, code, preEvalScript, hasPrototype);
 	}
 	
+	CCSE.GetProgressHTML = function(progress){
+		return `<div style="text-align: center; font-weight: bold; color: white;">${ progress }</div>`;
+	}
+
 	CCSE.InitNote = function(){
 		if(CCSE.Steam) CCSE.iconURL = CCSE.GetModPath('CCSE') + '/CCSEicon.png';
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
-		CCSE.functionsTotal = 134 + 
-							(CCSE.Steam ? 4 : 0) +
-							Game.ObjectsN * 18 - 1 + 3 + 
-							Game.UpgradesN * 1 + 26 + 
-							Game.AchievementsN * 1; // Needs to be manually updated
+		CCSE.functionsTotal = (
+			134
+			+ (CCSE.Steam ? 4 : 0)
+			+ Game.ObjectsN      * 18 - 1 + 3
+			+ Game.UpgradesN     * 1  + 26
+			+ Game.AchievementsN * 1
+		); // Needs to be manually updated
 		CCSE.functionsAltered = 0;
 		CCSE.progress = 0;
 		
-		Game.Notify('CCSE is initializing', '<div style="text-align: center;font-weight: bold;color: #ffffff;">0%</div>', [0, 0, CCSE.iconURL], 6, 1);
+		Game.Notify('CCSE is initializing', CCSE.GetProgressHTML(0), [0, 0, CCSE.iconURL], 6, 1);
 		CCSE.Note = Game.NotesById[Game.noteId - 1];
 		CCSE.Note.life = 600000; // 10 minutes, just to be sure
 	}
@@ -299,7 +292,7 @@ CCSE.launch = function(){
 		var progress = Math.min(Math.floor(CCSE.functionsAltered / CCSE.functionsTotal * 100), 100);
 		if(progress != CCSE.progress){
 			CCSE.progress = progress;
-			CCSE.Note.desc = '<div style="text-align: center;font-weight: bold;color: #ffffff;">' + CCSE.progress + '%</div>';
+			CCSE.Note.desc = CCSE.GetProgressHTML(CCSE.progress);
 			Game.UpdateNotes();
 		}
 	}
@@ -359,15 +352,15 @@ CCSE.launch = function(){
 				// Steam.modsPopup injection point 0
 				for(var i in Game.customModsPopup) Game.customModsPopup[i](selectedMod, mods);
 			`);
-			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "return okay;", 
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "return okay;",
 				`// Steam.modsPopup injection point 1
 				for(var i in Game.customModsPopupCheckModDependencies) okay = Game.customModsPopupCheckModDependencies[i](okay, mod, loadedMods, selectedMod, mods);
 				`, -1);
-			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "updateModOptions();", 
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', "updateModOptions();",
 				`// Steam.modsPopup injection point 2
 				for(var i in Game.customModsPopupUpdateModList) Game.customModsPopupUpdateModList[i](selectedMod, mods);
 				`, -1);
-			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");', 
+			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");',
 				`// Steam.modsPopup injection point 3
 				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod, mods);
 				`, 1);
@@ -379,7 +372,7 @@ CCSE.launch = function(){
 		// Game.LoadSave
 		if(!Game.customLoad) Game.customLoad = [];
 		if(!(Game.LoadSave.toString().indexOf('Game.customLoad') > 0)){
-			CCSE.ReplaceCodeIntoFunction('Game.LoadSave', 'if (Game.prefs.showBackupWarning==1)', 
+			CCSE.ReplaceCodeIntoFunction('Game.LoadSave', 'if (Game.prefs.showBackupWarning==1)',
 					`// Game.LoadSave injection point 0
 					for(var i in Game.customLoad) Game.customLoad[i](); `, -1);
 		}*/
@@ -403,10 +396,10 @@ CCSE.launch = function(){
 		// Gonna just replace it and try to keep up with any changes (however unlikely)
 		// function randomFloor(x) {if ((x%1)<Math.random()) return Math.floor(x); else return Math.ceil(x);}
 		// Return ret to have no effect
-		if(!Game.customRandomFloor) Game.customRandomFloor = []; 
+		if(!Game.customRandomFloor) Game.customRandomFloor = [];
 		randomFloor = function(x){
 			var ret;
-			if ((x%1)<Math.random()) ret = Math.floor(x); 
+			if ((x%1)<Math.random()) ret = Math.floor(x);
 			else ret = Math.ceil(x);
 			// randomFloor injection point 0
 			for(var i in Game.customRandomFloor) ret = Game.customRandomFloor[i](x, ret);
@@ -417,7 +410,7 @@ CCSE.launch = function(){
 		// Beautify
 		// Return ret to have no effect
 		if(!Game.customBeautify) Game.customBeautify = [];
-		CCSE.ReplaceCodeIntoFunction('Beautify', "return negative?'-'+output:output+decimal;", 
+		CCSE.ReplaceCodeIntoFunction('Beautify', "return negative?'-'+output:output+decimal;",
 	`var ret = negative?'-'+output:output+decimal;
 	// Beautify injection point 0
 	for(var i in Game.customBeautify) ret = Game.customBeautify[i](value, floats, ret);
@@ -444,13 +437,13 @@ CCSE.launch = function(){
 		CCSE.SliceCodeIntoFunction('Game.tooltip.update', -1, `
 			// Game.tooltip.update injection point 0
 			for(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();
-			`);
+		`);
 		
 		
 		// Game.crate
 		// Return ret to have no effect
 		if(!Game.customCrate) Game.customCrate = [];
-		CCSE.ReplaceCodeIntoFunction('Game.crate', 'return (Game', "var ret = (Game", 0);
+		CCSE.ReplaceCodeIntoFunction('Game.crate', "return '<div'+", "var ret = '<div'+", 0);
 		CCSE.SliceCodeIntoFunction('Game.crate', -1, `
 			// Game.crate injection point 0
 			for(var i in Game.customCrate) ret = Game.customCrate[i](me, context, forceClickStr, id, ret);
@@ -484,7 +477,7 @@ CCSE.launch = function(){
 		
 		// Game.HowManyCookiesReset
 		// Return ret to have no effect
-		if(!Game.customHowManyCookiesReset) Game.customHowManyCookiesReset = []; 
+		if(!Game.customHowManyCookiesReset) Game.customHowManyCookiesReset = [];
 		CCSE.ReplaceCodeIntoFunction('Game.HowManyCookiesReset', 'return', "var ret = ", 0);
 		CCSE.SliceCodeIntoFunction('Game.HowManyCookiesReset', -1, `
 			// Game.HowManyCookiesReset injection point 0
@@ -495,7 +488,7 @@ CCSE.launch = function(){
 		
 		// Game.GetHeavenlyMultiplier
 		// Functions should return a value to multiply the heavenlyMult by
-		if(!Game.customHeavenlyMultiplier) Game.customHeavenlyMultiplier = []; 
+		if(!Game.customHeavenlyMultiplier) Game.customHeavenlyMultiplier = [];
 		CCSE.ReplaceCodeIntoFunction('Game.GetHeavenlyMultiplier', 'return heavenlyMult;', `
 			// Game.GetHeavenlyMultiplier injection point 0
 			for(var i in Game.customHeavenlyMultiplier) heavenlyMult *= Game.customHeavenlyMultiplier[i]();`, -1);
@@ -549,7 +542,7 @@ CCSE.launch = function(){
 		// Game.lumpTooltip
 		// Return str to have no effect
 		if(!Game.customLumpTooltip) Game.customLumpTooltip = [];
-		CCSE.ReplaceCodeIntoFunction('Game.lumpTooltip', 'return', 
+		CCSE.ReplaceCodeIntoFunction('Game.lumpTooltip', 'return',
 			`// Game.lumpTooltip injection point 0
 			for(var i in Game.customLumpTooltip) str = Game.customLumpTooltip[i](str, phase);`, -1);
 		
@@ -580,9 +573,9 @@ CCSE.launch = function(){
 		
 		// Game.harvestLumps
 		if(!Game.customHarvestLumps) Game.customHarvestLumps = [];
-		CCSE.ReplaceCodeIntoFunction('Game.harvestLumps', 'total=Math.floor(total);', 
+		CCSE.ReplaceCodeIntoFunction('Game.harvestLumps', 'total=Math.floor(total);',
 			`// Game.harvestLumps injection point 0`, -1);
-		CCSE.ReplaceCodeIntoFunction('Game.harvestLumps', "Game.Win('Maillard reaction');", 
+		CCSE.ReplaceCodeIntoFunction('Game.harvestLumps', "Game.Win('Maillard reaction');",
 			`// Game.harvestLumps injection point 1`, 1);
 		CCSE.SliceCodeIntoFunction('Game.harvestLumps', -1, `
 			// Game.harvestLumps injection point 2
@@ -593,7 +586,7 @@ CCSE.launch = function(){
 		// Game.computeLumpType
 		// Functions should push things to types
 		if(!Game.customComputeLumpType) Game.customComputeLumpType = [];
-		CCSE.ReplaceCodeIntoFunction('Game.computeLumpType', '//caramelized', 
+		CCSE.ReplaceCodeIntoFunction('Game.computeLumpType', '//caramelized',
 				`// Game.computeLumpType injection point 0
 				for(var i in Game.customComputeLumpType) Game.customComputeLumpType[i](types);`, 1);
 		
@@ -603,7 +596,7 @@ CCSE.launch = function(){
 		if(!Game.customCanLumps) Game.customCanLumps = [];
 		CCSE.SpliceCodeIntoFunction('Game.canLumps', 2, 'var ret;');
 		CCSE.ReplaceCodeIntoFunction('Game.canLumps', 'return true;', 'ret = true;', 0);
-		CCSE.ReplaceCodeIntoFunction('Game.canLumps', 'return false', 
+		CCSE.ReplaceCodeIntoFunction('Game.canLumps', 'return false',
 			`else ret = false;
 			// Game.canLumps injection point 0
 			for(var i in Game.customCanLumps) ret = Game.customCanLumps[i](ret);
@@ -612,9 +605,9 @@ CCSE.launch = function(){
 		
 		// Game.getLumpRefillMax
 		// Return ret to have no effect
-		if(!Game.customLumpRefillMax) Game.customLumpRefillMax = []; 
+		if(!Game.customLumpRefillMax) Game.customLumpRefillMax = [];
 		CCSE.ReplaceCodeIntoFunction('Game.getLumpRefillMax', 'return', 'var ret =', 0);
-		CCSE.SliceCodeIntoFunction('Game.getLumpRefillMax', -1, 
+		CCSE.SliceCodeIntoFunction('Game.getLumpRefillMax', -1,
 			`// Game.getLumpRefillMax injection point 0
 			for(var i in Game.customLumpRefillMax) ret = Game.customLumpRefillMax[i](ret);
 			return ret;
@@ -645,14 +638,14 @@ CCSE.launch = function(){
 		// I really think this is what he meant it to be
 		// The original just has Game.customCps doing the same thing as Game.customCpsMult
 		//eval('Game.CalculateGains = ' + Game.CalculateGains.toString().replace(
-		//	'for (var i in Game.customCps) {mult*=Game.customCps[i]();}', 
+		//	'for (var i in Game.customCps) {mult*=Game.customCps[i]();}',
 		//	'for (var i in Game.customCps) {Game.cookiesPs += Game.customCps[i]();}'));
 		
 		
 		// Game.dropRateMult
 		// Return 1 to have no effect
-		if(!Game.customDropRateMult) Game.customDropRateMult = []; 
-		CCSE.ReplaceCodeIntoFunction('Game.dropRateMult', 'return', 
+		if(!Game.customDropRateMult) Game.customDropRateMult = [];
+		CCSE.ReplaceCodeIntoFunction('Game.dropRateMult', 'return',
 			`// Game.dropRateMult injection point 0
 			for(var i in Game.customDropRateMult) rate *= Game.customDropRateMult[i]();`, -1);
 		
@@ -746,10 +739,10 @@ CCSE.launch = function(){
 		if(!Game.customShimmerTypes['golden'].customEffectDurMod) Game.customShimmerTypes['golden'].customEffectDurMod = [];
 		if(!Game.customShimmerTypes['golden'].customMult) Game.customShimmerTypes['golden'].customMult = [];
 		if(!Game.customShimmerTypes['golden'].customBuff) Game.customShimmerTypes['golden'].customBuff = [];
-		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].popFunc", 'var list=[];', 
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].popFunc", 'var list=[];',
 					`// Game.shimmerTypes['golden'].popFunc injection point 1
 					for(var i in Game.customShimmerTypes['golden'].customListPush) Game.customShimmerTypes['golden'].customListPush[i](me, list);`, 1);
-		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].popFunc", 'var buff=0;', 
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].popFunc", 'var buff=0;',
 					`// Game.shimmerTypes['golden'].popFunc injection point 2
 					for(var i in Game.customShimmerTypes['golden'].customEffectDurMod) effectDurMod *= Game.customShimmerTypes['golden'].customEffectDurMod[i](me);
 					for(var i in Game.customShimmerTypes['golden'].customMult) mult *= Game.customShimmerTypes['golden'].customMult[i](me);
@@ -758,10 +751,10 @@ CCSE.launch = function(){
 		
 		// Game.shimmerTypes['reindeer'].popFunc
 		// customDropRateMult should return a multiplier to the fail rate for reindeer drops
-		// Game.customDropRateMult is already taken into account. This is for reindeer specific fucntions
+		// Game.customDropRateMult is already taken into account. This is for reindeer specific functions
 		// Return 1 to have no effect. Return 0 for a guarantee*
 		if(!Game.customShimmerTypes['reindeer'].customDropRateMult) Game.customShimmerTypes['reindeer'].customDropRateMult = [];
-		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].popFunc", 'if (Math.random()>failRate)', 
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].popFunc", 'if (Math.random()>failRate)',
 					`// Game.shimmerTypes['reindeer'].popFunc injection point 1
 					for(var i in Game.customShimmerTypes['reindeer'].customDropRateMult) failRate *= Game.customShimmerTypes['reindeer'].customDropRateMult[i](me);`, -1);
 		
@@ -778,14 +771,14 @@ CCSE.launch = function(){
 		
 		// Game.Object
 		// Alter this function so creating new buildings doesn't break the minigames
-		CCSE.ReplaceCodeIntoFunction('Game.Object', `var str='<div class="row" id="row'+this.id+'">`, 
+		CCSE.ReplaceCodeIntoFunction('Game.Object', `var str='<div class="row" id="row'+this.id+'">`,
 				`var div = document.createElement('div');
 				div.id = 'row'+this.id;
 				div.classList.add('row');
 				var str='`, 0);
-		CCSE.ReplaceCodeIntoFunction('Game.Object', `str+='<div class="rowSpecial" id="rowSpecial'+this.id+'"></div>';`, 
+		CCSE.ReplaceCodeIntoFunction('Game.Object', `str+='<div class="rowSpecial" id="rowSpecial'+this.id+'"></div>';`,
 				`div.innerHTML = str;`, 1);
-		CCSE.ReplaceCodeIntoFunction('Game.Object', `l('rows').innerHTML=l('rows').innerHTML+str;`, 
+		CCSE.ReplaceCodeIntoFunction('Game.Object', `l('rows').innerHTML=l('rows').innerHTML+str;`,
 				`l('rows').appendChild(div);`, 0);
 		
 		
@@ -916,7 +909,7 @@ CCSE.launch = function(){
 		// Game.DropEgg
 		// Functions should return a value to multiply failRate by (Return 1 to have no effect)
 		if(!Game.customDropEgg) Game.customDropEgg = [];
-		CCSE.SpliceCodeIntoFunction('Game.DropEgg', 2, 
+		CCSE.SpliceCodeIntoFunction('Game.DropEgg', 2,
 			`// Game.DropEgg injection point 0
 			for(var i in Game.customDropEgg) failRate *= Game.customDropEgg[i]();`);
 		
@@ -925,7 +918,7 @@ CCSE.launch = function(){
 		// Functions should return an upgrade id. Return id for no effect.
 		if(!Game.customPermanentUpgradeId) Game.customPermanentUpgradeId = [];
 		Game.customPermanentUpgradeId.push(CCSE.GetPermanentUpgrade);
-		CCSE.SpliceCodeIntoFunction('Game.PermanentSlotIcon', 2, 
+		CCSE.SpliceCodeIntoFunction('Game.PermanentSlotIcon', 2,
 			`// Game.PermanentSlotIcon injection point 0
 			var id = Game.permanentUpgrades[slot];
 			for(var i in Game.customPermanentUpgradeId) id = Game.customPermanentUpgradeId[i](slot, id);`,
@@ -933,11 +926,11 @@ CCSE.launch = function(){
 		
 		
 		// Game.AssignPermanentSlot
-		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'if (!fail)', 
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'if (!fail)',
 			'for (var ii in CCSE.config.permanentUpgrades) {if (CCSE.config.permanentUpgrades[ii]==me.name) fail=1;}', -1);
-		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'var upgrade=Game.permanentUpgrades[slot];', 
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'var upgrade=Game.permanentUpgrades[slot];',
 			'for(var i in Game.customPermanentUpgradeId) upgrade = Game.customPermanentUpgradeId[i](slot, upgrade);', 1);
-		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'Game.BuildAscendTree();', 
+		CCSE.ReplaceCodeIntoFunction('Game.AssignPermanentSlot', 'Game.BuildAscendTree();',
 			'CCSE.RectifyPermanentUpgrades();Game.BuildAscendTree();', 0);
 		
 		
@@ -977,11 +970,11 @@ CCSE.launch = function(){
 		
 		
 		// Game.NewUpgradeCookie
-		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0, CCSE.Steam ? 
+		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'new Game.Upgrade', 'CCSE.NewUpgrade', 0, CCSE.Steam ?
 			`var strCookieProductionMultiplierPlus=loc("Cookie production multiplier <b>+%1%</b>.",'[x]');
 			var getStrCookieProductionMultiplierPlus=function(x)
 			{return strCookieProductionMultiplierPlus.replace('[x]',x);}` : 0);
-		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'return upgrade;', 'Game.cookieUpgrades.push(upgrade);', -1, CCSE.Steam ? 
+		CCSE.ReplaceCodeIntoFunction('Game.NewUpgradeCookie', 'return upgrade;', 'Game.cookieUpgrades.push(upgrade);', -1, CCSE.Steam ?
 			`var strCookieProductionMultiplierPlus=loc("Cookie production multiplier <b>+%1%</b>.",'[x]');
 			var getStrCookieProductionMultiplierPlus=function(x)
 			{return strCookieProductionMultiplierPlus.replace('[x]',x);}` : 0);
@@ -999,7 +992,7 @@ CCSE.launch = function(){
 		// Just rewrote it instead of doing the eval replace thing
 		// Functions should return a multiplier to the season duration
 		// Return 1 to have no effect
-		if(!Game.customGetSeasonDuration) Game.customGetSeasonDuration = []; 
+		if(!Game.customGetSeasonDuration) Game.customGetSeasonDuration = [];
 		Game.getSeasonDuration = function(){
 			var ret = Game.fps*60*60*24;
 			// Game.getSeasonDuration injection point 0
@@ -1055,13 +1048,13 @@ CCSE.launch = function(){
 		for(var i in Game.buffTypes){
 			var buff = Game.buffTypes[i];
 			if(buff.name == 'building buff'){
-				CCSE.ReplaceCodeIntoFunction('Game.buffTypes[' + i + '].func', 
-					'icon:[obj.iconColumn,14],', 
+				CCSE.ReplaceCodeIntoFunction('Game.buffTypes[' + i + '].func',
+					'icon:[obj.iconColumn,14],',
 					'icon:[obj.iconColumn,14,(obj.art.customIconsPic ? obj.art.customIconsPic : 0)],', 0);
 			}
 			else if(buff.name == 'building debuff'){
-				CCSE.ReplaceCodeIntoFunction('Game.buffTypes[' + i + '].func', 
-					'icon:[obj.iconColumn,15],', 
+				CCSE.ReplaceCodeIntoFunction('Game.buffTypes[' + i + '].func',
+					'icon:[obj.iconColumn,15],',
 					'icon:[obj.iconColumn,15,(obj.art.customIconsPic ? obj.art.customIconsPic : 0)],', 0);
 			}
 		}
@@ -1159,7 +1152,7 @@ CCSE.launch = function(){
 		// Game.UpdateSpecial
 		// customSpecialTabs functions should push a string to Game.specialTabs (or not)
 		if(!Game.customSpecialTabs) Game.customSpecialTabs = [];
-		CCSE.ReplaceCodeIntoFunction('Game.UpdateSpecial', 'if (Game.specialTabs.length==0)', 
+		CCSE.ReplaceCodeIntoFunction('Game.UpdateSpecial', 'if (Game.specialTabs.length==0)',
 			`// Game.UpdateSpecial injection point 0
 			for(var i in Game.customSpecialTabs) Game.customSpecialTabs[i]();`, -1);
 		
@@ -1200,9 +1193,9 @@ CCSE.launch = function(){
 		/*if(!Game.customCurrentDragonAura) Game.customCurrentDragonAura = [];
 		if(!Game.customDragonAuraShow) Game.customDragonAuraShow = [];
 		temp = Game.SelectDragonAura.toString();
-		eval('Game.SelectDragonAura = ' + temp.replace('if (!update)', 
+		eval('Game.SelectDragonAura = ' + temp.replace('if (!update)',
 			`for(var i in Game.customCurrentDragonAura) currentAura = Game.customCurrentDragonAura[i](slot, update, currentAura);
-			if (!update)`).replace('if (i==0 || i!=otherAura)', 
+			if (!update)`).replace('if (i==0 || i!=otherAura)',
 					`var show = (i==0 || i!=otherAura);
 					for(var i in Game.customDragonAuraShow) show = Game.customDragonAuraShow[i](slot, update, i, show);
 					if (show)`));*/
@@ -1237,7 +1230,7 @@ CCSE.launch = function(){
 		// str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', <your pic here>)
 		// Pics are 96px by 96px
 		if(!Game.customToggleSpecialMenu) Game.customToggleSpecialMenu = [];
-		CCSE.ReplaceCodeIntoFunction('Game.ToggleSpecialMenu', "l('specialPopup').innerHTML=str;", 
+		CCSE.ReplaceCodeIntoFunction('Game.ToggleSpecialMenu', "l('specialPopup').innerHTML=str;",
 			`// Game.ToggleSpecialMenu injection point 0
 			for(var i in Game.customToggleSpecialMenu) str = Game.customToggleSpecialMenu[i](str);`, -1);
 		
@@ -1247,7 +1240,7 @@ CCSE.launch = function(){
 		// Pics are 96px by 96px
 		if(!Game.customDrawSpecial) Game.customDrawSpecial = [];
 		if(!Game.customDrawSpecialPic) Game.customDrawSpecialPic = [];
-		CCSE.ReplaceCodeIntoFunction('Game.DrawSpecial', "if (hovered || selected)", 
+		CCSE.ReplaceCodeIntoFunction('Game.DrawSpecial', "if (hovered || selected)",
 			`// Game.DrawSpecial injection point 0
 				var picframe = {pic:pic, frame:frame};
 				for(var j in Game.customDrawSpecialPic) Game.customDrawSpecialPic[j](picframe, Game.specialTabs[i]);
@@ -1261,22 +1254,22 @@ CCSE.launch = function(){
 		// -----     Visual Effects block     ----- //
 		
 		// Game.DrawBackground
-		// Game.customDrawBackground functions get called in the same block that creates the cookie rain and seasonal backgrounds 
+		// Game.customDrawBackground functions get called in the same block that creates the cookie rain and seasonal backgrounds
 		// If you want a hook somewhere else, let me know
 		if(!Game.customDrawBackground) Game.customDrawBackground = [];
-		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Timer.track('left background');", 
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Timer.track('left background');",
 			`// Game.DrawBackground injection point 0
 			for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();`, -1);
 		
 		// Setup for custom Milk Selector options
 		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
 		if(!Game.AllMilks){ // Browser compatibility
-			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;", 
+			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;",
 																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 			Game.AllMilks = [];
 			for(var i in Game.MilksByChoice) Game.AllMilks.push(Game.MilksByChoice[i]);
 		} else {
-			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;", 
+			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;",
 																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 		}
 		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
@@ -1286,7 +1279,7 @@ CCSE.launch = function(){
 		temp = temp.replace("Game.bg+'.jpg'", 'Game.bg');
 		temp = temp.replace("Game.bgFade+'.jpg'", 'Game.bgFade');
 		temp = temp.replace("Game.BGsByChoice[Game.bgType]", 'choice');
-		temp = temp.replace("if (Game.bgType!=0 && Game.ascensionMode!=1)", 
+		temp = temp.replace("if (Game.bgType!=0 && Game.ascensionMode!=1)",
 						`Game.bg += '.jpg';
 						Game.bgFade += '.jpg';
 						
@@ -1294,7 +1287,7 @@ CCSE.launch = function(){
 						{
 							let choice = CCSE.GetSelectedBackground();
 							if(choice.name != 'Automatic')`);
-		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)", 
+		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)",
 							`}
 						Game.Background.fillPattern(Pic(Game.bg)`);
 		eval('Game.DrawBackground = ' + temp);
@@ -1306,7 +1299,7 @@ CCSE.launch = function(){
 		// Game.OpenSesame
 		// Game.customOpenSesame functions should add HTML strings to the debug menu
 		if(!Game.customOpenSesame) Game.customOpenSesame = [];
-		CCSE.ReplaceCodeIntoFunction('Game.OpenSesame', "str+='</div>';", 
+		CCSE.ReplaceCodeIntoFunction('Game.OpenSesame', "str+='</div>';",
 			`// Game.OpenSesame injection point 0
 			for(var i in Game.customOpenSesame) str += Game.customOpenSesame[i]();`, -1);
 		
@@ -1330,7 +1323,7 @@ CCSE.launch = function(){
 		if(!Game.customShimmerTypes[key].durationMult) Game.customShimmerTypes[key].durationMult = [];
 		Game.customShimmerTypes[key].initFunc.push(CCSE.customShimmerTypesAllinitFunc);
 		Game.customShimmerTypes[key].durationMult.push(CCSE.customShimmerTypesAlldurationMult);
-		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", 'me.dur=dur;', 
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", 'me.dur=dur;',
 					`// Game.shimmerTypes['` + escKey + `'].initFunc injection point 0
 					for(var i in Game.customShimmerTypes['` + escKey + `'].durationMult) dur *= Game.customShimmerTypes['` + escKey + `'].durationMult[i](me);`, -1);
 		CCSE.SliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].initFunc", -1, `
@@ -1359,7 +1352,7 @@ CCSE.launch = function(){
 		
 		
 		// Game.shimmerTypes[key].spawnConditions
-		// Return ret to have no effect 
+		// Return ret to have no effect
 		if(!Game.customShimmerTypes[key].spawnConditions) Game.customShimmerTypes[key].spawnConditions = [];
 		Game.customShimmerTypes[key].spawnConditions.push(CCSE.customShimmerTypesAllspawnConditions);
 		CCSE.SpliceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].spawnConditions", 2, 'var ret;');
@@ -1373,7 +1366,7 @@ CCSE.launch = function(){
 		
 		// Game.shimmerTypes[key].getTimeMod
 		// Functions should return a multiplier to the shimmer's spawn time (higher takes longer to spawn)
-		// Return 1 to have no effect 
+		// Return 1 to have no effect
 		if(!Game.customShimmerTypes[key].getTimeMod) Game.customShimmerTypes[key].getTimeMod = [];
 		Game.customShimmerTypes[key].getTimeMod.push(CCSE.customShimmerTypesAllgetTimeMod);
 		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['" + escKey + "'].getTimeMod", 'return', `
@@ -1616,7 +1609,7 @@ CCSE.launch = function(){
 		
 		// this.tooltip
 		// Return ret to have no effect
-		if(!Game.customBuildings[key].tooltip) Game.customBuildings[key].tooltip = []; 
+		if(!Game.customBuildings[key].tooltip) Game.customBuildings[key].tooltip = [];
 		Game.customBuildings[key].tooltip.push(CCSE.customBuildingsAlltooltip);
 		CCSE.ReplaceCodeIntoFunction("Game.Objects['" + escKey + "'].tooltip", 'return', 'var ret =', 0);
 		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].tooltip", -1, `
@@ -1628,7 +1621,7 @@ CCSE.launch = function(){
 		
 		// this.levelTooltip
 		// Return ret to have no effect
-		if(!Game.customBuildings[key].levelTooltip) Game.customBuildings[key].levelTooltip = []; 
+		if(!Game.customBuildings[key].levelTooltip) Game.customBuildings[key].levelTooltip = [];
 		Game.customBuildings[key].levelTooltip.push(CCSE.customBuildingsAlllevelTooltip);
 		CCSE.ReplaceCodeIntoFunction("Game.Objects['" + escKey + "'].levelTooltip", 'return', 'var ret =', 0);
 		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].levelTooltip", -1, `
@@ -1701,10 +1694,10 @@ CCSE.launch = function(){
 		// cpsMult Functions should return a value to multiply the price by (Return 1 to have no effect)
 		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
 		Game.customBuildings[key].cpsMult.push(CCSE.customBuildingsAllcpsMult);
-		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].cps", -1, `
+		CCSE.ReplaceCodeIntoFunction("Game.Objects['" + escKey + "'].cps", 'return', `
 				// Game.Objects['` + escKey + `'].cps injection point 0
 				for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);
-			`);
+		`, -1);
 		
 		
 		for(var i in CCSE.customReplaceBuilding) CCSE.customReplaceBuilding[i](key, obj);
@@ -1712,7 +1705,7 @@ CCSE.launch = function(){
 	
 	if(!CCSE.customReplaceUpgrade) CCSE.customReplaceUpgrade = [];
 	CCSE.ReplaceUpgradesStart = function(){
-		if(!Game.customUpgradesAll) Game.customUpgradesAll = {}; 
+		if(!Game.customUpgradesAll) Game.customUpgradesAll = {};
 		
 		if(!Game.customUpgradesAll.getPrice) Game.customUpgradesAll.getPrice = [];
 		CCSE.customUpgradesAllgetPrice = function(me){
@@ -1726,7 +1719,7 @@ CCSE.launch = function(){
 			for(var i in Game.customUpgradesAll.click) Game.customUpgradesAll.click[i](me, e);
 		}
 		
-		if(!Game.customUpgradesAll.buy) Game.customUpgradesAll.buy = []; 
+		if(!Game.customUpgradesAll.buy) Game.customUpgradesAll.buy = [];
 		CCSE.customUpgradesAllbuy = function(me, bypass, success){
 			for(var i in Game.customUpgradesAll.buy) Game.customUpgradesAll.buy[i](me, bypass, success);
 		}
@@ -1809,7 +1802,7 @@ CCSE.launch = function(){
 			// Game.Upgrade.prototype.buy injection point 0
 			for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);`, -1);
 		
-		// this.earn 
+		// this.earn
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.earn", -1, `
 				// Game.Upgrade.prototype.earn injection point 0
 				for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this);
@@ -1862,7 +1855,7 @@ CCSE.launch = function(){
 		
 		// Game.Upgrades['Golden cookie sound selector'].choicesFunction
 		if(!Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction = [];
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesFunction", "return choices;", 
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesFunction", "return choices;",
 			`// Game.customUpgrades['Golden cookie sound selector'].choicesFunction injection point 0
 			for(var i in Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction[i](choices);
 			CCSE.OverrideShimmerSoundSelector(choices);`, -1);
@@ -1872,7 +1865,7 @@ CCSE.launch = function(){
 			choices[1].shimmerTypes = {golden:'snd/chime.mp3', reindeer:'snd/jingle.mp3'};
 		});
 		
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesPick", "Game.chimeType=id;", 
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesPick", "Game.chimeType=id;",
 			'CCSE.SetSelectedShimmerSound(id);', 0);
 		
 		
@@ -1881,7 +1874,7 @@ CCSE.launch = function(){
 		
 		// Game.Upgrades['Milk selector'].choicesFunction
 		if(!Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction = [];
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesFunction", "return choices;", 
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesFunction", "return choices;",
 			`// Game.customUpgrades['Milk selector'].choicesFunction injection point 0
 			for(var i in Game.customUpgrades['Milk selector'].choicesFunction) Game.customUpgrades['Milk selector'].choicesFunction[i](choices);
 			CCSE.OverrideMilkSelector(choices);`, -1);
@@ -1891,7 +1884,7 @@ CCSE.launch = function(){
 			choices[0].milk = Game.Milk;
 		});
 		
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesPick", "Game.milkType=id;", 
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Milk selector'].choicesPick", "Game.milkType=id;",
 			'CCSE.SetSelectedMilk(id);', 0);
 		
 		
@@ -1900,12 +1893,12 @@ CCSE.launch = function(){
 		
 		// Game.Upgrades['Background selector'].choicesFunction
 		if(!Game.customUpgrades['Background selector'].choicesFunction) Game.customUpgrades['Background selector'].choicesFunction = [];
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesFunction", "return choices;", 
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesFunction", "return choices;",
 			`// Game.customUpgrades['Background selector'].choicesFunction injection point 0
 			for(var i in Game.customUpgrades['Background selector'].choicesFunction) Game.customUpgrades['Background selector'].choicesFunction[i](choices);
 			CCSE.OverrideBackgroundSelector(choices);`, -1);
 		
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesPick", "Game.bgType=id;", 
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesPick", "Game.bgType=id;",
 			'CCSE.SetSelectedBackground(id);', 0);
 		
 		
@@ -1913,7 +1906,7 @@ CCSE.launch = function(){
 		var slots=['Permanent upgrade slot I','Permanent upgrade slot II','Permanent upgrade slot III','Permanent upgrade slot IV','Permanent upgrade slot V'];
 		for (var i=0;i<slots.length;i++)
 		{
-			CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + slots[i] + "'].olddescFunc", 1, 
+			CCSE.SpliceCodeIntoFunction("Game.Upgrades['" + slots[i] + "'].olddescFunc", 1,
 				`// ` + slots[i] + ` olddescFunc injection point 0
 				var id = Game.permanentUpgrades[` + i + `];
 				for(var i in Game.customPermanentUpgradeId) id = Game.customPermanentUpgradeId[i](` + i + `, id);`,
@@ -1934,7 +1927,7 @@ CCSE.launch = function(){
 		
 		// this.getPrice
 		// Functions should return a value to multiply the price by (Return 1 to have no effect)
-		if(!Game.customUpgrades[key].getPrice) Game.customUpgrades[key].getPrice = []; 
+		if(!Game.customUpgrades[key].getPrice) Game.customUpgrades[key].getPrice = [];
 		Game.customUpgrades[key].getPrice.push(CCSE.customUpgradesAllgetPrice);
 		
 		
@@ -1944,11 +1937,11 @@ CCSE.launch = function(){
 		
 		
 		// this.buy
-		if(!Game.customUpgrades[key].buy) Game.customUpgrades[key].buy = []; 
+		if(!Game.customUpgrades[key].buy) Game.customUpgrades[key].buy = [];
 		Game.customUpgrades[key].buy.push(CCSE.customUpgradesAllbuy);
 		
 		
-		// this.earn 
+		// this.earn
 		if(!Game.customUpgrades[key].earn) Game.customUpgrades[key].earn = [];
 		Game.customUpgrades[key].earn.push(CCSE.customUpgradesAllearn);
 		
@@ -2159,7 +2152,10 @@ CCSE.launch = function(){
 		span.style.fontSize = '13px';
 		span.style.verticalAlign = 'middle';
 		span.textContent = (CCSE.collapseMenu[title] ? '+' : '-');
-		span.onclick = function(){CCSE.ToggleCollabsibleMenu(title); Game.UpdateMenu();};
+		span.addEventListener("click", function(){
+			CCSE.ToggleCollabsibleMenu(title);
+			Game.UpdateMenu();
+		}) ;
 		titleDiv.appendChild(span);
 		
 		var bodyDiv;
@@ -2276,13 +2272,15 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.GetMenuString = function(){
-		var str =	'<div class="listing">' + CCSE.MenuHelper.ActionButton("CCSE.ExportSave();", 'Export custom save') +
-										 CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') + 
-										 '<label>Back up data added by mods and managed by CCSE</label></div>';
+		var str = '<div class="listing">' +
+			CCSE.MenuHelper.ActionButton("CCSE.ExportSave();", 'Export custom save') +
+			CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') +
+			'<label>Back up data added by mods and managed by CCSE</label></div>';
 		
-		/*str +=	'<div class="listing"><a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
-									 '<a class="option" ' + Game.clickStr + '="CCSE.ImportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Import combined save</a>' + 
-									 '<label>Back up vanilla game save as well as data added by mods and managed by CCSE</label></div>';*/
+		/*str +=	'<div class="listing">' +
+			'<a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
+			'<a class="option" ' + Game.clickStr + '="CCSE.ImportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Import combined save</a>' +
+			'<label>Back up vanilla game save as well as data added by mods and managed by CCSE</label></div>';*/
 		
 		return str;
 	}
@@ -2337,31 +2335,51 @@ CCSE.launch = function(){
 	
 	CCSE.MenuHelper = {
 		
-		ActionButton: (action, text) => '<a class="smallFancyButton option" ' + Game.clickStr + '="' + action + ' PlaySound(\'snd/tick.mp3\');">' + text + '</a>',
-		Header: (text) => '<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
-		InputBox: (id, width, value, onChange) => '<input id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
-		PasswordBox: (id, width, value, onChange) => '<input type="password" id="' + id + '" class="option" style="width:' + width + 'px;" value="' + value + '" onChange="' + onChange + '"></input>',
-		TinyIcon: (icon) => '<div class="icon" style="vertical-align:middle;display:inline-block;' + (icon[2]?'background-image:url('+icon[2]+');':'') + 'background-position:' + (-icon[0]*48) + 'px ' + (-icon[1]*48)+'px;transform:scale(0.5);margin:-16px;"></div>',
-		Slider: (slider, leftText, rightText, startValueFunction, callback, min, max, step) => {
-			if (!callback) callback = '';
-			if (!min) min = 0;
-			if (!max) max = 100;
-			if (!step) step = 1;
-			return '<div class="sliderBox"><div style="float:left;">' + leftText + '</div><div style="float:right;" id="' + slider + 'RightText">' + rightText.replace('[$]', startValueFunction()) + '</div><input class="slider" style="clear:both;" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + startValueFunction() + '" onchange="' + callback + '" oninput="'+callback+'" onmouseup="PlaySound(\'snd/tick.mp3\');" id="' + slider + '"/></div>';
+		ActionButton: (action, text) =>
+			'<a class="smallFancyButton option"' +
+			`${ Game.clickStr }="${ action } PlaySound('snd/tick.mp3');">${ text }</a>`,
+		
+		Header: (text) =>
+			'<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
+
+		InputBox: (id, width, value, onChange) =>
+			`<input type="text" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }">`,
+		
+		PasswordBox: (id, width, value, onChange) =>
+			`<input type="password" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }">`,
+		
+		TinyIcon: (icon) =>
+			'<div class="icon" style="vertical-align:middle;display:inline-block;margin:-16px;transform:scale(0.5);' +
+			(icon[2] ? `background-image:url(${ icon[2] });` : '') +
+			`background-position:${ -icon[0] * 48 }px ${ -icon[1] * 48 }px;"></div>`,
+		
+		Slider: (slider, leftText, rightText, startValueFunction, callback = '', min = 0, max = 100, step = 1) => {
+			var value = startValueFunction();
+			rightText = rightText.replace('[$]', value);
+			return `<div class="sliderBox"><div style="float:left;">${ leftText }</div>` +
+				`<div style="float:right;" id="${ slider }RightText">${ rightText }</div>` +
+				`<input type="range" id="${ slider }" class="slider" style="clear:both;" min="${ min }" max="${ max }" step="${ step }"` +
+				` value="${ value }" onchange="${ callback }" oninput="${ callback }" onmouseup="PlaySound('snd/tick.mp3');"></div>`
 		},
+
 		ToggleButton: (config, prefName, button, on, off, callback, invert) => {
 			var invert = invert ? 1 : 0;
 			if(!callback) callback = '';
-			else callback += "('" + prefName + "', '" + button + "', '" + on.replace("'","\\'") + "', '" + off.replace("'","\\'") + "', '" + invert + "');";
+			else callback += `('${ prefName }', '${ button }', '${ on.replace("'","\\'") }', '${ off.replace("'","\\'") }', '${ invert }');`;
 			callback += "PlaySound('snd/tick.mp3');";
-			return '<a class="smallFancyButton option' + ((config[prefName]^invert) ? '' : ' off') + '" id="' + button + '" ' + Game.clickStr + '="' + callback + '">' + (config[prefName] ? on : off) + '</a>';
+			var className = `smallFancyButton option${ (config[prefName]^invert) ? '' : ' off' }`;
+			return `<a id="${ button }" class="${ className }" ${ Game.clickStr }="${ callback }">${ config[prefName] ? on : off }</a>`;
 		},
+		
 		CheckBox: (config, prefName, button, on, off, callback, invert) => {
 			var invert = invert ? 1 : 0;
 			if(!callback) callback = '';
-			else callback += "('" + prefName + "', '" + button + "', '" + on.replace("'","\\'") + "', '" + off.replace("'","\\'") + "', '" + invert + "');";
+			else callback += `('${ prefName }', '${ button }', '${ on.replace("'","\\'") }', '${ off.replace("'","\\'") }', '${ invert }');`;
 			callback += "PlaySound('snd/tick.mp3');";
-			return '<input class="checkbox checkbox' + ((config[prefName]^invert) ? 'on' : ' off') + '" ' + (config[prefName] ? 'checked="checked"' : '') + ' type="checkbox" id="' + button + '" ' + Game.clickStr + '="' + callback + '"><label id="'+button+'_label" for="' + button + '">' + (config[prefName] ? on : off) + '</label>';
+			var checked = config[prefName] ? ' checked="checked"' : '';
+			var className = `checkbox checkbox${ (config[prefName]^invert) ? 'on' : ' off' }`;
+			return `<input type="checkbox" id="${ button }" class="${ className }" ${ checked } ${ Game.clickStr }="${ callback }">` +
+				`<label id="${ button }_label" for="${ button }">${ config[prefName] ? on : off }</label>`;
 		}
 		
 	}
@@ -2450,7 +2468,7 @@ CCSE.launch = function(){
 		// M.spells['hand of fate'].win
 		// functions should push a value to choices
 		if(!Game.customMinigame[objKey].fateWin) Game.customMinigame[objKey].fateWin = [];
-		CCSE.ReplaceCodeIntoFunction('M.spells["hand of fate"].win', 'newShimmer.force', 
+		CCSE.ReplaceCodeIntoFunction('M.spells["hand of fate"].win', 'newShimmer.force',
 					`// M.spells["hand of fate"].win injection point 0
 					for(var i in Game.customMinigame['` + objKey + `'].fateWin) Game.customMinigame['` + objKey + `'].fateWin[i](choices);`, -1,
 			preEvalScript);
@@ -2459,7 +2477,7 @@ CCSE.launch = function(){
 		// M.spells['hand of fate'].fail
 		// functions should push a value to choices
 		if(!Game.customMinigame[objKey].fateFail) Game.customMinigame[objKey].fateFail = [];
-		CCSE.ReplaceCodeIntoFunction('M.spells["hand of fate"].fail', 'newShimmer.force', 
+		CCSE.ReplaceCodeIntoFunction('M.spells["hand of fate"].fail', 'newShimmer.force',
 					`// M.spells["hand of fate"].fail injection point 0
 					for(var i in Game.customMinigame['` + objKey + `'].fateFail) Game.customMinigame['` + objKey + `'].fateFail[i](choices);`, -1,
 			preEvalScript);
@@ -2523,7 +2541,7 @@ CCSE.launch = function(){
 		// M.getGoodPrice
 		// functions should return a value to multiply val by (Return 1 for no effect)
 		if(!Game.customMinigame[objKey].getGoodPrice) Game.customMinigame[objKey].getGoodPrice = [];
-		CCSE.ReplaceCodeIntoFunction('M.getGoodPrice', 'return good.val;', 
+		CCSE.ReplaceCodeIntoFunction('M.getGoodPrice', 'return good.val;',
 			`var val = good.val;
 			// M.getGoodPrice injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].getGoodPrice) val *= Game.customMinigame['` + objKey + `'].getGoodPrice[i](good);
@@ -2772,7 +2790,7 @@ CCSE.launch = function(){
 		
 		// M.getUnlockedN
 		if(!Game.customMinigame[objKey].getUnlockedN) Game.customMinigame[objKey].getUnlockedN = [];
-		CCSE.ReplaceCodeIntoFunction('M.getUnlockedN', 'return', 
+		CCSE.ReplaceCodeIntoFunction('M.getUnlockedN', 'return',
 			`// M.getUnlockedN injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].getUnlockedN) Game.customMinigame['` + objKey + `'].getUnlockedN[i]();`, -1,
 			preEvalScript);
@@ -2780,7 +2798,7 @@ CCSE.launch = function(){
 		
 		// M.dropUpgrade
 		if(!Game.customMinigame[objKey].dropUpgrade) Game.customMinigame[objKey].dropUpgrade = [];
-		CCSE.SliceCodeIntoFunction('M.dropUpgrade', -1, 
+		CCSE.SliceCodeIntoFunction('M.dropUpgrade', -1,
 			`// M.dropUpgrade injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].dropUpgrade) Game.customMinigame['` + objKey + `'].dropUpgrade[i](upgrade, rate);
 		`, preEvalScript);
@@ -2788,7 +2806,7 @@ CCSE.launch = function(){
 		
 		// M.computeMatures
 		if(!Game.customMinigame[objKey].computeMatures) Game.customMinigame[objKey].computeMatures = [];
-		CCSE.SliceCodeIntoFunction('M.computeMatures', -1, 
+		CCSE.SliceCodeIntoFunction('M.computeMatures', -1,
 			`// M.computeMatures injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].computeMatures) Game.customMinigame['` + objKey + `'].computeMatures[i](mult);
 		`, preEvalScript);
@@ -2797,7 +2815,7 @@ CCSE.launch = function(){
 		// M.getMuts
 		// functions should push mutations to muts
 		if(!Game.customMinigame[objKey].getMuts) Game.customMinigame[objKey].getMuts = [];
-		CCSE.ReplaceCodeIntoFunction('M.getMuts', 'return', 
+		CCSE.ReplaceCodeIntoFunction('M.getMuts', 'return',
 			`// M.getMuts injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].getMuts) Game.customMinigame['` + objKey + `'].getMuts[i](neighs, neighsM, muts);`, -1,
 			preEvalScript);
@@ -2806,7 +2824,7 @@ CCSE.launch = function(){
 		// M.computeBoostPlot
 		// You're going to have to use MAXIMUM EFFORT
 		if(!Game.customMinigame[objKey].computeBoostPlot) Game.customMinigame[objKey].computeBoostPlot = [];
-		CCSE.SliceCodeIntoFunction('M.computeBoostPlot', -1, 
+		CCSE.SliceCodeIntoFunction('M.computeBoostPlot', -1,
 			`// M.computeBoostPlot injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].computeBoostPlot) Game.customMinigame['` + objKey + `'].computeBoostPlot[i]();
 		`, preEvalScript);
@@ -2815,7 +2833,7 @@ CCSE.launch = function(){
 		// M.computeEffs
 		// functions should change effs (or not, I'm a comment, not a cop)
 		if(!Game.customMinigame[objKey].computeEffs) Game.customMinigame[objKey].computeEffs = [];
-		CCSE.ReplaceCodeIntoFunction('M.computeEffs', 'M.effs=effs;', 
+		CCSE.ReplaceCodeIntoFunction('M.computeEffs', 'M.effs=effs;',
 			`// M.computeEffs injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].computeEffs) Game.customMinigame['` + objKey + `'].computeEffs[i](effs);`, -1,
 			preEvalScript);
@@ -2832,7 +2850,7 @@ CCSE.launch = function(){
 		if(!Game.customMinigame[objKey].getPlantDesc) Game.customMinigame[objKey].getPlantDesc = [];
 		CCSE.ReplaceCodeIntoFunction('M.getPlantDesc', 'return', 'var ret = ', 0,
 			preEvalScript);
-		CCSE.SliceCodeIntoFunction('M.getPlantDesc', -1, 
+		CCSE.SliceCodeIntoFunction('M.getPlantDesc', -1,
 				`// M.getPlantDesc injection point 0
 				for(var i in Game.customMinigame['` + objKey + `'].getPlantDesc) ret = Game.customMinigame['` + objKey + `'].getPlantDesc[i](me, ret);
 				return ret;
@@ -2842,7 +2860,7 @@ CCSE.launch = function(){
 		// M.soilTooltip
 		// Return str for no effect
 		if(!Game.customMinigame[objKey].soilTooltip) Game.customMinigame[objKey].soilTooltip = [];
-		CCSE.ReplaceCodeIntoFunction('M.soilTooltip', 'return str;', 
+		CCSE.ReplaceCodeIntoFunction('M.soilTooltip', 'return str;',
 				`// M.soilTooltip injection point 0
 				for(var i in Game.customMinigame['` + objKey + `'].soilTooltip) str = Game.customMinigame['` + objKey + `'].soilTooltip[i](id, str);`, -1,
 			preEvalScript);
@@ -2851,7 +2869,7 @@ CCSE.launch = function(){
 		// M.seedTooltip
 		// Return str for no effect
 		if(!Game.customMinigame[objKey].seedTooltip) Game.customMinigame[objKey].seedTooltip = [];
-		CCSE.ReplaceCodeIntoFunction('M.seedTooltip', 'return str;', 
+		CCSE.ReplaceCodeIntoFunction('M.seedTooltip', 'return str;',
 				`// M.seedTooltip injection point 0
 				for(var i in Game.customMinigame['` + objKey + `'].seedTooltip) str = Game.customMinigame['` + objKey + `'].seedTooltip[i](id, str);`, -1,
 			preEvalScript);
@@ -2860,7 +2878,7 @@ CCSE.launch = function(){
 		// M.toolTooltip
 		// Return str for no effect
 		if(!Game.customMinigame[objKey].toolTooltip) Game.customMinigame[objKey].toolTooltip = [];
-		CCSE.ReplaceCodeIntoFunction('M.toolTooltip', 'return str;', 
+		CCSE.ReplaceCodeIntoFunction('M.toolTooltip', 'return str;',
 				`// M.toolTooltip injection point 0
 				for(var i in Game.customMinigame['` + objKey + `'].toolTooltip) str = Game.customMinigame['` + objKey + `'].toolTooltip[i](id, str);`, -1,
 			preEvalScript);
@@ -2874,7 +2892,7 @@ CCSE.launch = function(){
 			preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.tileTooltip', /return str;/g, 'ret = str;', 0,
 			preEvalScript);
-		CCSE.ReplaceCodeIntoFunction('M.tileTooltip', '};', 
+		CCSE.ReplaceCodeIntoFunction('M.tileTooltip', '};',
 				`// M.tileTooltip injection point 0
 				for(var i in Game.customMinigame['` + objKey + `'].tileTooltip) ret = Game.customMinigame['` + objKey + `'].tileTooltip[i](x, y, ret);
 				return ret;`, -1,
@@ -2895,7 +2913,7 @@ CCSE.launch = function(){
 		
 		// M.buildPanel
 		if(!Game.customMinigame[objKey].buildPanel) Game.customMinigame[objKey].buildPanel = [];
-		CCSE.SliceCodeIntoFunction('M.buildPanel', -1, 
+		CCSE.SliceCodeIntoFunction('M.buildPanel', -1,
 			`// M.buildPanel injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].buildPanel) Game.customMinigame['` + objKey + `'].buildPanel[i]();
 		`, preEvalScript);
@@ -2903,7 +2921,7 @@ CCSE.launch = function(){
 		
 		// M.buildPlot
 		if(!Game.customMinigame[objKey].buildPlot) Game.customMinigame[objKey].buildPlot = [];
-		CCSE.SliceCodeIntoFunction('M.buildPlot', -1, 
+		CCSE.SliceCodeIntoFunction('M.buildPlot', -1,
 			`// M.buildPlot injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].buildPlot) Game.customMinigame['` + objKey + `'].buildPlot[i]();
 		`, preEvalScript);
@@ -2911,7 +2929,7 @@ CCSE.launch = function(){
 		
 		// M.clickTile
 		if(!Game.customMinigame[objKey].clickTile) Game.customMinigame[objKey].clickTile = [];
-		CCSE.SliceCodeIntoFunction('M.clickTile', -1, 
+		CCSE.SliceCodeIntoFunction('M.clickTile', -1,
 			`// M.clickTile injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].clickTile) Game.customMinigame['` + objKey + `'].clickTile[i](x, y);
 		`, preEvalScript);
@@ -2929,7 +2947,7 @@ CCSE.launch = function(){
 			preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.getTile', 'return', 'else ret =', 0,
 			preEvalScript);
-		CCSE.SliceCodeIntoFunction('M.getTile', -1, 
+		CCSE.SliceCodeIntoFunction('M.getTile', -1,
 			`// M.getTile injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].getTile) ret = Game.customMinigame['` + objKey + `'].getTile[i](x, y, ret);
 			return ret;
@@ -2938,12 +2956,12 @@ CCSE.launch = function(){
 		
 		// M.getTile
 		// Return ret to have no effect
-		if(!Game.customMinigame[objKey].isTileUnlocked) Game.customMinigame[objKey].isTileUnlocked = []; 
+		if(!Game.customMinigame[objKey].isTileUnlocked) Game.customMinigame[objKey].isTileUnlocked = [];
 		CCSE.ReplaceCodeIntoFunction('M.isTileUnlocked', '{', 'var ret;', 1,
 			preEvalScript);
 		CCSE.ReplaceCodeIntoFunction('M.isTileUnlocked', /return/g, 'ret =', 0,
 			preEvalScript);
-		CCSE.SliceCodeIntoFunction('M.isTileUnlocked', -1, 
+		CCSE.SliceCodeIntoFunction('M.isTileUnlocked', -1,
 			`// M.isTileUnlocked injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].isTileUnlocked) ret = Game.customMinigame['` + objKey + `'].isTileUnlocked[i](x, y, ret);
 			return ret;
@@ -2952,7 +2970,7 @@ CCSE.launch = function(){
 		
 		// M.computeStepT
 		if(!Game.customMinigame[objKey].computeStepT) Game.customMinigame[objKey].computeStepT = [];
-		CCSE.SliceCodeIntoFunction('M.computeStepT', -1, 
+		CCSE.SliceCodeIntoFunction('M.computeStepT', -1,
 			`// M.computeStepT injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].computeStepT) Game.customMinigame['` + objKey + `'].computeStepT[i]();
 		`, preEvalScript);
@@ -2960,7 +2978,7 @@ CCSE.launch = function(){
 		
 		// M.convert
 		if(!Game.customMinigame[objKey].convert) Game.customMinigame[objKey].convert = [];
-		CCSE.SliceCodeIntoFunction('M.convert', -1, 
+		CCSE.SliceCodeIntoFunction('M.convert', -1,
 			`// M.convert injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].convert) Game.customMinigame['` + objKey + `'].convert[i]();
 		`, preEvalScript);
@@ -2968,7 +2986,7 @@ CCSE.launch = function(){
 		
 		// M.harvestAll
 		if(!Game.customMinigame[objKey].harvestAll) Game.customMinigame[objKey].harvestAll = [];
-		CCSE.SliceCodeIntoFunction('M.harvestAll', -1, 
+		CCSE.SliceCodeIntoFunction('M.harvestAll', -1,
 			`// M.harvestAll injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].harvestAll) Game.customMinigame['` + objKey + `'].harvestAll[i](type, mature, mortal);
 		`, preEvalScript);
@@ -2976,7 +2994,7 @@ CCSE.launch = function(){
 		
 		// M.harvest
 		if(!Game.customMinigame[objKey].harvest) Game.customMinigame[objKey].harvest = [];
-		CCSE.ReplaceCodeIntoFunction('M.harvest', 'return true;', 
+		CCSE.ReplaceCodeIntoFunction('M.harvest', 'return true;',
 				`// M.harvest injection point 0
 				for(var i in Game.customMinigame['` + objKey + `'].harvest) Game.customMinigame['` + objKey + `'].harvest[i](x, y, manual);`, -1,
 			preEvalScript);
@@ -2984,7 +3002,7 @@ CCSE.launch = function(){
 		
 		// M.unlockSeed
 		if(!Game.customMinigame[objKey].unlockSeed) Game.customMinigame[objKey].unlockSeed = [];
-		CCSE.ReplaceCodeIntoFunction('M.unlockSeed', 'return true;', 
+		CCSE.ReplaceCodeIntoFunction('M.unlockSeed', 'return true;',
 			`// M.unlockSeed injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].unlockSeed) Game.customMinigame['` + objKey + `'].unlockSeed[i](me);`, -1,
 			preEvalScript);
@@ -2992,7 +3010,7 @@ CCSE.launch = function(){
 		
 		// M.lockSeed
 		if(!Game.customMinigame[objKey].lockSeed) Game.customMinigame[objKey].lockSeed = [];
-		CCSE.ReplaceCodeIntoFunction('M.lockSeed', 'return true;', 
+		CCSE.ReplaceCodeIntoFunction('M.lockSeed', 'return true;',
 			`// M.lockSeed injection point 0
 			for(var i in Game.customMinigame['` + objKey + `'].lockSeed) Game.customMinigame['` + objKey + `'].lockSeed[i](me);`, -1,
 			preEvalScript);
@@ -3135,19 +3153,19 @@ CCSE.launch = function(){
 	
 	/*=====================================================================================
 	Save custom things
-	If you use CCSE to create custom upgrades or achievements, 
+	If you use CCSE to create custom upgrades or achievements,
 	it will also save their state to local storage whenever the game is saved.
 		Each custom upgrade or achievement needs a unique name, or they could get overwritten.
-		Yes, this means across mods as well. 
+		Yes, this means across mods as well.
 		If two mods have things with the same name, the mods cannot be used at the same time.
 		This is because of how the game itself keeps track of these things
 	
-	You can also use CCSE to save your mod data. 
+	You can also use CCSE to save your mod data.
 		Add your save data as a child of CCSE.config.OtherMods. Make sure not to step on anyone else's toes!
 		Push your save function into CCSE.customSave, and push your load function into CCSE.customLoad
 	=======================================================================================*/
 	
-	// The following code copied from https://github.com/pieroxy/lz-string/
+	// The following code copied from https://github.com/pieroxy/lz-string
 	CCSE.LZString = function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length;n++)t[o][o.charAt(n)]=n}return t[o][r]}var r=String.fromCharCode,n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",e="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",t={},i={compressToBase64:function(o){if(null==o)return"";var r=i._compress(o,6,function(o){return n.charAt(o)});switch(r.length%4){default:case 0:return r;case 1:return r+"===";case 2:return r+"==";case 3:return r+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(e){return o(n,r.charAt(e))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(o){return null==o?"":""==o?null:i._decompress(o.length,16384,function(r){return o.charCodeAt(r)-32})},compressToUint8Array:function(o){for(var r=i.compress(o),n=new Uint8Array(2*r.length),e=0,t=r.length;t>e;e++){var s=r.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null===o||void 0===o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;t>e;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(o){return null==o?"":i._compress(o,6,function(o){return e.charAt(o)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(n){return o(e,r.charAt(n))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(o,r,n){if(null==o)return"";var e,t,i,s={},p={},u="",c="",a="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<o.length;i+=1)if(u=o.charAt(i),Object.prototype.hasOwnProperty.call(s,u)||(s[u]=f++,p[u]=!0),c=a+u,Object.prototype.hasOwnProperty.call(s,c))a=c;else{if(Object.prototype.hasOwnProperty.call(p,a)){if(a.charCodeAt(0)<256){for(e=0;h>e;e++)m<<=1,v==r-1?(v=0,d.push(n(m)),m=0):v++;for(t=a.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;h>e;e++)m=m<<1|t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=a.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete p[a]}else for(t=s[a],e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++),s[c]=f++,a=String(u)}if(""!==a){if(Object.prototype.hasOwnProperty.call(p,a)){if(a.charCodeAt(0)<256){for(e=0;h>e;e++)m<<=1,v==r-1?(v=0,d.push(n(m)),m=0):v++;for(t=a.charCodeAt(0),e=0;8>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;h>e;e++)m=m<<1|t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=a.charCodeAt(0),e=0;16>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}l--,0==l&&(l=Math.pow(2,h),h++),delete p[a]}else for(t=s[a],e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;l--,0==l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;h>e;e++)m=m<<1|1&t,v==r-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==r-1){d.push(n(m));break}v++}return d.join("")},decompress:function(o){return null==o?"":""==o?null:i._decompress(o.length,32768,function(r){return o.charCodeAt(r)})},_decompress:function(o,n,e){var t,i,s,p,u,c,a,l,f=[],h=4,d=4,m=3,v="",w=[],A={val:e(0),position:n,index:1};for(i=0;3>i;i+=1)f[i]=i;for(p=0,c=Math.pow(2,2),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;switch(t=p){case 0:for(p=0,c=Math.pow(2,8),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;l=r(p);break;case 1:for(p=0,c=Math.pow(2,16),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;l=r(p);break;case 2:return""}for(f[3]=l,s=l,w.push(l);;){if(A.index>o)return"";for(p=0,c=Math.pow(2,m),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;switch(l=p){case 0:for(p=0,c=Math.pow(2,8),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;f[d++]=r(p),l=d-1,h--;break;case 1:for(p=0,c=Math.pow(2,16),a=1;a!=c;)u=A.val&A.position,A.position>>=1,0==A.position&&(A.position=n,A.val=e(A.index++)),p|=(u>0?1:0)*a,a<<=1;f[d++]=r(p),l=d-1,h--;break;case 2:return w.join("")}if(0==h&&(h=Math.pow(2,m),m++),f[l])v=f[l];else{if(l!==d)return null;v=s+s.charAt(0)}w.push(v),f[d++]=s+v.charAt(0),h--,s=v,0==h&&(h=Math.pow(2,m),m++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module&&(module.exports=LZString);
 	
 	if(!CCSE.customSave) CCSE.customSave = [];
@@ -3259,7 +3277,7 @@ CCSE.launch = function(){
 				str = b64_to_utf8(str);
 				config = cautiousDecompress(str);
 			}
-		} 
+		}
 		else{ // Getting here from game function call
 			if(data){ // Has data in game save
 				config = cautiousDecompress(data);
@@ -3344,19 +3362,19 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.InitializeConfig = function(config){
-		if(!CCSE.config) CCSE.config = {};
-		if(!CCSE.config.version) CCSE.config.version = 1;
-		if(!CCSE.config.Achievements) CCSE.config.Achievements = {};
-		if(!CCSE.config.Upgrades) CCSE.config.Upgrades = {};
-		if(!CCSE.config.Buildings) CCSE.config.Buildings = {};
-		if(!CCSE.config.Buffs) CCSE.config.Buffs = {};
-		if(!CCSE.config.Seasons) CCSE.config.Seasons = {};
-		if(!CCSE.config.OtherMods) CCSE.config.OtherMods = {};
-		if(!CCSE.config.vault) CCSE.config.vault = [];
-		if(!CCSE.config.permanentUpgrades) CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
-		if(!CCSE.config.chimeType) CCSE.config.chimeType = 'No sound';
-		if(!CCSE.config.milkType) CCSE.config.milkType = 'Automatic';
-		if(!CCSE.config.bgType) CCSE.config.bgType = 'Automatic';
+		if(!CCSE.config)					 CCSE.config = {};
+		if(!CCSE.config.version)			 CCSE.config.version = 1;
+		if(!CCSE.config.Achievements)		 CCSE.config.Achievements = {};
+		if(!CCSE.config.Upgrades)			 CCSE.config.Upgrades = {};
+		if(!CCSE.config.Buildings)			 CCSE.config.Buildings = {};
+		if(!CCSE.config.Buffs)				 CCSE.config.Buffs = {};
+		if(!CCSE.config.Seasons)			 CCSE.config.Seasons = {};
+		if(!CCSE.config.OtherMods)			 CCSE.config.OtherMods = {};
+		if(!CCSE.config.vault)				 CCSE.config.vault = [];
+		if(!CCSE.config.permanentUpgrades)	 CCSE.config.permanentUpgrades = [-1,-1,-1,-1,-1];
+		if(!CCSE.config.chimeType)			 CCSE.config.chimeType = 'No sound';
+		if(!CCSE.config.milkType)			 CCSE.config.milkType = 'Automatic';
+		if(!CCSE.config.bgType)				 CCSE.config.bgType = 'Automatic';
 		
 		if(config){
 			if(config.version) CCSE.config.version = config.version;
@@ -3376,16 +3394,22 @@ CCSE.launch = function(){
 	
 	// These two kept for people who might be blindsided by the save format change
 	CCSE.ExportSave = function(){
-		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>It contains data that other mods authors decided to allow CCSE to manage, as well as data for custom things added through CCSE (i.e. achivements, upgrades, etc)</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-					CCSE.save(1) + 
-					'</textarea></div>',['All done!']);
+		Game.Prompt(
+			'<h3>Export configuration</h3>' +
+			'<div class="block">This is your CCSE save.<br>It contains data that other mods authors decided to allow CCSE to manage, as well as data for custom things added through CCSE (i.e. achivements, upgrades, etc)</div>' +
+			'<div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + CCSE.save(1) + '</textarea></div>',
+			['All done!']);
 		l('textareaPrompt').focus();
 		l('textareaPrompt').select();
 	}
 	
 	CCSE.ImportSave = function(){
-		Game.Prompt('<h3>Import config</h3><div class="block">Paste your CCSE save here.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;"></textarea></div>',
-					[['Load','if(l(\'textareaPrompt\').value.length > 0){CCSE.load(l(\'textareaPrompt\').value, 1); Game.ClosePrompt(); Game.UpdateMenu();}'], 'Nevermind']);
+		var load = 'if(l("textareaPrompt").value.length > 0){CCSE.load(l("textareaPrompt").value, 1); Game.ClosePrompt(); Game.UpdateMenu();}';
+		Game.Prompt(
+			'<h3>Import config</h3>'+
+			'<div class="block">Paste your CCSE save here.</div>'+
+			'<div class="block"><textarea id="textareaPrompt" style="width: 100%; height: 128px;"></textarea></div>',
+			[['Load', load], 'Nevermind']);
 		l('textareaPrompt').focus();
 	}
 	
@@ -3394,8 +3418,8 @@ CCSE.launch = function(){
 	
 	CCSE.ExportCombinedSave = function(){
 		var saveString = JSON.stringify({'Vanilla':Game.WriteSave(1),'CCSE':CCSE.save(1)});
-		Game.Prompt('<h3>Export combined save</h3><div class="block">This is your vanilla game save combined with your CCSE save in a single convenient location!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-					saveString + 
+		Game.Prompt('<h3>Export combined save</h3><div class="block">This is your vanilla game save combined with your CCSE save in a single convenient location!</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' +
+					saveString +
 					'</textarea></div>',['All done!']);
 		l('textareaPrompt').focus();
 		l('textareaPrompt').select();
@@ -3417,8 +3441,8 @@ CCSE.launch = function(){
 	I apparently never incorporated these anywhere. Might as well comment them out.
 	
 	CCSE.ExportEditableSave = function(){
-		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>In JSON format for people who want to edit it.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' + 
-					CCSE.save(3) + 
+		Game.Prompt('<h3>Export configuration</h3><div class="block">This is your CCSE save.<br>In JSON format for people who want to edit it.</div><div class="block"><textarea id="textareaPrompt" style="width:100%;height:128px;" readonly>' +
+					CCSE.save(3) +
 					'</textarea></div>',['All done!']);
 		l('textareaPrompt').focus();
 		l('textareaPrompt').select();
@@ -3714,10 +3738,10 @@ CCSE.launch = function(){
 	Custom Selector helper functions
 	=======================================================================================*/
 	CCSE.OverrideShimmerSoundSelector = function(choices){
-		let found = false; 
+		let found = false;
 		for(var i in choices){
 			let choice = choices[i];
-			if(choice.name == CCSE.config.chimeType){choice.selected = 1;found = true}
+			if(choice.name == CCSE.config.chimeType){choice.selected = 1; found = true}
 			else choice.selected = false;
 		}
 		
@@ -3749,10 +3773,10 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.OverrideMilkSelector = function(choices){
-		let found = false; 
+		let found = false;
 		for(var i in choices){
 			let choice = choices[i];
-			if(choice.name == CCSE.config.milkType){choice.selected = 1;found = true}
+			if(choice.name == CCSE.config.milkType){choice.selected = 1; found = true}
 			else choice.selected = false;
 		}
 		
@@ -3773,10 +3797,10 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.OverrideBackgroundSelector = function(choices){
-		let found = false; 
+		let found = false;
 		for(var i in choices){
 			let choice = choices[i];
-			if(choice.name == CCSE.config.bgType){choice.selected = 1;found = true}
+			if(choice.name == CCSE.config.bgType){choice.selected = 1; found = true}
 			else choice.selected = false;
 		}
 		
@@ -3832,8 +3856,9 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.SetSpecialMenuImage = function(str, pic, frame){
-		return str.replace('background:url(img/dragon.png?v='+Game.version+');background-position:-384px 0px;', 
-						   'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
+		return str.replace(
+			'background:url(img/dragon.png?v=' + Game.version + ');background-position:-384px 0px;',
+			'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	
 	CCSE.GetPermanentUpgrade = function(slot, id){
@@ -3866,10 +3891,16 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Confirmation Prompts
 	=======================================================================================*/
+	CCSE.ConfirmLoad = function(modName, modVersion, versionText){
+		return confirm(
+			`${ modName } version ${ modVersion } is meant for ${ versionText }.  `+
+			"Loading a different version may cause errors.  " +
+			`Do you still want to load ${ modName }?`);
+	}
 	CCSE.ConfirmGameVersion = function(modName, modVersion, version){
 		var proceed = true;
 		if(Game.version != version){
-			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + version + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+			proceed = CCSE.ConfirmLoad(modName, modVersion, `Game version ${ version }`);
 		}
 		return proceed;
 	}
@@ -3877,7 +3908,7 @@ CCSE.launch = function(){
 	CCSE.ConfirmCCSEVersion = function(modName, modVersion, version){
 		var proceed = true;
 		if(CCSE.version != version){
-			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + version + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+			proceed = CCSE.ConfirmLoad(modName, modVersion, `CCSE version ${ version }`);
 		}
 		return proceed;
 	}
@@ -3885,13 +3916,13 @@ CCSE.launch = function(){
 	CCSE.ConfirmGameCCSEVersion = function(modName, modVersion, gameVersion, ccseVersion){
 		var proceed = true;
 		if(Game.version != gameVersion && CCSE.version != ccseVersion){
-			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + gameVersion + ' and CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+			proceed = CCSE.ConfirmLoad(modName, modVersion, `Game version ${ gameVersion } and CCSE version ${ ccseVersion }`);
 		}
 		else if(Game.version != gameVersion){
-			proceed = confirm(modName + ' version ' + modVersion + ' is meant for Game version ' + gameVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+			proceed = CCSE.ConfirmLoad(modName, modVersion, `Game version ${ gameVersion }`);
 		}
 		else if(CCSE.version != ccseVersion){
-			proceed = confirm(modName + ' version ' + modVersion + ' is meant for CCSE version ' + ccseVersion + '.  Loading a different version may cause errors.  Do you still want to load ' + modName + '?');
+			proceed = CCSE.ConfirmLoad(modName, modVersion, `CCSE version ${ ccseVersion }`);
 		}
 		return proceed;
 	}
@@ -3939,7 +3970,7 @@ CCSE.launch = function(){
 			CCSE.GameLoadModData = Game.loadModData;
 			Game.loadModData = function(){CCSE.gameHasLoadedSave=1;}
 		}
-	} 
+	}
 }
 
 if(!CCSE.isLoaded && !CCSE.loading) CCSE.launch();

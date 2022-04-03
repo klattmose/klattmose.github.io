@@ -205,76 +205,62 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	The heart of the mod. Functions to inject code into functions.
 	=======================================================================================*/
-	CCSE.SliceCodeIntoFunction = function(functionName, pos, code, preEvalScript, hasPrototype){
+	CCSE.InjectCodeIntoFunction = function(functionName, alterFunctionCode, code, preEvalScript, hasPrototype){
 		// preEvalScript is to set variables that are used in the function but aren't declared in the function
 		if(preEvalScript) eval(preEvalScript);
 		
-		var proto;
-		if(hasPrototype) proto = eval(functionName + ".prototype");
-		
-		var temp = eval(functionName + ".toString()");
-		temp = temp.slice(0, pos) + code + temp.slice(pos);
+		var originalFunction = eval(functionName);
+		if (originalFunction === null) {
+			console.warn(`CCSE: ${ functionName } is not found. Could not inject ${ code }`);
+			return;
+		} else if (typeof originalFunction !== "function") {
+			console.warn(`CCSE: ${ functionName } is not a function. Could not inject ${ code }`);
+			return;
+		}
 		
 		//console.log(functionName);
-		eval(functionName + " = " + temp);
-		if(hasPrototype) eval(functionName + ".prototype = proto");
+		eval(functionName + " = " + alterFunctionCode(originalFunction.toString()));
+		if(hasPrototype) {
+			var alteredFunction = eval(functionName);
+			alteredFunction.prototype = originalFunction.prototype;
+		}
 		
 		CCSE.functionsAltered++;
 		if(!CCSE.isLoaded) CCSE.UpdateNote();
 		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+	}
+	
+	CCSE.SliceCodeIntoFunction = function(functionName, pos, code, preEvalScript, hasPrototype){
+		var alterFunctionCode = function(temp){
+			return temp.slice(0, pos) + code + temp.slice(pos);
+		}
+		CCSE.InjectCodeIntoFunction(functionName, alterFunctionCode, code, preEvalScript, hasPrototype);
 	}
 	
 	CCSE.SpliceCodeIntoFunction = function(functionName, row, code, preEvalScript, hasPrototype){
-		// preEvalScript is to set variables that are used in the function but aren't declared in the function
-		if(preEvalScript) eval(preEvalScript);
-		
-		var proto;
-		if(hasPrototype) proto = eval(functionName + ".prototype");
-		var i = Math.floor(row);
-		if(i == 0) throw new Error("row cannot be zero");
-		
-		var temp = eval(functionName + ".toString()").split("\n");
-		
-		i = row < 0 ? temp.length + row : row;
-		temp.splice(i, 0, code);
-		
-		//console.log(functionName);
-		eval(functionName + " = " + temp.join("\n"));
-		if(hasPrototype) eval(functionName + ".prototype = proto");
-		
-		CCSE.functionsAltered++;
-		if(!CCSE.isLoaded) CCSE.UpdateNote();
-		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ". Could not inject " + code);
+		var alterFunctionCode = function(temp){
+			temp = temp.split("\n");
+			i = row < 0 ? temp.length + row : row;
+			temp.splice(i, 0, code);
+			return temp.join("\n");
+		}
+		CCSE.InjectCodeIntoFunction(functionName, alterFunctionCode, code, preEvalScript, hasPrototype);
 	}
 	
 	CCSE.ReplaceCodeIntoFunction = function(functionName, targetString, code, mode, preEvalScript, hasPrototype){
-		// preEvalScript is to set variables that are used in the function but aren't declared in the function
-		if(preEvalScript) eval(preEvalScript);
-		
-		var proto;
-		if(hasPrototype) proto = eval(functionName + ".prototype");
-		var temp = eval(functionName + ".toString()");
-		
-		switch(mode){
-			case -1: // Insert before targetString
-				temp = temp.replace(targetString, code + "\n" + targetString);
-				break;
-			case 0: // Replace targetString. Regex should work
-				temp = temp.replace(targetString, code);
-				break;
-			case 1: // Insert after targetString
-				temp = temp.replace(targetString, targetString + "\n" + code);
-				break;
-			default:
-				throw new Error("mode must be either, -1, 0, or 1");
+		var alterFunctionCode = function(temp){
+			switch(mode){
+				case -1: // Insert before targetString
+					return temp.replace(targetString, code + "\n" + targetString);
+				case 0: // Replace targetString. Regex will work
+					return temp.replace(targetString, code);
+				case 1: // Insert after targetString
+					return temp.replace(targetString, targetString + "\n" + code);
+				default:
+					throw new Error("mode must be either, -1, 0, or 1");
+			}
 		}
-		
-		eval(functionName + " = " + temp);
-		if(hasPrototype) eval(functionName + ".prototype = proto");
-		
-		CCSE.functionsAltered++;
-		if(!CCSE.isLoaded) CCSE.UpdateNote();
-		//if(eval(functionName + ".toString()").indexOf(code) == -1) console.log("Error injecting code into function " + functionName + ".");
+		CCSE.InjectCodeIntoFunction(functionName, alterFunctionCode, code, preEvalScript, hasPrototype);
 	}
 	
 	CCSE.InitNote = function(){
@@ -444,13 +430,13 @@ CCSE.launch = function(){
 		CCSE.SliceCodeIntoFunction('Game.tooltip.update', -1, `
 			// Game.tooltip.update injection point 0
 			for(var i in Game.customTooltipUpdate) Game.customTooltipUpdate[i]();
-			`);
+		`);
 		
 		
 		// Game.crate
 		// Return ret to have no effect
 		if(!Game.customCrate) Game.customCrate = [];
-		CCSE.ReplaceCodeIntoFunction('Game.crate', 'return (Game', "var ret = (Game", 0);
+		CCSE.ReplaceCodeIntoFunction('Game.crate', "return '<div'+", "var ret = '<div'+", 0);
 		CCSE.SliceCodeIntoFunction('Game.crate', -1, `
 			// Game.crate injection point 0
 			for(var i in Game.customCrate) ret = Game.customCrate[i](me, context, forceClickStr, id, ret);
@@ -758,7 +744,7 @@ CCSE.launch = function(){
 		
 		// Game.shimmerTypes['reindeer'].popFunc
 		// customDropRateMult should return a multiplier to the fail rate for reindeer drops
-		// Game.customDropRateMult is already taken into account. This is for reindeer specific fucntions
+		// Game.customDropRateMult is already taken into account. This is for reindeer specific functions
 		// Return 1 to have no effect. Return 0 for a guarantee*
 		if(!Game.customShimmerTypes['reindeer'].customDropRateMult) Game.customShimmerTypes['reindeer'].customDropRateMult = [];
 		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].popFunc", 'if (Math.random()>failRate)', 
@@ -1701,10 +1687,10 @@ CCSE.launch = function(){
 		// cpsMult Functions should return a value to multiply the price by (Return 1 to have no effect)
 		if(!Game.customBuildings[obj.name].cpsMult) Game.customBuildings[obj.name].cpsMult = [];
 		Game.customBuildings[key].cpsMult.push(CCSE.customBuildingsAllcpsMult);
-		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].cps", -1, `
+		CCSE.ReplaceCodeIntoFunction("Game.Objects['" + escKey + "'].cps", 'return', `
 				// Game.Objects['` + escKey + `'].cps injection point 0
 				for(var i in Game.customBuildings[this.name].cpsMult) mult *= Game.customBuildings[this.name].cpsMult[i](me);
-			`);
+		`, -1);
 		
 		
 		for(var i in CCSE.customReplaceBuilding) CCSE.customReplaceBuilding[i](key, obj);

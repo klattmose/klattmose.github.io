@@ -1789,47 +1789,47 @@ CCSE.launch = function(){
 		// Functions should return a value to multiply the price by (Return 1 to have no effect)
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.getPrice", 'return Math', `
 			// Game.Upgrade.prototype.getPrice injection point 0
-			for(var i in Game.customUpgrades[this.name].getPrice) price *= Game.customUpgrades[this.name].getPrice[i](this);`, -1);
+			if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].getPrice) price *= Game.customUpgrades[this.name].getPrice[i](this);`, -1);
 		
 		// this.click
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.click", -1, `
 				// Game.Upgrade.prototype.click injection point 0
-				for(var i in Game.customUpgrades[this.name].click) Game.customUpgrades[this.name].click[i](this, e);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].click) Game.customUpgrades[this.name].click[i](this, e);
 			`);
 		
 		// this.buy
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrade.prototype.buy", 'return success', `
 			// Game.Upgrade.prototype.buy injection point 0
-			for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);`, -1);
+			if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buy) Game.customUpgrades[this.name].buy[i](this, bypass, success);`, -1);
 		
 		// this.earn
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.earn", -1, `
 				// Game.Upgrade.prototype.earn injection point 0
-				for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].earn) Game.customUpgrades[this.name].earn[i](this);
 			`);
 		
 		// this.unearn
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.unearn", -1, `
 				// Game.Upgrade.prototype.unearn injection point 0
-				for(var i in Game.customUpgrades[this.name].unearn) Game.customUpgrades[this.name].unearn[i](this);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].unearn) Game.customUpgrades[this.name].unearn[i](this);
 			`);
 		
 		// this.unlock
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.unlock", -1, `
 				// Game.Upgrade.prototype.unlock injection point 0
-				for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
 			`);
 		
 		// this.lose
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.lose", -1, `
 				// Game.Upgrade.prototype.lose injection point 0
-				for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].lose) Game.customUpgrades[this.name].lose[i](this);
 			`);
 		
 		// this.toggle
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.toggle", -1, `
 				// Game.Upgrade.prototype.toggle injection point 0
-				for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].toggle) Game.customUpgrades[this.name].toggle[i](this);
 			`);
 		
 		// this.isVaulted
@@ -1972,12 +1972,12 @@ CCSE.launch = function(){
 		if(upgrade.buyFunction){
 			CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buyFunction", -1, `
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
-				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
 			`);
 		}else{
 			upgrade.buyFunction = function(){
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
-				for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
 			}
 			CCSE.functionsAltered++;
 		}
@@ -1992,14 +1992,14 @@ CCSE.launch = function(){
 			upgrade.olddescFunc = upgrade.descFunc;
 			upgrade.descFunc = function(){
 				var desc = this.olddescFunc();
-				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
 				return desc;
 			}
 		}else{
 			upgrade.descFunc = function(){
 				var desc = this.ddesc ? this.ddesc : this.desc;
 				// Game.Upgrades['` + escKey + `'].descFunc injection point 0
-				for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].descFunc) desc = Game.customUpgrades[this.name].descFunc[i](this, desc);
 				return desc;
 			}
 		}
@@ -2052,7 +2052,7 @@ CCSE.launch = function(){
 		Game.customAchievements[key].click.push(CCSE.customAchievementsAllclick);
 		CCSE.SliceCodeIntoFunction("Game.Achievements['" + escKey + "'].click", -1, `
 				// Game.Achievements['` + escKey + `'].click injection point 0
-				for(var i in Game.customAchievements[this.name].click) Game.customAchievements[this.name].click[i](this);
+				if(Game.customAchievements[this.name]) for(var i in Game.customAchievements[this.name].click) Game.customAchievements[this.name].click[i](this);
 			`);
 		
 		
@@ -3497,13 +3497,13 @@ CCSE.launch = function(){
 			CCSE.config.bgType = 'Automatic';
 		} else {
 			if(Game.ascensionMode != 1){
-			for(var i in CCSE.config.permanentUpgrades){
-				if(CCSE.config.permanentUpgrades[i] != -1)
-					if(Game.Upgrades[CCSE.config.permanentUpgrades[i]])
-						Game.Upgrades[CCSE.config.permanentUpgrades[i]].earn();
+				for(var i in CCSE.config.permanentUpgrades){
+					if(CCSE.config.permanentUpgrades[i] != -1)
+						if(Game.Upgrades[CCSE.config.permanentUpgrades[i]])
+							Game.Upgrades[CCSE.config.permanentUpgrades[i]].earn();
+				}
 			}
 		}
-	}
 	}
 	
 	

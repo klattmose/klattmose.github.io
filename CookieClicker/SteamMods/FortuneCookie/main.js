@@ -144,7 +144,7 @@ FortuneCookie.launch = function(){
 			l(button).innerHTML = on;
 			FortuneCookie.config[prefName] = 1;
 		}
-		l(button).className = 'option' + ((FortuneCookie.config[prefName] ^ invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((FortuneCookie.config[prefName] ^ invert) ? '' : ' off');
 		
 		if(Game.specialTab=='dragon') Game.ToggleSpecialMenu(1);
 	}

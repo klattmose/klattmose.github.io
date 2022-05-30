@@ -269,7 +269,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.GetProgressHTML = function(progress){
-		return `<div style="text-align: center; font-weight: bold; color: white;">${ progress }</div>`;
+		return `<div style="text-align: center; font-weight: bold; color: white;">${ progress }%</div>`;
 	}
 
 	CCSE.InitNote = function(){

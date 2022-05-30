@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Heavenly upgrades that normally require your prestige level to end in a certain number now act like normal heavenly upgrades.",
 	"ModVersion": 1.1,
-	"GameVersion": 2.043,
+	"GameVersion": 2.047,
 	"Date": "4/09/2021",
 	"Dependencies": [],
 	"Disabled": 1

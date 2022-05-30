@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "A modding framework.",
 	"ModVersion": 2.032,
-	"GameVersion": 2.043,
+	"GameVersion": 2.047,
 	"Date": "1/09/2021",
 	"Dependencies": [],
 	"Disabled": 1,

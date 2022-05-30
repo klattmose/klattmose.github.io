@@ -1,7 +1,7 @@
 if(FortuneCookie === undefined) var FortuneCookie = {};
 FortuneCookie.name = 'Fortune Cookie';
 FortuneCookie.version = '2.10';
-FortuneCookie.GameVersion = '2.043';
+FortuneCookie.GameVersion = '2.047';
 
 FortuneCookie.launch = function(){
 	FortuneCookie.init = function(){
@@ -197,7 +197,7 @@ FortuneCookie.launch = function(){
 		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + Game.reindeerClicked + offset));
 		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
 		
-		if (Math.random() < 0.1){
+		if (Math.random() < Game.getVeilDefense()){
 			return true;
 		} else {
 			return false;

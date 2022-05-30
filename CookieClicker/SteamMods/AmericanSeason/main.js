@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 AmericanSeason.name = 'American Season';
 AmericanSeason.version = '1.7';
-AmericanSeason.GameVersion = '2.043';
+AmericanSeason.GameVersion = '2.047';
 
 AmericanSeason.launch = function(){
 	AmericanSeason.init = function(){
@@ -157,7 +157,7 @@ AmericanSeason.launch = function(){
 			l(button).innerHTML = on;
 			AmericanSeason.config[prefName] = 1;
 		}
-		l(button).className = 'option' + ((AmericanSeason.config[prefName] ^ invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((AmericanSeason.config[prefName] ^ invert) ? '' : ' off');
 	}
 	
 	AmericanSeason.Reset = function(hard){

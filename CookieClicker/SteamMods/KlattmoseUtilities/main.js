@@ -2,7 +2,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 KlattmoseUtilities.name = 'Klattmose Utilities';
 KlattmoseUtilities.version = '2.16';
-KlattmoseUtilities.GameVersion = '2.043';
+KlattmoseUtilities.GameVersion = '2.047';
 
 KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.defaultConfig = function(){
@@ -476,7 +476,7 @@ KlattmoseUtilities.launch = function(){
 			KlattmoseUtilities.config.patches[patchName] = 1;
 		}
 		
-		l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
 	}
 
 

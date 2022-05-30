@@ -1,7 +1,7 @@
 if(IdleTrading === undefined) var IdleTrading = {};
 IdleTrading.name = 'Idle Trading';
 IdleTrading.version = '1.10';
-IdleTrading.GameVersion = '2.043';
+IdleTrading.GameVersion = '2.047';
 
 IdleTrading.launch = function(){
 	IdleTrading.defaultConfig = function(){
@@ -136,7 +136,7 @@ IdleTrading.launch = function(){
 			l(button).innerHTML = on;
 			IdleTrading.config[prefName] = 1;
 		}
-		l(button).className = 'option' + ((IdleTrading.config[prefName] ^ invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((IdleTrading.config[prefName] ^ invert) ? '' : ' off');
 	}
 	
 	IdleTrading.ToggleGood = function(goodID, button, on, off, invert){
@@ -148,7 +148,7 @@ IdleTrading.launch = function(){
 			IdleTrading.config.goods[goodID].active = 1;
 		}
 		
-		l(button).className = 'option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off');
 		IdleTrading.save(IdleTrading.config);
 	}
 	

@@ -1,7 +1,7 @@
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 BlackholeInverter.name = 'Black Hole Inverter';
 BlackholeInverter.version = '1.13';
-BlackholeInverter.GameVersion = '2.043';
+BlackholeInverter.GameVersion = '2.047';
 
 BlackholeInverter.launch = function(){
 	BlackholeInverter.init = function(){
@@ -61,7 +61,7 @@ BlackholeInverter.launch = function(){
 		Game.TieredUpgrade('Reality-Bending Holes', '<q>Now you can see how close you are to certain doom! Two of them put together!</q>', 'Black hole inverter', 11); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Moving Black Holes', "<q>They can move now.</q>", 'Black hole inverter', 12); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Permanent Holes', "<q>They'll never disappear!</q>", 'Black hole inverter', 13); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		//Game.TieredUpgrade('It has pockets!', "<q>Also known as a pants hole</q>", 'Black hole inverter', 14); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('It has pockets!', "<q>Also known as a pants hole</q>", 'Black hole inverter', 14); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		order = BlackholeInverter.getGrandmaUpgradeOrder();
 		last = Game.GrandmaSynergy('Heavy grandmas', 'A dense grandma to accrete more cookies.', 'Black hole inverter'); last.order = order;
@@ -86,7 +86,7 @@ BlackholeInverter.launch = function(){
 		last = Game.TieredAchievement('Hey now, you\'re a dead star', '', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Incredibly dense', '', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.TieredAchievement('Infinitely dense', '', 'Black hole inverter', 13); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		//last = Game.TieredAchievement('Bottomless pit', '', 'Black hole inverter', 14); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Bottomless pit', '', 'Black hole inverter', 14); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		last = Game.ProductionAchievement('Relativistic jets', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.ProductionAchievement('Primordial black holes', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;

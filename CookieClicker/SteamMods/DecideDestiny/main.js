@@ -1,7 +1,7 @@
 if(DecideDestiny === undefined) var DecideDestiny = {};
 DecideDestiny.name = 'Decide Your Destiny';
 DecideDestiny.version = '1.3';
-DecideDestiny.GameVersion = '2.043';
+DecideDestiny.GameVersion = '2.047';
 
 
 //***********************************
@@ -122,7 +122,7 @@ DecideDestiny.CreateUpgrades = function(){
 	upgrade.descFunc = function(){
 		var choice = DecideDestiny.AllDestiniesByName[DecideDestiny.RectifyDecision()];
 		return '<div style="text-align:center;">' + 
-			   loc("Current:") + ' ' + CCSE.MenuHelper.TinyIcon(choice.icon) + ' <b>' + choice.name + '</b>' + 
+			   loc("Current:") + ' ' + tinyIcon(choice.icon) + ' <b>' + choice.name + '</b>' + 
 			   '</div><div class="line"></div>' + 
 			   (this.ddesc?this.ddesc:this.desc)
 	};

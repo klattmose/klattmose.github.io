@@ -1,7 +1,7 @@
 if(Horticookie === undefined) var Horticookie = {};
 Horticookie.name = 'Horticookie';
-Horticookie.version = '4.0';
-Horticookie.GameVersion = '2.043';
+Horticookie.version = '4.1';
+Horticookie.GameVersion = '2.047';
 
 Horticookie.launch = function(){
 	Horticookie.init = function(){
@@ -397,9 +397,15 @@ Horticookie.launch = function(){
 		return true;
 	}
 
-	Horticookie.getNTP = function(x, y){
+	Horticookie.getNTP = function(x, y, idx){
 		if (x < 0 || x >= Horticookie.maxPlotWidth || y < 0 || y >= Horticookie.maxPlotHeight || !Horticookie.M.isTileUnlocked(x, y)) return undefined;
+		
+		if(!idx){
 		return Horticookie.nextTickProbabilities[y][x];
+		} else {
+			return Horticookie.loopedNextTickProbabilities[idx].plot[y][x];
+		}
+		
 	}
 
 	Horticookie.getOutcomes = function(ntp){
@@ -523,12 +529,29 @@ Horticookie.launch = function(){
 		}
 	}
 
-	Horticookie.recalcPlantTile = function(x, y, weedMult, tile, plant){
+	Horticookie.init_loopedNextTickProbabilities = function(loops, dragonBoost){
+		Horticookie.loopedNextTickProbabilities = {};
+		
+		if(dragonBoost == 1){
+			Horticookie.loopedNextTickProbabilities[loops] = {probability:1, plot:JSON.parse(JSON.stringify(Horticookie.nextTickProbabilities))};
+		} else {
+			var minLoops = Math.floor(loops * dragonBoost);
+			var maxLoops = Math.ceil(loops * dragonBoost);
+			var fractional = (loops * dragonBoost) % 1;
+			
+			Horticookie.loopedNextTickProbabilities[minLoops] = {probability:1-fractional, plot:JSON.parse(JSON.stringify(Horticookie.nextTickProbabilities))};
+			Horticookie.loopedNextTickProbabilities[maxLoops] = {probability:  fractional, plot:JSON.parse(JSON.stringify(Horticookie.nextTickProbabilities))};
+		}
+		
+	}
+
+	Horticookie.recalcPlantTile = function(x, y, weedMult, tile, plant, loops){
 		var M = Horticookie.M;
 		var tile_boost = M.plotBoost[y][x];
-		var ntp = Horticookie.getNTP(x, y);
-		var probMature = Horticookie.calcProbAgingGT(Math.ceil(plant.mature - tile[1]), plant.ageTick, plant.ageTickR, tile_boost[0]);
-		var probDeath = plant.immortal ? 0 : Horticookie.calcProbAgingGT(Math.ceil(100 - tile[1]), plant.ageTick, plant.ageTickR, tile_boost[0]);
+		var dragonBoost = 1 + 0.05 * Game.auraMult('Supreme Intellect');
+		var ntp = Horticookie.getNTP(x, y, loops);
+		var probMature = Horticookie.calcProbAgingGT(Math.ceil(plant.mature - tile[1]), plant.ageTick, plant.ageTickR, tile_boost[0] * dragonBoost);
+		var probDeath = plant.immortal ? 0 : Horticookie.calcProbAgingGT(Math.ceil(100 - tile[1]), plant.ageTick, plant.ageTickR, tile_boost[0] * dragonBoost);
 		
 		ntp.empty = probDeath;
 		ntp.mature[plant.key] = (1 - probDeath) * probMature;
@@ -549,10 +572,10 @@ Horticookie.launch = function(){
 			
 			var neighsM = {}; // all surrounding mature plants
 			for(var i in M.plants){neighsM[i] = 0;}
-			var ntpNeigh = Horticookie.getNTP(x, y - 1); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
-			var ntpNeigh = Horticookie.getNTP(x, y + 1); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
-			var ntpNeigh = Horticookie.getNTP(x - 1, y); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
-			var ntpNeigh = Horticookie.getNTP(x + 1, y); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
+			var ntpNeigh = Horticookie.getNTP(x, y - 1, loops); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
+			var ntpNeigh = Horticookie.getNTP(x, y + 1, loops); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
+			var ntpNeigh = Horticookie.getNTP(x - 1, y, loops); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
+			var ntpNeigh = Horticookie.getNTP(x + 1, y, loops); if(ntpNeigh) for(var key in ntpNeigh.mature){neighsM[key] = (neighsM[key] ? neighsM[key] : 1) * ntpNeigh.mature[key];}
 			
 			for(var i in list2) if(neighsM[i] > 0){
 				for(var key in ntp.mature)   ntp.mature[key]   *= 1 - list2[i] * neighsM[i];
@@ -572,7 +595,7 @@ Horticookie.launch = function(){
 	Horticookie.recalcEmptyTile = function(x, y, weedMult, loops){
 		var M = Horticookie.M;
 		var tile_boost = M.plotBoost[y][x];
-		var ntp = Horticookie.getNTP(x, y);
+		var ntp = Horticookie.getNTP(x, y, loops);
 		
 		ntp.empty = 1;
 		for(var i in M.plants){ntp.immature[i] = 0;}
@@ -596,14 +619,14 @@ Horticookie.launch = function(){
 		
 		
 		var neighbors = [];
-		var neigh = Horticookie.getNTP(x, y - 1);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x, y + 1);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x - 1, y);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x + 1, y);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x - 1, y - 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x - 1, y + 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x + 1, y - 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
-		var neigh = Horticookie.getNTP(x + 1, y + 1); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x, y - 1, loops);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x, y + 1, loops);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x - 1, y, loops);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x + 1, y, loops);     if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x - 1, y - 1, loops); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x - 1, y + 1, loops); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x + 1, y - 1, loops); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
+		var neigh = Horticookie.getNTP(x + 1, y + 1, loops); if(neigh && neigh.empty != 1){neighbors.push(neigh);}
 		
 		var combos = [];
 		for(var i = 0; i < neighbors.length; i++){
@@ -682,9 +705,13 @@ Horticookie.launch = function(){
 		M.computeMatures();
 		
 		var weedMult = M.soilsById[M.soil].weedMult;
+		var dragonBoost = 1 + 0.05 * Game.auraMult('Supreme Intellect');
 		var loops = 1;
 		if (M.soilsById[M.soil].key == 'woodchips') loops = 3;
 		
+		Horticookie.init_loopedNextTickProbabilities(loops, dragonBoost);
+		
+		for(var dLoops in Horticookie.loopedNextTickProbabilities){
 		if(Horticookie.detectKUGardenPatch()){
 			for(var y = 0; y < Horticookie.maxPlotHeight; y++){
 				for(var x = 0; x < Horticookie.maxPlotWidth; x++){
@@ -692,9 +719,9 @@ Horticookie.launch = function(){
 						var tile = M.plot[y][x];
 						var plant = M.plantsById[tile[0] - 1];
 						if(tile[0] > 0){
-							Horticookie.recalcPlantTile(x, y, weedMult, tile, plant);
+								Horticookie.recalcPlantTile(x, y, weedMult, tile, plant, dLoops);
 						}else{
-							//Horticookie.recalcEmptyTile(x, y, weedMult, loops);
+								//Horticookie.recalcEmptyTile(x, y, weedMult, dLoops);
 						}
 					}
 				}
@@ -705,9 +732,9 @@ Horticookie.launch = function(){
 						var tile = M.plot[y][x];
 						var plant = M.plantsById[tile[0] - 1];
 						if(tile[0] > 0){
-							//Horticookie.recalcPlantTile(x, y, weedMult, tile, plant);
+								//Horticookie.recalcPlantTile(x, y, weedMult, tile, plant, dLoops);
 						}else{
-							Horticookie.recalcEmptyTile(x, y, weedMult, loops);
+								Horticookie.recalcEmptyTile(x, y, weedMult, dLoops);
 						}
 					}
 				}
@@ -719,14 +746,44 @@ Horticookie.launch = function(){
 						var tile = M.plot[y][x];
 						var plant = M.plantsById[tile[0] - 1];
 						if(tile[0] > 0){
-							Horticookie.recalcPlantTile(x, y, weedMult, tile, plant);
+								Horticookie.recalcPlantTile(x, y, weedMult, tile, plant, dLoops);
 						}else{
-							Horticookie.recalcEmptyTile(x, y, weedMult, loops);
+								Horticookie.recalcEmptyTile(x, y, weedMult, dLoops);
+							}
+						}
 						}
 					}
 				}
 			}
+		
+		if(dragonBoost == 1){
+			Horticookie.nextTickProbabilities = JSON.parse(JSON.stringify(Horticookie.loopedNextTickProbabilities[loops].plot));
+		} else {
+			var minLoops = Math.floor(loops * dragonBoost);
+			var maxLoops = Math.ceil(loops * dragonBoost);
+			
+			var minProb = Horticookie.loopedNextTickProbabilities[minLoops].probability;
+			var maxProb = Horticookie.loopedNextTickProbabilities[maxLoops].probability;
+			
+			for(var y = 0; y < Horticookie.maxPlotHeight; y++){
+				for(var x = 0; x < Horticookie.maxPlotWidth; ++x) {
+					var id = M.plot[y][x][0];
+					
+					var minNTP = Horticookie.loopedNextTickProbabilities[minLoops].plot[y][x];
+					var maxNTP = Horticookie.loopedNextTickProbabilities[maxLoops].plot[y][x];
+					
+					var ntp = {empty: minNTP.empty*minProb + maxNTP.empty*maxProb, immature: {}, mature: {}};
+					
+					for(var key in minNTP.immature) ntp.immature[key] = minNTP.immature[key] * minProb;
+					for(var key in minNTP.mature) ntp.mature[key] = minNTP.mature[key] * minProb;
+					for(var key in maxNTP.immature) if(ntp.immature[key]) ntp.immature[key] += maxNTP.immature[key] * maxProb; else ntp.immature[key] = maxNTP.immature[key] * maxProb;
+					for(var key in maxNTP.mature) if(ntp.mature[key]) ntp.mature[key] += maxNTP.mature[key] * maxProb; else ntp.mature[key] = maxNTP.mature[key] * maxProb;
+					
+					Horticookie.nextTickProbabilities[y][x] = ntp;
+				}
+			}
 		}
+		
 	}
 
 	Horticookie.recalcPlantStatus = function(){
@@ -1062,6 +1119,12 @@ Horticookie.launch = function(){
 		Game.customMinigame[objKey].buildPanel.push(Horticookie.buildPanel);
 		Game.customMinigame[objKey].unlockSeed.push(Horticookie.unlockSeed);
 		Game.customMinigame[objKey].lockSeed.push(Horticookie.lockSeed);
+		
+		// Recalc things in case the dragon aura has changed
+		Game.customToggleSpecialMenu.push(function(str){
+			Horticookie.computeEffs();
+			return str;
+		});
 		
 		CCSE.MinigameReplacer(function(){
 			var objKey = 'Farm';

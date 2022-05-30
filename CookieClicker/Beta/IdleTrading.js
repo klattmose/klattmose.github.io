@@ -137,7 +137,7 @@ IdleTrading.launch = function(){
 			l(button).innerHTML = on;
 			IdleTrading.config[prefName] = 1;
 		}
-		l(button).className = 'option' + ((IdleTrading.config[prefName] ^ invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((IdleTrading.config[prefName] ^ invert) ? '' : ' off');
 	}
 	
 	IdleTrading.ToggleGood = function(goodID, button, on, off, invert){
@@ -149,7 +149,7 @@ IdleTrading.launch = function(){
 			IdleTrading.config.goods[goodID].active = 1;
 		}
 		
-		l(button).className = 'option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off');
 		IdleTrading.save(IdleTrading.config);
 	}
 	

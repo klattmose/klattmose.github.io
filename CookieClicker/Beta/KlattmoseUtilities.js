@@ -478,7 +478,7 @@ KlattmoseUtilities.launch = function(){
 			KlattmoseUtilities.config.patches[patchName] = 1;
 		}
 		
-		l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
 	}
 
 

@@ -142,7 +142,7 @@ M.launch=function()
 			return function(){
 				var me=M.godsById[id];
 				me.icon=me.icon||[0,0];
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipGod">'+
 				'<div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-me.icon[0]*48)+'px '+(-me.icon[1]*48)+'px;"></div>'+
 				'<div class="name">'+me.name+'</div>'+
 				'<div class="line"></div><div class="description"><div style="margin:6px 0px;font-weight:bold;">'+loc("Effects:")+'</div>'+
@@ -164,10 +164,10 @@ M.launch=function()
 				{
 					var me=M.godsById[M.slot[id]];
 					var slot=me.slot;
-					if (Game.hasAura('Supreme Intellect')) slot=1;
+					if (Game.hasAura('Supreme Intellect')) slot=Math.max(0,slot-1);
 					me.icon=me.icon||[0,0];
 				}
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipPantheonSlot">'+
 				(M.slot[id]!=-1?(
 					'<div class="name templeEffect" style="margin-bottom:12px;"><div class="usesIcon shadowFilter templeGem templeGem'+(parseInt(id)+1)+'"></div>'+loc(M.slotNames[id]+" slot")+'</div>'+
 					'<div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-me.icon[0]*48)+'px '+(-me.icon[1]*48)+'px;"></div>'+
@@ -299,7 +299,7 @@ M.launch=function()
 			{
 				if (M.slot[i]==god.id)
 				{
-					if (Game.hasAura('Supreme Intellect')) return 2;
+					if (Game.hasAura('Supreme Intellect')) return Math.max(1,i);
 					else return (i+1);
 				}
 			}
@@ -320,7 +320,7 @@ M.launch=function()
 		
 		M.dragonBoostTooltip=function()
 		{
-			return '<div style="width:280px;padding:8px;text-align:center;"><b>'+loc("Supreme Intellect")+'</b><div class="line"></div>'+loc("All pantheon slots behave as ruby slots.")+'</div>';
+			return '<div style="width:280px;padding:8px;text-align:center;" id="tooltipDragonBoost"><b>'+loc("Supreme Intellect")+'</b><div class="line"></div>'+loc("The jade slot behaves as a ruby slot and the ruby slot behaves as a diamond slot.")+'</div>';
 		}
 		
 		var str='';
@@ -415,7 +415,7 @@ M.launch=function()
 		
 		
 		M.refillTooltip=function(){
-			return '<div style="padding:8px;width:300px;font-size:11px;text-align:center;">'+loc("Click to refill all your worship swaps for %1.",'<span class="price lump">'+loc("%1 sugar lump",LBeautify(1))+'</span>')+
+			return '<div style="padding:8px;width:300px;font-size:11px;text-align:center;" id="tooltipRefill">'+loc("Click to refill all your worship swaps for %1.",'<span class="price lump">'+loc("%1 sugar lump",LBeautify(1))+'</span>')+
 				(Game.canRefillLump()?'<br><small>('+loc("can be done once every %1",Game.sayTime(Game.getLumpRefillMax(),-1))+')</small>':('<br><small class="red">('+loc("usable again in %1",Game.sayTime(Game.getLumpRefillRemaining()+Game.fps,-1))+')</small>'))+
 			'</div>';
 		};

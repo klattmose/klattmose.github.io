@@ -500,7 +500,7 @@ a.orangeLink:hover,#topBar a.orangeLink:hover
 	background:#111 url(img/darkNoise.jpg);
 	background:url(img/shadedBorders.png) left top/100% 100%,#111 url(img/darkNoise.jpg);
 	text-align:center;
-	z-index:100000000000;
+	z-index:1000000000;
 	line-height:150%;
 	font-size:20px;
 }
@@ -763,6 +763,8 @@ textarea:read-only,input[type="text"]:read-only
 	resize:none;
 	border:1px solid rgba(255,255,255,0.25);
 }
+select,option{font-weight:bold;font-size:11px;margin:2px 4px 2px 0px;}
+select{padding:2px;border-radius:4px;}
 .smallFancyButton
 {
 	font-variant:small-caps;
@@ -775,6 +777,10 @@ a.option.smallFancyButton
 	width:130px;
 	text-align:right;
 }
+
+.prefButton{position:relative;}
+.prefButton:after{content:'';background:#fff;pointer-events:none;width:3px;height:3px;display:inline-block;border-radius:4px;box-shadow:0px 0px 2px 0px #3cf,0px 0px 6px 1px #33f;position:absolute;right:3px;top:50%;margin-top:-1px;}
+.prefButton.off:after{background:rgba(255,255,255,0.15);box-shadow:1px 1px 0px rgba(255,255,255,0.3);}
 
 .tight
 {
@@ -950,7 +956,7 @@ input[type=range]:active::-ms-thumb,input[type=range]:hover::-ms-thumb {backgrou
 	margin-top:8px;
 	font-style:italic;
 	color:rgba(255,255,255,0.5);
-	font-size:11.5px;
+	font-size:12px;
 	font-family:Georgia;
 	line-height:135%;
 }
@@ -1015,7 +1021,7 @@ input[type=range]:active::-ms-thumb,input[type=range]:hover::-ms-thumb {backgrou
 	background:rgba(255,255,255,0.05);
 }
 
-.framed .block
+.block
 {
 	padding:8px;
 	margin:2px;
@@ -1047,12 +1053,6 @@ input[type=range]:active::-ms-thumb,input[type=range]:hover::-ms-thumb {backgrou
 {
 	animation:wobble 0.1s ease-out;
 }
-#tooltip .data
-{
-	/*border-top:1px solid rgba(255,255,255,0.25);*/
-	padding:4px 0px;
-	font-size:80%;
-}
 
 .line
 {
@@ -1081,6 +1081,25 @@ input[type=range]:active::-ms-thumb,input[type=range]:hover::-ms-thumb {backgrou
 {
 	/*border-top:1px solid rgba(255,255,255,0.25);*/
 	margin:4px 0px;
+}
+.descriptionBlock
+{
+	border-radius:6px;
+	background:rgba(255,255,255,0.1);
+	padding:2px 6px;
+	margin:3px 0px;
+	position:relative;
+	font-size:85%;
+	text-shadow:0px 1px 0px #000;
+}
+.descriptionBlock:before
+{
+	position:absolute;
+	display:block;
+	content:"\2022";
+	left:-4px;
+	top:2px;
+	font-size:16px;
 }
 
 q:before
@@ -1420,38 +1439,51 @@ q:after
 }
 #prefsButton:hover>.subButton{box-shadow:0px 1px 0px rgba(250,180,150,1) inset,0px 0px 0px 1px rgba(0,0,0,0.75),0px 2px 3px rgba(250,180,150,0.75) inset,0px 1px 0px 1px rgba(250,180,150,0.25);}
 
-#logButton.hasUpdate {color:#ffc;}
+#logButton.hasUpdate {color:#fff;}
 #logButton.hasUpdate>div:first-child {position:relative;top:-8px;}
 #logButton.hasUpdate:before
 {
 	content:'';
 	display:block;
 	position:absolute;
-	left:-60px;
-	top:0px;
-	width:60px;
-	height:56px;
-	background:url(img/pointyLad.png);
-	animation:pointLadBump 0.5s infinite ease-in-out;
+	left:-40px;
+	top:10px;
+	width:48px;
+	height:38px;
+	background:url(img/pointGlow.gif);
+	animation:pointGlowBump 0.6s infinite ease-in-out;
 }
-@keyframes pointLadBump{
-	0% {transform:translate(0px,0px);}
-	20% {transform:translate(-15px,0px);}
-	50% {transform:translate(-20px,0px);}
-	80% {transform:translate(-15px,0px);}
+@keyframes pointGlowBump{
+	0% {transform:translate(0px,0px) scale(0.8,1.2);}
+	20% {transform:translate(-8px,0px);}
+	50% {transform:translate(-10px,0px);}
+	80% {transform:translate(-8px,0px);}
 	100% {transform:translate(0px,0px);}
 }
 #checkForUpdate
 {
 	display:none;
 	font-size:10px;
-	position:absolute;bottom:0px;left:0px;right:0px;
-	animation:checkForUpdateFlash 0.5s infinite ease-in-out;
+	position:absolute;bottom:8px;left:0px;right:0px;
+	animation:rainbowCycle 0.5s infinite ease-in-out;
 }
-@keyframes checkForUpdateFlash{
-	0% {color:#999;}
-	50% {color:#ffc;}
-	100% {color:#999;}
+@keyframes rainbowCycle{
+	0% {color:#ff1d87;}
+	16% {color:#a071ff;}
+	33% {color:#40b9ff;}
+	50% {color:#15ff57;}
+	66% {color:#ffed29;}
+	83% {color:#ff5f2e;}
+	100% {color:#ff1d87;}
+}
+@keyframes rainbowCycleBG{
+	0% {background-color:#ff1d87;}
+	16% {background-color:#a071ff;}
+	33% {background-color:#40b9ff;}
+	50% {background-color:#15ff57;}
+	66% {background-color:#ffed29;}
+	83% {background-color:#ff5f2e;}
+	100% {background-color:#ff1d87;}
 }
 #logButton.hasUpdate #checkForUpdate {display:block;}
 
@@ -1526,14 +1558,13 @@ q:after
 #legacyButton:hover>#ascendTooltip
 {display:block;}
 
+
 #lumps
 {
 	display:none;
 	position:absolute;
 	width:32px;
 	height:32px;
-	position:absolute;
-	z-index:10000;
 	left:-8px;
 	bottom:-12px;
 	z-index:10000;
@@ -2110,7 +2141,7 @@ from {top:20px;opacity:0;}
 {
 	position:absolute;
 	right:318px;
-	top:56px;
+	top:100px;
 	width:300px;
 	min-height:60px;
 	display:none;
@@ -2179,6 +2210,7 @@ from {top:20px;opacity:0;}
 .crate:before{background-position:120px 0px;}
 .crate.enabled:before{background-position:0px 0px;}
 .crate.enabled:hover:before,.crate.highlighted:before{background-position:60px 0px;}
+.crate.noFrame.highlighted{z-index:100;box-shadow:0px 0px 12px -4px rgba(255,255,255,1) inset,0px 0px 0px 1px rgba(255,255,255,0.65);}
 /*.crate.enabled:hover:after,.crate.highlighted:after
 {
 	content:'';
@@ -2832,7 +2864,7 @@ from {background-position:0px 0px;}
 .note h5
 {
 	opacity:0.6;
-	font-size:12px;
+	font-size:11px;
 }
 .note.haspic h3
 {
@@ -2899,8 +2931,6 @@ p
 	position:absolute;
 	left:0px;
 	top:0px;
-	margin-left:50%;
-	margin-top:25%;/* this should be 50%. not sure why it needs to be 25% */
 }
 .ascending #ascend
 {display:block;}
@@ -2987,6 +3017,16 @@ p
 }
 
 
+/* todo! */
+/* note: also change min game size ie. w/Math.max(800,w) to 400 and account for window resizing triggers */
+/*
+#sectionLeft
+{width:100%;}
+#sectionMiddle,#sectionRight,#leftBeam,#rightBeam
+{display:none;}
+#cookies,#bakeryName
+{background:transparent;}
+*/
 
 
 .green,b.green{color:#3f0;}.green b{color:inherit;}
@@ -3001,7 +3041,7 @@ p
 	opacity:0.5;
 	margin:8px;
 	font-size:22px;
-	z-index:100000000;
+	z-index:1000000001;
 }
 
 #alert
@@ -3013,15 +3053,40 @@ p
 	z-index:100000000000;
 	padding:12px 12px 24px 24px;
 	font-size:14px;
-	background:#990;
-	border-radius:16px;
+	background:#333;
+	border-radius:12px;
 	color:#fff;
 	box-shadow:0px 0px 4px #000, 0px 0px 4px #000 inset;
-	text-shadow:0px 0px 2px #000;
+	text-shadow:1px 1px 0px #000,0px 0px 2px #000;
 	border:4px solid #fff;
+	animation:rainbowCycleBG 15s infinite ease-in-out;
 }
 #alert b {font-weight:bold;}
 #alert small {font-size:80%;}
+
+a.smallBlackButton,a.smallOrangeButton,a.smallWhiteButton
+{
+	background:#222;
+	box-shadow:0px 0px 0px 1px #000 inset,0px 2px 0px #444 inset,0px 2px 3px rgba(0,0,0,0.4);
+	text-shadow:0px -1px 0px #444,0px 1px 0px #000;
+	text-decoration:none;
+	color:#fff;
+	font-weight:bold;
+	padding:4px 5px;
+}
+a.smallOrangeButton
+{
+	background:#f86754;
+	box-shadow:0px 0px 0px 1px #c52921 inset,0px 2px 0px #ff966d inset,0px 2px 3px rgba(0,0,0,0.4);
+	text-shadow:0px -1px 0px #ff966d,0px 1px 0px #c52921;
+}
+a.smallWhiteButton
+{
+	color:#222;
+	background:#ccc;
+	box-shadow:0px 0px 0px 1px #666 inset,0px 2px 0px #fff inset,0px 2px 3px rgba(0,0,0,0.4);
+	text-shadow:0px -1px 0px #eee,0px 1px 0px #999;
+}
 
 #debug
 {
@@ -3173,22 +3238,6 @@ SUPPORT
 }
 .highlightHover:hover{filter:brightness(125%);opacity:1;}
 .highlightHover:active{filter:brightness(85%);opacity:1;}
-
-#supportSection
-{
-	font-size:11px;
-	margin:4px 0px;
-	line-height:110%;
-	color:rgba(200,200,255,1);
-	background:rgba(128,128,255,0.15);
-	box-shadow:0px 0px 4px 4px rgba(128,128,255,0.15);
-	transition:box-shadow 0.25s,background 0.25s;
-}
-#supportSection:hover
-{
-	background:rgba(128,128,255,0.2);
-	box-shadow:0px 0px 4px 4px rgba(128,128,255,0.2);
-}
 
 .ifNoAds
 {

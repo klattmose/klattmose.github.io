@@ -1118,15 +1118,16 @@ M.launch=function()
 				}
 				children+='</div>';
 			}
+			var dragonBoost=1/(1+0.05*Game.auraMult('Supreme Intellect'));
 			return '<div class="description">'+
-						(!me.immortal?('<div style="margin:6px 0px;font-size:11px;"><b>'+loc("Average lifespan:")+'</b> '+Game.sayTime(((100/(me.ageTick+me.ageTickR/2))*M.stepT)*30,-1)+' <small>('+loc("%1 tick",LBeautify(Math.ceil((100/((me.ageTick+me.ageTickR/2)))*(1))))+')</small></div>'):'')+
-						'<div style="margin:6px 0px;font-size:11px;"><b>'+loc("Average maturation:")+'</b> '+Game.sayTime(((100/((me.ageTick+me.ageTickR/2)))*(me.mature/100)*M.stepT)*30,-1)+' <small>('+loc("%1 tick",LBeautify(Math.ceil((100/((me.ageTick+me.ageTickR/2)))*(me.mature/100))))+')</small></div>'+
+						(!me.immortal?('<div style="margin:6px 0px;font-size:11px;"><b>'+loc("Average lifespan:")+'</b> '+Game.sayTime(((100/(me.ageTick+me.ageTickR/2))*dragonBoost*M.stepT)*30,-1)+' <small>('+loc("%1 tick",LBeautify(Math.ceil((100/((me.ageTick+me.ageTickR/2)/dragonBoost))*(1))))+')</small></div>'):'')+
+						'<div style="margin:6px 0px;font-size:11px;"><b>'+loc("Average maturation:")+'</b> '+Game.sayTime(((100/((me.ageTick+me.ageTickR/2)))*(me.mature/100)*dragonBoost*M.stepT)*30,-1)+' <small>('+loc("%1 tick",LBeautify(Math.ceil((100/((me.ageTick+me.ageTickR/2)/dragonBoost))*(me.mature/100))))+')</small></div>'+
 						(me.weed?'<div style="margin:6px 0px;font-size:11px;"><b>'+(EN?"Is a weed":loc("Weed"))+'</b></div>':'')+
 						(me.fungus?'<div style="margin:6px 0px;font-size:11px;"><b>'+(EN?"Is a fungus":loc("Fungus"))+'</b></div>':'')+
 						(me.detailsStr?('<div style="margin:6px 0px;font-size:11px;"><b>'+loc("Details:")+'</b> '+me.detailsStr+'</div>'):'')+
 						(children!=''?('<div style="margin:6px 0px;font-size:11px;"><b>'+loc("Possible mutations:")+'</b> '+children+'</div>'):'')+
 						'<div class="line"></div>'+
-						'<div style="margin:6px 0px;"><b>'+loc("Effects:")+'</b></div>'+
+						'<div style="margin:6px 0px;"><b>'+loc("Effects:")+'</b> <span style="font-size:11px;">('+loc("while plant is alive; scales with plant growth")+')</span></div>'+
 						'<div style="font-size:11px;font-weight:bold;">'+me.effsStr+'</div>'+
 						(me.q?('<q>'+me.q+'</q>'):'')+
 					'</div>';
@@ -1150,7 +1151,7 @@ M.launch=function()
 		{
 			return function(){
 				var me=M.soilsById[id];
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipGardenSoil">'+
 					(M.parent.amount<me.req?(
 						'<div style="text-align:center;">'+loc("Soil unlocked at %1 farms.",me.req)+'</div>'
 					):('<div class="icon" style="background:url(img/gardenPlants.png?v='+Game.version+');float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-me.icon*48)+'px '+(-34*48)+'px;"></div>'+
@@ -1169,7 +1170,7 @@ M.launch=function()
 		{
 			return function(){
 				var me=M.plantsById[id];
-				var str='<div style="padding:8px 4px;min-width:400px;">'+
+				var str='<div style="padding:8px 4px;min-width:400px;" id="tooltipGardenSeed">'+
 					'<div class="icon" style="background:url(img/gardenPlants.png?v='+Game.version+');float:left;margin-left:-24px;margin-top:-4px;background-position:'+(-0*48)+'px '+(-me.icon*48)+'px;"></div>'+
 					'<div class="icon" style="background:url(img/gardenPlants.png?v='+Game.version+');float:left;margin-left:-24px;margin-top:-28px;background-position:'+(-4*48)+'px '+(-me.icon*48)+'px;"></div>'+
 					'<div style="background:url(img/turnInto.png);width:20px;height:22px;position:absolute;left:28px;top:24px;z-index:1000;"></div>'+
@@ -1186,7 +1187,7 @@ M.launch=function()
 			return function(){
 				var me=M.toolsById[id];
 				var icon=[me.icon,35];
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipGardenTool">'+
 					'<div class="icon" style="background:url(img/gardenPlants.png?v='+Game.version+');float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div>'+
 					'<div><div class="name">'+me.name+'</div></div>'+
 					'<div class="line"></div>'+
@@ -1205,16 +1206,13 @@ M.launch=function()
 				if (tile[0]==0)
 				{
 					var me=(M.seedSelected>=0)?M.plantsById[M.seedSelected]:0;
-					var str='<div style="padding:8px 4px;min-width:350px;text-align:center;">'+
+					var str='<div style="padding:8px 4px;min-width:350px;text-align:center;" id="tooltipGardenTile">'+
 						'<div class="name">'+loc("Empty tile")+'</div>'+'<div class="line"></div><div class="description">'+
 							loc("This tile of soil is empty.<br>Pick a seed and plant something!")+
 							(me?'<div class="line"></div>'+loc("Click to plant %1 for %2.",['<b>'+me.name+'</b>','<span class="price'+(M.canPlant(me)?'':' disabled')+'">'+Beautify(Math.round(M.getCost(me)))+'</span>'])+'<br><small>('+loc("%1 to plant multiple.",loc("Shift-click"))+')</small>'+(EN?'<br><small>(Holding the shift key pressed will also hide tooltips.)</small>':''):'')+
-							(M.plotBoost[y][x]!=[1,1,1]?('<small>'+
-								(M.plotBoost[y][x][0]!=1?'<br>'+loc("Aging multiplier:")+' '+Beautify(M.plotBoost[y][x][0]*100)+'%':'')+
-								(M.plotBoost[y][x][1]!=1?'<br>'+loc("Effect multiplier:")+' '+Beautify(M.plotBoost[y][x][1]*100)+'%':'')+
-								(M.plotBoost[y][x][2]!=1?'<br>'+loc("Weeds/fungus repellent:")+' '+Beautify(100-M.plotBoost[y][x][2]*100)+'%':'')+
-								'</small>'
-							):'')+
+								(M.plotBoost[y][x][0]!=1?'<br><small>'+loc("Aging multiplier:")+' '+Beautify(M.plotBoost[y][x][0]*100)+'%</small>':'')+
+								(M.plotBoost[y][x][1]!=1?'<br><small>'+loc("Effect multiplier:")+' '+Beautify(M.plotBoost[y][x][1]*100)+'%</small>':'')+
+								(M.plotBoost[y][x][2]!=1?'<br><small>'+loc("Weeds/fungus repellent:")+' '+Beautify(100-M.plotBoost[y][x][2]*100)+'%</small>':'')+
 						'</div>'+
 					'</div>';
 					return str;
@@ -1227,6 +1225,7 @@ M.launch=function()
 					else if (tile[1]>=me.mature*0.666) stage=3;
 					else if (tile[1]>=me.mature*0.333) stage=2;
 					else stage=1;
+					var dragonBoost=1/(1+0.05*Game.auraMult('Supreme Intellect'));
 					var icon=[stage,me.icon];
 					var str='<div style="padding:8px 4px;min-width:350px;">'+
 						'<div class="icon" style="background:url(img/gardenPlants.png?v='+Game.version+');float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div>'+
@@ -1244,21 +1243,17 @@ M.launch=function()
 							'<small>'+(stage==1?loc("Plant effects:")+' 10%':stage==2?loc("Plant effects:")+' 25%':stage==3?loc("Plant effects:")+' 50%':loc("Plant effects:")+' 100%; '+loc("may reproduce, will drop seed when harvested"))+'</small>'+
 							'<br><small>'+(
 								stage<4?(
-									loc("Mature in about %1",Game.sayTime(((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)))*((me.mature-tile[1])/100)*M.stepT)*30,-1))+' ('+loc("%1 tick",LBeautify(Math.ceil((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)))*((me.mature-tile[1])/100))))+')'
+									loc("Mature in about %1",Game.sayTime(((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)))*((me.mature-tile[1])/100)*dragonBoost*M.stepT)*30,-1))+' ('+loc("%1 tick",LBeautify(Math.ceil((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)/dragonBoost))*((me.mature-tile[1])/100))))+')'
 								):(
 									!me.immortal?(
-										loc("Decays in about %1",Game.sayTime(((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)))*((100-tile[1])/100)*M.stepT)*30,-1))+' ('+loc("%1 tick",LBeautify(Math.ceil((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)))*((100-tile[1])/100))))+')'
+										loc("Decays in about %1",Game.sayTime(((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)))*((100-tile[1])/100)*dragonBoost*M.stepT)*30,-1))+' ('+loc("%1 tick",LBeautify(Math.ceil((100/(M.plotBoost[y][x][0]*(me.ageTick+me.ageTickR/2)/dragonBoost))*((100-tile[1])/100))))+')'
 									):
 										loc("Does not decay")
 								)
 							)+'</small>'+
-							//'<small><br>'+M.plotBoost[y][x]+'</small>'+
-							(M.plotBoost[y][x]!=[1,1,1]?('<small>'+
-								(M.plotBoost[y][x][0]!=1?'<br>'+loc("Aging multiplier:")+' '+Beautify(M.plotBoost[y][x][0]*100)+'%':'')+
-								(M.plotBoost[y][x][1]!=1?'<br>'+loc("Effect multiplier:")+' '+Beautify(M.plotBoost[y][x][1]*100)+'%':'')+
-								(M.plotBoost[y][x][2]!=1?'<br>'+loc("Weeds/fungus repellent:")+' '+Beautify(100-M.plotBoost[y][x][2]*100)+'%':'')+
-								'</small>'
-							):'')+
+								(M.plotBoost[y][x][0]!=1?'<br><small>'+loc("Aging multiplier:")+' '+Beautify(M.plotBoost[y][x][0]*100)+'%</small>':'')+
+								(M.plotBoost[y][x][1]!=1?'<br><small>'+loc("Effect multiplier:")+' '+Beautify(M.plotBoost[y][x][1]*100)+'%</small>':'')+
+								(M.plotBoost[y][x][2]!=1?'<br><small>'+loc("Weeds/fungus repellent:")+' '+Beautify(100-M.plotBoost[y][x][2]*100)+'%</small>':'')+
 						'</div>'+
 						'<div class="line"></div>'+
 						//'<div style="text-align:center;">Click to harvest'+(M.seedSelected>=0?', planting <b>'+M.plantsById[M.seedSelected].name+'</b><br>for <span class="price'+(M.canPlant(me)?'':' disabled')+'">'+Beautify(Math.round(M.getCost(M.plantsById[M.seedSelected])))+'</span> in its place':'')+'.</div>'+
@@ -1272,7 +1267,7 @@ M.launch=function()
 		}
 		
 		M.refillTooltip=function(){
-			return '<div style="padding:8px;width:300px;font-size:11px;text-align:center;">'+loc("Click to refill your soil timer and trigger <b>1</b> plant growth tick with <b>x%1</b> spread and mutation rate for %2.",[3,'<span class="price lump">'+loc("%1 sugar lump",LBeautify(1))+'</span>'])+
+			return '<div style="padding:8px;width:300px;font-size:11px;text-align:center;" id="tooltipRefill">'+loc("Click to refill your soil timer and trigger <b>1</b> plant growth tick with <b>x%1</b> spread and mutation rate for %2.",[3,'<span class="price lump">'+loc("%1 sugar lump",LBeautify(1))+'</span>'])+
 				(Game.canRefillLump()?'<br><small>('+loc("can be done once every %1",Game.sayTime(Game.getLumpRefillMax(),-1))+')</small>':('<br><small class="red">('+loc("usable again in %1",Game.sayTime(Game.getLumpRefillRemaining()+Game.fps,-1))+')</small>'))+
 			'</div>';
 		};
@@ -1593,7 +1588,7 @@ M.launch=function()
 		
 		M.dragonBoostTooltip=function()
 		{
-			return '<div style="width:280px;padding:8px;text-align:center;"><b>'+loc("Supreme Intellect")+'</b><div class="line"></div>'+loc("Garden plants age and mutate %1% faster.",5)+'</div>';
+			return '<div style="width:280px;padding:8px;text-align:center;" id="tooltipDragonBoost"><b>'+loc("Supreme Intellect")+'</b><div class="line"></div>'+loc("Garden plants age and mutate %1% faster.",5*Game.auraMult('Supreme Intellect'))+'</div>';
 		}
 		
 		var str='';
@@ -1626,7 +1621,7 @@ M.launch=function()
 			'.gardenSeed:active .gardenSeedIcon{animation:pucker 0.2s;}'+
 			'.noFancy .gardenSeed:hover .gardenSeedIcon,.noFancy .gardenSeed:active .gardenSeedIcon{animation:none;}'+
 		'.gardenPanelLabel{font-size:12px;width:100%;padding:2px;margin-top:4px;margin-bottom:-4px;}'+'.gardenSeedTiny{transform:scale(0.5,0.5);margin:-20px -16px;display:inline-block;width:48px;height:48px;background:url(img/gardenPlants.png?v='+Game.version+');}'+
-		'.gardenSeed.on:before{pointer-events:none;content:\'\';display:block;position:absolute;left:0px;top:0px;right:0px;bottom:0px;margin:-2px;border-radius:12px;transform:rotate(45deg);background:rgba(0,0,0,0.2);box-shadow:0px 0px 8px rgba(255,255,255,0.75);}'+
+		'.gardenSeed.on:before{pointer-events:none;content:\'\';display:block;position:absolute;left:-10px;top:-10px;width:60px;height:60px;background:url(img/selectTarget.png);animation:wobble 0.2s ease-out;z-index:10;}'+
 		
 		'.gardenGrowthIndicator{background:#000;box-shadow:0px 0px 0px 1px #fff,0px 0px 0px 2px #000,2px 2px 2px 2px rgba(0,0,0,0.5);position:absolute;top:0px;width:1px;height:6px;z-index:100;}'+
 		'.noFancy .gardenGrowthIndicator{background:#fff;border:1px solid #000;margin-top:-1px;margin-left:-1px;}'+

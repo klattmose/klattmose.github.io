@@ -114,7 +114,7 @@ M.launch=function()
 			},
 		};
 		M.goodsById=[];var n=0;
-		for (var i in M.goods){var it=M.goods[i];it.id=n;it.hidden=false;it.active=false;it.last=0;it.building=Game.Objects[i];it.stock=0;it.mode=0;it.dur=0;it.val=1;it.vals=[it.val];it.d=0;M.goodsById[n]=it;it.icon=[it.building.iconColumn,33];it.name=loc(FindLocStringByPart('STOCK '+(it.id+1)+' TYPE'));it.company=loc(FindLocStringByPart('STOCK '+(it.id+1)+' NAME'));it.symbol=loc(FindLocStringByPart('STOCK '+(it.id+1)+' LOGO'));n++;}
+		for (var i in M.goods){var it=M.goods[i];it.id=n;it.hidden=false;it.active=false;it.last=0;it.building=Game.Objects[i];it.stock=0;it.mode=0;it.dur=0;it.prev=0;it.val=1;it.vals=[it.val];it.d=0;M.goodsById[n]=it;it.icon=[it.building.iconColumn,33];it.name=loc(FindLocStringByPart('STOCK '+(it.id+1)+' TYPE'));it.company=loc(FindLocStringByPart('STOCK '+(it.id+1)+' NAME'));it.symbol=loc(FindLocStringByPart('STOCK '+(it.id+1)+' LOGO'));n++;}
 		
 		M.goodTooltip=function(id)
 		{
@@ -123,7 +123,7 @@ M.launch=function()
 				var delta=M.goodDelta(id);
 				var val=M.getGoodPrice(me)
 				icon=me.icon||[0,0];
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipMarketGood">'+
 				'<div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div>'+
 				'<div class="name">'+me.name+' <span style="font-size:12px;opacity:0.8;">('+loc("from %1",'<span style="font-variant:small-caps;">'+me.company+'</span>')+')</span> <span class="bankSymbol">'+me.symbol+' <span class="bankSymbolNum'+(delta>=0?' bankSymbolUp':delta<0?' bankSymbolDown':'')+'">'+(delta+''+(delta==Math.floor(delta)?'.00':(delta*10)==Math.floor(delta*10)?'0':'')+'%')+'</span></span></div>'+
 				'<div class="line"></div>'+(EN?'<div class="description">'+
@@ -152,8 +152,10 @@ M.launch=function()
 				n=Math.abs(n);
 				if (buyOrSell) n=Math.min(n,maxStock-stock);
 				if (!buyOrSell) n=Math.min(n,stock);
-				var str='<div style="padding:8px 4px;min-width:128px;text-align:center;font-size:11px;">'+
+				var str='<div style="padding:8px 4px;min-width:128px;text-align:center;font-size:11px;" id="tooltipMarketTrade">'+
 					'<div style="font-size:9px;opacity:0.6;">'+cap(loc("stock:"))+' <b'+((!buyOrSell && stock==0)?' class="red"':'')+'>'+Beautify(stock)+'</b>/<b'+((buyOrSell && stock>=maxStock)?' class="red"':'')+'>'+Beautify(maxStock)+'</b></div>'+
+					(me.prev?('<div class="line"></div>'+
+					'<div style="font-size:9px;opacity:0.6;font-weight:bold;">'+loc("last bought at<br>$%1 each",Beautify(me.prev,2))+'</div>'):'')+
 					'<div class="line"></div>'+
 					'<div>'+(buyOrSell?loc("Buy"):loc("Sell"))+' <b>'+Beautify(n)+'</b>x <div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-me.icon[0]*48)+'px '+(-me.icon[1]*48)+'px;"></div> '+me.name+'</div>'+
 					'<div>'+loc("for $%1 each",Beautify(val,2))+'</div>'+
@@ -220,6 +222,7 @@ M.launch=function()
 				if (min>=100) Game.Win('Rookie numbers');
 				if (min>=500) Game.Win('No nobility in poverty');
 				me.last=1;
+				me.prev=costInS;
 				PlaySound('snd/cashOut.mp3',0.4);
 				return true;
 			}
@@ -292,7 +295,7 @@ M.launch=function()
 			return function(){
 				var me=M.offices[M.officeLevel];
 				var icon=me.icon||[0,0];
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipMarketOffice">'+
 				'<div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div>'+
 				'<div class="name">'+me.name+' <span style="font-size:11px;opacity:0.6;">['+loc("Level %1 offices",M.officeLevel+1)+']</span></div>'+
 				'<div class="line"></div><div class="description" style="font-size:11px;">'+
@@ -316,7 +319,7 @@ M.launch=function()
 		{
 			return function(){
 				var icon=[1,33];
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipMarketBrokers">'+
 				'<div class="icon" style="float:left;margin-left:-8px;margin-top:-8px;background-position:'+(-icon[0]*48)+'px '+(-icon[1]*48)+'px;"></div>'+
 				'<div class="name">'+(EN?('Stockbrokers <span style="font-size:11px;opacity:0.6;">(you have '+Beautify(M.brokers)+')</span>'):(loc("Brokers:")+' '+Beautify(M.brokers)))+'</div>'+
 				'<div class="line"></div><div class="description" style="font-size:11px;">'+
@@ -339,13 +342,13 @@ M.launch=function()
 			//name, mult, duration, payback mult, duration, downpayment (as % of bank), quote
 			[loc("a modest loan"),1.5,60*2,0.25,60*4,0.2,loc("Buy that vintage car you've always wanted. Just pay us back.")],
 			[loc("a pawnshop loan"),2,0.67,0.1,40,0.4,loc("Bad credit? No problem. It's your money, and you need it now.")],
-			['a retirement loan',1.2,60*24*2,0.8,60*24*5,0.5,loc("Finance your next house, boat, spouse, etc. You've earned it.")],
+			[loc("a retirement loan"),1.2,60*24*2,0.8,60*24*5,0.5,loc("Finance your next house, boat, spouse, etc. You've earned it.")],
 		];
 		M.loanTooltip=function(id)
 		{
 			return function(){
 				var loan=M.loanTypes[id-1];
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipMarketLoan">'+
 				'<div class="name">'+loc("Take out %1",loan[0])+'</div>'+
 				'<div class="line"></div><div class="description" style="font-size:11px;">'+
 					loc("By taking this loan, you will get %1 CpS for the next %2.",['<b class="green">+'+Math.round((loan[1]-1)*100)+'%</b>','<b>'+Game.sayTime(60*loan[2]*Game.fps)+'</b>'])+'<br>'+
@@ -388,7 +391,7 @@ M.launch=function()
 		M.oppTooltip=function()
 		{
 			return function(){
-				var str='<div style="padding:8px 4px;min-width:350px;">'+
+				var str='<div style="padding:8px 4px;min-width:350px;" id="tooltipMarketOpp">'+
 				'<div class="name">Generate opportunity</div>'+
 				'<div class="line"></div><div class="description" style="font-size:11px;">'+
 					'Pressing this button gives you up to 3 possible actions to choose from, depending on your office level.<br>These actions will let you manipulate the stock market to some degree, though some are riskier than others.<br>You may only generate an opportunity once an hour, though this can be refreshed with a sugar lump.'+
@@ -398,7 +401,7 @@ M.launch=function()
 		}
 		
 		M.refillTooltip=function(){
-			return '<div style="padding:8px;width:300px;font-size:11px;text-align:center;">'+loc("Click to refill your opportunity timer (and give a quick burst to your economy) for %1.",'<span class="price lump">'+loc("%1 sugar lump",LBeautify(1))+'</span>')+
+			return '<div style="padding:8px;width:300px;font-size:11px;text-align:center;" id="tooltipRefill">'+loc("Click to refill your opportunity timer (and give a quick burst to your economy) for %1.",'<span class="price lump">'+loc("%1 sugar lump",LBeautify(1))+'</span>')+
 				(Game.canRefillLump()?'<br><small>('+loc("can be done once every %1",Game.sayTime(Game.getLumpRefillMax(),-1))+')</small>':('<br><small class="red">('+loc("usable again in %1",Game.sayTime(Game.getLumpRefillRemaining()+Game.fps,-1))+')</small>'))+
 			'</div>';
 		};
@@ -654,7 +657,7 @@ M.launch=function()
 						if (x>=width-span*iR-span-2 && x<=width-span*iR+2 && y>=height-min*M.graphScale-6 && y<=height-min*M.graphScale+Math.max(3,max*M.graphScale)+6)
 						{
 							isOnLine=i;
-							Game.tooltip.draw(0,'<div style="width:128px;font-size:10px;text-align:center;"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-me.icon[0]*48)+'px '+(-me.icon[1]*48)+'px;"></div> <b>'+me.name+'</b><br>'+loc("valued at %1",'<b>$'+Beautify(me.vals[0+iR],2)+'</b>')+'<br>'+loc("%1 ago",Game.sayTime((iR+1)*M.secondsPerTick*Game.fps))+'</div>','top');
+							Game.tooltip.draw(0,'<div style="width:128px;font-size:10px;text-align:center;" id="tooltipMarketLine"><div class="icon" style="pointer-events:none;display:inline-block;transform:scale(0.5);margin:-16px -18px -16px -14px;vertical-align:middle;background-position:'+(-me.icon[0]*48)+'px '+(-me.icon[1]*48)+'px;"></div> <b>'+me.name+'</b><br>'+loc("valued at %1",'<b>$'+Beautify(me.vals[0+iR],2)+'</b>')+'<br>'+loc("%1 ago",Game.sayTime((iR+1)*M.secondsPerTick*Game.fps))+'</div>','top');
 							break bankGraphMouseDetect;
 						}
 					}
@@ -706,7 +709,7 @@ M.launch=function()
 		for (var iG=0;iG<M.goodsById.length;iG++)
 		{
 			var it=M.goodsById[iG];
-			str+=parseInt(it.val*100)+':'+parseInt(it.mode)+':'+parseInt(it.d*100)+':'+parseInt(it.dur)+':'+parseInt(it.stock)+':'+parseInt(it.hidden?1:0)+':'+parseInt(it.last)+'!';
+			str+=parseInt(it.val*100)+':'+parseInt(it.mode)+':'+parseInt(it.d*100)+':'+parseInt(it.dur)+':'+parseInt(it.stock)+':'+parseInt(it.hidden?1:0)+':'+parseInt(it.last)+':'+parseInt(it.prev*100)+'!';
 		}
 		str+=' '+parseInt(M.parent.onMinigame?'1':'0');
 		return str;
@@ -742,6 +745,7 @@ M.launch=function()
 			it.hidden=parseInt(itData[5])?true:false;
 			it.active=false;
 			it.last=parseInt(itData[6]||0);
+			it.prev=parseInt(itData[7]||0)/100;
 			if (it.building.highest>0) it.active=true;
 			if (it.l) M.updateGoodStyle(it.id);
 		}
@@ -767,13 +771,14 @@ M.launch=function()
 			var it=M.goodsById[i];
 			it.stock=0;
 			it.mode=choose([0,1,1,2,2,3,4,5]);
-			it.dur=Math.floor(10+Math.random()*990);
+			it.dur=Math.floor(10+Math.random()*690);
 			it.val=M.getRestingVal(it.id);
 			it.d=Math.random()*0.2-0.1;
 			it.vals=[it.val,it.val-it.d];
 			it.hidden=true;
 			it.active=false;
 			it.last=0;//0: didn't buy or sell this tick; 1: bought this tick; 2: sold this tick
+			it.prev=0;//value during previous purchase of this stock
 			if (it.l) M.updateGoodStyle(it.id);
 		}
 		M.onResize();
@@ -791,6 +796,8 @@ M.launch=function()
 	M.tick=function()
 	{
 		var dragonBoost=Game.auraMult('Supreme Intellect');
+		var globD=0;var globP=Math.pow(Math.random(),3);
+		if (Math.random()<0.1+0.1*dragonBoost) globD=(Math.random()-0.5)*2;
 		for (var i=0;i<M.goodsById.length;i++)
 		{
 			var me=M.goodsById[i];
@@ -801,15 +808,18 @@ M.launch=function()
 			if (me.mode==0) {me.d*=0.95;me.d+=0.05*(Math.random()-0.5);}
 			else if (me.mode==1) {me.d*=0.99;me.d+=0.05*(Math.random()-0.1);}
 			else if (me.mode==2) {me.d*=0.99;me.d-=0.05*(Math.random()-0.1);}
-			else if (me.mode==3) {me.d+=0.15*(Math.random()-0.1);me.val+=Math.random();}
-			else if (me.mode==4) {me.d-=0.15*(Math.random()-0.1);me.val-=Math.random();}
+			else if (me.mode==3) {me.d+=0.15*(Math.random()-0.1);me.val+=Math.random()*5;}
+			else if (me.mode==4) {me.d-=0.15*(Math.random()-0.1);me.val-=Math.random()*5;}
 			else if (me.mode==5) me.d+=0.3*(Math.random()-0.5);
 			
-			me.val+=(M.getRestingVal(me.id)-me.val)*0.02;
-			me.val+=(Math.random()-0.5)*0.4;
+			me.val+=(M.getRestingVal(me.id)-me.val)*0.01;
+			
+			if (globD!=0 && Math.random()<globP) {me.val-=(1+me.d*Math.pow(Math.random(),3)*10)*globD;me.val-=globD*(1+Math.pow(Math.random(),3)*10);me.d+=globD*(1+Math.random()*6);me.dur=0;}
+			
+			me.val+=Math.pow((Math.random()-0.5)*2,11)*5;
 			me.d+=0.1*(Math.random()-0.5);
-			if (Math.random()<0.1) me.val+=(Math.random()-0.5)*3;
-			if (Math.random()<0.01) me.val+=(Math.random()-0.5)*(20+30*dragonBoost);
+			if (Math.random()<0.15) me.val+=(Math.random()-0.5)*3;
+			if (Math.random()<0.03) me.val+=(Math.random()-0.5)*(20+30*dragonBoost);
 			if (Math.random()<0.1) me.d+=(Math.random()-0.5)*(0.3+0.2*dragonBoost);
 			if (me.mode==5)
 			{
@@ -848,7 +858,7 @@ M.launch=function()
 			//if (Math.random()<1/me.dur)
 			if (me.dur<=0)
 			{
-				me.dur=Math.floor(10+Math.random()*(990-200*dragonBoost));
+				me.dur=Math.floor(10+Math.random()*(690-200*dragonBoost));
 				if (Math.random()<dragonBoost && Math.random()<0.5) me.mode=5;
 				else if (Math.random()<0.7 && (me.mode==3 || me.mode==4)) me.mode=5;
 				else me.mode=choose([0,1,1,2,2,3,4,5]);
@@ -861,7 +871,7 @@ M.launch=function()
 	
 	M.dragonBoostTooltip=function()
 	{
-		return '<div style="width:280px;padding:8px;text-align:center;"><b>'+loc("Supreme Intellect")+'</b><div class="line"></div>'+loc("The stock market is more chaotic.")+'</div>';
+		return '<div style="width:280px;padding:8px;text-align:center;" id="tooltipDragonBoost"><b>'+loc("Supreme Intellect")+'</b><div class="line"></div>'+loc("The stock market is more chaotic.")+'</div>';
 	}
 	
 	M.tickT=0;

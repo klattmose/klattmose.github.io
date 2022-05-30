@@ -4,7 +4,7 @@
 <base href="/system/">
 <title>DashNet | 404!</title>
 <!--
-Code and graphics copyright Orteil, 2017
+Code and graphics copyright Orteil, 2022
 Feel free to alter this code to your liking, but please do not re-host it, do not profit from it and do not present it as your own.
 -->
 
@@ -24,11 +24,11 @@ Feel free to alter this code to your liking, but please do not re-host it, do no
 		<div id="subtitle">whoops</div>
 		<div class="blurb">
 			<div class="block">
-			<p>Either you typed a url wrong (that's on you!) or we messed up somewhere (that's our bad, please <a href="http://forum.dashnet.org">contact us</a>!).</p>
-			<p>Not sure where to go? You could check out our <a href="http://www.dashnet.org" target="_top">homepage</a> for some pretty neat stuff.</p>
+			<p>Either you typed a url wrong (that's on you!) or we messed up somewhere (that's our bad, please <a href="https://orteil42.tumblr.com">let us know</a>!).</p>
+			<p>Not sure where to go? You could check out our <a href="https://www.dashnet.org" target="_top">homepage</a> for some pretty neat stuff.</p>
 			</div>
 		</div>
-		<div id="credits">&copy; <a href="http://orteil.dashnet.org" target="_top">Orteil</a>, 2017 - <a href="http://dashnet.org" target="_top">DashNet</a></div>
+		<div id="credits">&copy; <a href="https://orteil.dashnet.org" target="_top">Orteil</a>, 2022 - <a href="https://dashnet.org" target="_top">DashNet</a></div>
 	</div>
 </div>
 </body>

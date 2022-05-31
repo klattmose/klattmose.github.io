@@ -1,6 +1,6 @@
 if(Horticookie === undefined) var Horticookie = {};
 Horticookie.name = 'Horticookie';
-Horticookie.version = '4.1';
+Horticookie.version = '4.2';
 Horticookie.GameVersion = '2.047';
 
 Horticookie.launch = function(){
@@ -1122,7 +1122,7 @@ Horticookie.launch = function(){
 		
 		// Recalc things in case the dragon aura has changed
 		Game.customToggleSpecialMenu.push(function(str){
-			Horticookie.computeEffs();
+			if(Game.Objects['Farm'].minigameLoaded) Horticookie.computeEffs();
 			return str;
 		});
 		

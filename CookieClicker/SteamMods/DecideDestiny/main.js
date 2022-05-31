@@ -184,17 +184,23 @@ DecideDestiny.CreateUpgrades = function(){
 		}
 	}
 	
+	var placement = [[276,-205],[367,-290],[500,-300],[577,-410],[710,-420],[787,-530],[920,-540],[997,-650],[1130,-660]];
+	var ups = [];
 	
-	CCSE.NewHeavenlyUpgrade('Destiny: Decided', loc("Unlocks the <b>Destiny decider</b>, letting you spend sugar lumps to choose the outcome of the next natural golden cookie."), 1e3, [22,11], 382, -229, []);
-	CCSE.NewHeavenlyUpgrade('Destiny: Architecture', loc("Adds the <b>Building special</b> effect to the pool of choices."), 1e4, [ 5, 6], 430, -337, ['Destiny: Decided']);
-	CCSE.NewHeavenlyUpgrade('Destiny: Agriculture', loc("Adds the <b>Dragon Harvest</b> effect to the pool of choices."), 1e5, [10,25], 535, -282, ['Destiny: Architecture']);
-	CCSE.NewHeavenlyUpgrade('Destiny: Scattershot', loc("Adds the <b>Cookie chain</b> and <b>Cookie storm</b> effects to the pool of choices."), 1e6, [22, 6], 547, -397, ['Destiny: Agriculture']);
-	CCSE.NewHeavenlyUpgrade('Destiny: Carpal tunnel', loc("Adds the <b>Click frenzy</b> and <b>Cursed finger</b> effects to the pool of choices."), 1e8, [ 0,14], 666, -365, ['Destiny: Scattershot']);
-	CCSE.NewHeavenlyUpgrade('Destiny: Misfortune', loc("Adds the <b>Ruin</b> and <b>Clot</b> effects to the pool of choices, which will <b>give</b> sugar lumps."), 1e9, [15, 5], 661, -482, ['Destiny: Carpal tunnel']);
-	CCSE.NewHeavenlyUpgrade('Destiny: Altitude', loc("Adds the <b>Dragonflight</b> effect to the pool of choices."), 1e10, [ 0,25], 781, -471, ['Destiny: Misfortune']);
-	CCSE.NewHeavenlyUpgrade('Destiny: Apocalypse', loc("Adds the <b>Elder frenzy</b> effect to the pool of choices."), 1e12, [29, 6], 765, -592, ['Destiny: Altitude']);
-	CCSE.NewHeavenlyUpgrade('Destiny: Whimsy', loc("Adds the <b>Blab</b> effect to the pool of choices."), 1e15, [29, 8], 893, -603, ['Destiny: Apocalypse']);
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Decided',       loc("Unlocks the <b>Destiny decider</b>, letting you spend sugar lumps to choose the outcome of the next natural golden cookie."), 1e3,  [22,11], 370, -230, []));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Architecture',  loc("Adds the <b>Building special</b> effect to the pool of choices."),                                                            1e4,  [ 5, 6], 470, -280, ['Destiny: Decided']));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Agriculture',   loc("Adds the <b>Dragon Harvest</b> effect to the pool of choices."),                                                              1e5,  [10,25], 570, -330, ['Destiny: Architecture']));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Scattershot',   loc("Adds the <b>Cookie chain</b> and <b>Cookie storm</b> effects to the pool of choices."),                                       1e6,  [22, 6], 670, -380, ['Destiny: Agriculture']));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Carpal tunnel', loc("Adds the <b>Click frenzy</b> and <b>Cursed finger</b> effects to the pool of choices."),                                      1e8,  [ 0,14], 770, -430, ['Destiny: Scattershot']));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Misfortune',    loc("Adds the <b>Ruin</b> and <b>Clot</b> effects to the pool of choices, which will <b>give</b> sugar lumps."),                   1e9,  [15, 5], 870, -480, ['Destiny: Carpal tunnel']));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Altitude',      loc("Adds the <b>Dragonflight</b> effect to the pool of choices."),                                                                1e10, [ 0,25], 970, -530, ['Destiny: Misfortune']));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Apocalypse',    loc("Adds the <b>Elder frenzy</b> effect to the pool of choices."),                                                                1e12, [29, 6], 1070, -580, ['Destiny: Altitude']));
+	ups.push(CCSE.NewHeavenlyUpgrade('Destiny: Whimsy',        loc("Adds the <b>Blab</b> effect to the pool of choices."),                                                                        1e15, [29, 8], 1170, -630, ['Destiny: Apocalypse']));
 	
+	for(var i = 0; i < ups.length; i++){
+		ups[i].posX = placement[i][0];
+		ups[i].posY = placement[i][1];
+	}
 	
 	Game.upgradesToRebuild = 1;
 }

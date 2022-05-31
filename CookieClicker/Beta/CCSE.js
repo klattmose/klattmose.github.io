@@ -2811,7 +2811,7 @@ CCSE.launch = function(){
 		temp = temp.replace('tile[1]=Math.max(tile[1],0);', 
 								`// M.logic injection point 0
 								for(var i in Game.customMinigame['` + objKey + `'].plantAging) age = Game.customMinigame['` + objKey + `'].plantAging[i](age, tile, x, y);
-								tile[1] = age;
+								tile[1] += age;
 								tile[1]=Math.max(tile[1],0);`);
 		eval('M.logic=' + temp);
 		

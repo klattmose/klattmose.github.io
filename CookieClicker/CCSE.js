@@ -1,9 +1,9 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.031';
+CCSE.version = '2.033';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.042' : '2.031';
+CCSE.GameVersion = CCSE.Steam ? '2.048' : '2.048';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -133,6 +133,10 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">01/07/2022</div>' + 
+			'<div class="listing">&bull; Added hook for Game.resize</div>' +
+			'<div class="listing">&bull; Added hook for Garden.logic (for plant aging)</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">10/04/2021</div>' +
 			'<div class="listing">&bull; Fixed bug that was preventing custom buildings, upgrades, and achievements from being saved in some circumstances</div>' +
@@ -265,7 +269,7 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.GetProgressHTML = function(progress){
-		return `<div style="text-align: center; font-weight: bold; color: white;">${ progress }</div>`;
+		return `<div style="text-align: center; font-weight: bold; color: white;">${ progress }%</div>`;
 	}
 
 	CCSE.InitNote = function(){
@@ -273,8 +277,8 @@ CCSE.launch = function(){
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
 		CCSE.functionsTotal = (
-			134
-			+ (CCSE.Steam ? 4 : 0)
+			135
+			+ (CCSE.Steam ? 7 : 0)
 			+ Game.ObjectsN      * 18 - 1 + 3
 			+ Game.UpgradesN     * 1  + 26
 			+ Game.AchievementsN * 1
@@ -318,7 +322,7 @@ CCSE.launch = function(){
 		if(!Game.customOptionsMenu) Game.customOptionsMenu = [];
 		if(!Game.customStatsMenu) Game.customStatsMenu = [];
 		if(!Game.customInfoMenu) Game.customInfoMenu = [];
-		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "url(img/'+milk.pic+'.png)", "url(img/'+milk.pic+')", 0);
+		
 		CCSE.ReplaceCodeIntoFunction('Game.UpdateMenu', "l('menu').innerHTML=str;", `
 			if(Game.onMenu == 'prefs'){
 				// Game.UpdateMenu injection point 0
@@ -363,6 +367,23 @@ CCSE.launch = function(){
 			CCSE.ReplaceCodeIntoFunction('Steam.modsPopup', 'else el.innerHTML=loc("Select a mod.");',
 				`// Steam.modsPopup injection point 3
 				for(var i in Game.customModsPopupUpdateModOptions) Game.customModsPopupUpdateModOptions[i](selectedMod, mods);
+				`, 1);
+			
+			// Steam.workshopPopup
+			if(!Game.customWorkshopPopup) Game.customWorkshopPopup = [];
+			if(!Game.customWorkshopPopupUpdateModDisplay) Game.customWorkshopPopupUpdateModDisplay = [];
+			if(!Game.customWorkshopPopupUpdatePublishedModsPopup) Game.customWorkshopPopupUpdatePublishedModsPopup = [];
+			CCSE.SliceCodeIntoFunction('Steam.workshopPopup', -1, `
+				// Steam.customWorkshopPopup injection point 0
+				for(var i in Game.customWorkshopPopup) Game.customWorkshopPopup[i](selectedMod, selectedModPath);
+			`);
+			CCSE.ReplaceCodeIntoFunction('Steam.workshopPopup', "Game.UpdatePrompt();",
+				`// Steam.customWorkshopPopup injection point 1
+				for(var i in Game.customWorkshopPopupUpdateModDisplay) Game.customWorkshopPopupUpdateModDisplay[i](selectedMod, el);
+				`, 1);
+			CCSE.ReplaceCodeIntoFunction('Steam.workshopPopup', "else l('modDisplay').innerHTML=`<div style=\"font-size:11px;margin:8px;\">(${loc(\"none\")})</div>`;",
+				`// Steam.customWorkshopPopup injection point 2
+				for(var i in Game.customWorkshopPopupUpdatePublishedModsPopup) Game.customWorkshopPopupUpdatePublishedModsPopup[i](response);
 				`, 1);
 		}
 		
@@ -422,6 +443,14 @@ CCSE.launch = function(){
 		CCSE.ReplaceCodeIntoFunction('Game.Loader.Load', 'img.src=this.domain', "img.src=(assets[i].indexOf('/')>=0?'':this.domain)", 0);
 		
 		
+		// Game.resize
+		if(!Game.customResize) Game.customResize = [];
+		CCSE.SliceCodeIntoFunction('Game.resize', -1, `
+			// Game.resize injection point 0
+			for(var i in Game.customResize) Game.customResize[i]();
+		`);
+		
+		
 		// -----     Tooltips block     ----- //
 		
 		// Game.tooltip.draw
@@ -443,10 +472,10 @@ CCSE.launch = function(){
 		// Game.crate
 		// Return ret to have no effect
 		if(!Game.customCrate) Game.customCrate = [];
-		CCSE.ReplaceCodeIntoFunction('Game.crate', "return '<div'+", "var ret = '<div'+", 0);
+		CCSE.ReplaceCodeIntoFunction('Game.crate', 'return (Game', "var ret = (Game", 0);
 		CCSE.SliceCodeIntoFunction('Game.crate', -1, `
 			// Game.crate injection point 0
-			for(var i in Game.customCrate) ret = Game.customCrate[i](me, context, forceClickStr, id, ret);
+			for(var i in Game.customCrate) ret = Game.customCrate[i](me, context, forceClickStr, id, ret, style);
 			return ret;
 		`);
 		
@@ -533,7 +562,7 @@ CCSE.launch = function(){
 		if(!Game.customBuildAscendTree) Game.customBuildAscendTree = [];
 		CCSE.SliceCodeIntoFunction('Game.BuildAscendTree', -1, `
 			// Game.BuildAscendTree injection point 0
-			for(var i in Game.customBuildAscendTree) Game.customBuildAscendTree[i]();
+			for(var i in Game.customBuildAscendTree) Game.customBuildAscendTree[i](justBought);
 		`);
 		
 		
@@ -726,8 +755,8 @@ CCSE.launch = function(){
 			CCSE.ReplaceShimmerType(key);
 		}
 		
-		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].initFunc", "PlaySound('snd/chime.mp3')", "CCSE.PlayShimmerSpawnSound('golden')", 0);
-		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].initFunc", "PlaySound('snd/jingle.mp3')", "CCSE.PlayShimmerSpawnSound('reindeer')", 0);
+		CCSE.SliceCodeIntoFunction("Game.playGoldenCookieChime", -1, "else CCSE.PlayShimmerSpawnSound('golden')", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].initFunc", "Game.chimeType==1", "Game.chimeType!=0", 0);
 		
 		
 		// Game.shimmerTypes['golden'].popFunc
@@ -760,6 +789,13 @@ CCSE.launch = function(){
 		
 		
 		// -----     Particles block       ----- //
+		// Game.particleAdd
+		temp = Game.particleAdd.toString();
+		temp = temp.replaceAll("pic='icons.png';", `if (me.picPos.length == 3) {pic=me.picPos[2];me.picId = 0;}
+						else pic='icons.png';`)
+		eval('Game.particleAdd=' + temp);
+		
+		
 		// -----     Notifications block   ----- //
 		// -----     Prompts block         ----- //
 		// -----     Menu block            ----- //
@@ -771,11 +807,13 @@ CCSE.launch = function(){
 		
 		// Game.Object
 		// Alter this function so creating new buildings doesn't break the minigames
-		CCSE.ReplaceCodeIntoFunction('Game.Object', `var str='<div class="row" id="row'+this.id+'">`,
-				`var div = document.createElement('div');
-				div.id = 'row'+this.id;
-				div.classList.add('row');
-				var str='`, 0);
+		CCSE.ReplaceCodeIntoFunction('Game.Object', `str+='<div class="row" id="row'+this.id+'"><div class="separatorBottom"></div>';`,
+				`{
+					var div = document.createElement('div');
+					div.id = 'row'+this.id;
+					div.classList.add('row');
+					str += '<div class="separatorBottom"></div>';
+				}`, 0);
 		CCSE.ReplaceCodeIntoFunction('Game.Object', `str+='<div class="rowSpecial" id="rowSpecial'+this.id+'"></div>';`,
 				`div.innerHTML = str;`, 1);
 		CCSE.ReplaceCodeIntoFunction('Game.Object', `l('rows').innerHTML=l('rows').innerHTML+str;`,
@@ -980,10 +1018,26 @@ CCSE.launch = function(){
 			{return strCookieProductionMultiplierPlus.replace('[x]',x);}` : 0);
 		
 		
+		// Game.getVeilDefense
+		// Return 0 for no effect
+		if(!Game.customGetVeilDefense) Game.customGetVeilDefense = [];
+		CCSE.ReplaceCodeIntoFunction('Game.getVeilDefense', 'return', `
+			// Game.getVeilDefense injection point 0
+			for(var i in Game.customGetVeilDefense) n += Game.customGetVeilDefense[i](n);`, -1);
+		
+		
+		// Game.getVeilBoost
+		// Return 0 for no effect
+		if(!Game.customGetVeilBoost) Game.customGetVeilBoost = [];
+		CCSE.ReplaceCodeIntoFunction('Game.getVeilBoost', 'return', `
+			// Game.getVeilBoost injection point 0
+			for(var i in Game.customGetVeilBoost) n += Game.customGetVeilBoost[i](n);`, -1);
+		
+		
 		// -----     Seasons block     ----- //
 		
 		// Game.computeSeasons
-		CCSE.ReplaceCodeIntoFunction('Game.computeSeasons', "else Game.Notify(str,'',this.icon,4);", `
+		CCSE.ReplaceCodeIntoFunction('Game.computeSeasons', `Game.Notify(Game.seasons[this.season].start+'<div class="line"></div>','',this.icon,4);`, `
 					// Game.computeSeasons injection point 0
 					for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);`, 1);
 		
@@ -1262,17 +1316,8 @@ CCSE.launch = function(){
 			for(var i in Game.customDrawBackground) Game.customDrawBackground[i]();`, -1);
 		
 		// Setup for custom Milk Selector options
-		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "Pic(pic+'.png')", 'Pic(pic)', 0);
-		if(!Game.AllMilks){ // Browser compatibility
-			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.MilksByChoice[Game.milkType].pic;",
-																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
-			Game.AllMilks = [];
-			for(var i in Game.MilksByChoice) Game.AllMilks.push(Game.MilksByChoice[i]);
-		} else {
-			CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;",
-																'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
-		}
-		for(var i in Game.AllMilks) Game.AllMilks[i].pic += '.png';
+		CCSE.ReplaceCodeIntoFunction('Game.DrawBackground', "if (Game.milkType!=0 && Game.ascensionMode!=1) pic=Game.AllMilks[Game.milkType].pic;",
+															'if (CCSE.config.milkType!="Automatic" && Game.ascensionMode!=1) pic=CCSE.GetSelectedMilk().milk.pic;', 0);
 		
 		// Setup for custom Background Selector options
 		temp = Game.DrawBackground.toString();
@@ -1817,7 +1862,7 @@ CCSE.launch = function(){
 		// this.unlock
 		CCSE.SliceCodeIntoFunction("Game.Upgrade.prototype.unlock", -1, `
 				// Game.Upgrade.prototype.unlock injection point 0
-				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
+				if(Game.customUpgrades[this.name]) if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].unlock) Game.customUpgrades[this.name].unlock[i](this);
 			`);
 		
 		// this.lose
@@ -1851,7 +1896,7 @@ CCSE.launch = function(){
 		
 		// Golden cookie sound selector custom options
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "this.choicesFunction()[Game.chimeType]", "CCSE.GetSelectedShimmerSound()", 0);
-		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "'+icon[2]+'", "'+choice.icon[2]+'", 0);
+		//CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].olddescFunc", "'+icon[2]+'", "'+choice.icon[2]+'", 0);
 		
 		// Game.Upgrades['Golden cookie sound selector'].choicesFunction
 		if(!Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction = [];
@@ -1860,10 +1905,10 @@ CCSE.launch = function(){
 			for(var i in Game.customUpgrades['Golden cookie sound selector'].choicesFunction) Game.customUpgrades['Golden cookie sound selector'].choicesFunction[i](choices);
 			CCSE.OverrideShimmerSoundSelector(choices);`, -1);
 		
-		Game.customUpgrades['Golden cookie sound selector'].choicesFunction.push(function(choices){
+		/*Game.customUpgrades['Golden cookie sound selector'].choicesFunction.push(function(choices){
 			choices[1].default = 'snd/chime.mp3';
 			choices[1].shimmerTypes = {golden:'snd/chime.mp3', reindeer:'snd/jingle.mp3'};
-		});
+		});*/
 		
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Golden cookie sound selector'].choicesPick", "Game.chimeType=id;",
 			'CCSE.SetSelectedShimmerSound(id);', 0);
@@ -1900,6 +1945,15 @@ CCSE.launch = function(){
 		
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Background selector'].choicesPick", "Game.bgType=id;",
 			'CCSE.SetSelectedBackground(id);', 0);
+		
+		
+		// Game.Upgrades['Jukebox'].choicesFunction
+		// Return str to have no effect
+		if(!Game.customUpgrades['Jukebox'].choicesFunction) Game.customUpgrades['Jukebox'].choicesFunction = [];
+		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Jukebox'].choicesFunction", "return",
+			`// Game.customUpgrades['Jukebox'].choicesFunction injection point 0
+			for(var i in Game.customUpgrades['Jukebox'].choicesFunction) str = Game.customUpgrades['Jukebox'].choicesFunction[i](str);
+			CCSE.OverrideBackgroundSelector(choices);`, -1);
 		
 		
 		// Permanent upgrades are tricky
@@ -1970,17 +2024,19 @@ CCSE.launch = function(){
 		if(!Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction = [];
 		Game.customUpgrades[key].buyFunction.push(CCSE.customUpgradesAllbuyFunction);
 		if(upgrade.buyFunction){
-			CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buyFunction", -1, `
+			upgrade.oldbuyFunction = upgrade.buyFunction;
+			upgrade.buyFunction = function(){
+				upgrade.oldbuyFunction();
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
 				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
-			`);
+			}
 		}else{
 			upgrade.buyFunction = function(){
 				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
 				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
 			}
-			CCSE.functionsAltered++;
 		}
+		CCSE.functionsAltered++;
 		
 		
 		// this.descFunc
@@ -2107,26 +2163,28 @@ CCSE.launch = function(){
 	=======================================================================================*/
 	CCSE.AppendOptionsMenu = function(inp){
 		// Accepts inputs of either string or div
-		var div;
+		var div = document.createElement('div');
+		//div.className = "framed";
+		//div.style= "margin:4px 48px;";
+		div.innerHTML = '<div class="block" style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
+		var div2 = div.children[0].children[0];
+		//var div2 = div.children[0];
+		
 		if(typeof inp == 'string'){
-			div = document.createElement('div');
-			div.innerHTML = inp;
+			div2.innerHTML = inp;
 		}
 		else{
-			div = inp;
+			div2.appendChild(inp);
 		}
 		
 		var menu = l('menu');
 		if(menu){
-			menu = menu.getElementsByClassName('subsection')[0];
-			if(menu){
-				var padding = menu.childNodes;
-				padding = padding[padding.length - 1];
-				if(padding){
-					menu.insertBefore(div, padding);
-				} else {
-					menu.appendChild(div);
-				}
+			var padding = menu.childNodes;
+			padding = padding[padding.length - 1];
+			if(padding){
+				menu.insertBefore(div, padding);
+			} else {
+				menu.appendChild(div);
 			}
 		}
 	}
@@ -2194,20 +2252,8 @@ CCSE.launch = function(){
 			div = inp;
 		}
 		
-		var general;
-		var subsections = l('menu').getElementsByClassName('subsection');
-		
-		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
-				general = subsections[i];
-				break;
-			}
-		}
-		
-		if(general){
-			var br = general.getElementsByTagName('br')[0];
-			if(br) general.insertBefore(div, br);
-		}
+		var general = l('statsGeneral');
+		if(general) general.appendChild(div);
 	}
 	
 	CCSE.AppendStatsSpecial = function(inp){
@@ -2221,54 +2267,27 @@ CCSE.launch = function(){
 			div = inp;
 		}
 		
-		var special;
-		var subsections = l('menu').getElementsByClassName('subsection');
-		
-		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'Special'){
-				special = subsections[i];
-				break;
-			}
-		}
-		
+		var special = l('statsSpecial');
 		if(!special){
-			var general;
 			subsections = l('menu').getElementsByClassName('subsection');
 			
-			for(var i in subsections){
-				if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
-					general = subsections[i];
-					break;
-				}
-			}
-			
-			if(general){
-				special = document.createElement('div');
-				special.className = 'subsection';
-				special.innerHTML = '<div class="title">' + 'Special' + '</div>';
-				l('menu').insertBefore(special, subsections[1]);
-			}
+			special = document.createElement('div');
+			special.className = 'subsection';
+			special.innerHTML = '<div class="title">' + loc('Special') + '</div>';
+			l('menu').insertBefore(special, subsections[1]);
 		}
 		
 		if(special) special.appendChild(div);
 	}
 	
 	CCSE.AppendStatsVersionNumber = function(modName, versionString){
-		var general;
+		var general = l('statsGeneral');
 		var str = '<b>' + modName + ':</b> ' + versionString;
 		var div = document.createElement('div');
 		div.className = 'listing';
 		div.innerHTML = str;
 		
-		var subsections = l('menu').getElementsByClassName('subsection');
-		for(var i in subsections){
-			if(subsections[i].childNodes && subsections[i].childNodes[0].innerHTML == 'General'){
-				general = subsections[i];
-				break;
-			}
-		}
-		
-		if(general) general.appendChild(div);
+		if(general) general.parentNode.appendChild(div);
 	}
 	
 	CCSE.GetMenuString = function(){
@@ -2276,11 +2295,6 @@ CCSE.launch = function(){
 			CCSE.MenuHelper.ActionButton("CCSE.ExportSave();", 'Export custom save') +
 			CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') +
 			'<label>Back up data added by mods and managed by CCSE</label></div>';
-		
-		/*str +=	'<div class="listing">' +
-			'<a class="option" ' + Game.clickStr + '="CCSE.ExportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Export combined save</a>' +
-			'<a class="option" ' + Game.clickStr + '="CCSE.ImportCombinedSave(); PlaySound(\'snd/tick.mp3\');">Import combined save</a>' +
-			'<label>Back up vanilla game save as well as data added by mods and managed by CCSE</label></div>';*/
 		
 		return str;
 	}
@@ -2367,7 +2381,7 @@ CCSE.launch = function(){
 			if(!callback) callback = '';
 			else callback += `('${ prefName }', '${ button }', '${ on.replace("'","\\'") }', '${ off.replace("'","\\'") }', '${ invert }');`;
 			callback += "PlaySound('snd/tick.mp3');";
-			var className = `smallFancyButton option${ (config[prefName]^invert) ? '' : ' off' }`;
+			var className = `smallFancyButton prefButton option${ (config[prefName]^invert) ? '' : ' off' }`;
 			return `<a id="${ button }" class="${ className }" ${ Game.clickStr }="${ callback }">${ config[prefName] ? on : off }</a>`;
 		},
 		
@@ -2786,6 +2800,20 @@ CCSE.launch = function(){
 		var objKey = "Farm";
 		var M = Game.Objects[objKey].minigame;
 		var preEvalScript = "var M = Game.Objects['" + objKey + "'].minigame;";
+		var temp = '';
+		
+		
+		// M.logic (plantAging)
+		// return age to have no effect
+		if(!Game.customMinigame[objKey].plantAging) Game.customMinigame[objKey].plantAging = [];
+		temp = M.logic.toString();
+		temp = temp.replace('tile[1]+=', 'var age = ');
+		temp = temp.replace('tile[1]=Math.max(tile[1],0);', 
+								`// M.logic injection point 0
+								for(var i in Game.customMinigame['` + objKey + `'].plantAging) age = Game.customMinigame['` + objKey + `'].plantAging[i](age, tile, x, y);
+								tile[1] = age;
+								tile[1]=Math.max(tile[1],0);`);
+		eval('M.logic=' + temp);
 		
 		
 		// M.getUnlockedN
@@ -3757,8 +3785,9 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.SetSelectedShimmerSound = function(id){
-		Game.chimeType = (id ? 1 : 0); // Vanilla value will stay either 0 or 1
-		CCSE.config.chimeType = Game.Upgrades['Golden cookie sound selector'].choicesFunction()[id].name;
+		let choices = Game.Upgrades['Golden cookie sound selector'].choicesFunction();
+		Game.chimeType = (id > 4 ? 0 : id);    // Manually update when vanilla choices change
+		CCSE.config.chimeType = choices[id].name;
 	}
 	
 	CCSE.PlayShimmerSpawnSound = function(shimmerType){

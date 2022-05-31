@@ -4,7 +4,7 @@ if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
 KlattmoseUtilities.version = '2.16';
-KlattmoseUtilities.GameVersion = '2.031';
+KlattmoseUtilities.GameVersion = '2.048';
 
 KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.defaultConfig = function(){
@@ -81,7 +81,7 @@ KlattmoseUtilities.launch = function(){
 			  "shift": false,
 			  "alt": false,
 			  "period": "10",
-			  "script": "Game.lastClick=0;\nGame.ClickCookie({detail:1,preventDefault:()=>{}});"
+			  "script": "Game.lastClick=0;\nGame.ClickCookie();"
 			},
 			{
 			  "keyCode": 98,
@@ -109,15 +109,6 @@ KlattmoseUtilities.launch = function(){
 			  "alt": false,
 			  "script": "var M = Game.Objects[\"Wizard tower\"].minigame;\nif(M && M.magic == M.magicM) M.castSpell(M.spells[\"haggler's charm\"]);",
 			  "period": "1000"
-			},
-			{
-			  "keyCode": 101,
-			  "nickname": "Cookie Monster Autobuy",
-			  "ctrl": false,
-			  "shift": false,
-			  "alt": false,
-			  "script": "if(typeof CookieMonsterData == 'undefined'){}\nelse{\n\tvar waitForUpgrade = false;\n\tfor (var i in CookieMonsterData['Upgrades']) {\n\t\tvar obj = Game.Upgrades[i];\n\t\tif((CookieMonsterData['Upgrades'][i].colour == 'Green' || CookieMonsterData['Upgrades'][i].colour == 'Blue') && obj.pool != \"toggle\" && !obj.isVaulted()){\n\t\t\tif(obj.getPrice() < Game.cookies) {\n\t\t\t\tobj.buy();\n\t\t\t\tGame.Notify('Bought ' + obj.name, '', '', 1, 1);\n\t\t\t\twaitForUpgrade = false;\n\t\t\t}else{\n\t\t\t\twaitForUpgrade = true;\n\t\t\t}\n\t\t}\n\t}\n\tif(!waitForUpgrade){\n\t\tfor (var i in CookieMonsterData['Objects1']) {\n\t\t\tvar obj = Game.Objects[i];\n\t\t\tif(CookieMonsterData['Objects1'][i].colour == 'Green' && obj.price < Game.cookies){\n\t\t\t\tobj.buy(1);\n\t\t\t\tGame.Notify('Bought a ' + obj.name, '', '', 1, 1);\n\t\t\t}\n\t\t}\n\t}\n}",
-			  "period": "100"
 			},
 			{
 			  "keyCode": 102,
@@ -350,7 +341,7 @@ KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.saveNewOnLoadFunction = function(i){
 		KlattmoseUtilities.tempOnLoadFunction.nickname = l('nicknameEditor').value;
 		KlattmoseUtilities.tempOnLoadFunction.script = l('textareaPrompt').value;
-		KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction
+		KlattmoseUtilities.config.onLoadFunctions[i] = KlattmoseUtilities.tempOnLoadFunction;
 		KlattmoseUtilities.functionalize();
 	}
 
@@ -487,7 +478,7 @@ KlattmoseUtilities.launch = function(){
 			KlattmoseUtilities.config.patches[patchName] = 1;
 		}
 		
-		l(button).className = 'option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((KlattmoseUtilities.config.patches[patchName]^invert) ? '' : ' off');
 	}
 
 
@@ -515,9 +506,12 @@ KlattmoseUtilities.launch = function(){
 						M.computeMatures();
 						
 						var weedMult=M.soilsById[M.soil].weedMult;
+				
+						var dragonBoost=1+0.05*Game.auraMult('Supreme Intellect');
 						
 						var loops=1;
 						if (M.soilsById[M.soil].key=='woodchips') loops=3;
+						loops=randomFloor(loops*dragonBoost);
 						loops*=M.loopsMult;
 						M.loopsMult=1;
 						
@@ -532,7 +526,7 @@ KlattmoseUtilities.launch = function(){
 									if (tile[0]>0)
 									{
 										//age
-										tile[1]+=randomFloor((me.ageTick+me.ageTickR*Math.random())*M.plotBoost[y][x][0]);
+										tile[1]+=randomFloor((me.ageTick+me.ageTickR*Math.random())*M.plotBoost[y][x][0]*dragonBoost);
 										tile[1]=Math.max(tile[1],0);
 										if (me.immortal) tile[1]=Math.min(me.mature+1,tile[1]);
 										else if (tile[1]>=100)
@@ -542,7 +536,7 @@ KlattmoseUtilities.launch = function(){
 											if (me.onDie) me.onDie(x,y);
 											if (M.soilsById[M.soil].key=='pebbles' && Math.random()<0.35)
 											{
-												if (M.unlockSeed(me)) Game.Popup('Unlocked '+me.name+' seed.',Game.mouseX,Game.mouseY);
+												if (M.unlockSeed(me)) Game.Popup(loc("Unlocked %1 seed.",me.name),Game.mouseX,Game.mouseY);
 											}
 										}
 										else if (!me.noContam)

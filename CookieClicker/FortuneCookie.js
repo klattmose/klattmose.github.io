@@ -1,8 +1,8 @@
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.8';
-FortuneCookie.GameVersion = '2.031';
+FortuneCookie.version = '2.10';
+FortuneCookie.GameVersion = '2.048';
 
 FortuneCookie.launch = function(){
 	FortuneCookie.init = function(){
@@ -12,9 +12,6 @@ FortuneCookie.launch = function(){
 		
 		FortuneCookie.config = FortuneCookie.defaultConfig();
 		if(CCSE.config.OtherMods.FortuneCookie && !Game.modSaveData[FortuneCookie.name]) Game.modSaveData[FortuneCookie.name] = JSON.stringify(CCSE.config.OtherMods.FortuneCookie);
-		/*FortuneCookie.load();
-		CCSE.customLoad.push(FortuneCookie.load);
-		CCSE.customSave.push(FortuneCookie.save);*/
 		
 		FortuneCookie.ReplaceNativeGrimoire();
 		FortuneCookie.initMembraneForecast();
@@ -48,19 +45,14 @@ FortuneCookie.launch = function(){
 	//    Configuration
 	//***********************************
 	FortuneCookie.save = function(){
-		//CCSE.config.OtherMods.FortuneCookie = FortuneCookie.config;
-		if(CCSE.config.OtherMods.FortuneCookie) delete CCSE.config.OtherMods.FortuneCookie; // no need to keep this, it's now junk data
 		return JSON.stringify(FortuneCookie.config);
 	}
 
 	FortuneCookie.load = function(str){
 		var config = JSON.parse(str);
-//		if(CCSE.config.OtherMods.FortuneCookie){
-//			var config = CCSE.config.OtherMods.FortuneCookie;
-			for(var pref in config){
-				FortuneCookie.config[pref] = config[pref];
-			}
-//		}
+		for(var pref in config){
+			FortuneCookie.config[pref] = config[pref];
+		}
 	}
 	
 	FortuneCookie.defaultConfig = function(){
@@ -153,7 +145,7 @@ FortuneCookie.launch = function(){
 			l(button).innerHTML = on;
 			FortuneCookie.config[prefName] = 1;
 		}
-		l(button).className = 'option' + ((FortuneCookie.config[prefName] ^ invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((FortuneCookie.config[prefName] ^ invert) ? '' : ' off');
 		
 		if(Game.specialTab=='dragon') Game.ToggleSpecialMenu(1);
 	}
@@ -206,7 +198,7 @@ FortuneCookie.launch = function(){
 		if (context=='shimmer') Math.seedrandom(Game.seed + '/' + (Game.goldenClicks + Game.reindeerClicked + offset));
 		else if (context=='click') Math.seedrandom(Game.seed + '/' + (Game.cookieClicks + offset));
 		
-		if (Math.random() < 0.1){
+		if (Math.random() < Game.getVeilDefense()){
 			return true;
 		} else {
 			return false;
@@ -418,7 +410,7 @@ FortuneCookie.launch = function(){
 		var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0); // + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
 		
 		switch(spell.name){
-			case "Force the Hand of Fate":
+			case loc("Force the Hand of Fate"):
 				backfire += 0.15 * FortuneCookie.getSimGCs();
 			
 				spellOutcome = spellOutcome.replace('<br/>', '<span style="color:yellow;">This spell is a bit complicated. See the Options menu for an explanation.</span><br/>') + 
@@ -439,7 +431,7 @@ FortuneCookie.launch = function(){
 				spellOutcome += '</table></div>';
 				break;
 			
-			case "Spontaneous Edifice":
+			case loc("Spontaneous Edifice"):
 				while(spellsCast < target){
 					Math.seedrandom(Game.seed + '/' + spellsCast);
 					if(Math.random() < (1 - backfire)){
@@ -460,7 +452,7 @@ FortuneCookie.launch = function(){
 							spellOutcome += '<span class="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No buildings to improve!</span><br/>';
 						}else{
 							var building = choose(buildings);
-							spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
+							spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + loc(building.name) + '</span><br/>';
 						}
 					}else{
 						if (Game.BuildingsOwned == 0){
@@ -472,7 +464,7 @@ FortuneCookie.launch = function(){
 									buildings.push(Game.Objects[i]);
 							}
 							var building=choose(buildings);
-							spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + building.name + '</span><br/>';
+							spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + loc(building.name) + '</span><br/>';
 						}
 					}
 					spellsCast += 1;
@@ -480,7 +472,7 @@ FortuneCookie.launch = function(){
 				}
 				break;
 				
-			case "Gambler's Fever Dream":
+			case loc("Gambler's Fever Dream"):
 				while(spellsCast < target){
 					Math.seedrandom(Game.seed + '/' + spellsCast);
 					
@@ -502,13 +494,13 @@ FortuneCookie.launch = function(){
 						Math.seedrandom(Game.seed + '/' + (spellsCast + 1));
 						if(Math.random() < (1 - gfdBackfire)){
 							spellOutcome += '<span class="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
-							if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, true) + ')';
-							if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, true) + ')';
+							if(gfdSpell.name == loc("Force the Hand of Fate")) spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, true) + ')';
+							if(gfdSpell.name == loc("Spontaneous Edifice")) spellOutcome += ' (' + loc(FortuneCookie.gamblerEdificeChecker(spellsCast + 1, true)) + ')';
 							spellOutcome += '</span><br/>';
 						}else{
 							spellOutcome += '<span class="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + gfdSpell.name;
-							if(gfdSpell.name == "Force the Hand of Fate") spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, false) + ')';
-							if(gfdSpell.name == "Spontaneous Edifice") spellOutcome += ' (' + FortuneCookie.gamblerEdificeChecker(spellsCast + 1, false) + ')';
+							if(gfdSpell.name == loc("Force the Hand of Fate")) spellOutcome += ' (' + FortuneCookie.gamblerFateChecker(spellsCast + 1, idx, false) + ')';
+							if(gfdSpell.name == loc("Spontaneous Edifice")) spellOutcome += ' (' + loc(FortuneCookie.gamblerEdificeChecker(spellsCast + 1, false)) + ')';
 							spellOutcome += '</span><br/>';
 						}
 					}
@@ -518,7 +510,7 @@ FortuneCookie.launch = function(){
 				}
 				break;
 				
-			case "Conjure Baked Goods":
+			case loc("Conjure Baked Goods"):
 				while(spellsCast < target){
 					Math.seedrandom(Game.seed + '/' + spellsCast);
 					if(Math.random() < (1 - backfire)){

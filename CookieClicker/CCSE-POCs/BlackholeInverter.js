@@ -2,8 +2,8 @@ Game.Win('Third-party');
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.12';
-BlackholeInverter.GameVersion = '2.031';
+BlackholeInverter.version = '1.13';
+BlackholeInverter.GameVersion = '2.048';
 
 BlackholeInverter.launch = function(){
 	BlackholeInverter.init = function(){
@@ -13,7 +13,7 @@ BlackholeInverter.launch = function(){
 			'black hole inverter|black hole inverters|extracted|[X]% larger event horizon|[X]% larger event horizon',
 			'Inverts the flow of gravity to get the infinitely delicious cookies from an infinitely dense singularity.',
 			1,
-			1,
+			2,
 			{
 				base:'https://klattmose.github.io/CookieClicker/img/blackholeinverter',
 				xV:8,
@@ -49,19 +49,20 @@ BlackholeInverter.launch = function(){
 		
 		// Upgrades
 		var last; var i = 0; var order = BlackholeInverter.getTieredUpgradeOrder();
-		last = Game.TieredUpgrade('Blacker holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Bigger and blacker.</q>', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Blackest holes', 'Black hole inverters are <b>twice</b> as efficient.<q>The biggest and blackest.</q>', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Vantablack holes', 'Black hole inverters are <b>twice</b> as efficient.<q>The universe doesn\'t care about some idiot\'s copyright.</q>', 'Black hole inverter', 3); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('African-American holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Some people take political correctness a little too far.</q>', 'Black hole inverter', 4); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Event Horizon Comics', 'Black hole inverters are <b>twice</b> as efficient.<q>dot com</q>', 'Black hole inverter', 5); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Large Hadron Collider', 'Black hole inverters are <b>twice</b> as efficient.<q>Smashing things together has never been so well funded!</q>', 'Black hole inverter', 6); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Superconducting Super Collider', 'Black hole inverters are <b>twice</b> as efficient.<q>In the land of what might have been.</q>', 'Black hole inverter', 7); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Hawking radiators', 'Black hole inverters are <b>twice</b> as efficient.<q>14 March 2018.</q>', 'Black hole inverter', 8); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Micro black holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Fun sized</q>', 'Black hole inverter', 9); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Accretion disco', 'Black hole inverters are <b>twice</b> as efficient.<q>Everybody dance now!</q>', 'Black hole inverter', 10); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Gravitational waves', 'Black hole inverters are <b>twice</b> as efficient.<q>What\'s better that one black hole? Two of them put together!</q>', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('White holes', 'Black hole inverters are <b>twice</b> as efficient.<q>Don\'t tan well, huh?</q>', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredUpgrade('Holes', 'Black hole inverters are <b>twice</b> as efficient.<q>It\'s also a book</q>', 'Black hole inverter', 13); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Blacker holes', '<q>Blacker than black!</q>', 'Black hole inverter', 1); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('More Mass', '<q>Big holes.</q>', 'Black hole inverter', 2); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Stronger Pull', '<q>No escape.</q>', 'Black hole inverter', 3); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Dead Space', '<q>You stare into the abyss and the abyss stares back at you.</q>', 'Black hole inverter', 4); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Cookiefication', '<q>Yum!</q>', 'Black hole inverter', 5); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('White Hole Inverters', '<q>How does this one even make sense?</q>', 'Black hole inverter', 6); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Merging', '<q>Combine!</q>', 'Black hole inverter', 7); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Wormholes', '<q>You go in one end, you come out the other. Easy as that.</q>', 'Black hole inverter', 8); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Micro black holes', '<q>Tiny, but deadly.</q>', 'Black hole inverter', 9); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Radio-Rings', '<q>Insanely radioactive, and extremely deadly!</q>', 'Black hole inverter', 10); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Reality-Bending Holes', '<q>Now you can see how close you are to certain doom! Two of them put together!</q>', 'Black hole inverter', 11); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Moving Black Holes', "<q>They can move now.</q>", 'Black hole inverter', 12); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Permanent Holes', "<q>They'll never disappear!</q>", 'Black hole inverter', 13); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('It has pockets!', "<q>Also known as a pants hole</q>", 'Black hole inverter', 14); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		order = BlackholeInverter.getGrandmaUpgradeOrder();
 		last = Game.GrandmaSynergy('Heavy grandmas', 'A dense grandma to accrete more cookies.', 'Black hole inverter'); last.order = order;
@@ -73,19 +74,20 @@ BlackholeInverter.launch = function(){
 		
 		// Achievements
 		order = BlackholeInverter.getAchievementOrder(); i = 0;
-		last = Game.TieredAchievement('Single singularity', 'Have <b>1</b> black hole inverter.', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Penrose diagram', 'Have <b>50</b> black hole inverters.', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Schwarzschild', 'Have <b>100</b> black hole inverters.', 'Black hole inverter', 3); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Holes in holes', 'Have <b>150</b> black hole inverters.', 'Black hole inverter', 4); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('No-hair theorem', 'Have <b>200</b> black hole inverters.', 'Black hole inverter', 5); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Photon sphere', 'Have <b>250</b> black hole inverters.', 'Black hole inverter', 6); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Information paradox', 'Have <b>300</b> black hole inverters.', 'Black hole inverter', 7); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Gravitaional lensing', 'Have <b>350</b> black hole inverters.', 'Black hole inverter', 8); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Galactic nuclei', 'Have <b>400</b> black hole inverters.', 'Black hole inverter', 9); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Sagittarius A*', 'Have <b>450</b> black hole inverters.', 'Black hole inverter', 10); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Hey now, you\'re a dead star', 'Have <b>500</b> black hole inverters.', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Incredibly dense', 'Have <b>550</b> black hole inverters.', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		last = Game.TieredAchievement('Infinitely dense', 'Have <b>600</b> black hole inverters.', 'Black hole inverter', 13); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Single singularity', '', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Penrose diagram', '', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Schwarzschild', '', 'Black hole inverter', 3); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Holes in holes', '', 'Black hole inverter', 4); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('No-hair theorem', '', 'Black hole inverter', 5); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Photon sphere', '', 'Black hole inverter', 6); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Information paradox', '', 'Black hole inverter', 7); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Gravitaional lensing', '', 'Black hole inverter', 8); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Galactic nuclei', '', 'Black hole inverter', 9); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Sagittarius A*', '', 'Black hole inverter', 10); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Hey now, you\'re a dead star', '', 'Black hole inverter', 11); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Incredibly dense', '', 'Black hole inverter', 12); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Infinitely dense', '', 'Black hole inverter', 13); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		last = Game.TieredAchievement('Bottomless pit', '', 'Black hole inverter', 14); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		
 		last = Game.ProductionAchievement('Relativistic jets', 'Black hole inverter', 1); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		last = Game.ProductionAchievement('Primordial black holes', 'Black hole inverter', 2); last.icon[2] = iconsURL; last.order = order + i / 100; i++;
@@ -167,6 +169,18 @@ BlackholeInverter.launch = function(){
 		return res + 0.01;
 	}
 	
+	
+	ModLanguage('*',{
+		
+		"%1 black hole inverter": [
+			"%1 black hole inverter",
+			"%1 black hole inverters"
+		],
+		"[Black hole inverter quote]Inverts the flow of gravity to get the infinitely delicious cookies from an infinitely dense singularity.": "Inverts the flow of gravity to get the infinitely delicious cookies from an infinitely dense singularity.",
+		"[Black hole inverter business name]Hypnodrone": "Hypnodrone",
+		'[Black hole inverter business quote]Autonomous aerial brand ambassadors to "encourage" more sales!': 'Autonomous aerial brand ambassadors to "encourage" more sales!',
+		
+	});
 	
 	if(CCSE.ConfirmGameVersion(BlackholeInverter.name, BlackholeInverter.version, BlackholeInverter.GameVersion)) BlackholeInverter.init();
 }

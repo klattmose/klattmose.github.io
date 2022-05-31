@@ -2,15 +2,13 @@ if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
 AmericanSeason.version = '1.7';
-AmericanSeason.GameVersion = '2.031';
+AmericanSeason.GameVersion = '2.048';
 
 AmericanSeason.launch = function(){
 	AmericanSeason.init = function(){
 		AmericanSeason.iconsURL = 'https://klattmose.github.io/CookieClicker/img/customIcons.png';
 		AmericanSeason.config = AmericanSeason.defaultConfig();
 		AmericanSeason.rocketsPopped = 0;
-		//AmericanSeason.load();
-		if(CCSE.config.OtherMods.AmericanSeason && !Game.modSaveData[AmericanSeason.name]) Game.modSaveData[AmericanSeason.name] = JSON.stringify(CCSE.config.OtherMods.AmericanSeason);
 		
 		
 		AmericanSeason.createSeason();
@@ -23,8 +21,6 @@ AmericanSeason.launch = function(){
 		
 		Game.registerHook('logic', AmericanSeason.Logic);
 		Game.registerHook('reset', AmericanSeason.Reset);
-		/*CCSE.customLoad.push(AmericanSeason.load);
-		CCSE.customSave.push(AmericanSeason.save);*/
 		Game.registerHook('cps', AmericanSeason.GetModifiedCPS);
 		
 		Game.customStatsMenu.push(function(){
@@ -126,11 +122,6 @@ AmericanSeason.launch = function(){
 	}
 	
 	AmericanSeason.save = function(){
-		/*CCSE.config.OtherMods.AmericanSeason = {
-			config : AmericanSeason.config,
-			rocketsPopped : AmericanSeason.rocketsPopped
-		}*/
-		
 		if(CCSE.config.OtherMods.AmericanSeason) delete CCSE.config.OtherMods.AmericanSeason; // no need to keep this, it's now junk data
 		return JSON.stringify({
 			config : AmericanSeason.config,
@@ -140,7 +131,7 @@ AmericanSeason.launch = function(){
 	
 	AmericanSeason.load = function(str){
 		var obj = JSON.parse(str);
-//		if(CCSE.config.OtherMods.AmericanSeason){
+		
 			var config = obj.config;
 			for(var pref in config){
 				AmericanSeason.config[pref] = config[pref];
@@ -148,8 +139,6 @@ AmericanSeason.launch = function(){
 			
 			if(obj.rocketsPopped !== undefined)
 				AmericanSeason.rocketsPopped = obj.rocketsPopped;
-//		}
-		
 	}
 	
 	AmericanSeason.UpdatePref = function(prefName, value){
@@ -168,7 +157,7 @@ AmericanSeason.launch = function(){
 			l(button).innerHTML = on;
 			AmericanSeason.config[prefName] = 1;
 		}
-		l(button).className = 'option' + ((AmericanSeason.config[prefName] ^ invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((AmericanSeason.config[prefName] ^ invert) ? '' : ' off');
 	}
 	
 	AmericanSeason.Reset = function(hard){

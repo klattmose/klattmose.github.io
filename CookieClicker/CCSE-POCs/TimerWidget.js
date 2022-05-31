@@ -1,10 +1,10 @@
 Game.Win('Third-party');
 if(TimerWidget === undefined) var TimerWidget = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
-TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/img/timer.png';
 TimerWidget.name = 'Timer Widget';
+TimerWidget.pic = 'https://klattmose.github.io/CookieClicker/img/timer.png';
 TimerWidget.version = '1.8';
-TimerWidget.GameVersion = '2.031';
+TimerWidget.GameVersion = '2.048';
 
 TimerWidget.launch = function(){
 	TimerWidget.init = function(){
@@ -163,7 +163,7 @@ TimerWidget.launch = function(){
 		}
 	}
 	
-	if(CCSE.ConfirmGameVersion(TimerWidget.name, TimerWidget.version, TimerWidget.GameVersion)) TimerWidget.init();
+	if(CCSE.ConfirmGameVersion(TimerWidget.name, TimerWidget.version, TimerWidget.GameVersion)) Game.registerMod(TimerWidget.name, TimerWidget); //TimerWidget.init();
 }
 
 

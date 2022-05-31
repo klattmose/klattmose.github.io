@@ -2,11 +2,11 @@ if(IdleTrading === undefined) var IdleTrading = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 IdleTrading.name = 'Idle Trading';
 IdleTrading.version = '1.10';
-IdleTrading.GameVersion = '2.031';
+IdleTrading.GameVersion = '2.048';
 
 IdleTrading.launch = function(){
 	IdleTrading.defaultConfig = function(){
-		//var M = Game.Objects['Bank'].minigame;
+		
 		var conf = {
 			goods: [],
 			autoBuy: 1,
@@ -30,10 +30,6 @@ IdleTrading.launch = function(){
 		IdleTrading.isLoaded = 1;
 		
 		IdleTrading.restoreDefaultConfig(1);
-		if(CCSE.config.OtherMods.IdleTrading && !Game.modSaveData[IdleTrading.name]) Game.modSaveData[IdleTrading.name] = JSON.stringify(CCSE.config.OtherMods.IdleTrading);
-		/*IdleTrading.load();
-		CCSE.customLoad.push(IdleTrading.load);
-		CCSE.customSave.push(IdleTrading.save);*/
 		
 		IdleTrading.ReplaceGameMenu();
 		CCSE.MinigameReplacer(IdleTrading.ReplaceNativeMarket, "Bank");
@@ -105,31 +101,26 @@ IdleTrading.launch = function(){
 	//***********************************
 	
 	IdleTrading.save = function(){
-		//CCSE.config.OtherMods.IdleTrading = IdleTrading.config;
-		if(CCSE.config.OtherMods.IdleTrading) delete CCSE.config.OtherMods.IdleTrading; // no need to keep this, it's now junk data
 		return JSON.stringify(IdleTrading.config);
 	}
 
 	IdleTrading.load = function(str){
 		var config = JSON.parse(str);
-//		if(CCSE.config.OtherMods.IdleTrading){
-//			var config = CCSE.config.OtherMods.IdleTrading;
 			
-			for(var pref in config){
-				if(pref == "goods"){
-					for(var iG = 0; iG < config.goods.length; iG++){
-						if(IdleTrading.config.goods[iG]){
-							for(var pref2 in config.goods[iG]){
-								IdleTrading.config.goods[iG][pref2] = config.goods[iG][pref2];
-							}
+		for(var pref in config){
+			if(pref == "goods"){
+				for(var iG = 0; iG < config.goods.length; iG++){
+					if(IdleTrading.config.goods[iG]){
+						for(var pref2 in config.goods[iG]){
+							IdleTrading.config.goods[iG][pref2] = config.goods[iG][pref2];
 						}
 					}
 				}
-				else{
-					IdleTrading.config[pref] = config[pref];
-				}
 			}
-//		}
+			else{
+				IdleTrading.config[pref] = config[pref];
+			}
+		}
 	}
 
 	IdleTrading.restoreDefaultConfig = function(mode){
@@ -146,7 +137,7 @@ IdleTrading.launch = function(){
 			l(button).innerHTML = on;
 			IdleTrading.config[prefName] = 1;
 		}
-		l(button).className = 'option' + ((IdleTrading.config[prefName] ^ invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((IdleTrading.config[prefName] ^ invert) ? '' : ' off');
 	}
 	
 	IdleTrading.ToggleGood = function(goodID, button, on, off, invert){
@@ -158,7 +149,7 @@ IdleTrading.launch = function(){
 			IdleTrading.config.goods[goodID].active = 1;
 		}
 		
-		l(button).className = 'option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off');
+		l(button).className = 'smallFancyButton prefButton option' + ((IdleTrading.config.goods[goodID].active^invert) ? '' : ' off');
 		IdleTrading.save(IdleTrading.config);
 	}
 	

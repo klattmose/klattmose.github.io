@@ -1,7 +1,7 @@
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 BlackholeInverter.name = 'Black Hole Inverter';
 BlackholeInverter.version = '1.13';
-BlackholeInverter.GameVersion = '2.047';
+BlackholeInverter.GameVersion = '2.048';
 
 BlackholeInverter.launch = function(){
 	BlackholeInverter.init = function(){

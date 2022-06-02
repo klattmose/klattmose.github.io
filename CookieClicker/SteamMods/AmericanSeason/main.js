@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 AmericanSeason.name = 'American Season';
 AmericanSeason.version = '1.7';
-AmericanSeason.GameVersion = '2.047';
+AmericanSeason.GameVersion = '2.048';
 
 AmericanSeason.launch = function(){
 	AmericanSeason.init = function(){

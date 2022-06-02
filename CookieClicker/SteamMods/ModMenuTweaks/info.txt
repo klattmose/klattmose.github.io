@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Double-click to enable/disable mods. Drag-and-drop reordering. Dynamic height resizing based on mod list length.",
 	"ModVersion": 1.1,
-	"GameVersion": 2.047,
+	"GameVersion": 2.048,
 	"Date": "27/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1,

@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Brings the Fourth of July into the game. Disables Steam achievements.",
 	"ModVersion": 1.7,
-	"GameVersion": 2.047,
+	"GameVersion": 2.048,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1

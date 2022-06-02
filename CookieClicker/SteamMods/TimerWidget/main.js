@@ -2,7 +2,7 @@ if(TimerWidget === undefined) var TimerWidget = {};
 TimerWidget.name = 'Timer Widget';
 TimerWidget.pic = '/timer.png';
 TimerWidget.version = '1.8';
-TimerWidget.GameVersion = '2.047';
+TimerWidget.GameVersion = '2.048';
 
 TimerWidget.launch = function(){
 	TimerWidget.init = function(){

@@ -1148,7 +1148,7 @@ AddLanguage('FR','french',{
 	"%1 are <b>twice</b> as efficient.": "%1 sont <b>deux fois</b> plus efficaces.",
 	"%1 are <b>%2%</b> more powerful.": "%1 sont <b>%2 %</b> plus puissants.",
 	"Unshackled! <b>+%1%</b> extra production.": "Débridé(e)s ! <b>+%1 %</b> de production supplémentaire.",
-	"Tiered upgrades for <b>%1</b> provide an extra <b>+%2%</b> production.<br>Only works with unshackled upgrade tiers.": "Les améliorations à paliers de <b>%1</b> fournissent <b>+%2 %</b> de production supplémentaire.<br>Ne fonctionne qu'avec les paliers d'amélioration débridées.",
+	"Tiered upgrades for <b>%1</b> provide an extra <b>+%2%</b> production.<br>Only works with unshackled upgrade tiers.": "Les améliorations à paliers de <b>%1</b> fournissent <b>+%2 %</b> de production supplémentaire.<br>Ne fonctionne qu'avec les paliers d'amélioration débridés.",
 	"Unshackles all <b>%1-tier upgrades</b>, making them more powerful.<br>Only applies to unshackled buildings.": "Débride toutes les <b>améliorations à palier %1</b>, les rendant plus puissantes.<br>S'applique uniquement aux constructions débridées.",
 	"The mouse and cursors are <b>twice</b> as efficient.": "La souris et les curseurs sont <b>deux fois</b> plus efficaces.",
 	"The mouse and cursors gain <b>+%1</b> cookies for each non-cursor building owned.": "La souris et les curseurs gagnent <b>+%1</b> cookies pour chaque construction possédée hors curseurs.",

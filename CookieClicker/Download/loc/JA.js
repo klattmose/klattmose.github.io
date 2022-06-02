@@ -471,7 +471,7 @@ AddLanguage('JA','japanese',{
 		"ゾンビ",
 		"ロボット"
 	],
-	"%1, age %2": "%1、%2歳、",
+	"%1, age %2": "%1、%2歳",
 	"Sugar lumps!": "砂糖玉！",
 	"Because you've baked a <b>billion cookies</b> in total, you are now attracting <b>sugar lumps</b>. They coalesce quietly near the top of your screen, under the Stats button.<br>You will be able to harvest them when they're ripe, after which you may spend them on all sorts of things!": "合計で<b>10億枚のクッキー</b>を焼いたので、<b>砂糖玉</b>が集まるようになりました。画面上部、記録ボタンの下でゆっくりと成長していきます。<br>完熟したら収穫して、色々なものに使うことができます！",
 	"A <b>sugar lump</b> is coalescing here, attracted by your accomplishments.": "あなたの成果が引き寄せた<b>砂糖玉</b>が、ここで成長しています。",
@@ -608,7 +608,7 @@ AddLanguage('JA','japanese',{
 	"Dragon's Curve": "ドラゴンの曲線",
 	"Reality Bending": "現実の歪曲",
 	"Dragon Orbs": "ドラゴンオーブ",
-	"Supreme Intellect": "最高峰の知性、",
+	"Supreme Intellect": "最高峰の知性",
 	"News :": "ニュース：",
 	"Ticker (grandma)": [
 		"しっとりとしたクッキーだ。",

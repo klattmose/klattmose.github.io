@@ -723,7 +723,7 @@ M.launch=function()
 		var spl=str.split(' ');
 		var spl2=spl[i++].split(':');
 		var i2=0;
-		M.officeLevel=parseInt(spl2[i2++]||M.officeLevel);
+		M.officeLevel=Math.max(0,Math.min(parseInt(spl2[i2++]||M.officeLevel),M.offices.length-1));
 		M.brokers=parseInt(spl2[i2++]||M.brokers);
 		M.graphLines=parseInt(spl2[i2++]||M.graphLines);
 		M.profit=parseFloat(spl2[i2++]||0);
@@ -796,7 +796,7 @@ M.launch=function()
 	M.tick=function()
 	{
 		var dragonBoost=Game.auraMult('Supreme Intellect');
-		var globD=0;var globP=Math.pow(Math.random(),3);
+		var globD=0;var globP=Math.random();
 		if (Math.random()<0.1+0.1*dragonBoost) globD=(Math.random()-0.5)*2;
 		for (var i=0;i<M.goodsById.length;i++)
 		{
@@ -814,12 +814,12 @@ M.launch=function()
 			
 			me.val+=(M.getRestingVal(me.id)-me.val)*0.01;
 			
-			if (globD!=0 && Math.random()<globP) {me.val-=(1+me.d*Math.pow(Math.random(),3)*10)*globD;me.val-=globD*(1+Math.pow(Math.random(),3)*10);me.d+=globD*(1+Math.random()*6);me.dur=0;}
+			if (globD!=0 && Math.random()<globP) {me.val-=(1+me.d*Math.pow(Math.random(),3)*7)*globD;me.val-=globD*(1+Math.pow(Math.random(),3)*7);me.d+=globD*(1+Math.random()*4);me.dur=0;}
 			
-			me.val+=Math.pow((Math.random()-0.5)*2,11)*5;
+			me.val+=Math.pow((Math.random()-0.5)*2,11)*3;
 			me.d+=0.1*(Math.random()-0.5);
 			if (Math.random()<0.15) me.val+=(Math.random()-0.5)*3;
-			if (Math.random()<0.03) me.val+=(Math.random()-0.5)*(20+30*dragonBoost);
+			if (Math.random()<0.03) me.val+=(Math.random()-0.5)*(10+10*dragonBoost);
 			if (Math.random()<0.1) me.d+=(Math.random()-0.5)*(0.3+0.2*dragonBoost);
 			if (me.mode==5)
 			{

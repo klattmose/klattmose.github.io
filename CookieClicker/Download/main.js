@@ -1325,26 +1325,20 @@ Game.Launch=function()
 	
 	Game.updateLog+=
 	
-	'</div><div class="subsection update small">'+
-	'<div class="title">07/05/2022 - beta update</div>'+
+	'</div><div class="subsection update">'+
+	'<div class="title">31/05/2022 - a mind of its own</div>'+
+	'<div class="listing">&bull; added a new building</div>'+
+	'<div class="listing">&bull; added a new tier of upgrades and achievements</div>'+
+	'<div class="listing">&bull; multi-language support added to web version</div>'+
 	'<div class="listing">&bull; added a few new heavenly upgrades</div>'+
 	'<div class="listing">&bull; added the jukebox</div>'+
 	'<div class="listing">&bull; the 3 secret heavenly upgrades now rely on how many times the relevant digit is present in total, rather than at the end</div>'+
-	'<div class="listing">&bull; the Reality Bending aura no longer applies other auras that haven\'t been unlocked yet</div>'+
-	'<div class="listing">&bull; grandmas no longer say mean things with "Scary stuff" disabled</div>'+
 	'<div class="listing">&bull; backgrounds overhauled; extra options for the background selector</div>'+
 	'<div class="listing">&bull; extra options for the golden cookie sound selector</div>'+
 	'<div class="listing">&bull; the bank minigame now tells you the value you previously bought a stock at</div>'+
 	'<div class="listing">&bull; the bank minigame flow is a little more exciting</div>'+
 	(App?'<div class="listing">&bull; new option to disable your game activity showing up in Discord</div>':'')+
-	'<div class="listing">&bull; some tweaks for modders: added RemoveEvent() and many tooltips now have ids</div>'+
 	(App?'<div class="listing">&bull; launch errors now provide the option to restart without mods</div>':'')+
-	
-	'</div><div class="subsection update">'+
-	'<div class="title">25/12/2021 - thoughtful merriment</div>'+
-	'<div class="listing">&bull; added a new building</div>'+
-	'<div class="listing">&bull; added a new tier of upgrades and achievements</div>'+
-	'<div class="listing">&bull; multi-language support added to web version</div>'+
 	
 	(App?('</div><div class="subsection update small">'+
 	'<div class="title">18/12/2021 - work it</div>'+
@@ -1954,14 +1948,10 @@ Game.Launch=function()
 		
 		if (!App)
 		{
-			//if (Game.beta) {var me=l('linkVersionBeta');me.parentNode.removeChild(me);}
-			if (Game.beta) {}
+			if (Game.beta) {var me=l('linkVersionBeta');me.parentNode.removeChild(me);}
 			else if (Game.version==1.0466) {var me=l('linkVersionOld');me.parentNode.removeChild(me);}
 			else {var me=l('linkVersionLive');me.parentNode.removeChild(me);}
 		}
-
-		//l('links').innerHTML=(Game.beta?'<a href="../" target="blank">Live version</a> | ':'<a href="beta" target="blank">Try the beta!</a> | ')+'<a href="http://orteil.dashnet.org/experiments/cookie/" target="blank">Classic</a>';
-		//l('links').innerHTML='<a href="http://orteil.dashnet.org/experiments/cookie/" target="blank">Cookie Clicker Classic</a>';
 		
 		Game.lastActivity=Date.now();//reset on mouse move, key press or click
 		
@@ -2203,9 +2193,20 @@ Game.Launch=function()
 		Game.bakeryNameL=l('bakeryName');
 		Game.bakeryNameSet=function(what)
 		{
-			//Game.bakeryName=what.replace(/\W+/g,' ');
-			Game.bakeryName=what.replace(/[^'\-_0-9 \p{L}]/gu,' ');
-			Game.bakeryName=Game.bakeryName.substring(0,28);
+			try
+			{
+				var exp=new RegExp('[^\'\\-_0-9 \\p{L}]','gu');
+				Game.bakeryName=what.replace(exp,' ');
+				//Game.bakeryName=what.replace(/[^'\-_0-9 \p{L}]/gu,' ');
+				Game.bakeryName=Game.bakeryName.trim().substring(0,28);
+			}
+			catch(e)
+			{
+				var exp=new RegExp('\W+','g');
+				Game.bakeryName=what.replace(exp,' ');
+				//Game.bakeryName=what.replace(/\W+/g,' ');
+				Game.bakeryName=Game.bakeryName.substring(0,28);
+			}
 			Game.bakeryNameRefresh();
 			if (Game.bakeryName=='RESTORE BACKUP' && App && App.restoreBackup) App.restoreBackup();
 		}
@@ -2511,7 +2512,7 @@ Game.Launch=function()
 			Game.attachTooltip(l('topbarIGM'),'<div style="padding:8px;width:250px;text-align:center;">A thing we made that lets you create your own idle games using a simple scripting language.</div>','this');
 			l('changeLanguage').innerHTML=loc("Change language");
 			l('links').childNodes[0].nodeValue=loc("Other versions");
-			l('linkVersionBeta').innerHTML=loc("Beta");
+			//l('linkVersionBeta').innerHTML=loc("Beta");
 		}
 		
 		Game.attachTooltip(l('heralds'),function(){
@@ -5740,7 +5741,7 @@ Game.Launch=function()
 				},
 				initFunc:function(me)
 				{
-					if (!this.spawned && Game.chimeType==1 && Game.ascensionMode!=1) PlaySound('snd/jingle.mp3');
+					if (!this.spawned && Game.chimeType!=0 && Game.ascensionMode!=1) PlaySound('snd/jingle.mp3');
 					
 					me.x=-128;
 					me.y=Math.floor(Math.random()*Math.max(0,Game.bounds.bottom-Game.bounds.top-256)+Game.bounds.top+128)-128;
@@ -9320,7 +9321,7 @@ Game.Launch=function()
 		Game.Has=function(what)
 		{
 			var it=Game.Upgrades[what];
-			if (Game.ascensionMode==1 && (it.pool=='prestige' || it.tier=='fortune')) return 0;
+			if (it && Game.ascensionMode==1 && (it.pool=='prestige' || it.tier=='fortune')) return 0;
 			return (it?it.bought:0);
 		}
 		Game.HasUnlocked=function(what)
@@ -11107,7 +11108,7 @@ Game.Launch=function()
 		new Game.Upgrade('Dragon scale',getStrCookieProductionMultiplierPlus(3)+'<br>'+loc("Cost scales with CpS, but %1 times cheaper with a fully-trained dragon.",10)+'<q>Your dragon sheds these regularly, so this one probably won\'t be missed.<br>Note: icon not to scale.</q>',999,[30,14]);Game.last.priceFunc=dragonDropUpgradeCost;
 		new Game.Upgrade('Dragon claw',loc("Clicking is <b>%1%</b> more powerful.",3)+'<br>'+loc("Cost scales with CpS, but %1 times cheaper with a fully-trained dragon.",10)+'<q>Will grow back in a few days\' time.<br>A six-inch retractable claw, like a razor, from the middle toe. So you know, try to show a little respect.</q>',999,[31,14]);Game.last.priceFunc=dragonDropUpgradeCost;
 		new Game.Upgrade('Dragon fang',loc("Golden cookies give <b>%1%</b> more cookies.",3)+'<br>'+loc("Dragon harvest and Dragonflight are <b>%1% stronger</b>.",10)+'<br>'+loc("Cost scales with CpS, but %1 times cheaper with a fully-trained dragon.",10)+'<q>Just a fallen baby tooth your dragon wanted you to have, as a gift.<br>It might be smaller than an adult tooth, but it\'s still frighteningly sharp - and displays some awe-inspiring cavities, which you might expect from a creature made out of sweets.</q>',999,[30,15]);Game.last.priceFunc=dragonDropUpgradeCost;
-		new Game.Upgrade('Dragon teddy bear',loc("Random drops are <b>%1% more common</b>.",3)+'<br>'+loc("Cost scales with CpS, but %1 times cheaper with a fully-trained dragon.",10)+'<q>Your dragon used to sleep with this, but it\'s yours now.<br>Crafted in the likelihood of a fearsome beast. Stuffed with magical herbs picked long ago by a wandering wizard. Woven from elven yarn and a polyester blend.</q>',999,[31,15]);Game.last.priceFunc=dragonDropUpgradeCost;
+		new Game.Upgrade('Dragon teddy bear',loc("Random drops are <b>%1% more common</b>.",3)+'<br>'+loc("Cost scales with CpS, but %1 times cheaper with a fully-trained dragon.",10)+'<q>Your dragon used to sleep with this, but it\'s yours now.<br>Crafted in the likeliness of a fearsome beast. Stuffed with magical herbs picked long ago by a wandering wizard. Woven from elven yarn and a polyester blend.</q>',999,[31,15]);Game.last.priceFunc=dragonDropUpgradeCost;
 		
 		order=10020;
 		Game.NewUpgradeCookie({name:'Granola cookies',desc:'Wait! These are just oatmeal cookies mixed with raisin cookies! What next, half-dark chocolate half-white chocolate cookies?',icon:[28,32],power:						5,price: getCookiePrice(28)});
@@ -11280,7 +11281,7 @@ Game.Launch=function()
 		Game.NewUnshackleBuilding=function(obj)
 		{
 			var building=Game.Objects[obj.building];
-			var upgrade=new Game.Upgrade('Unshackled '+building.plural,(obj.building=='Cursor'?getStrThousandFingersGain(25):loc("Tiered upgrades for <b>%1</b> provide an extra <b>+%2%</b> production.<br>Only works with unshackled upgrade tiers.",[cap(building.plural),Math.round((building.id==1?0.5:(20-building.id)*0.1)*100)]))+(EN?'<q>'+obj.q+'</q>':''),Math.pow(building.id+1,7)*15000000,[building.iconColumn,35]);
+			var upgrade=new Game.Upgrade('Unshackled '+building.bplural,(obj.building=='Cursor'?getStrThousandFingersGain(25):loc("Tiered upgrades for <b>%1</b> provide an extra <b>+%2%</b> production.<br>Only works with unshackled upgrade tiers.",[cap(building.plural),Math.round((building.id==1?0.5:(20-building.id)*0.1)*100)]))+(EN?'<q>'+obj.q+'</q>':''),Math.pow(building.id+1,7)*15000000,[building.iconColumn,35]);
 			upgrade.pool='prestige';
 			upgrade.parents=[obj.building=='Cursor'?'Unshackled flavor':Game.ObjectsById[building.id-1].unshackleUpgrade];
 			building.unshackleUpgrade=upgrade.name;

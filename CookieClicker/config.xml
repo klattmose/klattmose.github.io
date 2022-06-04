@@ -6,14 +6,18 @@
 		<file>minigameGarden.js</file>
 		<file>minigameGrimoire.js</file>
 		<file>minigamePantheon.js</file>
+		<file>minigameMarket.js</file>
+		<file>dungeons.js</file>
 		<file>showads.js</file>
 		<file>style.css</file>
 		<file>cookieconsent.css</file>
 		<file>cookieconsent.js</file>
 		<file>css.css</file>
+		<file>ajax.js</file>
 	</files>
 	<directories>
 		<directory>img</directory>
 		<directory>snd</directory>
+		<directory>loc</directory>
 	</directories>
 </root>

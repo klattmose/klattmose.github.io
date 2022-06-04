@@ -2370,8 +2370,8 @@ CCSE.launch = function(){
 		Slider: (slider, leftText, rightText, startValueFunction, callback = '', min = 0, max = 100, step = 1) => {
 			var value = startValueFunction();
 			rightText = rightText.replace('[$]', value);
-			return `<div class="sliderBox"><div style="float:left;">${ leftText }</div>` +
-				`<div style="float:right;" id="${ slider }RightText">${ rightText }</div>` +
+			return `<div class="sliderBox"><div style="float:left;" class="smallFancyButton">${ leftText }</div>` +
+				`<div style="float:right;" class="smallFancyButton" id="${ slider }RightText">${ rightText }</div>` +
 				`<input type="range" id="${ slider }" class="slider" style="clear:both;" min="${ min }" max="${ max }" step="${ step }"` +
 				` value="${ value }" onchange="${ callback }" oninput="${ callback }" onmouseup="PlaySound('snd/tick.mp3');"></div>`
 		},

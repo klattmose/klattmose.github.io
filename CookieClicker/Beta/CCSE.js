@@ -1952,8 +1952,7 @@ CCSE.launch = function(){
 		if(!Game.customUpgrades['Jukebox'].choicesFunction) Game.customUpgrades['Jukebox'].choicesFunction = [];
 		CCSE.ReplaceCodeIntoFunction("Game.Upgrades['Jukebox'].choicesFunction", "return",
 			`// Game.customUpgrades['Jukebox'].choicesFunction injection point 0
-			for(var i in Game.customUpgrades['Jukebox'].choicesFunction) str = Game.customUpgrades['Jukebox'].choicesFunction[i](str);
-			CCSE.OverrideBackgroundSelector(choices);`, -1);
+			for(var i in Game.customUpgrades['Jukebox'].choicesFunction) str = Game.customUpgrades['Jukebox'].choicesFunction[i](str);`, -1);
 		
 		
 		// Permanent upgrades are tricky

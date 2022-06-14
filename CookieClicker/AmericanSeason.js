@@ -1,7 +1,7 @@
 if(AmericanSeason === undefined) var AmericanSeason = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 AmericanSeason.name = 'American Season';
-AmericanSeason.version = '1.7';
+AmericanSeason.version = '1.8';
 AmericanSeason.GameVersion = '2.048';
 
 AmericanSeason.launch = function(){
@@ -269,11 +269,28 @@ AmericanSeason.launch = function(){
 			last.pool = 'debug';
 		last = CCSE.NewHeavenlyUpgrade('Starburst', 'Firework upgrades drop <b>5%</b> more often.<br>Rockets appear <b>5%</b> more often.', 111111, [0, 4, AmericanSeason.iconsURL], -630, 111, ['Season switcher']);
 			Game.Upgrades["Keepsakes"].parents.push(last);
-			Game.Upgrades["Starsnow"].posX = -630; Game.Upgrades["Starsnow"].posY = -344;
-			Game.Upgrades["Starlove"].posX = -685; Game.Upgrades["Starlove"].posY = -255;
-			Game.Upgrades["Starterror"].posX = -720; Game.Upgrades["Starterror"].posY = -166;
-			Game.Upgrades["Startrade"].posX = -720; Game.Upgrades["Startrade"].posY = -77;
-			Game.Upgrades["Starspawn"].posX = -685; Game.Upgrades["Starspawn"].posY = 22;
+		
+		var rearrangeUps = function(up, fraction){
+			let anchor = Game.Upgrades['Season switcher'];
+			let ref = Game.Upgrades['Starsnow'];
+			let dx = ref.posX - anchor.posX;
+			let dy = ref.posY - anchor.posY;
+			let r = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+			let theta = Math.atan(dy/dx);
+			
+			let theta2 = theta - Math.PI * fraction;
+			let dx2 = Math.cos(theta2) * r;
+			let dy2 = Math.sin(theta2) * r;
+			
+			up.posX = anchor.posX + dx2;
+			up.posY = anchor.posY + dy2;
+		}
+		
+		rearrangeUps(Game.Upgrades["Starlove"],   1/5);
+		rearrangeUps(Game.Upgrades["Starterror"], 2/5);
+		rearrangeUps(Game.Upgrades["Startrade"],  3/5);
+		rearrangeUps(Game.Upgrades["Starspawn"],  4/5);
+		rearrangeUps(Game.Upgrades["Starburst"],  5/5);
 	}
 	
 	AmericanSeason.createShimmer = function(){

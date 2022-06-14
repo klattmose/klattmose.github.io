@@ -3,9 +3,9 @@
 	"ID": "American Season",
 	"Author": "klattmose",
 	"Description": "Brings the Fourth of July into the game. Disables Steam achievements.",
-	"ModVersion": 1.7,
+	"ModVersion": 1.8,
 	"GameVersion": 2.048,
-	"Date": "1/09/2021",
+	"Date": "6/14/2022",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1
 }

@@ -1,6 +1,6 @@
 if(BlackholeInverter === undefined) var BlackholeInverter = {};
 BlackholeInverter.name = 'Black Hole Inverter';
-BlackholeInverter.version = '1.13';
+BlackholeInverter.version = '1.14';
 BlackholeInverter.GameVersion = '2.048';
 
 BlackholeInverter.launch = function(){
@@ -55,7 +55,7 @@ BlackholeInverter.launch = function(){
 		Game.TieredUpgrade('Cookiefication', '<q>Yum!</q>', 'Black hole inverter', 5); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('White Hole Inverters', '<q>How does this one even make sense?</q>', 'Black hole inverter', 6); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Merging', '<q>Combine!</q>', 'Black hole inverter', 7); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
-		Game.TieredUpgrade('Wormholes', '<q>You go in one end, you come out the other. Easy as that.</q>', 'Black hole inverter', 8); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
+		Game.TieredUpgrade('Worm holes', '<q>You go in one end, you come out the other. Easy as that.</q>', 'Black hole inverter', 8); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Micro black holes', '<q>Tiny, but deadly.</q>', 'Black hole inverter', 9); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Radio-Rings', '<q>Insanely radioactive, and extremely deadly!</q>', 'Black hole inverter', 10); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;
 		Game.TieredUpgrade('Reality-Bending Holes', '<q>Now you can see how close you are to certain doom! Two of them put together!</q>', 'Black hole inverter', 11); last = Game.last; last.icon[2] = iconsURL; last.order = order + i / 100; i++;

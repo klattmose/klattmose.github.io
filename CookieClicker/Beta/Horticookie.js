@@ -145,8 +145,8 @@ Horticookie.launch = function(){
 		str += '<div class="listing">' + m.CheckBox(Horticookie.config, 'ahNew', 'ahNewButton', '', '', 'Horticookie.togglePref') + '<label>Autoharvest mature plants that you don\'t have the seeds for.</label></div>';
 		str += '<div class="listing">' + m.CheckBox(Horticookie.config, 'ahJuicy', 'ahJuicyButton', '', '', 'Horticookie.togglePref') + '<label>Autoharvest mature Juicy Queenbeets.</label></div>';
 		str += '<div class="listing">' + m.CheckBox(Horticookie.config, 'ahUpgrade', 'ahUpgradeButton', '', '', 'Horticookie.togglePref') + '<label>Autoharvest plants that may unlock an upgrade.</label></div>';
-		str += '<div class="listing"><small>The Immortalize option has been split off into its own mod: <a href="' + baseDir + 'ImmortalGarden.js" target="_blank">Immortal Garden</a> (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2685525527" target="_blank">Steam</a>).</small></div>';
-		str += '<div class="listing"><small>The Accelerated Garden option has been split off into its own mod: <a href="' + baseDir + 'PredictablePlantGrowth.js" target="_blank">Predictable Plant Growth</a> (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2685527807" target="_blank">Steam</a>).</small></div>';
+		//str += '<div class="listing"><small>The Immortalize option has been split off into its own mod: <a href="' + baseDir + 'ImmortalGarden.js" target="_blank">Immortal Garden</a> (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2685525527" target="_blank">Steam</a>).</small></div>';
+		//str += '<div class="listing"><small>The Accelerated Garden option has been split off into its own mod: <a href="' + baseDir + 'PredictablePlantGrowth.js" target="_blank">Predictable Plant Growth</a> (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2685527807" target="_blank">Steam</a>).</small></div>';
 		
 		return str;
 	}

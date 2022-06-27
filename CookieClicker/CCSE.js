@@ -277,7 +277,7 @@ CCSE.launch = function(){
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
 		CCSE.functionsTotal = (
-			134
+			135
 			+ (CCSE.Steam ? 7 : 0)
 			+ Game.ObjectsN      * 18 - 1 + 3
 			+ Game.UpgradesN     * 1  + 25
@@ -756,7 +756,8 @@ CCSE.launch = function(){
 		}
 		
 		CCSE.SliceCodeIntoFunction("Game.playGoldenCookieChime", -1, "else CCSE.PlayShimmerSpawnSound('golden')", 0);
-		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].initFunc", " && Game.chimeType!=0", "", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].initFunc", "Game.chimeType!=0", "CCSE.config.chimeType != 'No sound'", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].initFunc", "Game.chimeType!=0", "CCSE.config.chimeType != 'No sound'", 0);
 		
 		
 		// Game.shimmerTypes['golden'].popFunc

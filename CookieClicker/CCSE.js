@@ -277,7 +277,7 @@ CCSE.launch = function(){
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
 		CCSE.functionsTotal = (
-			133
+			134
 			+ (CCSE.Steam ? 7 : 0)
 			+ Game.ObjectsN      * 18 - 1 + 3
 			+ Game.UpgradesN     * 1  + 25
@@ -756,7 +756,7 @@ CCSE.launch = function(){
 		}
 		
 		CCSE.SliceCodeIntoFunction("Game.playGoldenCookieChime", -1, "else CCSE.PlayShimmerSpawnSound('golden')", 0);
-		//CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['reindeer'].initFunc", "Game.chimeType==1", "Game.chimeType!=0", 0);
+		CCSE.ReplaceCodeIntoFunction("Game.shimmerTypes['golden'].initFunc", " && Game.chimeType!=0", "", 0);
 		
 		
 		// Game.shimmerTypes['golden'].popFunc
@@ -3790,14 +3790,14 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.PlayShimmerSpawnSound = function(shimmerType){
-		if(Game.chimeType){ // Game.chimeType is 0 for No sound
+		//if(Game.chimeType){ // Game.chimeType is 0 for No sound
 			let choice = CCSE.GetSelectedShimmerSound();
 			let sfx = '';
 			if(choice.shimmerTypes && choice.shimmerTypes[shimmerType] !== undefined) sfx = choice.shimmerTypes[shimmerType];
 			else if(choice.default) sfx = choice.default;
 			
 			PlaySound(sfx);
-		}
+		//}
 	}
 	
 	CCSE.OverrideMilkSelector = function(choices){

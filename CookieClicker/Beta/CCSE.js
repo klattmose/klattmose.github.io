@@ -3,7 +3,7 @@ if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
 CCSE.version = '2.033';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.047' : '2.047';
+CCSE.GameVersion = CCSE.Steam ? '2.048' : '2.05';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -277,7 +277,7 @@ CCSE.launch = function(){
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
 		CCSE.functionsTotal = (
-			135
+			141
 			+ (CCSE.Steam ? 7 : 0)
 			+ Game.ObjectsN      * 18 - 1 + 3
 			+ Game.UpgradesN     * 1  + 25
@@ -1349,6 +1349,76 @@ CCSE.launch = function(){
 			`// Game.OpenSesame injection point 0
 			for(var i in Game.customOpenSesame) str += Game.customOpenSesame[i]();`, -1);
 		
+		
+		// -----     YouCustomizer block     ----- //
+		
+		// Game.YouCustomizer.render
+		if(!Game.customYouCustomizerRender) Game.customYouCustomizerRender = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.render', -1, `
+			// Game.YouCustomizer.render injection point 0
+			for(var i in Game.customYouCustomizerRender) Game.customYouCustomizerRender[i]();
+		`);
+		
+		
+		// Game.YouCustomizer.getGeneValue
+		// Return retVal to have no effect
+		temp = Game.YouCustomizer.getGeneValue.toString();
+		temp = temp.replace('var gene=', 'var retVal;\r\nvar gene=');
+		temp = temp.replaceAll('return', 'retVal =');
+		eval('Game.YouCustomizer.getGeneValue = ' + temp);
+		if(!Game.customYouCustomizerGetGeneValue) Game.customYouCustomizerGetGeneValue = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.getGeneValue', -1, `
+			// Game.YouCustomizer.getGeneValue injection point 0
+			for(var i in Game.customYouCustomizerGetGeneValue) retVal = Game.customYouCustomizerGetGeneValue[i](id, retVal);
+			return retVal;
+		`);
+		
+		
+		// Game.YouCustomizer.offsetGene
+		if(!Game.customYouCustomizerOffsetGene) Game.customYouCustomizerOffsetGene = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.offsetGene', -1, `
+			// Game.YouCustomizer.offsetGene injection point 0
+			for(var i in Game.customYouCustomizerOffsetGene) Game.customYouCustomizerOffsetGene[i](gene,off);
+		`);
+		
+		
+		// Game.YouCustomizer.randomize
+		if(!Game.customYouCustomizerRandomize) Game.customYouCustomizerRandomize = [];
+		CCSE.ReplaceCodeIntoFunction('Game.YouCustomizer.randomize', "Game.YouCustomizer.render();",
+			`// Game.YouCustomizer.randomize injection point 0
+			for(var i in Game.customYouCustomizerRandomize) str = Game.customYouCustomizerRandomize[i]();`, -1);
+		
+		
+		// Game.YouCustomizer.renderPortrait
+		if(!Game.customYouCustomizerRenderPortrait) Game.customYouCustomizerRenderPortrait = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.renderPortrait', -1, `
+			// Game.YouCustomizer.renderPortrait injection point 0
+			for(var i in Game.customYouCustomizerRenderPortrait) Game.customYouCustomizerRenderPortrait[i]();
+		`);
+		
+		
+		// Game.YouCustomizer.prompt
+		if(!Game.customYouCustomizerPrompt) Game.customYouCustomizerPrompt = [];
+		if(!Game.customYouCustomizerMakeCustomizerSelector) Game.customYouCustomizerMakeCustomizerSelector = [];
+		temp = Game.YouCustomizer.prompt.toString();
+		temp = temp.replace('return', 'var retVal =');
+		temp = temp.replace('}', `
+			// Game.YouCustomizer.prompt injection point 0
+			for(var i in Game.customYouCustomizerMakeCustomizerSelector) retVal = Game.customYouCustomizerMakeCustomizerSelector[i](gene,text,retVal);
+			return retVal;
+		}`);
+		eval('Game.YouCustomizer.prompt = ' + temp);
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.prompt', -1, `
+			// Game.YouCustomizer.prompt injection point 1
+			for(var i in Game.customYouCustomizerPrompt) Game.customYouCustomizerPrompt[i]();
+		`);
+		
+		
+		// -----     Gifting block     ----- //
+		// Game.promptGiftRedeem
+		// Game.promptGiftSend
+			// Submit an issue to the GitHub page with where you want a hook
+			// Until that happens, these functions won't either
 		
 	}
 	

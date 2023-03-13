@@ -109,7 +109,7 @@ CCSE.launch = function(){
 		var textDiv = document.createElement('span');
 		textDiv.id = 'CCSEversionGame';
 		textDiv.innerHTML = 'Game ';
-		if(!CCSE.config.SHOW_VERSION_NUMBER){
+		if(!CCSE.config.showVersionNo){
 			versionDiv.style.display = 'none'
 			textDiv.style.display = 'none'
 		}
@@ -2383,7 +2383,7 @@ CCSE.launch = function(){
 			CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') +
 			'<label>Back up data added by mods and managed by CCSE</label></div>';
 		
-		str += '<div class="listing">' + CCSE.MenuHelper.CheckBox(CCSE.config, 'SHOW_VERSION_NUMBER', 'SHOW_VERSION_NUMBERButton', 'Version Number ON', 'Version Number OFF', 'CCSE.togglePref') + '<label>Show the version number of CCSE in the bottom left of the screen.</label></div>';
+		str += '<div class="listing">' + CCSE.MenuHelper.CheckBox(CCSE.config, 'showVersionNo', 'showVersionNoButton', 'Version Number ON', 'Version Number OFF', 'CCSE.togglePref') + '<label>Show the version number of CCSE in the bottom left of the screen.</label></div>';
 		
 		return str;
 	}
@@ -3505,7 +3505,7 @@ CCSE.launch = function(){
 		if(!CCSE.config.chimeType)			 CCSE.config.chimeType = 'No sound';
 		if(!CCSE.config.milkType)			 CCSE.config.milkType = 'Automatic';
 		if(!CCSE.config.bgType)				 CCSE.config.bgType = 'Automatic';
-		if(CCSE.config.SHOW_VERSION_NUMBER === undefined) CCSE.config.SHOW_VERSION_NUMBER = 1;
+		if(CCSE.config.showVersionNo === undefined) CCSE.config.showVersionNo = 1;
 		
 		if(config){
 			if(config.version) CCSE.config.version = config.version;
@@ -3520,13 +3520,13 @@ CCSE.launch = function(){
 			if(config.chimeType) CCSE.config.chimeType = config.chimeType;
 			if(config.milkType)  CCSE.config.milkType = config.milkType;
 			if(config.bgType)    CCSE.config.bgType = config.bgType;
-			if(config.SHOW_VERSION_NUMBER !== undefined) CCSE.config.SHOW_VERSION_NUMBER = config.SHOW_VERSION_NUMBER;
+			if(config.showVersionNo !== undefined) CCSE.config.showVersionNo = config.showVersionNo;
 		}
 	}
 	
 	CCSE.applyPref = function(prefName){
 		switch(prefName){
-			case 'SHOW_VERSION_NUMBER':
+			case 'showVersionNo':
 				if(CCSE.config[prefName]){
 					l('CCSEversionNumber').style.display = '';
 					l('CCSEversionGame').style.display = '';

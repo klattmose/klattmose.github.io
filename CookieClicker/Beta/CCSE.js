@@ -1,7 +1,7 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.033';
+CCSE.version = '2.034';
 CCSE.Steam = (typeof Steam !== 'undefined');
 CCSE.GameVersion = CCSE.Steam ? '2.048' : '2.05';
 
@@ -139,6 +139,11 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">03/13/2023</div>' + 
+			'<div class="listing">&bull; Added option to hide the CCSE version in the lower left of the screen</div>' +
+			'<div class="listing">&bull; Added some hooks for the YouCustomizer functions</div>' +
+			'<div class="listing">&bull; Fixed compatibility with Frozen Cookies</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">01/07/2022</div>' + 
 			'<div class="listing">&bull; Added hook for Game.resize</div>' +
@@ -2100,19 +2105,25 @@ CCSE.launch = function(){
 		if(!Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction = [];
 		Game.customUpgrades[key].buyFunction.push(CCSE.customUpgradesAllbuyFunction);
 		if(upgrade.buyFunction){
-			upgrade.oldbuyFunction = upgrade.buyFunction;
+			//upgrade.oldbuyFunction = upgrade.buyFunction;
+			CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buyFunction", -1, `
+				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
+			`);
+			
+			/* This broke Frozen Cookies
 			upgrade.buyFunction = function(){
 				upgrade.oldbuyFunction();
-				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
+				// Game.Upgrades[this.name].buyFunction injection point 0
 				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
-			}
+			}*/
 		}else{
 			upgrade.buyFunction = function(){
-				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
+				// Game.Upgrades[this.name].buyFunction injection point 0
 				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
 			}
+			CCSE.functionsAltered++;
 		}
-		CCSE.functionsAltered++;
 		
 		
 		// this.descFunc

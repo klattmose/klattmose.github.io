@@ -104,9 +104,15 @@ CCSE.launch = function(){
 		//l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
 		var versionNumber = l('versionNumber');
 		var versionDiv = document.createElement('p');
+		versionDiv.id = 'CCSEversionNumber';
 		versionDiv.innerHTML = 'CCSE v. ' + CCSE.version;
 		var textDiv = document.createElement('span');
+		textDiv.id = 'CCSEversionGame';
 		textDiv.innerHTML = 'Game ';
+		if(!CCSE.config.SHOW_VERSION_NUMBER){
+			versionDiv.style.display = 'none'
+			textDiv.style.display = 'none'
+		}
 		versionNumber.appendChild(versionDiv);
 		versionNumber.insertBefore(textDiv, versionNumber.firstChild);
 		
@@ -2366,6 +2372,8 @@ CCSE.launch = function(){
 			CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') +
 			'<label>Back up data added by mods and managed by CCSE</label></div>';
 		
+		str += '<div class="listing">' + CCSE.MenuHelper.CheckBox(CCSE.config, 'SHOW_VERSION_NUMBER', 'SHOW_VERSION_NUMBERButton', 'Version Number ON', 'Version Number OFF', 'CCSE.togglePref') + '<label>Show the version number of CCSE in the bottom left of the screen.</label></div>';
+		
 		return str;
 	}
 	
@@ -2466,6 +2474,19 @@ CCSE.launch = function(){
 				`<label id="${ button }_label" for="${ button }">${ config[prefName] ? on : off }</label>`;
 		}
 		
+	}
+	
+	CCSE.togglePref = function(prefName, button, on, off, invert){
+		if (CCSE.config[prefName]){
+			l(button).removeAttribute('checked');
+			l(button + '_label').innerHTML = off;
+			CCSE.config[prefName] = 0;
+		}else{
+			l(button).setAttribute('checked','checked')
+			l(button + '_label').innerHTML = on;
+			CCSE.config[prefName] = 1;
+		}
+		CCSE.applyPref(prefName);
 	}
 	
 	
@@ -3473,6 +3494,7 @@ CCSE.launch = function(){
 		if(!CCSE.config.chimeType)			 CCSE.config.chimeType = 'No sound';
 		if(!CCSE.config.milkType)			 CCSE.config.milkType = 'Automatic';
 		if(!CCSE.config.bgType)				 CCSE.config.bgType = 'Automatic';
+		if(CCSE.config.SHOW_VERSION_NUMBER === undefined) CCSE.config.SHOW_VERSION_NUMBER = 1;
 		
 		if(config){
 			if(config.version) CCSE.config.version = config.version;
@@ -3487,6 +3509,21 @@ CCSE.launch = function(){
 			if(config.chimeType) CCSE.config.chimeType = config.chimeType;
 			if(config.milkType)  CCSE.config.milkType = config.milkType;
 			if(config.bgType)    CCSE.config.bgType = config.bgType;
+			if(config.SHOW_VERSION_NUMBER !== undefined) CCSE.config.SHOW_VERSION_NUMBER = config.SHOW_VERSION_NUMBER;
+		}
+	}
+	
+	CCSE.applyPref = function(prefName){
+		switch(prefName){
+			case 'SHOW_VERSION_NUMBER':
+				if(CCSE.config[prefName]){
+					l('CCSEversionNumber').style.display = '';
+					l('CCSEversionGame').style.display = '';
+				}else{
+					l('CCSEversionNumber').style.display = 'none';
+					l('CCSEversionGame').style.display = 'none';
+				}
+				break;
 		}
 	}
 	

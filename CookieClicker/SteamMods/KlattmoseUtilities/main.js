@@ -2,7 +2,7 @@ if(KlattmoseUtilities === undefined) var KlattmoseUtilities = {};
 if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 KlattmoseUtilities.name = 'Klattmose Utilities';
 KlattmoseUtilities.version = '2.16';
-KlattmoseUtilities.GameVersion = '2.048';
+KlattmoseUtilities.GameVersion = '2.051';
 
 KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.defaultConfig = function(){

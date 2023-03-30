@@ -1,7 +1,7 @@
 if(Horticookie === undefined) var Horticookie = {};
 Horticookie.name = 'Horticookie';
 Horticookie.version = '4.2';
-Horticookie.GameVersion = '2.048';
+Horticookie.GameVersion = '2.051';
 
 Horticookie.launch = function(){
 	Horticookie.init = function(){

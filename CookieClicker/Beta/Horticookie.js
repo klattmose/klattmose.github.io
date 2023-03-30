@@ -2,7 +2,7 @@ if(Horticookie === undefined) var Horticookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 Horticookie.name = 'Horticookie';
 Horticookie.version = '4.2';
-Horticookie.GameVersion = '2.047';
+Horticookie.GameVersion = '2.051';
 
 Horticookie.launch = function(){
 	Horticookie.init = function(){

@@ -1,9 +1,9 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.033';
+CCSE.version = '2.034';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.048' : '2.048';
+CCSE.GameVersion = CCSE.Steam ? '2.051' : '2.051';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -104,9 +104,15 @@ CCSE.launch = function(){
 		//l('versionNumber').innerHTML = 'Game ' + l('versionNumber').innerHTML + '<br>CCSE v. ' + CCSE.version;
 		var versionNumber = l('versionNumber');
 		var versionDiv = document.createElement('p');
+		versionDiv.id = 'CCSEversionNumber';
 		versionDiv.innerHTML = 'CCSE v. ' + CCSE.version;
 		var textDiv = document.createElement('span');
+		textDiv.id = 'CCSEversionGame';
 		textDiv.innerHTML = 'Game ';
+		if(!CCSE.config.showVersionNo){
+			versionDiv.style.display = 'none'
+			textDiv.style.display = 'none'
+		}
 		versionNumber.appendChild(versionDiv);
 		versionNumber.insertBefore(textDiv, versionNumber.firstChild);
 		
@@ -133,6 +139,11 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">03/13/2023</div>' + 
+			'<div class="listing">&bull; Added option to hide the CCSE version in the lower left of the screen</div>' +
+			'<div class="listing">&bull; Added some hooks for the YouCustomizer functions</div>' +
+			'<div class="listing">&bull; Fixed compatibility with Frozen Cookies</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">01/07/2022</div>' + 
 			'<div class="listing">&bull; Added hook for Game.resize</div>' +
@@ -277,7 +288,7 @@ CCSE.launch = function(){
 		else CCSE.iconURL = 'https://klattmose.github.io/CookieClicker/img/CCSEicon.png';
 		
 		CCSE.functionsTotal = (
-			135
+			141
 			+ (CCSE.Steam ? 7 : 0)
 			+ Game.ObjectsN      * 18 - 1 + 3
 			+ Game.UpgradesN     * 1  + 25
@@ -1350,6 +1361,76 @@ CCSE.launch = function(){
 			for(var i in Game.customOpenSesame) str += Game.customOpenSesame[i]();`, -1);
 		
 		
+		// -----     YouCustomizer block     ----- //
+		
+		// Game.YouCustomizer.render
+		if(!Game.customYouCustomizerRender) Game.customYouCustomizerRender = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.render', -1, `
+			// Game.YouCustomizer.render injection point 0
+			for(var i in Game.customYouCustomizerRender) Game.customYouCustomizerRender[i]();
+		`);
+		
+		
+		// Game.YouCustomizer.getGeneValue
+		// Return retVal to have no effect
+		temp = Game.YouCustomizer.getGeneValue.toString();
+		temp = temp.replace('var gene=', 'var retVal;\r\nvar gene=');
+		temp = temp.replaceAll('return', 'retVal =');
+		eval('Game.YouCustomizer.getGeneValue = ' + temp);
+		if(!Game.customYouCustomizerGetGeneValue) Game.customYouCustomizerGetGeneValue = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.getGeneValue', -1, `
+			// Game.YouCustomizer.getGeneValue injection point 0
+			for(var i in Game.customYouCustomizerGetGeneValue) retVal = Game.customYouCustomizerGetGeneValue[i](id, retVal);
+			return retVal;
+		`);
+		
+		
+		// Game.YouCustomizer.offsetGene
+		if(!Game.customYouCustomizerOffsetGene) Game.customYouCustomizerOffsetGene = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.offsetGene', -1, `
+			// Game.YouCustomizer.offsetGene injection point 0
+			for(var i in Game.customYouCustomizerOffsetGene) Game.customYouCustomizerOffsetGene[i](gene,off);
+		`);
+		
+		
+		// Game.YouCustomizer.randomize
+		if(!Game.customYouCustomizerRandomize) Game.customYouCustomizerRandomize = [];
+		CCSE.ReplaceCodeIntoFunction('Game.YouCustomizer.randomize', "Game.YouCustomizer.render();",
+			`// Game.YouCustomizer.randomize injection point 0
+			for(var i in Game.customYouCustomizerRandomize) str = Game.customYouCustomizerRandomize[i]();`, -1);
+		
+		
+		// Game.YouCustomizer.renderPortrait
+		if(!Game.customYouCustomizerRenderPortrait) Game.customYouCustomizerRenderPortrait = [];
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.renderPortrait', -1, `
+			// Game.YouCustomizer.renderPortrait injection point 0
+			for(var i in Game.customYouCustomizerRenderPortrait) Game.customYouCustomizerRenderPortrait[i]();
+		`);
+		
+		
+		// Game.YouCustomizer.prompt
+		if(!Game.customYouCustomizerPrompt) Game.customYouCustomizerPrompt = [];
+		if(!Game.customYouCustomizerMakeCustomizerSelector) Game.customYouCustomizerMakeCustomizerSelector = [];
+		temp = Game.YouCustomizer.prompt.toString();
+		temp = temp.replace('return', 'var retVal =');
+		temp = temp.replace('}', `
+			// Game.YouCustomizer.prompt injection point 0
+			for(var i in Game.customYouCustomizerMakeCustomizerSelector) retVal = Game.customYouCustomizerMakeCustomizerSelector[i](gene,text,retVal);
+			return retVal;
+		}`);
+		eval('Game.YouCustomizer.prompt = ' + temp);
+		CCSE.SliceCodeIntoFunction('Game.YouCustomizer.prompt', -1, `
+			// Game.YouCustomizer.prompt injection point 1
+			for(var i in Game.customYouCustomizerPrompt) Game.customYouCustomizerPrompt[i]();
+		`);
+		
+		
+		// -----     Gifting block     ----- //
+		// Game.promptGiftRedeem
+		// Game.promptGiftSend
+			// Submit an issue to the GitHub page with where you want a hook
+			// Until that happens, these functions won't either
+		
 	}
 	
 	if(!CCSE.customReplaceShimmerType) CCSE.customReplaceShimmerType = [];
@@ -2024,19 +2105,25 @@ CCSE.launch = function(){
 		if(!Game.customUpgrades[key].buyFunction) Game.customUpgrades[key].buyFunction = [];
 		Game.customUpgrades[key].buyFunction.push(CCSE.customUpgradesAllbuyFunction);
 		if(upgrade.buyFunction){
-			upgrade.oldbuyFunction = upgrade.buyFunction;
+			//upgrade.oldbuyFunction = upgrade.buyFunction;
+			CCSE.SliceCodeIntoFunction("Game.Upgrades['" + escKey + "'].buyFunction", -1, `
+				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
+				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
+			`);
+			
+			/* This broke Frozen Cookies
 			upgrade.buyFunction = function(){
 				upgrade.oldbuyFunction();
-				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
+				// Game.Upgrades[this.name].buyFunction injection point 0
 				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
-			}
+			}*/
 		}else{
 			upgrade.buyFunction = function(){
-				// Game.Upgrades['` + escKey + `'].buyFunction injection point 0
+				// Game.Upgrades[this.name].buyFunction injection point 0
 				if(Game.customUpgrades[this.name]) for(var i in Game.customUpgrades[this.name].buyFunction) Game.customUpgrades[this.name].buyFunction[i](this);
 			}
+			CCSE.functionsAltered++;
 		}
-		CCSE.functionsAltered++;
 		
 		
 		// this.descFunc
@@ -2296,6 +2383,8 @@ CCSE.launch = function(){
 			CCSE.MenuHelper.ActionButton("CCSE.ImportSave();", 'Import custom save') +
 			'<label>Back up data added by mods and managed by CCSE</label></div>';
 		
+		str += '<div class="listing">' + CCSE.MenuHelper.CheckBox(CCSE.config, 'showVersionNo', 'showVersionNoButton', 'Version Number ON', 'Version Number OFF', 'CCSE.togglePref') + '<label>Show the version number of CCSE in the bottom left of the screen.</label></div>';
+		
 		return str;
 	}
 	
@@ -2396,6 +2485,19 @@ CCSE.launch = function(){
 				`<label id="${ button }_label" for="${ button }">${ config[prefName] ? on : off }</label>`;
 		}
 		
+	}
+	
+	CCSE.togglePref = function(prefName, button, on, off, invert){
+		if (CCSE.config[prefName]){
+			l(button).removeAttribute('checked');
+			l(button + '_label').innerHTML = off;
+			CCSE.config[prefName] = 0;
+		}else{
+			l(button).setAttribute('checked','checked')
+			l(button + '_label').innerHTML = on;
+			CCSE.config[prefName] = 1;
+		}
+		CCSE.applyPref(prefName);
 	}
 	
 	
@@ -3403,6 +3505,7 @@ CCSE.launch = function(){
 		if(!CCSE.config.chimeType)			 CCSE.config.chimeType = 'No sound';
 		if(!CCSE.config.milkType)			 CCSE.config.milkType = 'Automatic';
 		if(!CCSE.config.bgType)				 CCSE.config.bgType = 'Automatic';
+		if(CCSE.config.showVersionNo === undefined) CCSE.config.showVersionNo = 1;
 		
 		if(config){
 			if(config.version) CCSE.config.version = config.version;
@@ -3417,6 +3520,21 @@ CCSE.launch = function(){
 			if(config.chimeType) CCSE.config.chimeType = config.chimeType;
 			if(config.milkType)  CCSE.config.milkType = config.milkType;
 			if(config.bgType)    CCSE.config.bgType = config.bgType;
+			if(config.showVersionNo !== undefined) CCSE.config.showVersionNo = config.showVersionNo;
+		}
+	}
+	
+	CCSE.applyPref = function(prefName){
+		switch(prefName){
+			case 'showVersionNo':
+				if(CCSE.config[prefName]){
+					l('CCSEversionNumber').style.display = '';
+					l('CCSEversionGame').style.display = '';
+				}else{
+					l('CCSEversionNumber').style.display = 'none';
+					l('CCSEversionGame').style.display = 'none';
+				}
+				break;
 		}
 	}
 	

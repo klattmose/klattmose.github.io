@@ -3,7 +3,7 @@ if(DecideDestiny === undefined) var DecideDestiny = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 DecideDestiny.name = 'Decide Your Destiny';
 DecideDestiny.version = '1.3';
-DecideDestiny.GameVersion = '2.051';
+DecideDestiny.GameVersion = '2.052';
 
 
 //***********************************

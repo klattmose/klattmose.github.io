@@ -4,7 +4,7 @@ if(KlattmoseUtilities.patches === undefined) KlattmoseUtilities.patches = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
 KlattmoseUtilities.name = 'Klattmose Utilities';
 KlattmoseUtilities.version = '2.16';
-KlattmoseUtilities.GameVersion = '2.051';
+KlattmoseUtilities.GameVersion = '2.052';
 
 KlattmoseUtilities.launch = function(){
 	KlattmoseUtilities.defaultConfig = function(){

@@ -3,7 +3,7 @@ if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
 CCSE.version = '2.034';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.051' : '2.051';
+CCSE.GameVersion = CCSE.Steam ? '2.051' : '2.052';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -4003,8 +4003,9 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.SetSpecialMenuImage = function(str, pic, frame){
+		// We assume that Game.specialTab is not santa or dragon
 		return str.replace(
-			'background:url(img/dragon.png?v=' + Game.version + ');background-position:-384px 0px;',
+			'background:url('+Game.resPath+'img/dragon.png?v='+Game.version+');background-position:'+(-4*96)+'px 0px;',
 			'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	

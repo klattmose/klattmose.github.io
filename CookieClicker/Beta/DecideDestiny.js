@@ -1,6 +1,6 @@
 Game.Win('Third-party');
 if(DecideDestiny === undefined) var DecideDestiny = {};
-if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (1 ? 'Beta/' : '') + 'CCSE.js');
+if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 DecideDestiny.name = 'Decide Your Destiny';
 DecideDestiny.version = '1.3';
 DecideDestiny.GameVersion = '2.052';

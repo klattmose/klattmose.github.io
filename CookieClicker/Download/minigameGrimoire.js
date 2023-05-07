@@ -377,7 +377,7 @@ M.launch=function()
 		
 		var str='';
 		str+='<style>'+
-		'#grimoireBG{background:url(img/shadedBorders.png),url(img/BGgrimoire.jpg);background-size:100% 100%,auto;position:absolute;left:0px;right:0px;top:0px;bottom:16px;}'+
+		'#grimoireBG{background:url('+Game.resPath+'img/shadedBorders.png),url('+Game.resPath+'img/BGgrimoire.jpg);background-size:100% 100%,auto;position:absolute;left:0px;right:0px;top:0px;bottom:16px;}'+
 		'#grimoireContent{position:relative;box-sizing:border-box;padding:4px 24px;}'+
 		'#grimoireBar{max-width:95%;margin:4px auto;height:16px;}'+
 		'#grimoireBarFull{transform:scale(1,2);transform-origin:50% 0;height:50%;}'+
@@ -385,7 +385,7 @@ M.launch=function()
 		'#grimoireSpells{text-align:center;width:100%;padding:8px;box-sizing:border-box;}'+
 		'.grimoireIcon{pointer-events:none;margin:2px 6px 0px 6px;width:48px;height:48px;opacity:0.8;position:relative;}'+
 		'.grimoirePrice{pointer-events:none;}'+
-		'.grimoireSpell{box-shadow:4px 4px 4px #000;cursor:pointer;position:relative;color:#f33;opacity:0.8;text-shadow:0px 0px 4px #000,0px 0px 6px #000;font-weight:bold;font-size:12px;display:inline-block;width:60px;height:74px;background:url(img/spellBG.png);}'+
+		'.grimoireSpell{box-shadow:4px 4px 4px #000;cursor:pointer;position:relative;color:#f33;opacity:0.8;text-shadow:0px 0px 4px #000,0px 0px 6px #000;font-weight:bold;font-size:12px;display:inline-block;width:60px;height:74px;background:url('+Game.resPath+'img/spellBG.png);}'+
 		'.grimoireSpell.ready{color:rgba(255,255,255,0.8);opacity:1;}'+
 		'.grimoireSpell.ready:hover{color:#fff;}'+
 		'.grimoireSpell:hover{box-shadow:6px 6px 6px 2px #000;z-index:1000000001;top:-1px;}'+

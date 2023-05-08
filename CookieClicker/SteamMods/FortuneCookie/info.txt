@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Predict the outcome of any spell in the Grimoire.",
 	"ModVersion": "2.10",
-	"GameVersion": 2.051,
+	"GameVersion": 2.052,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1,

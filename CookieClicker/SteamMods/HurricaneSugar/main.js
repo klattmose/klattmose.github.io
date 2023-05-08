@@ -1,7 +1,7 @@
 if(HurricaneSugar === undefined) var HurricaneSugar = {};
 HurricaneSugar.name = 'Hurricane Sugar';
 HurricaneSugar.version = '1.7';
-HurricaneSugar.GameVersion = '2.051';
+HurricaneSugar.GameVersion = '2.052';
 
 HurricaneSugar.launch = function(){
 	HurricaneSugar.init = function(){

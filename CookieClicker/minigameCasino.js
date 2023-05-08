@@ -5,7 +5,8 @@ var M = {};
 M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
-M.version = '3.16';
+M.bankPercentage = false;
+M.version = '4.0';
 M.GameVersion = '2.052';
 
 M.launch = function(){
@@ -16,6 +17,7 @@ M.launch = function(){
 		if(localStorage.getItem(M.savePrefix) != null && !CCSE.config.OtherMods[M.name]) CCSE.config.OtherMods[M.name] = localStorage.getItem(M.savePrefix); // Import old version that doesn't use CCSE if necessary
 		if(!M.parent.minigameSave && CCSE.config.OtherMods[M.name]) M.parent.minigameSave = CCSE.config.OtherMods[M.name];
 		M.saveString = M.parent.minigameSave;
+		M.div = div;
 		
 		
 		//***********************************
@@ -118,8 +120,11 @@ M.launch = function(){
 		M.games.Blackjack = {
 			wins : 0,
 			winsT : 0,
+			losses : 0,
 			tiesLost : 0,
 			ownLuckWins : 0,
+			doubleDown : 0,
+			splits : 0,
 			netTotal : 0,
 			
 			phases : {
@@ -128,7 +133,8 @@ M.launch = function(){
 				firstTurn: 2,
 				playerTurn: 3,
 				dealerTurn: 4,
-				evaluate: 5
+				evaluate: 5,
+				surrender: 6
 			},
 			
 			getHandValue : function(hand){
@@ -161,7 +167,7 @@ M.launch = function(){
 						Game.Unlock('Math lessons');
 						this.stand();
 					}
-				}else if(player && oldValue >= 17 && hand.value > oldValue){
+				} else if(player && oldValue >= 17 && hand.value > oldValue){
 					Game.Win('I like to live dangerously');
 				}
 				
@@ -171,7 +177,8 @@ M.launch = function(){
 			doubledown : function(){
 				Game.Spend(M.betAmount);
 				M.betAmount *= 2;
-				this.hit(M.hands.player[0], true);
+				M.games.Blackjack.doubleDown++;
+				this.hit(M.hands.player[M.currentPlayerHand], true);
 				this.stand();
 			},
 			
@@ -181,10 +188,27 @@ M.launch = function(){
 				M.hands.player.push({value:0, cards:[]});
 				M.hands.player[1].cards.push(M.hands.player[0].cards[1]);
 				M.hands.player[0].cards.splice(1, 1);
-				
+				M.hands.player[0].splitFirstTurn = true;
+				M.hands.player[1].splitFirstTurn = true;
+				M.games.Blackjack.splits += 2;
+
 				this.hit(M.hands.player[0], true);
 				this.hit(M.hands.player[1], true);
-				
+				for (i = 0; i < 2; i++)
+					if (M.hands.player[i].value == 21) {
+						Game.tooltip.shouldHide = 1;
+						M.currentPlayerHand = i;
+						M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
+						M.games.Blackjack.stand();
+					} else {
+						this.buildSidebar();
+						this.buildTable();
+					}
+			},
+			
+			surrender : function() {
+				this.phase = this.phases.surrender;
+				M.nextBeat = Date.now() + M.beatLength;
 				this.buildSidebar();
 				this.buildTable();
 			},
@@ -209,10 +233,11 @@ M.launch = function(){
 					}
 					
 				}else{
+					M.nextBeat = Date.now() + M.beatLength;
 					M.currentPlayerHand++;
 				}
 				
-				this.buildSidebar()
+				this.buildSidebar();
 				this.buildTable();
 			},
 			
@@ -221,6 +246,9 @@ M.launch = function(){
 			toggleBetMode : function(){
 				if(M.betMode == 1 && Game.Has('Raise the stakes')) M.betMode = 2;
 				else if(M.betMode < 3 && Game.Has('High roller!')) M.betMode = 3;
+				else if(M.betMode < 4 && Game.Has('Big spender!')) M.betMode = 4;
+				else if(M.betMode < 5 && Game.Has('Main player')) M.betMode = 5;
+				else if(M.betMode < 6 && Game.Has('True gambler')) M.betMode = 6;
 				else M.betMode = 1;
 				
 				this.buildSidebar();
@@ -228,7 +256,8 @@ M.launch = function(){
 			
 			toggleBetChoice : function(){
 				if(M.betChoice == 1 && Game.Has('Double or nothing')) M.betChoice = 2;
-				else if(M.betChoice < 5 && Game.Has('Stoned cows')) M.betChoice = 5;
+				else if(M.betChoice < 3 && Game.Has('Stoned cows')) M.betChoice = 5;
+				else if(M.betChoice < 10 && Game.Has('Game for Pros')) M.betChoice = 20;
 				else M.betChoice = 1;
 				
 				this.buildSidebar();
@@ -319,7 +348,8 @@ M.launch = function(){
 				M.games.Blackjack.recursiveDealerSim(cards, outcomes, simHand, M.Deck.length + 1, 1);
 				
 				winChance += outcomes[22];
-				for(var i = 21; i >= 17; i--) if(i >= M.hands.player[M.currentPlayerHand].value + (Game.Has('Tiebreaker') ? 1 : 0)) lossChance += outcomes[i]; else winChance += outcomes[i];
+				if (Game.Has('Tiebreaker') || !Game.Has('Standard push'))
+					for(var i = 21; i >= 17; i--) if(i >= M.hands.player[M.currentPlayerHand].value + (Game.Has('Tiebreaker') ? 1 : 0)) lossChance += outcomes[i]; else winChance += outcomes[i];
 				if(winChance) res += '<b>Win : </b><span class="green">' + M.formatPercentage(winChance) + '</span><br/>'
 				if(lossChance) res += '<b>Lose : </b><span class="red">' + M.formatPercentage(lossChance) + '</span><br/>'
 				
@@ -363,13 +393,26 @@ M.launch = function(){
 					mode = 'minute';
 				}else if(M.betMode == 3){
 					mode = 'hour';
+				}else if(M.betMode == 4){
+					mode = 'day';
+				}else if(M.betMode == 5){
+					mode = 'month';
+				}else if(M.betMode == 6){
+					mode = 'decade';
 				}
 				var str = '';
+				var strBet;
 				
-				if(Game.Has('Double or nothing') || Game.Has('Stoned cows')) str += '<div>Bet: <a class="option" id="casinoBetChoiceToggle" >' + Beautify(M.betChoice) + '</a> ';
-				else str += '<div>Bet: ' + Beautify(M.betChoice) + ' ';
+				if (M.bankPercentage == true)
+					strBet = Beautify(M.betChoice / 10, 1);
+				else
+					strBet = Beautify(M.betChoice);
+				if(Game.Has('Double or nothing') || Game.Has('Stoned cows') || Game.Has('Game for Pros')) str += '<div>Bet: <a class="option" id="casinoBetChoiceToggle" >' + strBet + '</a> ';
+				else str += '<div>Bet: ' + strBet + ' ';
 				
-				if(Game.Has('Raise the stakes') || Game.Has('High roller!')) str += '<a class="option" id="casinoBetModeToggle" >' + mode + (M.betChoice == 1 ? '' : 's') + '</a> of CPS</div>';
+				if (M.bankPercentage == true)
+					str += 'percent of bank</div>';
+				else if(Game.Has('Raise the stakes') || Game.Has('High roller!') || Game.Has('Big spender!') || Game.Has('Main player') || Game.Has('True gambler')) str += '<a class="option" id="casinoBetModeToggle" >' + mode + (M.betChoice == 1 ? '' : 's') + '</a> of CPS</div>';
 				else str += mode + (M.betChoice == 1 ? '' : 's') + ' of CPS</div>';
 				
 				str += '<div id="casinoCurrentBet">(' + Beautify(M.betAmount) + ' cookies)</div>';
@@ -381,10 +424,13 @@ M.launch = function(){
 				else str += '<tr><td><div class="listing">Deal</div></td></tr>';
 				if(this.phase == this.phases.firstTurn || this.phase == this.phases.playerTurn) str += '<tr><td><div class="listing"><a class="option" id="casinoHit" >Hit</a></div></td></tr>';
 				else str += '<tr><td><div class="listing">Hit</div></td></tr>';
-				if(this.phase == this.phases.firstTurn && Game.cookies >= M.betAmount) str += '<tr><td><div class="listing"><a class="option" id="casinoDoubledown" >Double Down</a></div></td></tr>';
-				else str += '<tr><td><div class="listing">Double Down</div></td></tr>';
+				if((this.phase == this.phases.firstTurn || M.games.Blackjack.splits && Game.Has('Double down') && M.hands.player[M.currentPlayerHand].splitFirstTurn) && Game.cookies >= M.betAmount) {
+					str += '<tr><td><div class="listing"><a class="option" id="casinoDoubledown" >Double Down</a></div></td></tr>';
+				} else str += '<tr><td><div class="listing">Double Down</div></td></tr>';
 				if(this.phase == this.phases.firstTurn && Game.cookies >= M.betAmount && M.hands.player[0].cards[0].pip == M.hands.player[0].cards[1].pip) str += '<tr><td><div class="listing"><a class="option" id="casinoSplit" >Split</a></div></td></tr>';
 				else str += '<tr><td><div class="listing">Split</div></td></tr>';
+				if(Game.Has('Surrender') && (this.phase == this.phases.firstTurn || M.games.Blackjack.splits && M.hands.player[M.currentPlayerHand].splitFirstTurn)) str += '<tr><td><div class="listing"><a class="option" id="casinoSurrender" >Surrender</a></div></td></tr>';
+				else str += '<tr><td><div class="listing">Surrender</div></td></tr>';
 				if(this.phase == this.phases.firstTurn || this.phase == this.phases.playerTurn) str += '<tr><td><div class="listing"><a class="option" id="casinoStand" >Stand</a></div></td></tr>';
 				else str += '<tr><td><div class="listing">Stand</div></td></tr>';
 				str += '</table>';
@@ -412,7 +458,13 @@ M.launch = function(){
 					Game.tooltip.shouldHide = 1;
 					M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
 					M.games.Blackjack.hit(M.hands.player[M.currentPlayerHand], true);
-					M.games.Blackjack.buildSidebar();
+					M.hands.player[M.currentPlayerHand].splitFirstTurn = false;
+					if (M.hands.player[M.currentPlayerHand].value == 21) {
+						Game.tooltip.shouldHide = 1;
+						M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
+						M.games.Blackjack.stand();
+					} else
+						M.games.Blackjack.buildSidebar();
 				}}()); 
 				if(l('casinoDoubledown')) AddEvent(l('casinoDoubledown'), 'click', function(){return function(){
 					PlaySound('snd/tick.mp3');
@@ -426,6 +478,12 @@ M.launch = function(){
 					M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
 					M.games.Blackjack.split();
 				}}()); 
+				if(l('casinoSurrender')) AddEvent(l('casinoSurrender'), 'click', function(){return function(){
+					PlaySound('snd/tick.mp3');
+					Game.tooltip.shouldHide = 1;
+					M.games.Blackjack.phase = M.games.Blackjack.phases.playerTurn;
+					M.games.Blackjack.surrender();
+				}}()); 
 				if(l('casinoStand')) AddEvent(l('casinoStand'), 'click', function(){return function(){
 					PlaySound('snd/tick.mp3');
 					Game.tooltip.shouldHide = 1;
@@ -438,6 +496,7 @@ M.launch = function(){
 					if(l('casinoHit')) Game.attachTooltip(l('casinoHit'), this.drawProbabilities, 'this');
 					if(l('casinoDoubledown')) Game.attachTooltip(l('casinoDoubledown'), this.drawProbabilities, 'this');
 					//if(l('casinoSplit')) Game.attachTooltip(l('casinoSplit'), this.drawProbabilities, 'this');
+					if(l('casinoSurrender')) Game.attachTooltip(l('casinoSurrender'), this.standProbabilities, 'this');
 					if(l('casinoStand')) Game.attachTooltip(l('casinoStand'), this.standProbabilities, 'this');
 				}
 			},
@@ -474,12 +533,24 @@ M.launch = function(){
 			
 			logic : function(){
 				//run each frame
-				if(M.betMode == 1 && this.phase == this.phases.inactive){
-					M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice);
-				}else if(M.betMode == 2 && this.phase == this.phases.inactive){
-					M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice * 60);
-				}else if(M.betMode == 3 && this.phase == this.phases.inactive){
-					M.betAmount = Math.min(Game.cookies, Game.cookiesPs * M.betChoice * 60 * 60);
+				if (this.phase == this.phases.inactive) {
+					if (M.bankPercentage == true) {
+						M.betAmount = Game.cookies * M.betChoice / 1000;
+					} else {
+						if(M.betMode == 1){
+							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice);
+						}else if(M.betMode == 2){
+							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60);
+						}else if(M.betMode == 3){
+							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60);
+						}else if(M.betMode == 4){
+							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60 * 24);
+						}else if(M.betMode == 5){
+							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60 * 24 * 30);
+						}else if(M.betMode == 6){
+							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60 * 24 * 365.259636 * 10);
+						}
+					}
 				}
 				
 				if(Date.now() > M.nextBeat){
@@ -492,7 +563,7 @@ M.launch = function(){
 					else if(this.phase == this.phases.deal){
 						if(this.istep == 0){
 							if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
-							M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
+							M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, splitFirstTurn:true, cards:[]}]};
 							M.currentPlayerHand = 0;
 							Game.Spend(M.betAmount);
 							
@@ -514,18 +585,19 @@ M.launch = function(){
 							M.hands.dealer.cards[1] = M.cards[0];
 							
 							this.phase = this.phases.firstTurn;
-							if(Math.random() < this.instantWinChance()){
+							if (M.games.Blackjack.splits) {
+							} else if(M.hands.player[0].value == 21){
+								M.hands.dealer.cards[1] = this.hiddenCard;
+								outcome = 'playerblackjack';
+								this.phase = this.phases.inactive;
+								
+							} else if(Math.random() < this.instantWinChance()){
 								M.hands.dealer.cards[1] = this.hiddenCard;
 								
 								M.hands.player[0].cards[0] = {pip:choose([10,11,12,13]), value:10, suit:choose([0,1,2,3])};
 								M.hands.player[0].cards[1] = {pip:1, value:1, suit:choose([0,1,2,3])};
 								
 								outcome = 'instantWin';
-								this.phase = this.phases.inactive;
-								
-							} else if(M.hands.player[0].value == 21){
-								M.hands.dealer.cards[1] = this.hiddenCard;
-								outcome = 'playerblackjack';
 								this.phase = this.phases.inactive;
 								
 							} else if(M.hands.dealer.value == 21){
@@ -540,9 +612,9 @@ M.launch = function(){
 						
 						this.buildTable();
 						this.buildSidebar();
+						M.hands.player[M.currentPlayerHand].splitFirstTurn = false;
 					}
 					else if(this.phase == this.phases.playerTurn || this.phase == this.phases.firstTurn){
-						
 					}
 					else if(this.phase == this.phases.dealerTurn){
 						if(M.hands.dealer.value < 17){
@@ -582,6 +654,22 @@ M.launch = function(){
 							this.phase = this.phases.inactive;
 						}
 						
+						this.buildTable();
+						this.buildSidebar();
+					}
+					else if(this.phase == this.phases.surrender){
+						var playerHand = M.currentPlayerHand;
+						M.hands.dealer.cards[1] = this.hiddenCard;
+						this.buildTable();							
+						outcome = 'surrender';
+						playerHand++;
+						if(playerHand < M.hands.player.length){
+							M.currentPlayerHand = playerHand;
+							this.phase = this.phases.evaluate;
+						} 
+						else{
+							this.phase = this.phases.inactive;
+						}
 						this.buildTable();
 						this.buildSidebar();
 					}
@@ -637,15 +725,26 @@ M.launch = function(){
 								messg = 'You lose';
 								break;
 								
+							case 'surrender':
+								winnings *= .5;
+								messg = 'You lose half your bet';
+								break;
+								
 							case 'push':
 								if(Game.Has('Tiebreaker')){
 									winnings *= 2;
 									messg = 'Tie goes to player!';
+									if (!Game.Has('Standard push'))
+										Game.Unlock('Standard push');
+								}else if(Game.Has('Standard push')){
+									messg = 'True push - nobody wins!';
+									this.tiesLost++;
+									if(this.tiesLost >= 7) Game.Unlock('Tiebreaker');
 								}else{
 									winnings *= 0;
 									messg = 'Tie goes to dealer';
 									this.tiesLost++;
-									if(this.tiesLost >= 7) Game.Unlock('Tiebreaker');
+									if(this.tiesLost >= 3) Game.Unlock('Standard push');
 								}
 								
 								break;
@@ -654,15 +753,22 @@ M.launch = function(){
 								break;
 						}
 						
+						if (M.games.Blackjack.splits)
+							M.games.Blackjack.splits--;
 						messg += '<div style="font-size:65%;">';
-						if(winnings > 0){
-							Game.Earn(winnings);
+						Game.Earn(winnings);
+						if(winnings >= M.betAmount){
 							this.wins++;
 							this.winsT++;
 							messg += 'Gain ' + Beautify(Math.abs(winnings - M.betAmount)) + ' cookies!';
 							
-							if(this.winsT >= 7) Game.Unlock('Raise the stakes');
-							if(Game.Has('Raise the stakes') && this.winsT >= 49) Game.Unlock('High roller!');
+							if (M.bankPercentage == false) {
+								if(this.winsT >= 7) Game.Unlock('Raise the stakes');
+								if(Game.Has('Raise the stakes') && this.winsT >= 49) Game.Unlock('High roller!');
+								if(Game.Has('High roller!') && this.winsT >= 77) Game.Unlock('Big spender!');
+								if(Game.Has('Big spender!') && this.winsT >= 108) Game.Unlock('Main player');
+								if(Game.Has('Main player') && this.winsT >= 150) Game.Unlock('True gambler');
+							}
 							if(this.winsT >= 21) Game.Win('Card minnow');
 							if(this.winsT >= 210) Game.Win('Card trout');
 							if(this.winsT >= 2100) Game.Win('Card shark');
@@ -671,7 +777,9 @@ M.launch = function(){
 							if(M.hands.player[M.currentPlayerHand].cards.length >= 6) Game.Win("Why can't I hold all these cards?");
 							if(M.hands.player[M.currentPlayerHand].value <= 5) Game.Win('I also like to live dangerously');
 						}else{
-							messg += 'Lost ' + Beautify(Math.abs(M.betAmount)) + ' cookies';
+							this.losses++;
+							messg += 'Lost ' + Beautify(Math.abs(M.betAmount) - winnings) + ' cookies';
+							if (this.losses >= 21) Game.Unlock('Surrender');
 						}
 						messg += '</div>';
 						
@@ -757,6 +865,7 @@ M.launch = function(){
 			res += '_' + parseFloat(M.games.Blackjack.netTotal);
 			res += '_' + parseInt(0);
 			res += '_' + parseInt(M.beatLength);
+			res += '_' + Number(M.bankPercentage);
 			
 			return res;
 		}
@@ -833,6 +942,7 @@ M.launch = function(){
 			M.games.Blackjack.netTotal = parseFloat(spl[i++] || 0);
 			var dummy = parseInt(spl[i++] || 0);
 			M.beatLength = parseInt(spl[i++] || 750);
+			M.bankPercentage = Number(spl[i++] || true);
 			
 			if(on && Game.ascensionMode != 1) M.parent.switchMinigame(1);
 		}
@@ -917,7 +1027,7 @@ M.launch = function(){
 		M.games.Blackjack.getHandValue(M.hands.dealer);
 		if(M.Deck.length < (M.minDecks * 52)) M.reshuffle();
 		if(M.games.Blackjack.phase == M.games.Blackjack.phases.inactive){
-			M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
+			M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, splitFirstTurn:false, cards:[]}]};
 			M.currentPlayerHand = 0;
 		}
 		
@@ -928,7 +1038,7 @@ M.launch = function(){
 	M.reset = function(hard){
 		M.deckCount = 4;
 		M.Deck = [];
-		M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, cards:[]}]};
+		M.hands = {dealer:{value:0, cards:[]}, player:[{value:0, splitFirstTurn:false, cards:[]}]};
 		M.games.Blackjack.hiddenCard = M.cards[0];
 		M.currentPlayerHand = 0;
 		M.minDecks = 2;
@@ -936,11 +1046,13 @@ M.launch = function(){
 		M.betChoice = 1;
 		M.betMode = 1;
 		M.games.Blackjack.wins = 0;
+		M.games.Blackjack.losses = 0;
 		M.games.Blackjack.ownLuckWins = 0;
 		M.games.Blackjack.tiesLost = 0;
 		M.games.Blackjack.phase = 0;
 		M.games.Blackjack.istep = 0;
 		M.nextBeat = Date.now();
+		M.bankPercentage = true;
 		
 		M.setPercentagePrecision(1);
 		
@@ -992,31 +1104,43 @@ M.launcher = function(){
 	M.sourceFolder = 'https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '');
 	M.cardsImage = M.sourceFolder + 'img/phantasypantsCards.png';
 	M.iconsImage = M.sourceFolder + 'img/customIcons.png';
-	M.chancemakerChance = 0.0003;
+	M.chancemakerChance = 0.0002;
 	M.beatLength = 750;
 	
 	//***********************************
 	//    Upgrades
 	//***********************************
 	M.Upgrades = [];
+	
 	M.Upgrades.push(CCSE.NewUpgrade('Raise the stakes', "Can bet a minute of CPS at a time.<q>Now we're getting somewhere!</q>", 10, [0, 3, M.iconsImage])); 
 	M.Upgrades.push(CCSE.NewUpgrade('High roller!', "Can bet an hour of CPS at a time.<q>If you have to ask, you can't afford it.</q>", 60, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Big spender!', "Can bet a day of CPS at a time.<q>Now you're getting serious.</q>", 90, [0, 3, M.iconsImage]));
+	M.Upgrades.push(CCSE.NewUpgrade('Main player', "Can bet a month of CPS at a time.<q>Don't even think about it.</q>", 120, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('True gambler', "Can bet a decade of CPS at a time.<q>Putting your life savings on the line.</q>", 180, [0, 3, M.iconsImage]));
+	
 	M.Upgrades.push(CCSE.NewUpgrade('Math lessons', "Show the value of your current blackjack hand.<q>C'mon, it's not that hard.</q>", 1, [0, 3, M.iconsImage])); 
 	M.Upgrades.push(CCSE.NewUpgrade('Counting cards', "Keeps track of which cards have been played. 2-6 increase the count by 1. 10-K and Aces decrease the count by 1. Higher counts give better odds.<q>Technically not cheating, but casinos frown on this sort of thing.</q>", 21, [0, 3, M.iconsImage])); 
-	M.Upgrades.push(CCSE.NewUpgrade('Tiebreaker', "Ties push to the player, not the dealer.<q>Look at me. I'm the dealer now.</q>", 15, [0, 3, M.iconsImage])); 
-	M.Upgrades.push(CCSE.NewUpgrade('I make my own luck', "Each Chancemaker gives a <b>0.0<span></span>3%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [0, 3, M.iconsImage])); 
-	M.Upgrades.push(CCSE.NewUpgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 180, [0, 3, M.iconsImage]));
+	M.Upgrades.push(CCSE.NewUpgrade('Standard push', "A true tie - nobody wins.<q>Well, it's better than losing to the dealer.</q>", 8, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Tiebreaker', "Ties push to the player.<q>Look at me. I'm the dealer now.</q>", 15, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Double down', "Doubling down after splits is permitted.<q>Time to make some real money!</q>", 18, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Surrender', "Surrendering allows half your bet to be returned to you.<q>It's better than losing everyting!</q>", 35, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('I make my own luck', "Each Chancemaker gives a <b>0.0<span></span>2%</b> chance to instantly win the hand.<q>Wait, that's illegal.</q>", 60, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Infinite Improbability Drive', "Chancemaker chance to instantly win the hand is <b>doubled</b>.<q>You stole a protoype spaceship just to cheat at cards?</q>", 250, [0, 3, M.iconsImage]));
+	
 	M.Upgrades.push(CCSE.NewUpgrade('Double or nothing', "Multiply your bet by <b>2</b>.<q>The Martingale System sounds good on paper, but one losing streak long enough will bankrupt anyone.</q>", 120, [0, 3, M.iconsImage])); 
 	M.Upgrades.push(CCSE.NewUpgrade('Stoned cows', "Multiply your bet by <b>5</b>.<q>The steaks have never been higher!</q>", 300, [0, 3, M.iconsImage])); 
+	M.Upgrades.push(CCSE.NewUpgrade('Game for Pros', "Multiply your bet by <b>20</b>.<q>Much skill is required here.</q>", 600, [0, 3, M.iconsImage]));
+	
 	M.Upgrades.push(CCSE.NewHeavenlyUpgrade('Actually, do tell me the odds', "Display the probabilities of various outcomes of taking an action in the Casino.<q>2 + 2 is 4 minus 1 that's 3 quick maffs.</q>", 21000000, [0, 3, M.iconsImage], 38, -188, []));
 		Game.last.showIf = function(){return Game.HasAchiev('Card shark');}
 	
 	for(var i = 0; i < M.Upgrades.length; i++){
 		M.Upgrades[i].order = 1000000 + i / 100;
-		if(M.Upgrades[i].pool != 'prestige') M.Upgrades[i].priceFunc = function(){return this.basePrice * Game.cookiesPs * 60;};
+		if(M.Upgrades[i].pool != 'prestige') M.Upgrades[i].priceFunc = function(){return this.basePrice * Game.cookiesPsRawHighest * 60;};
 	}
-	Game.Upgrades['Double or nothing'].order = Game.Upgrades['High roller!'].order + 0.001;
+	Game.Upgrades['Double or nothing'].order = Game.Upgrades['True gambler'].order + 0.001;
 	Game.Upgrades['Stoned cows'].order = Game.Upgrades['Double or nothing'].order + 0.001;
+	Game.Upgrades['Game for Pros'].order = Game.Upgrades['Stoned cows'].order + 0.001;
 	
 	
 	//***********************************
@@ -1034,8 +1158,8 @@ M.launcher = function(){
 	M.Achievements.push(CCSE.NewAchievement('Deal with the Devil', "Win <b>666</b> hands of blackjack through chancemaker intervention in one ascension.<q>Just sign right here.</q>", [0, 3, M.iconsImage]));
 		Game.last.pool = 'shadow';
 	M.Achievements.push(CCSE.NewAchievement('Blackjack!', "Be dealt a hand totaling 21 naturally.", [0, 3, M.iconsImage]));
-	M.Achievements.push(CCSE.NewAchievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.<q>My name is Number 2. This is my Italian confidential secretary. Her name is Alotta. Alotta Fagina.</q>", [0, 3, M.iconsImage]));
-	M.Achievements.push(CCSE.NewAchievement('I also like to live dangerously', "Win with a score of <b>5</b> or less.<q>Yeah baby!</q>", [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('I like to live dangerously', "Hit on <b>17</b> or above without going over <b>21</b>.", [0, 3, M.iconsImage]));
+	M.Achievements.push(CCSE.NewAchievement('I also like to live dangerously', "Win with a hand of <b>5</b> or less.<q>Yeah baby!</q>", [0, 3, M.iconsImage]));
 		Game.last.pool = 'shadow';
 	
 	for(var i = 0; i < M.Achievements.length; i++) M.Achievements[i].order = 1000000 + i / 100;
@@ -1045,8 +1169,12 @@ M.launcher = function(){
 	//    CCSE arrays
 	//***********************************
 	Game.customOptionsMenu.push(function(){
+		CCSE.MenuHelper;
+		var str = '<div class="listing">'
+		+ CCSE.MenuHelper.ToggleButton(M, 'bankPercentage', 'Casino_bankPercentageButton', 'Bank Percentage ON', 'Bank Percentage OFF', "Game.Objects['Chancemaker'].minigame.Toggle")
+		+ '<label>Calculate all bets as a percentage of the current bank.</label></div>';
 		var callback = "Game.Objects['Chancemaker'].minigame.beatLength = Math.round(l('beatLengthSlider').value); l('beatLengthSliderRightText').innerHTML = Game.Objects['Chancemaker'].minigame.beatLength;";
-		var str = '<div class="listing">' +
+		str += '<div class="listing">' +
 			CCSE.MenuHelper.Slider('beatLengthSlider', 'Beat Length', '[$]', () => M.beatLength, callback, 0, 1000, 10) + 
 			'This is the time in milliseconds between each card deal.</div>';
 		
@@ -1061,6 +1189,20 @@ M.launcher = function(){
 		}
 	});
 	
+	M.Toggle = function(prefName, button, on, off, invert){
+		if(M[prefName]){
+			l(button).innerHTML = off;
+			M.bankPercentage = false;
+		}
+		else{
+			l(button).innerHTML = on;
+			M.bankPercentage = true;
+		}
+		l(button).className = 'smallFancyButton prefButton option' + ((M[prefName] ^ invert) ? '' : ' off');
+		M.save();
+		//M.init(M.div);
+		M.buildSidebar();
+	}
 	
 	CCSE.customLoad.push(function(ret){
 		if(M.load){
@@ -1072,14 +1214,22 @@ M.launcher = function(){
 		}
 		return ret;
 	});
+	
 	Game.registerHook('check', function(){
 		if(M.loadedCount){
 			if(M.games.Blackjack.winsT >= 7) Game.Unlock('Raise the stakes');
 			if(Game.Has('Raise the stakes') && M.games.Blackjack.winsT >= 49) Game.Unlock('High roller!');
 			if(Game.Has('High roller!') && Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
 			if(Game.Has('Double or nothing') && Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
+			if(Game.Has('Stoned cows') && Game.cookies >= (20 * Game.cookiesPs * 60 * 60)) Game.Unlock('Big spender!');
+			if(Game.Has('Big spender!') && Game.cookies >= (30 * Game.cookiesPs * 60 * 60)) Game.Unlock('Game for Pros');
+			if(Game.Has('Game for Pros') && Game.cookies >= (40 * Game.cookiesPs * 60 * 60)) Game.Unlock('Main player');
+			if(Game.Has('Main player') && Game.cookies >= (48 * Game.cookiesPs * 60 * 60)) Game.Unlock('True gambler');
+			
 			if(Game.Has('I make my own luck') && M.games.Blackjack.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
+			if(M.games.Blackjack.tiesLost >= 3) Game.Unlock('Standard push');
 			if(M.games.Blackjack.tiesLost >= 7) Game.Unlock('Tiebreaker');
+			if(M.games.Blackjack.doubleDown >= 7) Game.Unlock('Double down');
 			
 			if(M.games.Blackjack.winsT >= 21) Game.Win('Card minnow');
 			if(M.games.Blackjack.winsT >= 210) Game.Win('Card trout');

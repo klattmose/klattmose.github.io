@@ -1221,10 +1221,7 @@ M.launcher = function(){
 			if(Game.Has('Raise the stakes') && M.games.Blackjack.winsT >= 49) Game.Unlock('High roller!');
 			if(Game.Has('High roller!') && Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
 			if(Game.Has('Double or nothing') && Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
-			if(Game.Has('Stoned cows') && Game.cookies >= (20 * Game.cookiesPs * 60 * 60)) Game.Unlock('Big spender!');
-			if(Game.Has('Big spender!') && Game.cookies >= (30 * Game.cookiesPs * 60 * 60)) Game.Unlock('Game for Pros');
-			if(Game.Has('Game for Pros') && Game.cookies >= (40 * Game.cookiesPs * 60 * 60)) Game.Unlock('Main player');
-			if(Game.Has('Main player') && Game.cookies >= (48 * Game.cookiesPs * 60 * 60)) Game.Unlock('True gambler');
+			if(Game.Has('Stoned cows') && Game.cookies >= (30 * Game.cookiesPs * 60 * 60)) Game.Unlock('Game for Pros');
 			
 			if(Game.Has('I make my own luck') && M.games.Blackjack.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
 			if(M.games.Blackjack.tiesLost >= 3) Game.Unlock('Standard push');

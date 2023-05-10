@@ -3,7 +3,7 @@ if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
 CCSE.version = '2.034';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.051' : '2.052';
+CCSE.GameVersion = CCSE.Steam ? '2.052' : '2.052';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;
@@ -109,10 +109,6 @@ CCSE.launch = function(){
 		var textDiv = document.createElement('span');
 		textDiv.id = 'CCSEversionGame';
 		textDiv.innerHTML = 'Game ';
-		if(!CCSE.config.showVersionNo){
-			versionDiv.style.display = 'none'
-			textDiv.style.display = 'none'
-		}
 		versionNumber.appendChild(versionDiv);
 		versionNumber.insertBefore(textDiv, versionNumber.firstChild);
 		
@@ -128,6 +124,8 @@ CCSE.launch = function(){
 			CCSE.LaunchOtherMods();
 			if(CCSE.gameHasLoadedSave) Game.loadModData();
 		}
+		
+		CCSE.applyPref('showVersionNo');
 	}
 	
 	

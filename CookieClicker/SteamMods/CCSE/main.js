@@ -109,10 +109,6 @@ CCSE.launch = function(){
 		var textDiv = document.createElement('span');
 		textDiv.id = 'CCSEversionGame';
 		textDiv.innerHTML = 'Game ';
-		if(!CCSE.config.showVersionNo){
-			versionDiv.style.display = 'none'
-			textDiv.style.display = 'none'
-		}
 		versionNumber.appendChild(versionDiv);
 		versionNumber.insertBefore(textDiv, versionNumber.firstChild);
 		
@@ -128,6 +124,8 @@ CCSE.launch = function(){
 			CCSE.LaunchOtherMods();
 			if(CCSE.gameHasLoadedSave) Game.loadModData();
 		}
+		
+		CCSE.applyPref('showVersionNo');
 	}
 	
 	
@@ -4003,8 +4001,9 @@ CCSE.launch = function(){
 	}
 	
 	CCSE.SetSpecialMenuImage = function(str, pic, frame){
+		// We assume that Game.specialTab is not santa or dragon
 		return str.replace(
-			'background:url(img/dragon.png?v=' + Game.version + ');background-position:-384px 0px;',
+			'background:url('+Game.resPath+'img/dragon.png?v='+Game.version+');background-position:'+(-4*96)+'px 0px;',
 			'background:url(' + pic + ');background-position:' + (frame * (-96)) + 'px 0px;');
 	}
 	

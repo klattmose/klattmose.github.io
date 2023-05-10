@@ -109,10 +109,6 @@ CCSE.launch = function(){
 		var textDiv = document.createElement('span');
 		textDiv.id = 'CCSEversionGame';
 		textDiv.innerHTML = 'Game ';
-		if(!CCSE.config.showVersionNo){
-			versionDiv.style.display = 'none'
-			textDiv.style.display = 'none'
-		}
 		versionNumber.appendChild(versionDiv);
 		versionNumber.insertBefore(textDiv, versionNumber.firstChild);
 		
@@ -128,6 +124,8 @@ CCSE.launch = function(){
 			CCSE.LaunchOtherMods();
 			if(CCSE.gameHasLoadedSave) Game.loadModData();
 		}
+		
+		CCSE.applyPref('showVersionNo');
 	}
 	
 	

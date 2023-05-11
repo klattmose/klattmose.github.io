@@ -1,6 +1,6 @@
 # Cookie Clicker Script Extender (CCSE)
 
-*Current version : 2.031*
+*Current version : 2.034*
 
 **CCSE** is a modding framework for the game <code>https://orteil.dashnet.org/cookieclicker/</code>. On its own, it makes no changes to the game. Instead, it makes modding the game much easier.
 
@@ -211,13 +211,20 @@ Provides examples of:
 
 CCSE sinks its grabby hooks into a huge number of the game's functions. I haven't done extensive testing with every single Cookie Clicker add-on in existence, so I can't give any definitives. Tell me of any conflicts you find and I'll add them to the list. 
 
-* CCES must be loaded before Cookie Monster. (Load any mod that uses CCSE before Cookie Monster)
+* CCSE must be loaded before Cookie Monster. (Load any mod that uses CCSE before Cookie Monster)
 
 ## Bugs and suggestions
 
 Any bug or suggestion should be **opened as an issue** [in the repository](https://github.com/klattmose/klattmose.github.io/issues) for easier tracking. This allows me to close issues once they're fixed.
 
 ## Version History
+
+**03/13/2023 - (2.034)**
+* Added option to hide the CCSE version in the lower left of the screen
+* Added some hooks for the YouCustomizer functions
+* Fixed compatibility with Frozen Cookies
+* Added hook for Game.resize
+* Added hook for Garden.logic (for plant aging)
 
 **10/04/2021 - (2.031)**
 * Fixed bug that was preventing custom buildings, upgrades, and achievements from being saved in some circumstances

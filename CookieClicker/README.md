@@ -10,15 +10,15 @@ A comprehensive list of the mods I have made for this game.
 
 A browser extension to manage and automatically load javascript mods and add-ons for this game.
 
-### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js?v=2.031)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685465009))
+### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js?v=2.034)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685465009))
 
 A modding framework that other mods can use to simplify the modding process. [Documentation](https://klattmose.github.io/CookieClicker/CCSE-POCs/)\
-Current version: 2.031
+Current version: 2.034
 
-### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js?v=2.8)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685510551&))
+### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js?v=2.10)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685510551&))
 
 Predicts the outcomes of the Grimoire minigame spells.\
-Current version: 2.8
+Current version: 2.10
 
 ### [Klattmose Utilities](https://klattmose.github.io/CookieClicker/KlattmoseUtilities.js?v=2.16)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685514670))
 
@@ -26,26 +26,26 @@ Create an unlimited amount of fully customizable hotkeys.\
 Current version: 2.16\
 Disables Steam achievements.
 
-### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js?v=4.0)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685514527))
+### [Horticookie](https://klattmose.github.io/CookieClicker/Horticookie.js?v=4.2)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685514527))
 
 A helper tool for the Garden minigame.\
-Current version: 4.0
+Current version: 4.2
 
 ### [Idle Trading](https://klattmose.github.io/CookieClicker/IdleTrading.js?v=1.10)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685515551))
 
 A helper tool for the Market minigame.\
 Current version: 1.10
 
-### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js?v=3.16)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685520293))
+### [Casino](https://klattmose.github.io/CookieClicker/minigameCasino.js?v=4.0)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685520293))
 
 Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies.\
-Current version: 3.16\
+Current version: 4.0\
 Disables Steam achievements.
 
-### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js?v=1.7)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685516372))
+### [American Season](https://klattmose.github.io/CookieClicker/AmericanSeason.js?v=1.8)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685516372))
 
 Adds a firework themed season to the game.\
-Current version: 1.7\
+Current version: 1.8\
 Disables Steam achievements.
 
 ### [Decide Your Destiny](https://klattmose.github.io/CookieClicker/DecideDestiny.js?v=1.3)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685516514))
@@ -65,10 +65,10 @@ Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ri
 Current version: 1.7\
 Disables Steam achievements.
 
-### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.12)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685520002))
+### [Black Hole Inverter](https://klattmose.github.io/CookieClicker/CCSE-POCs/BlackholeInverter.js?v=1.14)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685520002))
 
 Adds a new building and an appropriate amount of upgrades and achievments.\
-Current version: 1.12\
+Current version: 1.14\
 Disables Steam achievements.
 
 ### [Immortal Garden](https://klattmose.github.io/CookieClicker/ImmortalGarden.js?v=1)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685525527))
@@ -86,7 +86,7 @@ Disables Steam achievements.
 ### Mod Menu Tweaks  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685529903))
 
 Double-click to enable/disable mods. Drag-and-drop reordering. Dynamic height resizing based on mod list length.\
-Current version: 1.0
+Current version: 1.1
 
 ### Steam Achievement Enabler  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685537895))
 

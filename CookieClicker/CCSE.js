@@ -2440,8 +2440,8 @@ CCSE.launch = function(){
 			'<a class="smallFancyButton option"' +
 			`${ Game.clickStr }="${ action } PlaySound('snd/tick.mp3');">${ text }</a>`,
 		
-		Header: (text) =>
-			'<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
+		Header: (id, text) =>
+			`<div class="listing optionHeader" id="${ id }" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">` + text + '</div>',
 
 		InputBox: (id, width, value, onChange) =>
 			`<input type="text" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }">`,

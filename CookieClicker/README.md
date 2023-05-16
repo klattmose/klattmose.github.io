@@ -10,10 +10,10 @@ A comprehensive list of the mods I have made for this game.
 
 A browser extension to manage and automatically load javascript mods and add-ons for this game.
 
-### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js?v=2.034)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685465009))
+### [Cookie Clicker Script Extender](https://klattmose.github.io/CookieClicker/CCSE.js?v=2.035)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685465009))
 
 A modding framework that other mods can use to simplify the modding process. [Documentation](https://klattmose.github.io/CookieClicker/CCSE-POCs/)\
-Current version: 2.034
+Current version: 2.035
 
 ### [Fortune Cookie](https://klattmose.github.io/CookieClicker/FortuneCookie.js?v=2.10)  ([Steam](https://steamcommunity.com/sharedfiles/filedetails/?id=2685510551&))
 

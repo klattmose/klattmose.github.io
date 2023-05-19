@@ -2249,12 +2249,23 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Menu functions
 	=======================================================================================*/
-	CCSE.AppendOptionsMenu = function(inp){
+	CCSE.AppendOptionsMenu = function(inp, style = 1){
 		// Accepts inputs of either string or div
+		// Choose div class based on given style. A style of 0 will have no class.
+		var divClass;
+		switch (style) {
+			case 1:
+				divClass = "block";
+				break;
+			case 2:
+				divClass = "framed";
+				break;
+		}
+
 		var div = document.createElement('div');
 		//div.className = "framed";
 		//div.style= "margin:4px 48px;";
-		div.innerHTML = '<div class="block" style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
+		div.innerHTML = '<div' + (divClass ? ` class="${ divClass }" ` : '') + 'style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
 		var div2 = div.children[0].children[0];
 		//var div2 = div.children[0];
 		

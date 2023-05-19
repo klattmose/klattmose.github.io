@@ -1,7 +1,7 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.034';
+CCSE.version = '2.035';
 CCSE.Steam = (typeof Steam !== 'undefined');
 CCSE.GameVersion = CCSE.Steam ? '2.052' : '2.052';
 
@@ -137,6 +137,9 @@ CCSE.launch = function(){
 			'<div class="listing">Further documentation can be found <a href="https://klattmose.github.io/CookieClicker/CCSE-POCs/" target="_blank">here</a>.</div>' +
 			'<div class="listing">If you have a bug report or a suggestion, create an issue <a href="https://github.com/klattmose/klattmose.github.io/issues" target="_blank">here</a>.</div></div>' +
 			'<div class="subsection"><div class="title">CCSE version history</div>' +
+			
+			'</div><div class="subsection update small"><div class="title">05/16/2023</div>' + 
+			'<div class="listing">&bull; Can now give ids to Headers</div>' +
 			
 			'</div><div class="subsection update small"><div class="title">03/13/2023</div>' + 
 			'<div class="listing">&bull; Added option to hide the CCSE version in the lower left of the screen</div>' +
@@ -2449,8 +2452,8 @@ CCSE.launch = function(){
 			'<a class="smallFancyButton option"' +
 			`${ Game.clickStr }="${ action } PlaySound('snd/tick.mp3');">${ text }</a>`,
 		
-		Header: (text) =>
-			'<div class="listing" style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">' + text + '</div>',
+		Header: (text, id) =>
+			'<div class="listing optionHeader" ' + (id ? `id="${ id }" ` : '') + `style="padding: 5px 16px; opacity: 0.7; font-size: 17px; font-family: Kavoon, Georgia, serif;">${ text }</div>`,
 
 		InputBox: (id, width, value, onChange) =>
 			`<input type="text" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }">`,

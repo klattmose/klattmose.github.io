@@ -2258,13 +2258,11 @@ CCSE.launch = function(){
 				divClass = "framed";
 				break;
 		}
-		
-		var div = document.createElement('div');
-		//div.className = "framed";
-		//div.style= "margin:4px 48px;";
-		div.innerHTML = '<div' + (divClass ? ` class="${ divClass }" ` : '') + 'style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
+    
+		var template = document.createElement('template');
+		template.innerHTML = '<div class="block" style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
+		var div = template.content;
 		var div2 = div.children[0].children[0];
-		//var div2 = div.children[0];
 		
 		if(typeof inp == 'string'){
 			div2.innerHTML = inp;

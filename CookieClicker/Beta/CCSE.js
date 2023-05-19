@@ -2249,8 +2249,19 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Menu functions
 	=======================================================================================*/
-	CCSE.AppendOptionsMenu = function(inp){
+	CCSE.AppendOptionsMenu = function(inp, style = 1){
 		// Accepts inputs of either string or div
+		// Choose div class based on given style. A style of 0 will have no class.
+		var divClass;
+		switch (style) {
+			case 1:
+				divClass = "block";
+				break;
+			case 2:
+				divClass = "framed";
+				break;
+		}
+		
 		var template = document.createElement('template');
 		template.innerHTML = '<div class="block" style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
 		var div = template.content;

@@ -2263,7 +2263,7 @@ CCSE.launch = function(){
 		}
 		
 		var template = document.createElement('template');
-		template.innerHTML = '<div class="block" style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
+		template.innerHTML = '<div ' + (divClass ? `class="${ divClass }" ` : '') + 'style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
 		var div = template.content;
 		var div2 = div.children[0].children[0];
 		

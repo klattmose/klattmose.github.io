@@ -2461,6 +2461,9 @@ CCSE.launch = function(){
 		PasswordBox: (id, width, value, onChange) =>
 			`<input type="password" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }">`,
 		
+		SearchBox: (id, width, value, onChange, placeholder = 'Search') =>
+			`<input type="search" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }" placeholder="${ placeholder }">`,
+		
 		TinyIcon: (icon) =>
 			'<div class="icon" style="vertical-align:middle;display:inline-block;margin:-16px;transform:scale(0.5);' +
 			(icon[2] ? `background-image:url(${ icon[2] });` : '') +

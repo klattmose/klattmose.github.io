@@ -6,11 +6,17 @@ M.parent = Game.Objects['Chancemaker'];
 M.parent.minigame = M;
 M.loadedCount = 0;
 M.bankPercentage = false;
-M.version = '4.0';
+M.version = '4.1';
 M.GameVersion = '2.052';
 
 M.launch = function(){
 	var M = this;
+
+	const MINUTE = 60;
+	const HOUR = 60 * 60;
+	const DAY = 60 * 60 * 24;
+	const MONTH = 60 * 60 * 24 * 30;
+	const DECADE = 60 * 60 * 24 * 365.26 * 10;
 	
 	M.init = function(div){
 		// It's possible that the save data might get lost if entrusted to the game's save
@@ -385,37 +391,53 @@ M.launch = function(){
 			},
 			
 			buildSidebar : function(){
-				var mode = '';
+				let betTime;
+				let mode = '';
+				let betCapped;
 				
 				if(M.betMode == 1){
 					mode = 'second';
+					betTime = 1;
 				}else if(M.betMode == 2){
 					mode = 'minute';
+					betTime = MINUTE;
 				}else if(M.betMode == 3){
 					mode = 'hour';
+					betTime = HOUR;
 				}else if(M.betMode == 4){
 					mode = 'day';
+					betTime = DAY;
 				}else if(M.betMode == 5){
 					mode = 'month';
+					betTime = MONTH;
 				}else if(M.betMode == 6){
 					mode = 'decade';
+					betTime = DECADE;
 				}
 				var str = '';
 				var strBet;
 				
-				if (M.bankPercentage == true)
+				if (M.bankPercentage) {
+					betCapped = Game.cookiesPsRawHighest * 20 * DECADE < Game.cookies * M.betChoice / 1000;
 					strBet = Beautify(M.betChoice / 10, 1);
-				else
+					if (betCapped) strBet += " (" + Beautify(Math.min(Game.cookies * M.betChoice / 1000, Game.cookiesPsRawHighest * 20 * DECADE) / (Game.cookies / 100), 1) + ")";
+				} else {
+					betCapped = Game.cookies * .02 < Game.cookiesPsRawHighest * M.betChoice * betTime;
 					strBet = Beautify(M.betChoice);
-				if(Game.Has('Double or nothing') || Game.Has('Stoned cows') || Game.Has('Game for Pros')) str += '<div>Bet: <a class="option" id="casinoBetChoiceToggle" >' + strBet + '</a> ';
+					if (betCapped) strBet += " (" + Beautify(Math.min(Game.cookies * .02, Game.cookiesPsRawHighest * M.betChoice * betTime) / (Game.cookiesPsRawHighest * betTime), 2) + ")";
+				}
+				if(Game.Has('Double or nothing') || Game.Has('Stoned cows') || Game.Has('Game for Pros'))
+					str += '<div>Bet: <a class="option" id="casinoBetChoiceToggle" >' + strBet + '</a> ';
 				else str += '<div>Bet: ' + strBet + ' ';
 				
-				if (M.bankPercentage == true)
+				if (M.bankPercentage)
 					str += 'percent of bank</div>';
-				else if(Game.Has('Raise the stakes') || Game.Has('High roller!') || Game.Has('Big spender!') || Game.Has('Main player') || Game.Has('True gambler')) str += '<a class="option" id="casinoBetModeToggle" >' + mode + (M.betChoice == 1 ? '' : 's') + '</a> of CPS</div>';
-				else str += mode + (M.betChoice == 1 ? '' : 's') + ' of CPS</div>';
+				else if(Game.Has('Raise the stakes') || Game.Has('High roller!') || Game.Has('Big spender!') || Game.Has('Main player') || Game.Has('True gambler')) str += '<a class="option" id="casinoBetModeToggle" >' + mode + (strBet == '1' ? '' : 's') + '</a> of CPS</div>';
+				else str += mode + (strBet == '1' ? '' : 's') + ' of CPS</div>';
 				
 				str += '<div id="casinoCurrentBet">(' + Beautify(M.betAmount) + ' cookies)</div>';
+				if (betCapped)
+					str += '<div>(Maximum bet limit reached)</div>';
 				M.moneyL.innerHTML = str;
 				
 				
@@ -535,20 +557,20 @@ M.launch = function(){
 				//run each frame
 				if (this.phase == this.phases.inactive) {
 					if (M.bankPercentage == true) {
-						M.betAmount = Game.cookies * M.betChoice / 1000;
+						M.betAmount = Math.min(Game.cookies * M.betChoice / 1000, Game.cookiesPsRawHighest * 20 * DECADE);
 					} else {
 						if(M.betMode == 1){
-							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice);
+							M.betAmount = Math.min(Game.cookies * .02, Game.cookiesPsRawHighest * M.betChoice);
 						}else if(M.betMode == 2){
-							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60);
+							M.betAmount = Math.min(Game.cookies * .02, Game.cookiesPsRawHighest * M.betChoice * MINUTE);
 						}else if(M.betMode == 3){
-							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60);
+							M.betAmount = Math.min(Game.cookies * .02, Game.cookiesPsRawHighest * M.betChoice * HOUR);
 						}else if(M.betMode == 4){
-							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60 * 24);
+							M.betAmount = Math.min(Game.cookies * .02, Game.cookiesPsRawHighest * M.betChoice * DAY);
 						}else if(M.betMode == 5){
-							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60 * 24 * 30);
+							M.betAmount = Math.min(Game.cookies * .02, Game.cookiesPsRawHighest * M.betChoice * MONTH);
 						}else if(M.betMode == 6){
-							M.betAmount = Math.min(Game.cookies * .1, Game.cookiesPsRawHighest * M.betChoice * 60 * 60 * 24 * 365.259636 * 10);
+							M.betAmount = Math.min(Game.cookies * .02, Game.cookiesPsRawHighest * M.betChoice * DECADE);
 						}
 					}
 				}
@@ -734,8 +756,10 @@ M.launch = function(){
 								if(Game.Has('Tiebreaker')){
 									winnings *= 2;
 									messg = 'Tie goes to player!';
-									if (!Game.Has('Standard push'))
+									if (!Game.Has('Standard push')) {
 										Game.Unlock('Standard push');
+										Game.Upgrades['Standard push'].earn();
+									}
 								}else if(Game.Has('Standard push')){
 									messg = 'True push - nobody wins!';
 									this.tiesLost++;
@@ -763,11 +787,16 @@ M.launch = function(){
 							messg += 'Gain ' + Beautify(Math.abs(winnings - M.betAmount)) + ' cookies!';
 							
 							if (M.bankPercentage == false) {
-								if(this.winsT >= 7) Game.Unlock('Raise the stakes');
-								if(Game.Has('Raise the stakes') && this.winsT >= 49) Game.Unlock('High roller!');
-								if(Game.Has('High roller!') && this.winsT >= 77) Game.Unlock('Big spender!');
-								if(Game.Has('Big spender!') && this.winsT >= 108) Game.Unlock('Main player');
-								if(Game.Has('Main player') && this.winsT >= 150) Game.Unlock('True gambler');
+								if(this.winsT >= 7 && Game.cookies * .02 >= Game.cookiesPsRawHighest * MINUTE)
+									Game.Unlock('Raise the stakes');
+								if(Game.Has('Raise the stakes') && this.winsT >= 49 && Game.cookies * .02 >= Game.cookiesPsRawHighest * HOUR)
+									Game.Unlock('High roller!');
+								if(Game.Has('High roller!') && this.winsT >= 77 && Game.cookies * .02 >= Game.cookiesPsRawHighest * DAY)
+									Game.Unlock('Big spender!');
+								if(Game.Has('Big spender!') && this.winsT >= 108 && Game.cookies * .02 >= Game.cookiesPsRawHighest * MONTH)
+									Game.Unlock('Main player');
+								if(Game.Has('Main player') && this.winsT >= 150 && Game.cookies * .02 >= Game.cookiesPsRawHighest * DECADE)
+									Game.Unlock('True gambler');
 							}
 							if(this.winsT >= 21) Game.Win('Card minnow');
 							if(this.winsT >= 210) Game.Win('Card trout');
@@ -1219,9 +1248,9 @@ M.launcher = function(){
 		if(M.loadedCount){
 			if(M.games.Blackjack.winsT >= 7) Game.Unlock('Raise the stakes');
 			if(Game.Has('Raise the stakes') && M.games.Blackjack.winsT >= 49) Game.Unlock('High roller!');
-			if(Game.Has('High roller!') && Game.cookies >= (4 * Game.cookiesPs * 60 * 60)) Game.Unlock('Double or nothing');
-			if(Game.Has('Double or nothing') && Game.cookies >= (10 * Game.cookiesPs * 60 * 60)) Game.Unlock('Stoned cows');
-			if(Game.Has('Stoned cows') && Game.cookies >= (30 * Game.cookiesPs * 60 * 60)) Game.Unlock('Game for Pros');
+			if(Game.Has('High roller!') && Game.cookies >= (4 * Game.cookiesPs * HOUR)) Game.Unlock('Double or nothing');
+			if(Game.Has('Double or nothing') && Game.cookies >= (10 * Game.cookiesPs * HOUR)) Game.Unlock('Stoned cows');
+			if(Game.Has('Stoned cows') && Game.cookies >= (30 * Game.cookiesPs * HOUR)) Game.Unlock('Game for Pros');
 			
 			if(Game.Has('I make my own luck') && M.games.Blackjack.ownLuckWins >= 52) Game.Unlock('Infinite Improbability Drive');
 			if(M.games.Blackjack.tiesLost >= 3) Game.Unlock('Standard push');

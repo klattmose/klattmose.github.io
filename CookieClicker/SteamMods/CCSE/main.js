@@ -2263,7 +2263,7 @@ CCSE.launch = function(){
 		}
     
 		var template = document.createElement('template');
-		template.innerHTML = '<div class="block" style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
+		template.innerHTML = '<div ' + (divClass ? `class="${ divClass }" ` : '') + 'style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
 		var div = template.content;
 		var div2 = div.children[0].children[0];
 		
@@ -2460,6 +2460,9 @@ CCSE.launch = function(){
 		
 		PasswordBox: (id, width, value, onChange) =>
 			`<input type="password" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }">`,
+		
+		SearchBox: (id, width, value, onChange, placeholder = 'Search') =>
+			`<input type="search" id="${ id }" class="option" style="width:${ width }px;" value="${ value }" onChange="${ onChange }" placeholder="${ placeholder }">`,
 		
 		TinyIcon: (icon) =>
 			'<div class="icon" style="vertical-align:middle;display:inline-block;margin:-16px;transform:scale(0.5);' +

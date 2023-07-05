@@ -1344,7 +1344,7 @@ CCSE.launch = function(){
 						if (Game.ascensionMode!=1)
 						{
 							let choice = CCSE.GetSelectedBackground();
-							if(choice.name != 'Automatic')`);
+							if(choice.name != loc('Automatic'))`);
 		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)",
 							`}
 						Game.Background.fillPattern(Pic(Game.bg)`);

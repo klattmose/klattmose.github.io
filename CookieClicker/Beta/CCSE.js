@@ -1344,7 +1344,7 @@ CCSE.launch = function(){
 						if (Game.ascensionMode!=1)
 						{
 							let choice = CCSE.GetSelectedBackground();
-							if(choice.name != 'Automatic')`);
+							if(choice.name != loc('Automatic'))`);
 		temp = temp.replace("Game.Background.fillPattern(Pic(Game.bg)",
 							`}
 						Game.Background.fillPattern(Pic(Game.bg)`);
@@ -2261,7 +2261,7 @@ CCSE.launch = function(){
 				divClass = "framed";
 				break;
 		}
-		
+
 		var template = document.createElement('template');
 		template.innerHTML = '<div ' + (divClass ? `class="${ divClass }" ` : '') + 'style="padding:0px;margin:8px 4px;"><div class="subsection" style="padding:0px;"></div></div>';
 		var div = template.content;

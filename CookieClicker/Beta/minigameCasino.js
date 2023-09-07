@@ -418,7 +418,7 @@ M.launch = function(){
 				}else if(M.betMode == 6){
 					mode = 'decade';
 					betTime = DECADE;
-				}elseif(M.betMode==7){
+				}else if(M.betMode==7){
 					mode='millenni';
 					betTime=MILLENNIUM;
 				}

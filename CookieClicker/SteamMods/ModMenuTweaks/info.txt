@@ -3,9 +3,9 @@
 	"ID": "Mod Menu Tweaks",
 	"Author": "klattmose",
 	"Description": "Double-click to enable/disable mods. Drag-and-drop reordering. Dynamic height resizing based on mod list length.",
-	"ModVersion": 1.1,
-	"GameVersion": 2.052,
-	"Date": "27/09/2021",
+	"ModVersion": 1.2,
+	"GameVersion": 2.053,
+	"Date": "04/02/2025",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1,
 	"AllowSteamAchievs": 1

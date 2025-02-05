@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Adds a minigame to the Chancemaker building where you can play blackjack and bet cookies.",
 	"ModVersion": 4.1,
-	"GameVersion": 2.052,
+	"GameVersion": 2.053,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 0

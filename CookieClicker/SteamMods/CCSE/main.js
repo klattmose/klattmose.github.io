@@ -3,7 +3,7 @@ if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
 CCSE.version = '2.035';
 CCSE.Steam = (typeof Steam !== 'undefined');
-CCSE.GameVersion = CCSE.Steam ? '2.052' : '2.052';
+CCSE.GameVersion = CCSE.Steam ? '2.053' : '2.052';
 
 CCSE.launch = function(){
 	CCSE.loading = 1;

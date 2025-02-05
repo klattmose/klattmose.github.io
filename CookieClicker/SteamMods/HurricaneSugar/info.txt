@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "Adds a Golden Cookie effect that briefly shortens the time for sugar lumps to ripen to 1 second. Disables Steam achievements.",
 	"ModVersion": 1.6,
-	"GameVersion": 2.052,
+	"GameVersion": 2.053,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1

@@ -9,7 +9,7 @@ Casino.launcher = function(){
 	M.loadedCount = 0;
 	M.bankPercentage = false;
 	M.version = '4.3';
-	M.GameVersion = '2.052';
+	M.GameVersion = '2.053';
 
 	const MINUTE = 60;
 	const HOUR = 60 * 60;

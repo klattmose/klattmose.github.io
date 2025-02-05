@@ -4,7 +4,7 @@
 	"Author": "klattmose",
 	"Description": "A helper tool for the Market minigame. Automate the buying and selling of goods at customizable prices.",
 	"ModVersion": 1.9,
-	"GameVersion": 2.052,
+	"GameVersion": 2.053,
 	"Date": "1/09/2021",
 	"Dependencies": ["CCSE"],
 	"Disabled": 1,

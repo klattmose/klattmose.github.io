@@ -210,7 +210,8 @@ IdleTrading.launch = function(){
 	}
 	
 	
-	if(CCSE.ConfirmGameVersion(IdleTrading.name, IdleTrading.version, IdleTrading.GameVersion)) Game.registerMod(IdleTrading.name, IdleTrading); // IdleTrading.init();
+	//if(CCSE.ConfirmGameVersion(IdleTrading.name, IdleTrading.version, IdleTrading.GameVersion)) 
+		Game.registerMod(IdleTrading.name, IdleTrading); // IdleTrading.init();
 }
 
 if(!IdleTrading.isLoaded){

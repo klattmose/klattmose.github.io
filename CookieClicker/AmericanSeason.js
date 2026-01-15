@@ -781,7 +781,8 @@ AmericanSeason.launch = function(){
 	//***********************************
 	//    Start the mod
 	//***********************************
-	if(CCSE.ConfirmGameVersion(AmericanSeason.name, AmericanSeason.version, AmericanSeason.GameVersion)) Game.registerMod(AmericanSeason.name, AmericanSeason); // AmericanSeason.init();
+	//if(CCSE.ConfirmGameVersion(AmericanSeason.name, AmericanSeason.version, AmericanSeason.GameVersion)) 
+		Game.registerMod(AmericanSeason.name, AmericanSeason); // AmericanSeason.init();
 }
 
 if(!AmericanSeason.isLoaded){

@@ -163,7 +163,8 @@ TimerWidget.launch = function(){
 		}
 	}
 	
-	if(CCSE.ConfirmGameVersion(TimerWidget.name, TimerWidget.version, TimerWidget.GameVersion)) Game.registerMod(TimerWidget.name, TimerWidget); //TimerWidget.init();
+	//if(CCSE.ConfirmGameVersion(TimerWidget.name, TimerWidget.version, TimerWidget.GameVersion)) 
+		Game.registerMod(TimerWidget.name, TimerWidget); //TimerWidget.init();
 }
 
 

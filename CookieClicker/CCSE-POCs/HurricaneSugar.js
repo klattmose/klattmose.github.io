@@ -68,7 +68,8 @@ HurricaneSugar.launch = function(){
 	}
 	
 	
-	if(CCSE.ConfirmGameVersion(HurricaneSugar.name, HurricaneSugar.version, HurricaneSugar.GameVersion)) HurricaneSugar.init();
+	//if(CCSE.ConfirmGameVersion(HurricaneSugar.name, HurricaneSugar.version, HurricaneSugar.GameVersion)) 
+		HurricaneSugar.init();
 }
 
 

@@ -552,7 +552,8 @@ FortuneCookie.launch = function(){
 		return KlattmoseUtilities.config.patches.gamblersFeverDreamFix == 1;
 	}
 	
-	if(CCSE.ConfirmGameVersion(FortuneCookie.name, FortuneCookie.version, FortuneCookie.GameVersion)) Game.registerMod(FortuneCookie.name, FortuneCookie); // FortuneCookie.init();
+	//if(CCSE.ConfirmGameVersion(FortuneCookie.name, FortuneCookie.version, FortuneCookie.GameVersion)) 
+		Game.registerMod(FortuneCookie.name, FortuneCookie); // FortuneCookie.init();
 }
 
 

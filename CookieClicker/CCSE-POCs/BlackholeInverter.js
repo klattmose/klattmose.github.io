@@ -182,7 +182,8 @@ BlackholeInverter.launch = function(){
 		
 	});
 	
-	if(CCSE.ConfirmGameVersion(BlackholeInverter.name, BlackholeInverter.version, BlackholeInverter.GameVersion)) BlackholeInverter.init();
+	//if(CCSE.ConfirmGameVersion(BlackholeInverter.name, BlackholeInverter.version, BlackholeInverter.GameVersion)) 
+		BlackholeInverter.init();
 }
 
 

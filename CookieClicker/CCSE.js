@@ -4121,7 +4121,7 @@ CCSE.launch = function(){
 	/*=====================================================================================
 	Start your engines
 	=======================================================================================*/
-	if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)){
+	//if(CCSE.ConfirmGameVersion(CCSE.name, CCSE.version, CCSE.GameVersion)){
 		Game.registerMod(CCSE.name, CCSE);
 		
 		if(CCSE.Steam){
@@ -4131,7 +4131,7 @@ CCSE.launch = function(){
 			CCSE.GameLoadModData = Game.loadModData;
 			Game.loadModData = function(){CCSE.gameHasLoadedSave=1;}
 		}
-	}
+	//}
 }
 
 if(!CCSE.isLoaded && !CCSE.loading) CCSE.launch();

@@ -971,7 +971,8 @@ KlattmoseUtilities.launch = function(){
 		
 	}
 	
-	if(CCSE.ConfirmGameVersion(KlattmoseUtilities.name, KlattmoseUtilities.version, KlattmoseUtilities.GameVersion)) Game.registerMod(KlattmoseUtilities.name, KlattmoseUtilities); // KlattmoseUtilities.init();
+	//if(CCSE.ConfirmGameVersion(KlattmoseUtilities.name, KlattmoseUtilities.version, KlattmoseUtilities.GameVersion)) 
+		Game.registerMod(KlattmoseUtilities.name, KlattmoseUtilities); // KlattmoseUtilities.init();
 }
 
 if(!KlattmoseUtilities.isLoaded){

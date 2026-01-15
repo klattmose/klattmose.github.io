@@ -270,7 +270,8 @@ DecideDestiny.NewDestiny = function(name, icon, effect, other){
 //***********************************
 
 DecideDestiny.launch = function(){
-	if(CCSE.ConfirmGameVersion(DecideDestiny.name, DecideDestiny.version, DecideDestiny.GameVersion)) Game.registerMod(DecideDestiny.name, DecideDestiny);
+	//if(CCSE.ConfirmGameVersion(DecideDestiny.name, DecideDestiny.version, DecideDestiny.GameVersion)) 
+		Game.registerMod(DecideDestiny.name, DecideDestiny);
 }
 
 if(!DecideDestiny.isLoaded){

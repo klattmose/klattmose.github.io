@@ -1154,7 +1154,8 @@ Horticookie.launch = function(){
 	}
 	
 	
-	if(CCSE.ConfirmGameVersion(Horticookie.name, Horticookie.version, Horticookie.GameVersion)) Game.registerMod(Horticookie.name, Horticookie); // Horticookie.init();
+	//if(CCSE.ConfirmGameVersion(Horticookie.name, Horticookie.version, Horticookie.GameVersion)) 
+		Game.registerMod(Horticookie.name, Horticookie); // Horticookie.init();
 }
 
 

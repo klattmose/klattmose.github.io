@@ -1,7 +1,7 @@
 if(FortuneCookie === undefined) var FortuneCookie = {};
 if(typeof CCSE == 'undefined') Game.LoadMod('https://klattmose.github.io/CookieClicker/' + (0 ? 'Beta/' : '') + 'CCSE.js');
 FortuneCookie.name = 'Fortune Cookie';
-FortuneCookie.version = '2.10';
+FortuneCookie.version = '2.11';
 FortuneCookie.GameVersion = '2.052';
 
 FortuneCookie.launch = function(){
@@ -107,8 +107,8 @@ FortuneCookie.launch = function(){
 		
 		str += m.Header('Force the Hand of Fate') + 
 				'<div class="listing">This spell\'s outcome changes based on the season, how many Golden Cookies are already on screen, and if a Dragonflight buff is currently active.</div>' + 
-				'<div class="listing">Column 1 : The season is <b>neither</b> Easter nor Valentine\'s.</div>' + 
-				'<div class="listing">Column 2 : The season is <b>either</b> Easter or Valentine\'s.</div>' + 
+				'<div class="listing">Column 1 : The season is <b>not</b> Easter, Valentine\'s, Halloween, nor Business day.</div>' + 
+				'<div class="listing">Column 2 : The season is <b>either</b> Easter, Valentine\'s, Halloween, or Business day.</div>' + 
 				'<div class="listing">You can use this slider to forecast the outcome with more Golden Cookies on screen.</div>' +
 				'<div class="listing">' +
 					m.Slider('simGCsSlider', 'Simulate GCs', '[$]', FortuneCookie.getSimGCs, "FortuneCookie.UpdatePref('simGCs', Math.round(l('simGCsSlider').value)); l('simGCsSliderRightText').innerHTML = FortuneCookie.config.simGCs;", 0, 10, 1) + '<br>'+
@@ -407,7 +407,7 @@ FortuneCookie.launch = function(){
 		var backfire = M.getFailChance(spell);
 		var spellsCast = M.spellsCastTotal;
 		var target = spellsCast + FortuneCookie.config.spellForecastLength;
-		var idx = ((Game.season == "valentines" || Game.season == "easter") ? 1 : 0); // + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
+		var idx = ((Game.season == "valentines" || Game.season == "easter" || Game.season == "fools" || Game.season == "halloween") ? 1 : 0); // + ((Game.chimeType == 1 && Game.ascensionMode != 1) ? 1 : 0);
 		
 		switch(spell.name){
 			case loc("Force the Hand of Fate"):

@@ -1713,6 +1713,7 @@ CCSE.launch = function(){
 		Game.customBuildings[key].buyFree.push(CCSE.customBuildingsAllbuyFree);
 		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].buyFree", -1, `
 				// Game.Objects['` + escKey + `'].buyFree injection point 0
+				// CCSE overrides the price variable to turn off the conditional check
 				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount);
 			`, 'var price = 0');
 		

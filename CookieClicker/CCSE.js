@@ -1,7 +1,7 @@
 if(CCSE === undefined) var CCSE = {};
 if(!CCSE.postLoadHooks) CCSE.postLoadHooks = [];
 CCSE.name = 'CCSE';
-CCSE.version = '2.035';
+CCSE.version = '2.036';
 CCSE.Steam = (typeof Steam !== 'undefined');
 CCSE.GameVersion = CCSE.Steam ? '2.052' : '2.052';
 
@@ -1714,7 +1714,7 @@ CCSE.launch = function(){
 		CCSE.SliceCodeIntoFunction("Game.Objects['" + escKey + "'].buyFree", -1, `
 				// Game.Objects['` + escKey + `'].buyFree injection point 0
 				for(var i in Game.customBuildings[this.name].buyFree) Game.customBuildings[this.name].buyFree[i](this, amount);
-			`, 'var price = Game.Objects["' + escKey + '"].basePrice');
+			`, 'var price = 0');
 		
 		
 		// this.getFree
